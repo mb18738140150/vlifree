@@ -1,0 +1,21 @@
+//
+//  GeneralHeader.pch
+//  vlifree
+//
+//  Created by 仙林 on 15/5/19.
+//  Copyright (c) 2015年 仙林. All rights reserved.
+//
+
+
+#import "UIViewAdditions.h"
+
+
+#define MAIN_COLOR [UIColor colorWithRed:226 / 250.0 green:74 / 250.0 blue:10 / 250.0 alpha:1]
+
+#ifndef vlifree_GeneralHeader_pch
+#define vlifree_GeneralHeader_pch
+
+// Include any system framework and library headers here that should be included in all compilation units.
+// You will also need to set the Prefix Header build setting of one or more of your targets to reference this file.
+
+#endif

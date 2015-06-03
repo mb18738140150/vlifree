@@ -7,6 +7,8 @@
 //
 
 #import "AppDelegate.h"
+#import "MyTabBarController.h"
+
 
 @interface AppDelegate ()
 
@@ -20,6 +22,12 @@
     // Override point for customization after application launch.
     self.window.backgroundColor = [UIColor whiteColor];
     [self.window makeKeyAndVisible];
+    
+    MyTabBarController * myTabBarVC = [[MyTabBarController alloc] init];
+    self.window.rootViewController = myTabBarVC;
+    
+    
+    
     return YES;
 }
 

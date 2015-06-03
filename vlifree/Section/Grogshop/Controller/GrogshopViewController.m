@@ -1,0 +1,195 @@
+//
+//  GrogshopViewController.m
+//  vlifree
+//
+//  Created by 仙林 on 15/5/19.
+//  Copyright (c) 2015年 仙林. All rights reserved.
+//
+
+#import "GrogshopViewController.h"
+#import "GrogshopViewCell.h"
+#import "GrogshopHeaderView.h"
+#import "DetailsGrogshopViewController.h"
+
+
+#define CELL_INDENTIFIER @"CELL"
+@interface GrogshopViewController ()<UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate>
+
+@property (nonatomic, strong)UITableView * groshopTabelView;
+@property (nonatomic, strong)UIButton * cancelBT;
+@property (nonatomic, strong)UISearchBar * searchB;
+
+@end
+
+@implementation GrogshopViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+
+    
+    self.cancelBT = [UIButton buttonWithType:UIButtonTypeCustom];
+    _cancelBT.frame = CGRectMake(0, 0, 40, 30);
+    [_cancelBT setTitle:@"取消" forState:UIControlStateNormal];
+    [_cancelBT setTitleColor:[UIColor colorWithWhite:0.6 alpha:0.8] forState:UIControlStateNormal];
+    _cancelBT.hidden = YES;
+    [_cancelBT addTarget:self action:@selector(cancelSearch:) forControlEvents:UIControlEventTouchUpInside];
+//    _cancelBT.backgroundColor = [UIColor redColor];
+    UIBarButtonItem * barBT = [[UIBarButtonItem alloc] initWithCustomView:_cancelBT];
+    self.navigationItem.rightBarButtonItem = barBT;
+    
+    
+    UIView * searchView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.width / 5 * 3, 30)];
+    self.searchB = [[UISearchBar alloc] initWithFrame:searchView.bounds];
+    _searchB.backgroundColor = [UIColor clearColor];
+    _searchB.layer.cornerRadius = 10;
+    _searchB.delegate = self;
+    _searchB.tag = 20001;
+    _searchB.barTintColor = [UIColor whiteColor];
+    UITextField * textTF = (UITextField *)[[[_searchB.subviews firstObject] subviews] lastObject];
+//    textTF.backgroundColor = [UIColor colorWithWhite:0.9 alpha:0.8];
+    textTF.borderStyle = UITextBorderStyleNone;
+//    textTF.layer.borderColor = [UIColor colorWithWhite:0.8 alpha:0.7].CGColor;
+//    textTF.layer.borderWidth = 1.5;
+//    textTF.layer.cornerRadius = 5;
+    textTF.backgroundColor = [UIColor colorWithWhite:0.9 alpha:0.8];
+    
+    UIView * view = [_searchB.subviews firstObject];
+    view.backgroundColor = [UIColor clearColor];
+    view.layer.cornerRadius = 5;
+    view.layer.borderWidth = 1;
+    view.layer.borderColor = [UIColor colorWithWhite:0.8 alpha:0.7].CGColor;
+    _searchB.placeholder = @"搜索酒店名称或者位置";
+    [searchView addSubview:_searchB];
+    self.navigationItem.titleView = searchView;
+    
+    
+    GrogshopHeaderView * gsHeaderView = [[GrogshopHeaderView alloc] initWithFrame:CGRectMake(0, self.navigationController.navigationBar.bottom, self.view.width, [GrogshopHeaderView viewHeight])];
+    gsHeaderView.tag = 1000;
+    [gsHeaderView.allButton addTarget:self action:@selector(changeTypeData:) forControlEvents:UIControlEventTouchUpInside];
+    [gsHeaderView.priceButton addTarget:self action:@selector(changeTypeData:) forControlEvents:UIControlEventTouchUpInside];
+    [gsHeaderView.distanceButton addTarget:self action:@selector(changeTypeData:) forControlEvents:UIControlEventTouchUpInside];
+    [gsHeaderView.soldButton addTarget:self action:@selector(changeTypeData:) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:gsHeaderView];
+    
+    
+    self.groshopTabelView = [[UITableView alloc] initWithFrame:CGRectMake(0, gsHeaderView.bottom, self.view.width, self.view.height - gsHeaderView.bottom - self.tabBarController.tabBar.height) style:UITableViewStylePlain];
+    _groshopTabelView.dataSource = self;
+    _groshopTabelView.delegate = self;
+    [self.view addSubview:_groshopTabelView];
+    [self.groshopTabelView registerClass:[GrogshopViewCell class] forCellReuseIdentifier:CELL_INDENTIFIER];
+    
+
+    
+    // Do any additional setup after loading the view.
+}
+
+
+
+
+- (void)cancelSearch:(UIButton *)button
+{
+    button.hidden = YES;
+    [self.searchB resignFirstResponder];
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+- (void)changeTypeData:(UIButton *)button
+{
+    if (button.selected) {
+        return;
+    }
+    GrogshopHeaderView * gsView = (GrogshopHeaderView *)[self.view viewWithTag:1000];
+    gsView.allButton.selected = NO;
+    gsView.priceButton.selected = NO;
+    gsView.distanceButton.selected = NO;
+    gsView.soldButton.selected = NO;
+    button.selected = !button.selected;
+}
+
+
+#pragma mark - 搜索框
+
+- (BOOL)searchBarShouldBeginEditing:(UISearchBar *)searchBar
+{
+    _cancelBT.hidden = NO;
+    /*
+    [searchBar setShowsCancelButton:YES animated:YES];
+    for (UIView * view in searchBar.subviews) {
+//        NSLog(@"%@", view);
+        for (UIView * smallView in view.subviews) {
+            smallView.backgroundColor = [UIColor colorWithWhite:0.9 alpha:0.8];
+        }
+        
+    }
+     */
+    return YES;
+}
+
+- (BOOL)searchBarShouldEndEditing:(UISearchBar *)searchBar
+{
+    searchBar.showsCancelButton = NO;
+    self.cancelBT.hidden = YES;
+    return YES;
+}
+
+- (void)searchBarCancelButtonClicked:(UISearchBar *)searchBar
+{
+    [searchBar resignFirstResponder];
+}
+
+
+- (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar
+{
+    searchBar.text = nil;
+    [searchBar resignFirstResponder];
+}
+
+#pragma mark - TableView
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
+    return 10;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    GrogshopViewCell * cell = [tableView dequeueReusableCellWithIdentifier:CELL_INDENTIFIER];
+    [cell createSubiew:tableView.bounds];
+    cell.rightButtons = @[[MGSwipeButton buttonWithTitle:@"关注酒店" backgroundColor:[UIColor redColor] callback:^BOOL(MGSwipeTableCell *sender) {
+        NSLog(@"111");
+        return YES;
+    }]];
+    return cell;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return [GrogshopViewCell cellHeigth];
+}
+
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
+    DetailsGrogshopViewController * detailsVC = [[DetailsGrogshopViewController alloc] init];
+    detailsVC.hidesBottomBarWhenPushed = YES;
+    [self.navigationController pushViewController:detailsVC animated:YES];
+}
+
+
+
+
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+
+@end
