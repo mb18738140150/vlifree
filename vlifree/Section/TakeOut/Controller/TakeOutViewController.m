@@ -20,7 +20,7 @@
 
 #define CYCLESCROLLVIEW_HEIGHT 150
 
-@interface TakeOutViewController ()<UITableViewDataSource, UITableViewDelegate, CLLocationManagerDelegate>
+@interface TakeOutViewController ()<UITableViewDataSource, UITableViewDelegate, CLLocationManagerDelegate, MAMapViewDelegate>
 
 @property (nonatomic, strong)UITableView * takeOutTabelView;
 @property (nonatomic, strong)TypeView * typeView;
@@ -31,6 +31,7 @@
 @property (nonatomic, strong)UIImageView * addressIM;
 
 @property (nonatomic, strong)CycleScrollView * cycleScrollView;//轮播图
+@property (nonatomic, strong)MAMapView * aMapView;
 
 
 
@@ -117,6 +118,15 @@
     
     [self createTypeView];
     
+    [MAMapServices sharedServices].apiKey = @"bdb563c4b3d8dae3a9ba228ab0c1f41c";
+    
+    self.aMapView = [[MAMapView alloc] initWithFrame:self.view.bounds];
+    _aMapView.delegate = self;
+    _aMapView.showsUserLocation = YES;
+    _aMapView.userTrackingMode = MAUserTrackingModeNone;
+    [_aMapView setZoomLevel:16.5 animated:YES];
+    
+    /*
     self.locationManager = [[CLLocationManager alloc] init];
     self.locationManager.delegate = self;
     self.locationManager.desiredAccuracy = kCLLocationAccuracyBest;
@@ -124,7 +134,7 @@
     //    [self.locationManager requestAlwaysAuthorization];//始终允许访问位置信息
     [self.locationManager requestWhenInUseAuthorization];
     [self.locationManager startUpdatingLocation];//开始更新位置信息
-    
+    */
     // Do any additional setup after loading the view.
 }
 
@@ -136,7 +146,8 @@
 - (void)startLocation:(UIButton *)button
 {
     NSLog(@"11");
-    [self.locationManager startUpdatingLocation];
+    _aMapView.showsUserLocation = YES;
+//    [self.locationManager startUpdatingLocation];
 }
 
 - (void)createTypeView
@@ -211,6 +222,43 @@
 
 #pragma mark - 定位
 
+
+
+-(void)mapView:(MAMapView *)mapView didUpdateUserLocation:(MAUserLocation *)userLocation
+updatingLocation:(BOOL)updatingLocation
+{
+    if(updatingLocation)
+    {
+        [UserLocation shareUserLocation].location = userLocation.location;
+        NSLog(@"%f, %f", userLocation.location.coordinate.latitude, userLocation.location.coordinate.longitude);
+        CLGeocoder * geocoder = [[CLGeocoder alloc] init];
+        [geocoder reverseGeocodeLocation:userLocation.location completionHandler:^(NSArray *placemarks, NSError *error) {
+            if (placemarks.count > 0) {
+                CLPlacemark * placemark = [placemarks firstObject];
+                NSLog(@"%@, %@, %@, %@", placemark.locality, placemark.subLocality, placemark.thoroughfare, placemark.subThoroughfare);
+                [UserLocation shareUserLocation].placemark = placemark;
+                NSMutableString * addressStr = [NSMutableString string];
+                if (placemark.subLocality.length) {
+                    [addressStr appendString:placemark.subLocality];
+                }
+                if (placemark.thoroughfare.length) {
+                    [addressStr appendString:placemark.thoroughfare];
+                }
+                if (placemark.subThoroughfare.length) {
+                    [addressStr appendString:placemark.subThoroughfare];
+                }
+                self.addressLB.text = [addressStr copy];
+                CGSize size = [self.addressLB.text sizeWithAttributes:[NSDictionary dictionaryWithObjectsAndKeys:[UIFont systemFontOfSize:17], NSFontAttributeName, nil]];
+                _addressLB.frame = CGRectMake(_addressLB.left, _addressLB.top, size.width, 30);
+                _addressBT.frame = CGRectMake(_addressBT.left, _addressBT.top, _addressIM.width + _addressLB.width, _addressBT.height);
+                mapView.showsUserLocation = NO;
+            }
+        }];
+    }
+}
+
+
+/*
 - (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
 {
     CLLocation * location = [locations lastObject];
@@ -251,6 +299,9 @@
         NSLog(@"无法获得位置信息");
     }
 }
+*/
+
+
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];

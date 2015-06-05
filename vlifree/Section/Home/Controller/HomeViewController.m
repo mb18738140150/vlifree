@@ -12,6 +12,7 @@
 #import "SearchViewController.h"
 #import <CoreLocation/CoreLocation.h>
 #import "DetailTakeOutViewController.h"
+#import <MAMapKit/MAMapKit.h>
 
 
 #define CELL_INDENTIFIER @"cell"
@@ -22,11 +23,12 @@
 #define LOCATION_IMAGE_WIDTH BUTTON_HEIGTH
 
 
-@interface HomeViewController ()<CLLocationManagerDelegate>
+@interface HomeViewController ()<CLLocationManagerDelegate, MAMapViewDelegate>
+
 
 @property (nonatomic, strong)CLLocationManager * locationManager;
 @property (nonatomic, strong)UILabel * locationLB;
-
+@property (nonatomic, strong)MAMapView * aMapView;
 
 @end
 
@@ -55,11 +57,20 @@
     _locationLB.textAlignment = NSTextAlignmentRight;
     [locationBT addSubview:_locationLB];
     
-    /*
+    
     UIImageView * locationIG = [[UIImageView alloc] initWithFrame:CGRectMake(_locationLB.right, 0, LOCATION_IMAGE_WIDTH, _locationLB.height)];
     locationIG.image = [UIImage imageNamed:@"location.png"];
     [locationBT addSubview:locationIG];
     
+    [MAMapServices sharedServices].apiKey = @"bdb563c4b3d8dae3a9ba228ab0c1f41c";
+    
+    self.aMapView = [[MAMapView alloc] initWithFrame:self.view.bounds];
+    _aMapView.delegate = self;
+    _aMapView.showsUserLocation = YES;
+    _aMapView.userTrackingMode = MAUserTrackingModeNone;
+    [_aMapView setZoomLevel:16.5 animated:YES];
+    
+    /*
     UIButton * searchBT = [UIButton buttonWithType:UIButtonTypeCustom];
     searchBT.frame = CGRectMake(0, (self.navigationController.navigationBar.height - 23) / 2, 100, 23);
     searchBT.tag = 2000;
@@ -68,6 +79,7 @@
     [searchBT addTarget:self action:@selector(searchAction:) forControlEvents:UIControlEventTouchUpInside];
     [self.navigationController.navigationBar addSubview:searchBT];
     */
+    /*
     self.locationManager = [[CLLocationManager alloc] init];
     self.locationManager.delegate = self;
     self.locationManager.desiredAccuracy = kCLLocationAccuracyBest;
@@ -75,7 +87,7 @@
 //    [self.locationManager requestAlwaysAuthorization];//始终允许访问位置信息
     [self.locationManager requestWhenInUseAuthorization];
     [self.locationManager startUpdatingLocation];//开始更新位置信息
-    
+    */
     /*
     UISearchBar * searchBar = [[UISearchBar alloc] initWithFrame:CGRectMake(0, 5, 100, 30)];
     searchBar.center = CGPointMake(self.view.centerX, searchBar.centerY);
@@ -89,6 +101,8 @@
     // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
     // self.navigationItem.rightBarButtonItem = self.editButtonItem;
 }
+
+
 
 
 
@@ -135,7 +149,7 @@
 - (void)locationAction:(UIButton *)button
 {
     NSLog(@"定位");
-    [self.locationManager startUpdatingLocation];//开始更新位置信息
+    _aMapView.showsUserLocation = YES;
 }
 
 
@@ -154,31 +168,23 @@
 
 #pragma mark - 定位
 
-- (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
+
+-(void)mapView:(MAMapView *)mapView didUpdateUserLocation:(MAUserLocation *)userLocation
+updatingLocation:(BOOL)updatingLocation
 {
-    CLLocation * location = [locations lastObject];
-    NSLog(@"%@, ----%@", location, location.description);
-    CLGeocoder * geocoder = [[CLGeocoder alloc] init];
-    [geocoder reverseGeocodeLocation:location completionHandler:^(NSArray *placemarks, NSError *error) {
-//        NSLog(@"%@, error = %@", placemarks, error);
-        if (placemarks.count) {
-            CLPlacemark *placeMark = [placemarks objectAtIndex:0];
-            NSString *locatioName = [NSString stringWithFormat:@"您现在所处的位置为%@",placeMark.name];
-            NSLog(@"%@, %@, %@, %@, %@", locatioName, placeMark.thoroughfare, placeMark.administrativeArea, placeMark.subLocality, placeMark.subThoroughfare);
-            self.locationLB.text = placeMark.locality;
-        }
-    }];
-    [manager stopUpdatingLocation];
-}
-
-
-- (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error{
-    NSLog(@"%@", error);
-    if ([error code] == kCLErrorDenied) {
-        NSLog(@"访问被拒绝");
-    }
-    if ([error code] == kCLErrorLocationUnknown) {
-        NSLog(@"无法获得位置信息");
+    if(updatingLocation)
+    {
+        [UserLocation shareUserLocation].location = userLocation.location;
+        CLGeocoder * geocoder = [[CLGeocoder alloc] init];
+        [geocoder reverseGeocodeLocation:userLocation.location completionHandler:^(NSArray *placemarks, NSError *error) {
+            if (placemarks.count > 0) {
+                CLPlacemark * placemark = [placemarks firstObject];
+                NSLog(@"%@, %@, %@, %@", placemark.locality, placemark.subLocality, placemark.thoroughfare, placemark.subThoroughfare);
+                self.locationLB.text = placemark.locality;
+                [UserLocation shareUserLocation].placemark = placemark;
+                mapView.showsUserLocation = NO;
+            }
+        }];
     }
 }
 

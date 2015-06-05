@@ -13,7 +13,7 @@
 
 
 #define CELL_INDENTIFIER @"CELL"
-@interface GrogshopViewController ()<UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate>
+@interface GrogshopViewController ()<UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate, HTTPPostDelegate>
 
 @property (nonatomic, strong)UITableView * groshopTabelView;
 @property (nonatomic, strong)UIButton * cancelBT;
@@ -108,8 +108,63 @@
     gsView.distanceButton.selected = NO;
     gsView.soldButton.selected = NO;
     button.selected = !button.selected;
+    
+    if ([button isEqual:gsView.allButton]) {
+        
+    }else if ([button isEqual:gsView.priceButton]) {
+        
+    }else if ([button isEqual:gsView.distanceButton]) {
+        
+    }else if ([button isEqual:gsView.soldButton]) {
+        
+    }
+    
+    
 }
 
+#pragma mark - 数据请求
+- (void)downloadDataWithCommand:(NSNumber *)command page:(int)page count:(int)count
+{
+    
+    NSDictionary * jsonDic = @{
+                               };
+    [self playPostWithDictionary:jsonDic];
+    /*
+     //    NSLog(@"%@, %@", self.classifyId, [UserInfo shareUserInfo].userId);
+     NSString * jsonStr = [jsonDic JSONString];
+     NSString * str = [NSString stringWithFormat:@"%@231618", jsonStr];
+     NSLog(@"%@", str);
+     NSString * md5Str = [str md5];
+     NSString * urlString = [NSString stringWithFormat:@"http://p.vlifee.com/getdata.ashx?md5=%@",md5Str];
+     
+     HTTPPost * httpPost = [HTTPPost shareHTTPPost];
+     [httpPost post:urlString HTTPBody:[jsonStr dataUsingEncoding:NSUTF8StringEncoding]];
+     httpPost.delegate = self;
+     */
+}
+
+- (void)playPostWithDictionary:(NSDictionary *)dic
+{
+    NSString * jsonStr = [dic JSONString];
+    //    NSLog(@"%@", jsonStr);
+    NSString * str = [NSString stringWithFormat:@"%@231618", jsonStr];
+    NSString * md5Str = [str md5];
+    NSString * urlString = [NSString stringWithFormat:@"http://p.vlifee.com/getdata.ashx?md5=%@",md5Str];
+    
+    HTTPPost * httpPost = [HTTPPost shareHTTPPost];
+    [httpPost post:urlString HTTPBody:[jsonStr dataUsingEncoding:NSUTF8StringEncoding]];
+    httpPost.delegate = self;
+}
+
+- (void)refresh:(id)data
+{
+    
+}
+
+- (void)failWithError:(NSError *)error
+{
+    
+}
 
 #pragma mark - 搜索框
 

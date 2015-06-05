@@ -90,6 +90,29 @@
 }
 
 
+- (void)setHotelModel:(HotelModel *)hotelModel
+{
+    _hotelModel = hotelModel;
+    self.nameLabel.text = hotelModel.hotelName;
+    self.priceLabel.attributedText = [self customAttributedStringWithString:[NSString stringWithFormat:@"¥%@元", hotelModel.price]];
+    self.addressLabel.text = hotelModel.address;
+    self.soldLabel.text = [NSString stringWithFormat:@"月售:%@", hotelModel.sold];
+    if ([hotelModel.wifiState isEqual:@YES]) {
+        self.wifiImage.image = [UIImage imageNamed:@"wifi_on.png"];
+    }else
+    {
+        self.wifiImage.image = [UIImage imageNamed:@"wifi_off.png"];
+    }
+    
+    if ([hotelModel.parkState isEqual:@YES]) {
+        self.parkImage.image = [UIImage imageNamed:@"P_on.png"];
+    }else
+    {
+        self.parkImage.image = [UIImage imageNamed:@"P_off.png"];
+    }
+}
+
+
 - (NSAttributedString *)customAttributedStringWithString:(NSString *)string
 {
     NSMutableAttributedString * str = [[NSMutableAttributedString alloc] initWithString:string];

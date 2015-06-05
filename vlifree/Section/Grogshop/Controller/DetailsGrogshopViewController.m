@@ -13,6 +13,8 @@
 #import "DetailsGSViewCell.h"
 #import "GSOrderPayViewController.h"
 #import "DescribeView.h"
+#import "GSMapViewController.h"
+
 
 #define CELL_INDENTIFIER @"CELL"
 
@@ -103,6 +105,8 @@
 - (void)lookOverMapk:(UIButton *)button
 {
     NSLog(@"查看地图");
+    GSMapViewController * gsMapVC = [[GSMapViewController alloc] init];
+    [self.navigationController pushViewController:gsMapVC animated:YES];
 }
 
 

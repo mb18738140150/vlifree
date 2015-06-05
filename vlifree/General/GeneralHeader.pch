@@ -8,7 +8,15 @@
 
 
 #import "UIViewAdditions.h"
+#import "HTTPPost.h"
+#import "NSString+NSString_MD5.h"
+#import "UIImageView+WebCache.h"
+#import "JSONKit.h"
+#import <MAMapKit/MAMapKit.h>
+#import "UserLocation.h"
 
+
+#define COUNT 15
 
 #define MAIN_COLOR [UIColor colorWithRed:226 / 250.0 green:74 / 250.0 blue:10 / 250.0 alpha:1]
 

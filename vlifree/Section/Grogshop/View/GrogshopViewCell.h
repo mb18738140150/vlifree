@@ -9,9 +9,12 @@
 #import <UIKit/UIKit.h>
 #import "MGSwipeTableCell.h"
 #import "MGSwipeButton.h"
+#import "HotelModel.h"
+
 
 @interface GrogshopViewCell : MGSwipeTableCell
 
+@property (nonatomic, strong)HotelModel * hotelModel;
 
 - (void)createSubiew:(CGRect)frame;
 + (CGFloat)cellHeigth;
