@@ -45,6 +45,10 @@
         _icon.image = [UIImage imageNamed:@"home_takeOut.png"];
         [self.contentView addSubview:_icon];
         
+        self.IconButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        _IconButton.frame = _icon.bounds;
+        [self.contentView addSubview:_IconButton];
+        
         self.nameLabel = [[UILabel alloc] initWithFrame:CGRectMake(_icon.right + LEFT_SPACE, TOP_SPACE, frame.size.width - IMAGE_SIZE - 2 * LEFT_SPACE, LABEL_HEIGTH)];
         _nameLabel.text = @"陕西三民斋餐厅";
         _nameLabel.font = [UIFont systemFontOfSize:19];

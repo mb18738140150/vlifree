@@ -16,6 +16,8 @@
 
 @property (nonatomic, strong)HotelModel * hotelModel;
 
+@property (nonatomic, strong)UIButton * IconButton;
+
 - (void)createSubiew:(CGRect)frame;
 + (CGFloat)cellHeigth;
 

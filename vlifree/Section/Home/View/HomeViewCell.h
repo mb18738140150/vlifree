@@ -8,7 +8,11 @@
 
 #import <UIKit/UIKit.h>
 
+@class CollectModel;
 @interface HomeViewCell : UITableViewCell
+
+@property (nonatomic, strong)CollectModel * collectModel;
+@property (nonatomic, strong)UIButton * IconButton;
 
 - (void)createSubview:(CGRect)frame;
 + (CGFloat)cellHeigth;

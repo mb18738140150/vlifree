@@ -52,7 +52,7 @@
         _reserveButton.titleLabel.font = [UIFont systemFontOfSize:14];
         _reserveButton.layer.cornerRadius = 5;
         [self addSubview:_reserveButton];
-        self.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+        self.accessoryType = UITableViewCellAccessoryDisclosureIndicator ;
 
     }
 }

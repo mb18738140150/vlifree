@@ -26,6 +26,7 @@
 @property (nonatomic, assign) id<HTTPPostDelegate> delegate;
 + (HTTPPost *)shareHTTPPost;
 - (void)post:(NSString *)urlString HTTPBody:(NSData *)body;
+- (void)getWithUrlStr:(NSString *)urlString;
 
 
 

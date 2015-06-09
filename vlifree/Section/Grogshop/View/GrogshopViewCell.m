@@ -51,7 +51,13 @@
     if (!_icon) {
         self.icon = [[UIImageView alloc] initWithFrame:CGRectMake(LEFT_SPACE, TOP_SPACE, IMAGE_SIZE, IMAGE_SIZE)];
         _icon.image = [UIImage imageNamed:@"superMarket.png"];
+//        _icon.userInteractionEnabled = YES;
         [self.contentView addSubview:_icon];
+        
+        self.IconButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        _IconButton.frame = _icon.bounds;
+        [self.contentView addSubview:_IconButton];
+        
         self.nameLabel = [[UILabel alloc] initWithFrame:CGRectMake(_icon.right + LEFT_SPACE, TOP_SPACE, NAME_LABEL_WIDTH, LABEL_HEIGTH)];
         _nameLabel.text = @"北京五棵松体育馆快捷酒店";
         _nameLabel.font = [UIFont systemFontOfSize:18];
@@ -93,7 +99,7 @@
 - (void)setHotelModel:(HotelModel *)hotelModel
 {
     _hotelModel = hotelModel;
-    self.nameLabel.text = hotelModel.hotelName;
+    self.nameLabel.text = hotelModel.name;
     self.priceLabel.attributedText = [self customAttributedStringWithString:[NSString stringWithFormat:@"¥%@元", hotelModel.price]];
     self.addressLabel.text = hotelModel.address;
     self.soldLabel.text = [NSString stringWithFormat:@"月售:%@", hotelModel.sold];
@@ -110,6 +116,15 @@
     {
         self.parkImage.image = [UIImage imageNamed:@"P_off.png"];
     }
+    NSInteger r = [hotelModel.range integerValue];
+    double km = r / 1000.0;
+    self.distanceLabel.text = [NSString stringWithFormat:@"%.1fKM", km];
+    [self.icon setImageWithURL:[NSURL URLWithString:hotelModel.icon]];
+    self.IconButton.enabled = NO;
+    GrogshopViewCell * cell = self;
+    [self.icon setImageWithURL:[NSURL URLWithString:hotelModel.icon] placeholderImage:[UIImage imageNamed:@"placeholderIM.png"] completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType) {
+        cell.IconButton.enabled = YES;
+    }];
 }
 
 
@@ -120,11 +135,11 @@
     NSRange yRange = NSMakeRange(0, 1);
     NSRange lastRange = NSMakeRange(str.length - 1, 1);
     [str addAttribute:NSForegroundColorAttributeName value:[UIColor redColor] range:strRange];
-    [str addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:20] range:strRange];
+    [str addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:15] range:strRange];
     [str addAttribute:NSForegroundColorAttributeName value:[UIColor blackColor] range:yRange];
-    [str addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:15] range:yRange];
+    [str addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:12] range:yRange];
     [str addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithWhite:0.5 alpha:1] range:lastRange];
-    [str addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:15] range:lastRange];
+    [str addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:12] range:lastRange];
     return [str copy];
 }
 

@@ -10,4 +10,8 @@
 
 @interface UserViewController : UIViewController
 
+
+- (void)showUserInfoViewWithCode:(NSString *)code;
+
+
 @end

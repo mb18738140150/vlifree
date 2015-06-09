@@ -20,7 +20,7 @@
 
 #define CYCLESCROLLVIEW_HEIGHT 150
 
-@interface TakeOutViewController ()<UITableViewDataSource, UITableViewDelegate, CLLocationManagerDelegate, MAMapViewDelegate>
+@interface TakeOutViewController ()<UITableViewDataSource, UITableViewDelegate, CLLocationManagerDelegate, MAMapViewDelegate, HTTPPostDelegate>
 
 @property (nonatomic, strong)UITableView * takeOutTabelView;
 @property (nonatomic, strong)TypeView * typeView;
@@ -220,6 +220,77 @@
     }
 }
 
+
+#pragma mark - 数据请求
+- (void)downloadDataWithCommand:(NSNumber *)command page:(int)page count:(int)count
+{
+    
+    NSDictionary * jsonDic = @{
+                               @"Command":command,
+                               @"CurPage":[NSNumber numberWithInt:page],
+                               @"CurCount":[NSNumber numberWithInt:count],
+                               @"Lat":[NSNumber numberWithDouble:[UserLocation shareUserLocation].location.coordinate.latitude],
+                               @"Lon":[NSNumber numberWithDouble:[UserLocation shareUserLocation].location.coordinate.longitude]
+                               };
+    [self playPostWithDictionary:jsonDic];
+    /*
+     //    NSLog(@"%@, %@", self.classifyId, [UserInfo shareUserInfo].userId);
+     NSString * jsonStr = [jsonDic JSONString];
+     NSString * str = [NSString stringWithFormat:@"%@231618", jsonStr];
+     NSLog(@"%@", str);
+     NSString * md5Str = [str md5];
+     NSString * urlString = [NSString stringWithFormat:@"http://p.vlifee.com/getdata.ashx?md5=%@",md5Str];
+     
+     HTTPPost * httpPost = [HTTPPost shareHTTPPost];
+     [httpPost post:urlString HTTPBody:[jsonStr dataUsingEncoding:NSUTF8StringEncoding]];
+     httpPost.delegate = self;
+     */
+}
+
+- (void)playPostWithDictionary:(NSDictionary *)dic
+{
+    NSString * jsonStr = [dic JSONString];
+    //    NSLog(@"%@", jsonStr);
+    NSString * str = [NSString stringWithFormat:@"%@231618", jsonStr];
+    NSString * md5Str = [str md5];
+    NSString * urlString = [NSString stringWithFormat:@"%@%@", POST_URL, md5Str];
+    
+    HTTPPost * httpPost = [HTTPPost shareHTTPPost];
+    [httpPost post:urlString HTTPBody:[jsonStr dataUsingEncoding:NSUTF8StringEncoding]];
+    httpPost.delegate = self;
+}
+
+- (void)refresh:(id)data
+{
+    NSLog(@"+++%@", data);
+    if ([[data objectForKey:@"Result"] isEqual:@1]) {
+        NSLog(@"%@", [data objectForKey:@"ErrorMsg"]);
+//        self.allCount = [data objectForKey:@"AllCount"];
+        NSArray * array = [data objectForKey:@"AllList"];
+//        if(_page == 1)
+//        {
+//            _dataArray = nil;
+//        }
+        for (NSDictionary * dic in array) {
+//            [self.dataArray addObject:hotelMD];
+        }
+        [self.takeOutTabelView reloadData];
+    }
+    [self.takeOutTabelView headerEndRefreshing];
+    [self.takeOutTabelView footerEndRefreshing];
+    [SVProgressHUD dismiss];
+}
+
+- (void)failWithError:(NSError *)error
+{
+    [self.takeOutTabelView headerEndRefreshing];
+    [self.takeOutTabelView footerEndRefreshing];
+    [SVProgressHUD dismiss];
+    NSLog(@"%@", error);
+}
+
+
+
 #pragma mark - 定位
 
 
@@ -327,6 +398,8 @@ updatingLocation:(BOOL)updatingLocation
         NSLog(@"111");
         return YES;
     }]];
+    [cell.IconButton addTarget:self action:@selector(lookBigImage:) forControlEvents:UIControlEventTouchUpInside];
+    cell.IconButton.tag = 5000 + indexPath.row;
     return cell;
 }
 
@@ -343,6 +416,44 @@ updatingLocation:(BOOL)updatingLocation
     detailTakeOutVC.hidesBottomBarWhenPushed = YES;
     [self.navigationController pushViewController:detailTakeOutVC animated:YES];
 }
+
+
+#pragma mark - 点击图片放大
+
+- (void)lookBigImage:(UIButton *)button
+{
+    CGPoint point = self.takeOutTabelView.contentOffset;
+    CGRect cellRect = [self.takeOutTabelView rectForRowAtIndexPath:[NSIndexPath indexPathForRow:button.tag - 5000 inSection:0]];
+    CGRect btFrame = button.frame;
+    btFrame.origin.y = cellRect.origin.y - point.y + button.frame.origin.y + self.takeOutTabelView.top;
+    UITapGestureRecognizer * tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(removeBigImage)];
+    
+    UIView * view = [[UIView alloc] initWithFrame:[UIScreen mainScreen].bounds];
+    view.tag = 70000;
+    [view addGestureRecognizer:tapGesture];
+    view.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.3];
+    UIImageView * imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 200, 200)];
+    imageView.center = view.center;
+    CGRect imageFrame = imageView.frame;
+    imageView.frame = btFrame;
+    imageView.image = [UIImage imageNamed:@"superMarket.png"];
+    [view addSubview:imageView];
+    [self.view.window addSubview:view];
+    
+    [UIView animateWithDuration:1 animations:^{
+        imageView.frame = imageFrame;
+    }];
+    
+    NSLog(@",  %g, %g", cellRect.origin.x, cellRect.origin.y);
+}
+
+- (void)removeBigImage
+{
+    UIView * view = [self.view.window viewWithTag:70000];
+    [view removeFromSuperview];
+}
+
+
 
 /*
 #pragma mark - Navigation

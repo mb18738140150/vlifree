@@ -41,6 +41,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+
     self.navigationController.navigationBar.barTintColor = [UIColor whiteColor];
     
     self.sectionTableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, 80, self.view.height - SHOPPINGCARVIEW_HEIGHT) style:UITableViewStylePlain];
@@ -169,7 +170,37 @@
     cell.subtractBT.hidden = NO;
     self.shoppingCarView.countLabel.text = [NSString stringWithFormat:@"%ld", [self.shoppingCarView.countLabel.text integerValue] + 1];
     self.shoppingCarView.changeButton.enabled = YES;
+    
+    CGRect cellFrame = [self.menusTableView rectForRowAtIndexPath:[NSIndexPath indexPathForRow:button.tag - ADD_BUTTON_TAG inSection:0]];
+    CGRect btFrame = button.frame;
+    btFrame.origin.x = btFrame.origin.x + self.menusTableView.left;
+    btFrame.origin.y = cellFrame.origin.y - self.menusTableView.contentOffset.y + button.origin.y + self.menusTableView.top;
+    [self countLBAnimateWithFromeFrame:btFrame];
+    
 }
+
+
+- (void)countLBAnimateWithFromeFrame:(CGRect)frame
+{
+    UILabel * redView = [[UILabel alloc] initWithFrame:frame];
+    redView.size = CGSizeMake(20, 20);
+    redView.text = @"1";
+    redView.textAlignment = NSTextAlignmentCenter;
+    redView.textColor = [UIColor whiteColor];
+    redView.layer.backgroundColor = [UIColor redColor].CGColor;
+    redView.layer.cornerRadius = 10;
+    [self.view addSubview:redView];
+    CGRect rect = CGRectMake(65, _shoppingCarView.top - 10, 20, 20);
+    [UIView animateWithDuration:0.8 animations:^{
+        redView.frame = rect;
+    }];
+    [redView performSelector:@selector(removeFromSuperview) withObject:nil afterDelay:0.8];
+}
+
+
+
+
+
 
 /*
 #pragma mark - Navigation

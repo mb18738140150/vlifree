@@ -11,6 +11,8 @@
 
 @interface TakeOutViewCell : MGSwipeTableCell
 
+@property (nonatomic, strong)UIButton * IconButton;
+
 - (void)createSubview:(CGRect)frame;
 + (CGFloat)cellHeight;
 

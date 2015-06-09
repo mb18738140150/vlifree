@@ -31,6 +31,21 @@ static HTTPPost * httpPost = nil;
     return httpPost;
 }
 
+
+- (void)getWithUrlStr:(NSString *)urlString
+{
+    NSString * newUrlStr = [urlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    
+    //    NSLog(@"%@", newUrlStr);
+    //把字符创转成URL对象
+    NSURL * url = [NSURL URLWithString:newUrlStr];
+    //根据URL创建一个请求
+    NSURLRequest * request = [NSURLRequest requestWithURL:url];
+    //和服务器建立异步连接
+    [NSURLConnection connectionWithRequest:request delegate:self];
+}
+
+
 - (void)post:(NSString *)urlString HTTPBody:(NSData *)body
 {
     //为了请求接口的正确性

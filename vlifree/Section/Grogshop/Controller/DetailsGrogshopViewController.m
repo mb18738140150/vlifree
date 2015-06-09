@@ -45,6 +45,12 @@
     return _dataArray;
 }
 
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    self.navigationController.navigationBar.barTintColor = [UIColor whiteColor];
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     

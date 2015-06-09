@@ -13,7 +13,8 @@
 #import <CoreLocation/CoreLocation.h>
 #import "DetailTakeOutViewController.h"
 #import <MAMapKit/MAMapKit.h>
-
+#import "CollectModel.h"
+#import "DetailsGrogshopViewController.h"
 
 #define CELL_INDENTIFIER @"cell"
 
@@ -23,16 +24,29 @@
 #define LOCATION_IMAGE_WIDTH BUTTON_HEIGTH
 
 
-@interface HomeViewController ()<CLLocationManagerDelegate, MAMapViewDelegate>
-
-
+@interface HomeViewController ()<CLLocationManagerDelegate, MAMapViewDelegate, HTTPPostDelegate>
+{
+    int _page;
+    BOOL _isLOC;
+}
 @property (nonatomic, strong)CLLocationManager * locationManager;
 @property (nonatomic, strong)UILabel * locationLB;
 @property (nonatomic, strong)MAMapView * aMapView;
+@property (nonatomic, strong)NSMutableArray * dataArray;
+
 
 @end
 
 @implementation HomeViewController
+
+- (NSMutableArray *)dataArray
+{
+    if (!_dataArray) {
+        self.dataArray = [NSMutableArray array];
+    }
+    return _dataArray;
+}
+
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -69,7 +83,8 @@
     _aMapView.showsUserLocation = YES;
     _aMapView.userTrackingMode = MAUserTrackingModeNone;
     [_aMapView setZoomLevel:16.5 animated:YES];
-    
+    _page = 1;
+    _isLOC = NO;
     /*
     UIButton * searchBT = [UIButton buttonWithType:UIButtonTypeCustom];
     searchBT.frame = CGRectMake(0, (self.navigationController.navigationBar.height - 23) / 2, 100, 23);
@@ -166,6 +181,72 @@
     // Dispose of any resources that can be recreated.
 }
 
+
+#pragma mark - 数据请求
+- (void)downloadDataWithCommand:(NSNumber *)command page:(int)page count:(int)count
+{
+    
+    NSDictionary * jsonDic = @{
+                               @"Command":command,
+//                               @"CurPage":[NSNumber numberWithInt:page],
+//                               @"CurCount":[NSNumber numberWithInt:count],
+                               @"Lat":[NSNumber numberWithDouble:[UserLocation shareUserLocation].location.coordinate.latitude],
+                               @"Lon":[NSNumber numberWithDouble:[UserLocation shareUserLocation].location.coordinate.longitude],
+                               @"UserId":@102
+                               };
+    [self playPostWithDictionary:jsonDic];
+    /*
+     //    NSLog(@"%@, %@", self.classifyId, [UserInfo shareUserInfo].userId);
+     NSString * jsonStr = [jsonDic JSONString];
+     NSString * str = [NSString stringWithFormat:@"%@231618", jsonStr];
+     NSLog(@"%@", str);
+     NSString * md5Str = [str md5];
+     NSString * urlString = [NSString stringWithFormat:@"http://p.vlifee.com/getdata.ashx?md5=%@",md5Str];
+     
+     HTTPPost * httpPost = [HTTPPost shareHTTPPost];
+     [httpPost post:urlString HTTPBody:[jsonStr dataUsingEncoding:NSUTF8StringEncoding]];
+     httpPost.delegate = self;
+     */
+}
+
+- (void)playPostWithDictionary:(NSDictionary *)dic
+{
+    NSString * jsonStr = [dic JSONString];
+    //    NSLog(@"%@", jsonStr);
+    NSString * str = [NSString stringWithFormat:@"%@231618", jsonStr];
+    NSString * md5Str = [str md5];
+    NSString * urlString = [NSString stringWithFormat:@"%@%@", POST_URL, md5Str];
+    
+    HTTPPost * httpPost = [HTTPPost shareHTTPPost];
+    [httpPost post:urlString HTTPBody:[jsonStr dataUsingEncoding:NSUTF8StringEncoding]];
+    httpPost.delegate = self;
+}
+
+- (void)refresh:(id)data
+{
+    NSLog(@"+++%@", data);
+    if ([[data objectForKey:@"Result"] isEqual:@1]) {
+        NSLog(@"%@", [data objectForKey:@"ErrorMsg"]);
+        NSArray * array = [data objectForKey:@"BusinessList"];
+        if(_page == 1)
+        {
+            _dataArray = nil;
+        }
+        for (NSDictionary * dic in array) {
+            CollectModel * collectMD = [[CollectModel alloc] initWithDictionary:dic];
+            [self.dataArray addObject:collectMD];
+        }
+        [self.tableView reloadData];
+    }
+}
+
+- (void)failWithError:(NSError *)error
+{
+    NSLog(@"%@", error);
+}
+
+
+
 #pragma mark - 定位
 
 
@@ -183,6 +264,10 @@ updatingLocation:(BOOL)updatingLocation
                 self.locationLB.text = placemark.locality;
                 [UserLocation shareUserLocation].placemark = placemark;
                 mapView.showsUserLocation = NO;
+                if (!_isLOC) {
+                    [self downloadDataWithCommand:@1 page:_page count:DATA_COUNT];
+                    _isLOC = YES;
+                }
             }
         }];
     }
@@ -197,16 +282,20 @@ updatingLocation:(BOOL)updatingLocation
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     // Return the number of rows in the section.
-    return 10;
+    return _dataArray.count;
 }
 
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    CollectModel * collectMD = [self.dataArray objectAtIndex:indexPath.row];
     HomeViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CELL_INDENTIFIER forIndexPath:indexPath];
     [cell createSubview:tableView.bounds];
     cell.separatorInset = UIEdgeInsetsZero;
     cell.preservesSuperviewLayoutMargins = NO;
     cell.layoutMargins = UIEdgeInsetsZero;
+    cell.collectModel = collectMD;
+    [cell.IconButton addTarget:self action:@selector(lookBigImage:) forControlEvents:UIControlEventTouchUpInside];
+    cell.IconButton.tag = 5000 + indexPath.row;
 //    cell.textLabel.text = @"23";
     // Configure the cell...
     
@@ -231,9 +320,54 @@ updatingLocation:(BOOL)updatingLocation
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    DetailTakeOutViewController * detaiTOVC = [[DetailTakeOutViewController alloc] init];
-    detaiTOVC.hidesBottomBarWhenPushed = YES;
-    [self.navigationController pushViewController:detaiTOVC animated:YES];
+    CollectModel * collectMD = [self.dataArray objectAtIndex:indexPath.row];
+    if ([collectMD.businessType isEqualToNumber:@1]) {
+        DetailTakeOutViewController * detaiTOVC = [[DetailTakeOutViewController alloc] init];
+        detaiTOVC.hidesBottomBarWhenPushed = YES;
+        [self.navigationController pushViewController:detaiTOVC animated:YES];
+    }else
+    {
+        DetailsGrogshopViewController * detailsGSVC = [[DetailsGrogshopViewController alloc] init];
+        detailsGSVC.hidesBottomBarWhenPushed = YES;
+        [self.navigationController pushViewController:detailsGSVC animated:YES];
+    }
+    
+}
+
+#pragma mark - 点击图片放大
+- (void)lookBigImage:(UIButton *)button
+{
+    CollectModel * collectMD = [self.dataArray objectAtIndex:button.tag - 5000];
+    CGPoint point = self.tableView.contentOffset;
+    CGRect cellRect = [self.tableView rectForRowAtIndexPath:[NSIndexPath indexPathForRow:button.tag - 5000 inSection:0]];
+    CGRect btFrame = button.frame;
+    btFrame.origin.y = cellRect.origin.y - point.y + button.frame.origin.y;
+    UITapGestureRecognizer * tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(removeBigImage)];
+    
+    UIView * view = [[UIView alloc] initWithFrame:[UIScreen mainScreen].bounds];
+    view.tag = 70000;
+    [view addGestureRecognizer:tapGesture];
+    view.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.3];
+    UIImageView * imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, self.view.width - 100, self.view.width - 100)];
+    imageView.center = view.center;
+    [imageView setImageWithURL:[NSURL URLWithString:collectMD.icon] placeholderImage:[UIImage imageNamed:@"placeholderIM.png"]];
+    CGRect imageFrame = imageView.frame;
+    imageView.frame = btFrame;
+    //    imageView.image = [UIImage imageNamed:@"superMarket.png"];
+    [view addSubview:imageView];
+    [self.view.window addSubview:view];
+    
+    [UIView animateWithDuration:1 animations:^{
+        imageView.frame = imageFrame;
+    }];
+    
+    NSLog(@",  %g, %g", cellRect.origin.x, cellRect.origin.y);
+}
+
+- (void)removeBigImage
+{
+    UIView * view = [self.view.window viewWithTag:70000];
+    [view removeFromSuperview];
 }
 
 

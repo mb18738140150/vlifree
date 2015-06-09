@@ -14,9 +14,16 @@
 #import "JSONKit.h"
 #import <MAMapKit/MAMapKit.h>
 #import "UserLocation.h"
-
+#import "MJRefresh.h"
+#import "SVProgressHUD.h"
 
 #define COUNT 15
+#define APP_ID_WX @"wxaac5e5f7421e84ac"
+#define APP_SECRET_WX @"055e7e10c698b7b140511d8d1a73cec4"
+#define APP_KEY_WX @"p2j4b57gmdk90nd5bla84nkyqldicn32"
+
+#define POST_URL @"http://test.vlifee.com/User_getdata.ashx?md5="
+#define DATA_COUNT 15
 
 #define MAIN_COLOR [UIColor colorWithRed:226 / 250.0 green:74 / 250.0 blue:10 / 250.0 alpha:1]
 

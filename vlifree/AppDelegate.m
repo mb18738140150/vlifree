@@ -8,9 +8,15 @@
 
 #import "AppDelegate.h"
 #import "MyTabBarController.h"
+#import "WXApi.h"
+#import "UserViewController.h"
 
 
-@interface AppDelegate ()
+@interface AppDelegate ()<WXApiDelegate>
+
+
+@property (nonatomic, strong)MyTabBarController * myTabBarVC;
+
 
 @end
 
@@ -23,12 +29,89 @@
     self.window.backgroundColor = [UIColor whiteColor];
     [self.window makeKeyAndVisible];
     
-    MyTabBarController * myTabBarVC = [[MyTabBarController alloc] init];
-    self.window.rootViewController = myTabBarVC;
+    self.myTabBarVC = [[MyTabBarController alloc] init];
+    self.window.rootViewController = _myTabBarVC;
     
-    
+    [WXApi registerApp:@"wxaac5e5f7421e84ac"];
+
     
     return YES;
+}
+
+- (void)onReq:(BaseReq *)req
+{
+    NSLog(@"%@", req);
+}
+
+- (void)onResp:(BaseResp *)resp
+{
+    NSLog(@"---%@", resp);
+    if ([resp isKindOfClass:[SendAuthResp class]]) {
+        SendAuthResp * sendAR = (SendAuthResp *)resp;
+        if (sendAR.errCode == 0) {//0代表已授权登陆
+            //根据授权获取 access_token
+            NSString * urlString = [NSString stringWithFormat:@"https://api.weixin.qq.com/sns/oauth2/access_token?appid=wxaac5e5f7421e84ac&secret=055e7e10c698b7b140511d8d1a73cec4&code=%@&grant_type=authorization_code", sendAR.code];
+            NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:urlString]];
+            //将请求的url数据放到NSData对象中
+            NSData *response = [NSURLConnection sendSynchronousRequest:request returningResponse:nil error:nil];
+            if (response) {
+                NSDictionary * dic = [NSJSONSerialization JSONObjectWithData:response options:0 error:nil];
+                //        NSLog(@"++++++%@", dic);
+                if ([dic objectForKey:@"access_token"]) {
+                    [[NSUserDefaults standardUserDefaults] setObject:[dic objectForKey:@"refresh_token"] forKey:@"refresh_token"];//保存 refresh_token
+                    [self saveAuthorizeDate];//保存获取refresh_token的时间
+                    //验证授权是否可用(验证access_token)
+                    NSString * yanzhengURLSTR = [NSString stringWithFormat:@"https://api.weixin.qq.com/sns/auth?access_token=%@&openid=%@", [dic objectForKey:@"access_token"], [dic objectForKey:@"openid"]];
+                    NSURLRequest * yzRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:yanzhengURLSTR]];
+                    NSData * yzData = [NSURLConnection sendSynchronousRequest:yzRequest returningResponse:nil error:nil];
+                    if (yzData) {
+                        NSDictionary * yzDic = [NSJSONSerialization JSONObjectWithData:yzData options:0 error:nil];
+                        if ([[yzDic objectForKey:@"errcode"] isEqual:@0]) {
+                            NSString * infoURLSTR = [NSString stringWithFormat:@"https://api.weixin.qq.com/sns/userinfo?access_token=%@&openid=%@", [dic objectForKey:@"access_token"], [dic objectForKey:@"openid"]];
+                            NSURLRequest * infoRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:infoURLSTR]];
+                            NSData * infoData = [NSURLConnection sendSynchronousRequest:infoRequest returningResponse:nil error:nil];
+                            if (infoData) {
+                                NSDictionary * infoDic = [NSJSONSerialization JSONObjectWithData:infoData options:0 error:nil];
+                                NSLog(@"user info = %@", infoDic);
+                                [self getUserLogInVCWithCode:sendAR.code];
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }else if ([resp isKindOfClass:[PayResp class]])
+    {
+        NSLog(@"支付");
+    }
+}
+
+
+- (void)getUserLogInVCWithCode:(NSString *)code
+{
+    UINavigationController * userNav = (UINavigationController *)[self.myTabBarVC selectedViewController];
+    UserViewController * userVC = (UserViewController *)userNav.topViewController;
+    [userVC showUserInfoViewWithCode:code];
+}
+
+
+- (void)saveAuthorizeDate
+{
+    NSDateFormatter * formater = [[NSDateFormatter alloc] init];
+    [formater setDateFormat:@"yyyy-MM-dd"];
+    NSString * dateStr = [formater stringFromDate:[NSDate date]];
+    [[NSUserDefaults standardUserDefaults] setObject:dateStr forKey:@"tokenDate"];
+}
+
+
+- (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url
+{
+    return [WXApi handleOpenURL:url delegate:self];
+}
+
+- (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation
+{
+    return [WXApi handleOpenURL:url delegate:self];
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application {

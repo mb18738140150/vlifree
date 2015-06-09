@@ -14,7 +14,7 @@
 
 #define LABEL_HEIGHT 20
 #define PRICE_LABEL_WIDTH 40
-#define BUTTON_SIZE 20
+#define BUTTON_SIZE 30
 #define COUNT_LABEL_SIZE BUTTON_SIZE
 
 //#define VIEW_COLOR [UIColor magentaColor]
@@ -57,17 +57,17 @@
         [self addSubview:_priceLabel];
         
         self.subtractBT = [UIButton buttonWithType:UIButtonTypeCustom];
-        _subtractBT.frame = CGRectMake(_priceLabel.right + 2 * LEFT_SPACE, TOP_SPACE, BUTTON_SIZE, BUTTON_SIZE);
+        _subtractBT.frame = CGRectMake(_priceLabel.right + 2 * LEFT_SPACE, (self.height - BUTTON_SIZE) / 2, BUTTON_SIZE, BUTTON_SIZE);
         [_subtractBT setBackgroundImage:[UIImage imageNamed:@"subtract.png"] forState:UIControlStateNormal];
         [self addSubview:_subtractBT];
         
-        self.countLabel = [[UILabel alloc] initWithFrame:CGRectMake(_subtractBT.right, TOP_SPACE, COUNT_LABEL_SIZE, COUNT_LABEL_SIZE)];
+        self.countLabel = [[UILabel alloc] initWithFrame:CGRectMake(_subtractBT.right, _subtractBT.top, COUNT_LABEL_SIZE, COUNT_LABEL_SIZE)];
         _countLabel.textAlignment = NSTextAlignmentCenter;
         _countLabel.text = @"34";
         [self addSubview:_countLabel];
         
         self.addButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        _addButton.frame = CGRectMake(_countLabel.right, _priceLabel.bottom - BUTTON_SIZE, BUTTON_SIZE, BUTTON_SIZE);
+        _addButton.frame = CGRectMake(_countLabel.right, _subtractBT.top, BUTTON_SIZE, BUTTON_SIZE);
         [_addButton setBackgroundImage:[UIImage imageNamed:@"add.png"] forState:UIControlStateNormal];
         //        [_addButton setTitle:@"+" forState:UIControlStateNormal];
         //        [_addButton setTitleColor:[UIColor redColor] forState:UIControlStateNormal];

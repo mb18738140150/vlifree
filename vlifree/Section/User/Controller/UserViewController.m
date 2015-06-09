@@ -15,12 +15,14 @@
 #import "UserTOOrderViewController.h"
 #import "GSOrderViewController.h"
 #import "RegisterViewController.h"
+#import "WXApi.h"
+
 
 #define CELL_INDENTIFIER @"cell"
 #define MODIFY_BUTTON_TAG 1000
 
 
-@interface UserViewController ()<UITableViewDataSource, UITableViewDelegate>
+@interface UserViewController ()<UITableViewDataSource, UITableViewDelegate, WXApiDelegate, HTTPPostDelegate>
 
 @property (nonatomic, strong)UITableView * userTableView;
 
@@ -54,6 +56,7 @@
 //    _logInView.backgroundColor = [UIColor grayColor];
     [_logInView.logInButton addTarget:self action:@selector(userLogInAction:) forControlEvents:UIControlEventTouchUpInside];
     [_logInView.registerButton addTarget:self action:@selector(registerUser:) forControlEvents:UIControlEventTouchUpInside];
+    [_logInView.weixinButton addTarget:self action:@selector(weixinLogIn:) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:_logInView];
     
     self.userTableView = [[UITableView alloc] initWithFrame:CGRectMake(0, self.navigationController.navigationBar.bottom, self.view.width, self.view.height - self.navigationController.navigationBar.bottom - self.tabBarController.tabBar.height) style:UITableViewStylePlain];
@@ -77,7 +80,6 @@
     [footView addSubview:exitButton];
     _userTableView.tableFooterView = footView;
     
-    
     // Do any additional setup after loading the view.
 }
 
@@ -98,6 +100,53 @@
     [_logInView textFiledResignFirstResponder];
 }
 
+
+- (void)showUserInfoViewWithCode:(NSString *)code
+{
+    /*
+     NSString * urlString = [NSString stringWithFormat:@"https://api.weixin.qq.com/sns/oauth2/access_token?appid=wxaac5e5f7421e84ac&secret=055e7e10c698b7b140511d8d1a73cec4&code=%@&grant_type=authorization_code", code];
+    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:urlString]];
+    //将请求的url数据放到NSData对象中
+    NSData *response = [NSURLConnection sendSynchronousRequest:request returningResponse:nil error:nil];
+    if (response) {
+        NSDictionary * dic = [NSJSONSerialization JSONObjectWithData:response options:0 error:nil];
+//        NSLog(@"++++++%@", dic);
+        if ([dic objectForKey:@"access_token"]) {
+            //验证授权是否可用(验证access_token)
+            NSString * yanzhengURLSTR = [NSString stringWithFormat:@"https://api.weixin.qq.com/sns/auth?access_token=%@&openid=%@", [dic objectForKey:@"access_token"], [dic objectForKey:@"openid"]];
+            NSURLRequest * yzRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:yanzhengURLSTR]];
+            NSData * yzData = [NSURLConnection sendSynchronousRequest:yzRequest returningResponse:nil error:nil];
+            if (yzData) {
+                NSDictionary * yzDic = [NSJSONSerialization JSONObjectWithData:yzData options:0 error:nil];
+                if ([[yzDic objectForKey:@"errcode"] isEqual:@0]) {
+                    NSString * infoURLSTR = [NSString stringWithFormat:@"https://api.weixin.qq.com/sns/userinfo?access_token=%@&openid=%@", [dic objectForKey:@"access_token"], [dic objectForKey:@"openid"]];
+                    NSURLRequest * infoRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:infoURLSTR]];
+                    NSData * infoData = [NSURLConnection sendSynchronousRequest:infoRequest returningResponse:nil error:nil];
+                    if (infoData) {
+                        NSDictionary * infoDic = [NSJSONSerialization JSONObjectWithData:infoData options:0 error:nil];
+                        NSLog(@"user info = %@", infoDic);
+                    }
+                    
+                }
+            }
+        }
+
+    }
+    */
+    _userTableView.hidden = NO;
+    [UIView beginAnimations:nil context:nil];
+    [UIView setAnimationDuration:1];
+    [UIView setAnimationTransition:UIViewAnimationTransitionCurlDown forView:self.view cache:YES];
+    [UIView commitAnimations];
+    _logInView.hidden = YES;
+    self.navigationItem.title = @"会员中心";
+    [_logInView textFiledResignFirstResponder];
+//    HTTPPost * http = [HTTPPost shareHTTPPost];
+//    http.delegate = self;
+//    NSString * urlString = [NSString stringWithFormat:@"https://api.weixin.qq.com/sns/oauth2/access_token?appid=wxaac5e5f7421e84ac&secret=055e7e10c698b7b140511d8d1a73cec4&code=%@&grant_type=authorization_code", code];
+//    [http getWithUrlStr:urlString];
+}
+
 - (void)registerUser:(UIButton *)button
 {
     RegisterViewController * registerVC = [[RegisterViewController alloc] init];
@@ -105,6 +154,24 @@
     [self.navigationController pushViewController:registerVC animated:YES];
 }
 
+
+- (void)weixinLogIn:(UIButton *)button//微信登陆
+{
+    NSLog(@"微信登陆");
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:@"refresh_token"]) {
+        if ([self compareDate]) {
+            [self avoidweixinAuthorizeLogIn];
+        }else
+        {
+            [self weixinAuthorizeLogIn];
+        }
+    }else
+    {
+        [self weixinAuthorizeLogIn];
+    }
+    
+    
+}
 
 - (void)exitLogInAciton:(UIButton *)button
 {
@@ -225,6 +292,90 @@
     }
 }
 
+
+#pragma marc - 微信登陆
+
+//发送授权请求
+- (void)weixinAuthorizeLogIn
+{
+    if ([WXApi isWXAppInstalled] && [WXApi isWXAppSupportApi]) {
+        SendAuthReq * req = [[SendAuthReq alloc] init];
+        req.scope = @"snsapi_userinfo";
+        req.state = @"123456789";
+        //    [WXApi sendReq:req];
+        [WXApi sendAuthReq:req viewController:self delegate:self];
+    }else if([WXApi isWXAppInstalled] == NO)
+    {
+        UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:@"你的设备还没安装微信,请先安装微信" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
+        [alert show];
+        [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:2];
+    }else if([WXApi isWXAppSupportApi] == NO)
+    {
+        UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:@"你的微信版本不支持,请更新微信" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
+        [alert show];
+        [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:2];
+    }
+    
+}
+
+
+- (BOOL)compareDate
+{
+    NSString * dateStr = [[NSUserDefaults standardUserDefaults] objectForKey:@"tokenDate"];
+    NSDateFormatter * formatter = [[NSDateFormatter alloc] init];
+    [formatter setDateFormat:@"yyyy-MM-dd"];
+    NSDate * date = [formatter dateFromString:dateStr];
+    
+    NSCalendar *userCalendar = [NSCalendar currentCalendar];
+    unsigned int unitFlags = NSCalendarUnitDay;
+    NSDateComponents *components = [userCalendar components:unitFlags fromDate:date toDate:[NSDate date] options:0];
+    NSInteger days = [components day];
+    if (days > 28) {
+        return NO;
+    }
+    return YES;
+}
+
+
+- (void)avoidweixinAuthorizeLogIn
+{
+    NSString * tokenUrl = [NSString stringWithFormat:@"https://api.weixin.qq.com/sns/oauth2/refresh_token?appid=%@&grant_type=refresh_token&refresh_token=%@", APP_ID_WX, [[NSUserDefaults standardUserDefaults] objectForKey:@"refresh_token"]];
+    NSURLRequest * tokenRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:tokenUrl]];
+    //将请求的url数据放到NSData对象中
+    NSData * tokenData = [NSURLConnection sendSynchronousRequest:tokenRequest returningResponse:nil error:nil];
+    if (tokenData) {
+        NSDictionary * tokenDic = [NSJSONSerialization JSONObjectWithData:tokenData options:0 error:nil];
+        if ([tokenDic objectForKey:@"access_token"]) {
+            NSString * yanzhengURLSTR = [NSString stringWithFormat:@"https://api.weixin.qq.com/sns/auth?access_token=%@&openid=%@", [tokenDic objectForKey:@"access_token"], [tokenDic objectForKey:@"openid"]];
+            NSURLRequest * yzRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:yanzhengURLSTR]];
+            NSData * yzData = [NSURLConnection sendSynchronousRequest:yzRequest returningResponse:nil error:nil];
+            if (yzData) {
+                NSDictionary * yzDic = [NSJSONSerialization JSONObjectWithData:yzData options:0 error:nil];
+                if ([[yzDic objectForKey:@"errcode"] isEqual:@0]) {
+                    NSString * infoURLSTR = [NSString stringWithFormat:@"https://api.weixin.qq.com/sns/userinfo?access_token=%@&openid=%@", [tokenDic objectForKey:@"access_token"], [tokenDic objectForKey:@"openid"]];
+                    NSURLRequest * infoRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:infoURLSTR]];
+                    NSData * infoData = [NSURLConnection sendSynchronousRequest:infoRequest returningResponse:nil error:nil];
+                    if (infoData) {
+                        NSDictionary * infoDic = [NSJSONSerialization JSONObjectWithData:infoData options:0 error:nil];
+                        [self showUserInfoViewWithCode:nil];
+                        NSLog(@"user info = %@", infoDic);
+                    }
+                    
+                }
+            }
+        }
+    }
+}
+
+
+- (void)refresh:(id)data
+{
+    NSLog(@"%@", data);
+}
+- (void)failWithError:(NSError *)error
+{
+    NSLog(@"%@", error);
+}
 
 /*
 #pragma mark - Navigation

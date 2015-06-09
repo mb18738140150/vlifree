@@ -14,14 +14,31 @@
 
 #define CELL_INDENTIFIER @"CELL"
 @interface GrogshopViewController ()<UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate, HTTPPostDelegate>
-
+{
+    int _page;
+    int _type;
+}
 @property (nonatomic, strong)UITableView * groshopTabelView;
 @property (nonatomic, strong)UIButton * cancelBT;
 @property (nonatomic, strong)UISearchBar * searchB;
 
+@property (nonatomic, strong)NSMutableArray * dataArray;
+
+@property (nonatomic, strong)NSTimer * timer;
+@property (nonatomic, strong)NSNumber * allCount;
+
 @end
 
 @implementation GrogshopViewController
+
+
+- (NSMutableArray *)dataArray
+{
+    if (!_dataArray) {
+        self.dataArray = [NSMutableArray array];
+    }
+    return _dataArray;
+}
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -77,13 +94,33 @@
     _groshopTabelView.delegate = self;
     [self.view addSubview:_groshopTabelView];
     [self.groshopTabelView registerClass:[GrogshopViewCell class] forCellReuseIdentifier:CELL_INDENTIFIER];
-    
-
+    [self.groshopTabelView addHeaderWithTarget:self action:@selector(headerRereshing)];
+    [self.groshopTabelView addFooterWithTarget:self action:@selector(footerRereshing)];
+    _page = 1;
+    _type = 2;
+    if ([UserLocation shareUserLocation].placemark != nil) {
+        [self downloadDataWithCommand:@2 page:_page count:DATA_COUNT];
+    }else
+    {
+        self.timer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(downloadData) userInfo:nil repeats:YES];
+        [_timer fire];
+    }
     
     // Do any additional setup after loading the view.
 }
 
 
+
+
+- (void)downloadData
+{
+    NSLog(@"2222");
+    if ([UserLocation shareUserLocation].placemark != nil) {
+//        [self downloadDataWithCommand:@2 page:_page count:DATA_COUNT];
+        [self.groshopTabelView headerBeginRefreshing];
+        [self.timer invalidate];
+    }
+}
 
 
 - (void)cancelSearch:(UIButton *)button
@@ -108,17 +145,42 @@
     gsView.distanceButton.selected = NO;
     gsView.soldButton.selected = NO;
     button.selected = !button.selected;
-    
+    _page = 1;
     if ([button isEqual:gsView.allButton]) {
-        
+        [self downloadDataWithCommand:@2 page:_page count:DATA_COUNT];
+        _type = 2;
     }else if ([button isEqual:gsView.priceButton]) {
-        
+        [self downloadDataWithCommand:@3 page:_page count:DATA_COUNT];
+        _type = 3;
     }else if ([button isEqual:gsView.distanceButton]) {
-        
+        [self downloadDataWithCommand:@4 page:_page count:DATA_COUNT];
+        _type = 4;
     }else if ([button isEqual:gsView.soldButton]) {
-        
+        [self downloadDataWithCommand:@5 page:_page count:DATA_COUNT];
+        _type = 5;
     }
-    
+    [SVProgressHUD showWithStatus:@"正在加载数据..." maskType:SVProgressHUDMaskTypeBlack];
+    [self.groshopTabelView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:YES];
+}
+
+#pragma mark - 数据刷新,加载更多
+
+- (void)headerRereshing
+{
+    [self downloadDataWithCommand:[NSNumber numberWithInt:_type] page:1 count:DATA_COUNT];
+    _page = 1;
+}
+
+- (void)footerRereshing
+{
+    if (self.dataArray.count < [_allCount integerValue]) {
+        self.groshopTabelView.footerRefreshingText = @"正在加载数据";
+        [self downloadDataWithCommand:@1 page:++_page count:DATA_COUNT];
+    }else
+    {
+        self.groshopTabelView.footerRefreshingText = @"数据已经加载完";
+        [self.groshopTabelView performSelector:@selector(footerEndRefreshing) withObject:nil afterDelay:1.5];
+    }
     
 }
 
@@ -127,6 +189,11 @@
 {
     
     NSDictionary * jsonDic = @{
+                               @"Command":command,
+                               @"CurPage":[NSNumber numberWithInt:page],
+                               @"CurCount":[NSNumber numberWithInt:count],
+                               @"Lat":[NSNumber numberWithDouble:[UserLocation shareUserLocation].location.coordinate.latitude],
+                               @"Lon":[NSNumber numberWithDouble:[UserLocation shareUserLocation].location.coordinate.longitude]
                                };
     [self playPostWithDictionary:jsonDic];
     /*
@@ -149,7 +216,7 @@
     //    NSLog(@"%@", jsonStr);
     NSString * str = [NSString stringWithFormat:@"%@231618", jsonStr];
     NSString * md5Str = [str md5];
-    NSString * urlString = [NSString stringWithFormat:@"http://p.vlifee.com/getdata.ashx?md5=%@",md5Str];
+    NSString * urlString = [NSString stringWithFormat:@"%@%@", POST_URL, md5Str];
     
     HTTPPost * httpPost = [HTTPPost shareHTTPPost];
     [httpPost post:urlString HTTPBody:[jsonStr dataUsingEncoding:NSUTF8StringEncoding]];
@@ -158,12 +225,32 @@
 
 - (void)refresh:(id)data
 {
-    
+    NSLog(@"+++%@", data);
+    if ([[data objectForKey:@"Result"] isEqual:@1]) {
+        NSLog(@"%@", [data objectForKey:@"ErrorMsg"]);
+        self.allCount = [data objectForKey:@"AllCount"];
+        NSArray * array = [data objectForKey:@"AllList"];
+        if(_page == 1)
+        {
+            _dataArray = nil;
+        }
+        for (NSDictionary * dic in array) {
+            HotelModel * hotelMD = [[HotelModel alloc] initWithDictionary:dic];
+            [self.dataArray addObject:hotelMD];
+        }
+        [self.groshopTabelView reloadData];
+    }
+    [self.groshopTabelView headerEndRefreshing];
+    [self.groshopTabelView footerEndRefreshing];
+    [SVProgressHUD dismiss];
 }
 
 - (void)failWithError:(NSError *)error
 {
-    
+    [self.groshopTabelView headerEndRefreshing];
+    [self.groshopTabelView footerEndRefreshing];
+    [SVProgressHUD dismiss];
+    NSLog(@"%@", error);
 }
 
 #pragma mark - 搜索框
@@ -206,19 +293,28 @@
 #pragma mark - TableView
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
-    return 10;
+    return _dataArray.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    HotelModel * hotelMD = [self.dataArray objectAtIndex:indexPath.row];
     GrogshopViewCell * cell = [tableView dequeueReusableCellWithIdentifier:CELL_INDENTIFIER];
     [cell createSubiew:tableView.bounds];
     cell.rightButtons = @[[MGSwipeButton buttonWithTitle:@"关注酒店" backgroundColor:[UIColor redColor] callback:^BOOL(MGSwipeTableCell *sender) {
         NSLog(@"111");
         return YES;
     }]];
+    [cell.IconButton addTarget:self action:@selector(lookBigImage:) forControlEvents:UIControlEventTouchUpInside];
+    cell.IconButton.tag = 5000 + indexPath.row;
+    cell.hotelModel = hotelMD;
+//    UITapGestureRecognizer * tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(lookBigImage)];
+//    [cell.icon addGestureRecognizer:tap];
+//    cell.icon.tag = 5000 + indexPath.row;
     return cell;
 }
+
+
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
@@ -235,6 +331,42 @@
 }
 
 
+#pragma mark - 点击图片放大
+
+- (void)lookBigImage:(UIButton *)button
+{
+    HotelModel * hotelMD = [self.dataArray objectAtIndex:button.tag - 5000];
+    CGPoint point = self.groshopTabelView.contentOffset;
+    CGRect cellRect = [self.groshopTabelView rectForRowAtIndexPath:[NSIndexPath indexPathForRow:button.tag - 5000 inSection:0]];
+    CGRect btFrame = button.frame;
+    btFrame.origin.y = cellRect.origin.y - point.y + button.frame.origin.y + self.groshopTabelView.top;
+    UITapGestureRecognizer * tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(removeBigImage)];
+    
+    UIView * view = [[UIView alloc] initWithFrame:[UIScreen mainScreen].bounds];
+    view.tag = 70000;
+    [view addGestureRecognizer:tapGesture];
+    view.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.3];
+    UIImageView * imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 200, 200)];
+    imageView.center = view.center;
+    [imageView setImageWithURL:[NSURL URLWithString:hotelMD.icon] placeholderImage:[UIImage imageNamed:@"placeholderIM.png"]];
+    CGRect imageFrame = imageView.frame;
+    imageView.frame = btFrame;
+//    imageView.image = [UIImage imageNamed:@"superMarket.png"];
+    [view addSubview:imageView];
+    [self.view.window addSubview:view];
+    
+    [UIView animateWithDuration:1 animations:^{
+        imageView.frame = imageFrame;
+    }];
+    
+    NSLog(@",  %g, %g", cellRect.origin.x, cellRect.origin.y);
+}
+
+- (void)removeBigImage
+{
+    UIView * view = [self.view.window viewWithTag:70000];
+    [view removeFromSuperview];
+}
 
 
 /*
