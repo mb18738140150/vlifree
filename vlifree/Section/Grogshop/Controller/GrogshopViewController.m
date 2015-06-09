@@ -226,7 +226,7 @@
 - (void)refresh:(id)data
 {
     NSLog(@"+++%@", data);
-    if ([[data objectForKey:@"Result"] isEqual:@1]) {
+    if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
         NSLog(@"%@", [data objectForKey:@"ErrorMsg"]);
         self.allCount = [data objectForKey:@"AllCount"];
         NSArray * array = [data objectForKey:@"AllList"];

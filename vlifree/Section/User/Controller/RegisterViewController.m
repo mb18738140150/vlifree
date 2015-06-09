@@ -15,7 +15,7 @@
 #define IMAGE_SIZE 30
 #define VIEW_COLOR [UIColor clearColor]
 
-@interface RegisterViewController ()
+@interface RegisterViewController ()<HTTPPostDelegate>
 
 @property (nonatomic, strong)UITextField * phoneTF;
 @property (nonatomic, strong)UITextField * passwordTF;
@@ -97,7 +97,70 @@
 {
     [self.passwordTF resignFirstResponder];
     [self.phoneTF resignFirstResponder];
+    if (self.phoneTF.text.length == 0) {
+        UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:@"请输入电话号码" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
+        [alert show];
+        [alert performSelectorOnMainThread:@selector(dismissAnimated:) withObject:nil waitUntilDone:YES];
+    }else if (self.passwordTF.text.length == 0)
+    {
+        UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:@"请输入密码" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
+        [alert show];
+        [alert performSelectorOnMainThread:@selector(dismissAnimated:) withObject:nil waitUntilDone:YES];
+    }else if (self.passwordTF.text.length != 0 & self.phoneTF.text.length != 0)
+    {
+        [self registerUserToServers];
+    }
 }
+
+- (void)registerUserToServers
+{
+    NSDictionary * jsonDic = @{
+                               @"Command":@8,
+                               @"Password":self.passwordTF.text,
+                               @"PhoneNumber":self.phoneTF.text,
+                               @"LoginType":@1
+                               };
+    [self playPostWithDictionary:jsonDic];
+    /*
+     //    NSLog(@"%@, %@", self.classifyId, [UserInfo shareUserInfo].userId);
+     NSString * jsonStr = [jsonDic JSONString];
+     NSString * str = [NSString stringWithFormat:@"%@231618", jsonStr];
+     NSLog(@"%@", str);
+     NSString * md5Str = [str md5];
+     NSString * urlString = [NSString stringWithFormat:@"http://p.vlifee.com/getdata.ashx?md5=%@",md5Str];
+     
+     HTTPPost * httpPost = [HTTPPost shareHTTPPost];
+     [httpPost post:urlString HTTPBody:[jsonStr dataUsingEncoding:NSUTF8StringEncoding]];
+     httpPost.delegate = self;
+     */
+}
+
+- (void)playPostWithDictionary:(NSDictionary *)dic
+{
+    NSString * jsonStr = [dic JSONString];
+    //    NSLog(@"%@", jsonStr);
+    NSString * str = [NSString stringWithFormat:@"%@231618", jsonStr];
+    NSString * md5Str = [str md5];
+    NSString * urlString = [NSString stringWithFormat:@"%@%@", POST_URL, md5Str];
+    
+    HTTPPost * httpPost = [HTTPPost shareHTTPPost];
+    [httpPost post:urlString HTTPBody:[jsonStr dataUsingEncoding:NSUTF8StringEncoding]];
+    httpPost.delegate = self;
+}
+
+- (void)refresh:(id)data
+{
+    NSLog(@"+++%@", data);
+    if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
+        
+    }
+}
+
+- (void)failWithError:(NSError *)error
+{
+    NSLog(@"%@", error);
+}
+
 
 
 - (void)didReceiveMemoryWarning {

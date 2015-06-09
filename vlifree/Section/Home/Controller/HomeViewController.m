@@ -9,7 +9,6 @@
 #import "HomeViewController.h"
 #import "HomeHeaderView.h"
 #import "HomeViewCell.h"
-#import "SearchViewController.h"
 #import <CoreLocation/CoreLocation.h>
 #import "DetailTakeOutViewController.h"
 #import <MAMapKit/MAMapKit.h>
@@ -168,12 +167,7 @@
 }
 
 
-- (void)searchAction:(UIButton *)button
-{
-    NSLog(@"搜索");
-    SearchViewController * searchVC = [[SearchViewController alloc] init];
-    [self.navigationController pushViewController:searchVC animated:YES];
-}
+
 
 
 - (void)didReceiveMemoryWarning {
@@ -225,7 +219,7 @@
 - (void)refresh:(id)data
 {
     NSLog(@"+++%@", data);
-    if ([[data objectForKey:@"Result"] isEqual:@1]) {
+    if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
         NSLog(@"%@", [data objectForKey:@"ErrorMsg"]);
         NSArray * array = [data objectForKey:@"BusinessList"];
         if(_page == 1)

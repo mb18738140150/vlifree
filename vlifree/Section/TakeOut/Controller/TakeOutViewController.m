@@ -14,13 +14,20 @@
 #import "CycleScrollView.h"
 #import "MGSwipeButton.h"
 #import "MGSwipeTableCell.h"
-
+#import "TakeOutModel.h"
+#import "SearchViewController.h"
 
 #define CELL_INDENTIFIER @"cell"
 
 #define CYCLESCROLLVIEW_HEIGHT 150
 
 @interface TakeOutViewController ()<UITableViewDataSource, UITableViewDelegate, CLLocationManagerDelegate, MAMapViewDelegate, HTTPPostDelegate>
+
+{
+    int _page;
+    BOOL _isLoc;
+    int _type;
+}
 
 @property (nonatomic, strong)UITableView * takeOutTabelView;
 @property (nonatomic, strong)TypeView * typeView;
@@ -33,7 +40,9 @@
 @property (nonatomic, strong)CycleScrollView * cycleScrollView;//轮播图
 @property (nonatomic, strong)MAMapView * aMapView;
 
-
+@property (nonatomic, strong)NSMutableArray * dataArray;
+@property (nonatomic, strong)NSNumber * allCount;
+@property (nonatomic, strong)NSTimer * timer;
 
 @end
 
@@ -125,6 +134,17 @@
     _aMapView.showsUserLocation = YES;
     _aMapView.userTrackingMode = MAUserTrackingModeNone;
     [_aMapView setZoomLevel:16.5 animated:YES];
+    _page = 1;
+    _isLoc = NO;
+    _type = 0;
+    if ([UserLocation shareUserLocation].placemark) {
+        [self downloadDataWithCommand:@6 page:_page count:DATA_COUNT type:0];
+        _isLoc = YES;
+    }else
+    {
+        self.timer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(downloadData) userInfo:nil repeats:YES];
+        [_timer fire];
+    }
     
     /*
     self.locationManager = [[CLLocationManager alloc] init];
@@ -138,9 +158,22 @@
     // Do any additional setup after loading the view.
 }
 
+
+- (void)downloadData
+{
+    NSLog(@"2222");
+    if ([UserLocation shareUserLocation].placemark != nil) {
+        [self downloadDataWithCommand:@6 page:_page count:DATA_COUNT type:0];
+//        [self.takeOutTabelView headerBeginRefreshing];
+        [self.timer invalidate];
+    }
+}
+
 - (void)searchTakeOut:(id)sender
 {
     NSLog(@"搜索");
+    SearchViewController * searchVC = [[SearchViewController alloc] init];
+    [self.navigationController pushViewController:searchVC animated:YES];
 }
 
 - (void)startLocation:(UIButton *)button
@@ -177,52 +210,99 @@
         case 9000:
         {
             NSLog(@"零食");
+            [self downloadDataWithCommand:@6 page:_page count:DATA_COUNT type:1];
+            _type = 1;
         }
             break;
         case 9001:
         {
             NSLog(@"快餐");
+            [self downloadDataWithCommand:@6 page:_page count:DATA_COUNT type:2];
+            _type = 2;
         }
             break;
         case 9002:
         {
             NSLog(@"超市");
+            [self downloadDataWithCommand:@6 page:_page count:DATA_COUNT type:3];
+            _type = 3;
         }
             break;
         case 9003:
         {
             NSLog(@"蛋糕");
+            [self downloadDataWithCommand:@6 page:_page count:DATA_COUNT type:4];
+            _type = 4;
         }
             break;
         case 9004:
         {
             NSLog(@"奶茶");
+            [self downloadDataWithCommand:@6 page:_page count:DATA_COUNT type:5];
+            _type = 5;
+
         }
             break;
         case 9005:
         {
             NSLog(@"水果");
+            [self downloadDataWithCommand:@6 page:_page count:DATA_COUNT type:6];
+            _type = 6;
+
         }
             break;
         case 9006:
         {
             NSLog(@"甜品");
+            [self downloadDataWithCommand:@6 page:_page count:DATA_COUNT type:7];
+            _type = 7;
+
         }
             break;
         case 9007:
         {
             NSLog(@"面食");
+            [self downloadDataWithCommand:@6 page:_page count:DATA_COUNT type:8];
+            _type = 8;
         }
             break;
             
         default:
             break;
     }
+    self.typeView.hidden = YES;
+    UIButton * typeBT = (UIButton *)[self.view viewWithTag:2000];
+    typeBT.selected = NO;
+    [SVProgressHUD showWithStatus:@"正在加载..." maskType:SVProgressHUDMaskTypeBlack];
+    [self.takeOutTabelView selectRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] animated:YES scrollPosition:UITableViewScrollPositionTop];
 }
 
 
+#pragma mark - 数据刷新,加载更多
+
+- (void)headerRereshing
+{
+    [self downloadDataWithCommand:[NSNumber numberWithInt:_type] page:1 count:DATA_COUNT type:_type];
+    _page = 1;
+}
+
+- (void)footerRereshing
+{
+    if (self.dataArray.count < [_allCount integerValue]) {
+        self.takeOutTabelView.footerRefreshingText = @"正在加载数据";
+        [self downloadDataWithCommand:@1 page:++_page count:DATA_COUNT type:_type];
+    }else
+    {
+        self.takeOutTabelView.footerRefreshingText = @"数据已经加载完";
+        [self.takeOutTabelView performSelector:@selector(footerEndRefreshing) withObject:nil afterDelay:1.5];
+    }
+    
+}
+
+
+
 #pragma mark - 数据请求
-- (void)downloadDataWithCommand:(NSNumber *)command page:(int)page count:(int)count
+- (void)downloadDataWithCommand:(NSNumber *)command page:(int)page count:(int)count type:(int)type
 {
     
     NSDictionary * jsonDic = @{
@@ -230,7 +310,8 @@
                                @"CurPage":[NSNumber numberWithInt:page],
                                @"CurCount":[NSNumber numberWithInt:count],
                                @"Lat":[NSNumber numberWithDouble:[UserLocation shareUserLocation].location.coordinate.latitude],
-                               @"Lon":[NSNumber numberWithDouble:[UserLocation shareUserLocation].location.coordinate.longitude]
+                               @"Lon":[NSNumber numberWithDouble:[UserLocation shareUserLocation].location.coordinate.longitude],
+                               @"WakeoutType":[NSNumber numberWithInt:type]
                                };
     [self playPostWithDictionary:jsonDic];
     /*
@@ -263,16 +344,17 @@
 - (void)refresh:(id)data
 {
     NSLog(@"+++%@", data);
-    if ([[data objectForKey:@"Result"] isEqual:@1]) {
+    if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
         NSLog(@"%@", [data objectForKey:@"ErrorMsg"]);
-//        self.allCount = [data objectForKey:@"AllCount"];
+        self.allCount = [data objectForKey:@"AllCount"];
         NSArray * array = [data objectForKey:@"AllList"];
-//        if(_page == 1)
-//        {
-//            _dataArray = nil;
-//        }
+        if(_page == 1)
+        {
+            _dataArray = nil;
+        }
         for (NSDictionary * dic in array) {
-//            [self.dataArray addObject:hotelMD];
+            TakeOutModel * takeOutMD = [[TakeOutModel alloc] initWithDictionary:dic];
+            [self.dataArray addObject:takeOutMD];
         }
         [self.takeOutTabelView reloadData];
     }

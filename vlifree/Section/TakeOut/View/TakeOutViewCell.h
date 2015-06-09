@@ -9,9 +9,12 @@
 #import <UIKit/UIKit.h>
 #import "MGSwipeTableCell.h"
 
+@class TakeOutModel;
 @interface TakeOutViewCell : MGSwipeTableCell
 
 @property (nonatomic, strong)UIButton * IconButton;
+@property (nonatomic, strong)TakeOutModel * takeOutModel;
+
 
 - (void)createSubview:(CGRect)frame;
 + (CGFloat)cellHeight;

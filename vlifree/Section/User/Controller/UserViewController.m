@@ -360,7 +360,6 @@
                         [self showUserInfoViewWithCode:nil];
                         NSLog(@"user info = %@", infoDic);
                     }
-                    
                 }
             }
         }

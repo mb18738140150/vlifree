@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		730384E21B267CFF007C7ACB /* TakeOutModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 730384E11B267CFF007C7ACB /* TakeOutModel.m */; };
+		730385141B269145007C7ACB /* SearchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 730385131B269145007C7ACB /* SearchViewController.m */; };
+		730385171B269212007C7ACB /* ResultViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 730385161B269212007C7ACB /* ResultViewController.m */; };
 		7324922B1B181B7800CC5B6C /* PayTypeView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7324922A1B181B7800CC5B6C /* PayTypeView.m */; };
 		7324922E1B1836CB00CC5B6C /* baiduzhifu.png in Resources */ = {isa = PBXBuildFile; fileRef = 7324922C1B1836CB00CC5B6C /* baiduzhifu.png */; };
 		7324922F1B1836CB00CC5B6C /* weixinzhifu.png in Resources */ = {isa = PBXBuildFile; fileRef = 7324922D1B1836CB00CC5B6C /* weixinzhifu.png */; };
@@ -51,7 +54,6 @@
 		733819941B0AEC1A00E9F8AD /* HomeViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 733819931B0AEC1A00E9F8AD /* HomeViewCell.m */; };
 		733819961B0B04E200E9F8AD /* location.png in Resources */ = {isa = PBXBuildFile; fileRef = 733819951B0B04E200E9F8AD /* location.png */; };
 		733819981B0B0AC800E9F8AD /* search.png in Resources */ = {isa = PBXBuildFile; fileRef = 733819971B0B0AC800E9F8AD /* search.png */; };
-		7338199B1B0B0C9900E9F8AD /* SearchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7338199A1B0B0C9900E9F8AD /* SearchViewController.m */; };
 		7338199E1B0B166100E9F8AD /* GrogshopViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 7338199D1B0B166100E9F8AD /* GrogshopViewCell.m */; };
 		733819A11B0B255200E9F8AD /* TakeOutViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 733819A01B0B255200E9F8AD /* TakeOutViewCell.m */; };
 		733819A31B0B2A7C00E9F8AD /* storeState_k.png in Resources */ = {isa = PBXBuildFile; fileRef = 733819A21B0B2A7C00E9F8AD /* storeState_k.png */; };
@@ -244,6 +246,12 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		730384E01B267CFF007C7ACB /* TakeOutModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TakeOutModel.h; sourceTree = "<group>"; };
+		730384E11B267CFF007C7ACB /* TakeOutModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TakeOutModel.m; sourceTree = "<group>"; };
+		730385121B269145007C7ACB /* SearchViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SearchViewController.h; sourceTree = "<group>"; };
+		730385131B269145007C7ACB /* SearchViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SearchViewController.m; sourceTree = "<group>"; };
+		730385151B269212007C7ACB /* ResultViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ResultViewController.h; sourceTree = "<group>"; };
+		730385161B269212007C7ACB /* ResultViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ResultViewController.m; sourceTree = "<group>"; };
 		732492291B181B7800CC5B6C /* PayTypeView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PayTypeView.h; sourceTree = "<group>"; };
 		7324922A1B181B7800CC5B6C /* PayTypeView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PayTypeView.m; sourceTree = "<group>"; };
 		7324922C1B1836CB00CC5B6C /* baiduzhifu.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = baiduzhifu.png; sourceTree = "<group>"; };
@@ -313,8 +321,6 @@
 		733819931B0AEC1A00E9F8AD /* HomeViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HomeViewCell.m; sourceTree = "<group>"; };
 		733819951B0B04E200E9F8AD /* location.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = location.png; sourceTree = "<group>"; };
 		733819971B0B0AC800E9F8AD /* search.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = search.png; sourceTree = "<group>"; };
-		733819991B0B0C9900E9F8AD /* SearchViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SearchViewController.h; sourceTree = "<group>"; };
-		7338199A1B0B0C9900E9F8AD /* SearchViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SearchViewController.m; sourceTree = "<group>"; };
 		7338199C1B0B166100E9F8AD /* GrogshopViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GrogshopViewCell.h; sourceTree = "<group>"; };
 		7338199D1B0B166100E9F8AD /* GrogshopViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GrogshopViewCell.m; sourceTree = "<group>"; };
 		7338199F1B0B255200E9F8AD /* TakeOutViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TakeOutViewCell.h; sourceTree = "<group>"; };
@@ -903,8 +909,6 @@
 			children = (
 				733819681B0ACF0500E9F8AD /* HomeViewController.h */,
 				733819691B0ACF0500E9F8AD /* HomeViewController.m */,
-				733819991B0B0C9900E9F8AD /* SearchViewController.h */,
-				7338199A1B0B0C9900E9F8AD /* SearchViewController.m */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -952,6 +956,10 @@
 				732492351B183D1800CC5B6C /* AddressViewController.m */,
 				732492481B18694A00CC5B6C /* AddAddressViewController.h */,
 				732492491B18694A00CC5B6C /* AddAddressViewController.m */,
+				730385121B269145007C7ACB /* SearchViewController.h */,
+				730385131B269145007C7ACB /* SearchViewController.m */,
+				730385151B269212007C7ACB /* ResultViewController.h */,
+				730385161B269212007C7ACB /* ResultViewController.m */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -961,6 +969,8 @@
 			children = (
 				7324923E1B1844EF00CC5B6C /* AddressModel.h */,
 				7324923F1B1844EF00CC5B6C /* AddressModel.m */,
+				730384E01B267CFF007C7ACB /* TakeOutModel.h */,
+				730384E11B267CFF007C7ACB /* TakeOutModel.m */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -1529,6 +1539,7 @@
 				7329E3931B1C373A0058137E /* CustomSearchBar.m in Sources */,
 				735DD7BB1B25248300E3E93E /* WXUtil.mm in Sources */,
 				735DD7EB1B258AEF00E3E93E /* UIScrollView+MJExtension.m in Sources */,
+				730385171B269212007C7ACB /* ResultViewController.m in Sources */,
 				735DD7ED1B258AEF00E3E93E /* UIView+MJExtension.m in Sources */,
 				735DD7E71B258AEF00E3E93E /* MJRefreshBaseView.m in Sources */,
 				7363600A1B12C71900EE8F56 /* MGSwipeButton.m in Sources */,
@@ -1577,7 +1588,9 @@
 				734657C61B1D4585000C3E9D /* CJSONSerialization.m in Sources */,
 				734657EE1B1D4585000C3E9D /* SDImageCache.m in Sources */,
 				735D94611B14168D002B0980 /* ShoppingMenuView.m in Sources */,
+				730385141B269145007C7ACB /* SearchViewController.m in Sources */,
 				734657C51B1D4585000C3E9D /* CJSONDeserializer_BlocksExtensions.m in Sources */,
+				730384E21B267CFF007C7ACB /* TakeOutModel.m in Sources */,
 				73D65AB41B13084E002A22FE /* MenusViewCell.m in Sources */,
 				734657F21B1D4586000C3E9D /* SDWebImageDownloaderOperation.m in Sources */,
 				734657D91B1D4585000C3E9D /* CSerializedJSONData.m in Sources */,
@@ -1614,7 +1627,6 @@
 				734657F81B1D4586000C3E9D /* UIImage+WebP.m in Sources */,
 				7357A26D1B1FDC0100993A87 /* HTTPPost.m in Sources */,
 				733819671B0ACE4100E9F8AD /* MyTabBarController.m in Sources */,
-				7338199B1B0B0C9900E9F8AD /* SearchViewController.m in Sources */,
 				734657B21B1D4585000C3E9D /* ASIAuthenticationDialog.m in Sources */,
 				73461EF41B0DDCAE0089352E /* NSTimer+Addition.m in Sources */,
 				732492401B1844EF00CC5B6C /* AddressModel.m in Sources */,
@@ -1751,6 +1763,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Framework",
 				);
+				GCC_INPUT_FILETYPE = automatic;
 				GCC_PREFIX_HEADER = "$(SRCROOT)/vlifree/General/GeneralHeader.pch";
 				INFOPLIST_FILE = vlifree/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
@@ -1781,6 +1794,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Framework",
 				);
+				GCC_INPUT_FILETYPE = automatic;
 				GCC_PREFIX_HEADER = "$(SRCROOT)/vlifree/General/GeneralHeader.pch";
 				INFOPLIST_FILE = vlifree/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;

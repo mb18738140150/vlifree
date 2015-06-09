@@ -8,6 +8,7 @@
 
 #import "TakeOutViewCell.h"
 #import "MGSwipeButton.h"
+#import "TakeOutModel.h"
 
 #define LEFT_SPACE 10  
 #define TOP_SPACE 10
