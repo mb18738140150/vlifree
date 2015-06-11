@@ -99,7 +99,7 @@
 - (void)setHotelModel:(HotelModel *)hotelModel
 {
     _hotelModel = hotelModel;
-    self.nameLabel.text = hotelModel.name;
+    self.nameLabel.text = hotelModel.hotelName;
     self.priceLabel.attributedText = [self customAttributedStringWithString:[NSString stringWithFormat:@"¥%@元", hotelModel.price]];
     self.addressLabel.text = hotelModel.address;
     self.soldLabel.text = [NSString stringWithFormat:@"月售:%@", hotelModel.sold];
@@ -116,9 +116,14 @@
     {
         self.parkImage.image = [UIImage imageNamed:@"P_off.png"];
     }
-    NSInteger r = [hotelModel.range integerValue];
-    double km = r / 1000.0;
-    self.distanceLabel.text = [NSString stringWithFormat:@"%.1fKM", km];
+    double r = [hotelModel.distance integerValue];
+    if (r > 999.99) {
+        double km = r / 1000.0;
+        self.distanceLabel.text = [NSString stringWithFormat:@"%.1fKM", km];
+    }else
+    {
+        self.distanceLabel.text = [NSString stringWithFormat:@"%.1fM", r];
+    }
     [self.icon setImageWithURL:[NSURL URLWithString:hotelModel.icon]];
     self.IconButton.enabled = NO;
     GrogshopViewCell * cell = self;

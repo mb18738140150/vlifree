@@ -12,10 +12,10 @@
 @interface DetailsGSHearderView : UIView
 
 
-@property (nonatomic, copy)NSString * address;
-@property (nonatomic, copy)NSString * phone;
+//@property (nonatomic, copy)NSString * address;
+//@property (nonatomic, copy)NSString * phone;
 
-@property (nonatomic, copy)NSArray *  cycleViews;
+//@property (nonatomic, copy)NSArray *  cycleViews;
 
 @property (nonatomic, strong)DescribeView * addressView;
 @property (nonatomic, strong)DescribeView * phoneView;

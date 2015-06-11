@@ -67,14 +67,15 @@
     [_headerView.phoneView.button addTarget:self action:@selector(callNumberWithPhone:) forControlEvents:UIControlEventTouchUpInside];
 //    _headerView.backgroundColor = [UIColor grayColor];
     self.detailsTableView.tableHeaderView = _headerView;
-    NSMutableArray * iary = [@[@"1-1.jpg", @"1-2.jpg", @"1-3.jpg", @"1-4.jpg"] mutableCopy];
-    NSMutableArray * imageViewAry = [NSMutableArray array];
-    for (int i = 0; i < iary.count; i++) {
-        UIImageView * imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, _headerView.width, 150)];
-        imageView.image = [UIImage imageNamed:[iary objectAtIndex:i]];
-        [imageViewAry addObject:imageView];
-    }
-    _headerView.cycleViews = [imageViewAry copy];
+    
+//    NSMutableArray * iary = [@[@"1-1.jpg", @"1-2.jpg", @"1-3.jpg", @"1-4.jpg"] mutableCopy];
+//    NSMutableArray * imageViewAry = [NSMutableArray array];
+//    for (int i = 0; i < iary.count; i++) {
+//        UIImageView * imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, _headerView.width, 150)];
+//        imageView.image = [UIImage imageNamed:[iary objectAtIndex:i]];
+//        [imageViewAry addObject:imageView];
+//    }
+//    _headerView.cycleViews = [imageViewAry copy];
     
     
     self.footerView = [[DetailsFooterView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, 100)];
@@ -86,7 +87,7 @@
     [backBT setBackgroundImage:[UIImage imageNamed:@"back_r.png"] forState:UIControlStateNormal];
     [backBT addTarget:self action:@selector(backLastVC:) forControlEvents:UIControlEventTouchUpInside];
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:backBT];
-    
+    [self downloadDataWithCommand];
 
 }
 
@@ -106,6 +107,12 @@
 - (void)callNumberWithPhone:(UIButton *)button
 {
     NSLog(@"打电话");
+    UIWebView *callWebView = [[UIWebView alloc] init];
+    
+    NSURL *telURL = [NSURL URLWithString:@"tel:13788052976"];
+    //    [[UIApplication sharedApplication] openURL:telURL];
+    [callWebView loadRequest:[NSURLRequest requestWithURL:telURL]];
+    [self.view addSubview:callWebView];
 }
 
 - (void)lookOverMapk:(UIButton *)button
@@ -128,6 +135,69 @@
     GSOrderPayViewController * gsOrderPayVC = [[GSOrderPayViewController alloc] init];
     [self.navigationController pushViewController:gsOrderPayVC animated:YES];
 }
+
+
+#pragma mark - 数据请求
+- (void)downloadDataWithCommand
+{
+    
+    NSDictionary * jsonDic = @{
+                               @"Command":@10,
+                               @"HotelId":self.hotelID
+                               };
+    [self playPostWithDictionary:jsonDic];
+    /*
+     //    NSLog(@"%@, %@", self.classifyId, [UserInfo shareUserInfo].userId);
+     NSString * jsonStr = [jsonDic JSONString];
+     NSString * str = [NSString stringWithFormat:@"%@231618", jsonStr];
+     NSLog(@"%@", str);
+     NSString * md5Str = [str md5];
+     NSString * urlString = [NSString stringWithFormat:@"http://p.vlifee.com/getdata.ashx?md5=%@",md5Str];
+     
+     HTTPPost * httpPost = [HTTPPost shareHTTPPost];
+     [httpPost post:urlString HTTPBody:[jsonStr dataUsingEncoding:NSUTF8StringEncoding]];
+     httpPost.delegate = self;
+     */
+}
+
+- (void)playPostWithDictionary:(NSDictionary *)dic
+{
+    NSString * jsonStr = [dic JSONString];
+    //    NSLog(@"%@", jsonStr);
+    NSString * str = [NSString stringWithFormat:@"%@231618", jsonStr];
+    NSString * md5Str = [str md5];
+    NSString * urlString = [NSString stringWithFormat:@"%@%@", POST_URL, md5Str];
+    
+    HTTPPost * httpPost = [HTTPPost shareHTTPPost];
+    [httpPost post:urlString HTTPBody:[jsonStr dataUsingEncoding:NSUTF8StringEncoding]];
+    httpPost.delegate = self;
+}
+
+- (void)refresh:(id)data
+{
+    NSLog(@"+++%@", data);
+    if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
+        NSLog(@"%@", [data objectForKey:@"ErrorMsg"]);
+        NSArray * array = [data objectForKey:@"AllList"];
+        for (NSDictionary * dic in array) {
+//            HotelModel * hotelMD = [[HotelModel alloc] initWithDictionary:dic];
+//            [self.dataArray addObject:hotelMD];
+        }
+        [self.detailsTableView reloadData];
+    }
+//    [self.detailsTableView headerEndRefreshing];
+//    [self.detailsTableView footerEndRefreshing];
+    [SVProgressHUD dismiss];
+}
+
+- (void)failWithError:(NSError *)error
+{
+//    [self.groshopTabelView headerEndRefreshing];
+//    [self.groshopTabelView footerEndRefreshing];
+    [SVProgressHUD dismiss];
+    NSLog(@"%@", error);
+}
+
 
 
 #pragma mark - tableView 

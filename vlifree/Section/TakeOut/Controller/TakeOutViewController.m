@@ -103,13 +103,17 @@
     _takeOutTabelView.delegate = self;
     [self.view addSubview:_takeOutTabelView];
     
+    [self.takeOutTabelView addHeaderWithTarget:self action:@selector(headerRereshing)];
+    [self.takeOutTabelView addFooterWithTarget:self action:@selector(footerRereshing)];
+    
 //    [self.takeOutTabelView registerClass:[TakeOutViewCell class] forCellReuseIdentifier:CELL_INDENTIFIER];
+    
+    /*
     NSMutableArray * iary = [@[@"1-1.jpg", @"1-2.jpg", @"1-3.jpg", @"1-4.jpg"] mutableCopy];
-
     self.cycleScrollView = [[CycleScrollView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, CYCLESCROLLVIEW_HEIGHT) array:nil animationDuration:3];
     //    _cycleScrollView.backgroundColor = [UIColor greenColor];
     _cycleScrollView.backgroundColor = [UIColor whiteColor];
-    _takeOutTabelView.tableHeaderView = _cycleScrollView;
+//    _takeOutTabelView.tableHeaderView = _cycleScrollView;
     NSMutableArray * imageViewAry = [NSMutableArray array];
     for (int i = 0; i < iary.count; i++) {
         UIImageView * imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, _cycleScrollView.width, 150)];
@@ -123,7 +127,7 @@
     _cycleScrollView.totalPagesCount = ^NSInteger(void){
         return imageViewAry.count;
     };
-    
+    */
     
     [self createTypeView];
     
@@ -169,10 +173,15 @@
     }
 }
 
+
+
+
+
 - (void)searchTakeOut:(id)sender
 {
     NSLog(@"搜索");
     SearchViewController * searchVC = [[SearchViewController alloc] init];
+    searchVC.hidesBottomBarWhenPushed = YES;
     [self.navigationController pushViewController:searchVC animated:YES];
 }
 
@@ -270,11 +279,12 @@
         default:
             break;
     }
+    _page = 1;
     self.typeView.hidden = YES;
     UIButton * typeBT = (UIButton *)[self.view viewWithTag:2000];
     typeBT.selected = NO;
     [SVProgressHUD showWithStatus:@"正在加载..." maskType:SVProgressHUDMaskTypeBlack];
-    [self.takeOutTabelView selectRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] animated:YES scrollPosition:UITableViewScrollPositionTop];
+    [self.takeOutTabelView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:YES];
 }
 
 

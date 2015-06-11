@@ -8,8 +8,9 @@
 
 #import "SearchViewController.h"
 #import "ResultViewController.h"
+#import "ZWYPopKeyWordsView.h"
 
-@interface SearchViewController ()<UISearchBarDelegate, UISearchResultsUpdating>
+@interface SearchViewController ()<UISearchBarDelegate, UISearchResultsUpdating, ZWYSearchShowViewDelegate>
 
 
 @property (nonatomic, strong)UISearchBar * searchBar;
@@ -57,9 +58,20 @@
     [backBT addTarget:self action:@selector(backLastVC:) forControlEvents:UIControlEventTouchUpInside];
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:backBT];
     
-
+    
+//    ZWYPopKeyWordsView * zwyPopKWV = [[ZWYPopKeyWordsView alloc] initWithFrame:CGRectMake(0, 150, self.view.width, 300)];
+//    zwyPopKWV.keyWordArray = [NSMutableArray arrayWithArray:@[@"445", @"yyy"]];
+//    zwyPopKWV.delegate = self;
+//    [self.view addSubview:zwyPopKWV];
+//    [zwyPopKWV changeSearchKeyWord];
     // Do any additional setup after loading the view.
 }
+
+- (void)searchHotTaglibWithKeyWord:(NSString *)keyWords
+{
+    NSLog(@"%@", keyWords);
+}
+
 
 - (void)backLastVC:(id)sender
 {

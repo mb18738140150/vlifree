@@ -23,11 +23,12 @@
 
 @property (nonatomic, strong)CycleScrollView * cycleScrollView;//轮播图
 
-
+@property (nonatomic, strong)UIImageView * hotelImage;
 
 @property (nonatomic, strong)UIImageView * wifiView;
 @property (nonatomic, strong)UIImageView * parkView;
 @property (nonatomic, strong)UIImageView * foodView;
+
 
 
 @end
@@ -53,7 +54,11 @@
     self.cycleScrollView = [[CycleScrollView alloc] initWithFrame:CGRectMake(0, 0, self.width, CYCLESCROLLVIEW_HEIGHT) array:nil animationDuration:3];
 //    _cycleScrollView.backgroundColor = [UIColor greenColor];
     _cycleScrollView.backgroundColor = [UIColor whiteColor];
-    [self addSubview:_cycleScrollView];
+    
+    self.hotelImage = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, self.width, CYCLESCROLLVIEW_HEIGHT)];
+    [self addSubview:_hotelImage];
+    
+//    [self addSubview:_cycleScrollView];
     UIView * lineView = [[UIView alloc] initWithFrame:CGRectMake(0, _cycleScrollView.height - 1, self.width, 1)];
     lineView.backgroundColor = [UIColor colorWithWhite:0.9 alpha:0.4];
     [self addSubview:lineView];
@@ -103,18 +108,18 @@
 }
 
 
-- (void)setCycleViews:(NSArray *)cycleViews
-{
-    _cycleViews = cycleViews;
-    _cycleScrollView.page.numberOfPages = cycleViews.count;
-    _cycleScrollView.fetchContentViewAtIndex = ^UIView *(NSInteger pageIndex){
-        return cycleViews[pageIndex];
-    };
-    _cycleScrollView.totalPagesCount = ^NSInteger(void){
-        return cycleViews.count;
-    };
-
-}
+//- (void)setCycleViews:(NSArray *)cycleViews
+//{
+//    _cycleViews = cycleViews;
+//    _cycleScrollView.page.numberOfPages = cycleViews.count;
+//    _cycleScrollView.fetchContentViewAtIndex = ^UIView *(NSInteger pageIndex){
+//        return cycleViews[pageIndex];
+//    };
+//    _cycleScrollView.totalPagesCount = ^NSInteger(void){
+//        return cycleViews.count;
+//    };
+//
+//}
 
 
 /*

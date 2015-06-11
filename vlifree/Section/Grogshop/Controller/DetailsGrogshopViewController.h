@@ -10,4 +10,7 @@
 
 @interface DetailsGrogshopViewController : UIViewController
 
+@property (nonatomic, strong)NSNumber * hotelID;
+
+
 @end

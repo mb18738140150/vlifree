@@ -90,6 +90,34 @@
 
 - (void)userLogInAction:(UIButton *)button
 {
+    if (self.logInView.phoneTF.text.length == 0) {
+        UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:@"请输入手机号" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
+        [alert show];
+        [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:2];
+    }else if (self.logInView.passwordTF.text.length == 0)
+    {
+        UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:@"请输入密码" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
+        [alert show];
+        [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:2];
+    }else
+    {
+        NSDictionary * jsonDic = @{
+                                   @"Command":@7,
+                                   @"LoginType":@1,
+                                   @"Account":self.logInView.phoneTF,
+                                   @"Password":self.logInView.passwordTF,
+                                   };
+        NSString * jsonStr = [jsonDic JSONString];
+        //    NSLog(@"%@", jsonStr);
+        NSString * str = [NSString stringWithFormat:@"%@231618", jsonStr];
+        NSString * md5Str = [str md5];
+        NSString * urlString = [NSString stringWithFormat:@"%@%@", POST_URL, md5Str];
+        
+        HTTPPost * httpPost = [HTTPPost shareHTTPPost];
+        [httpPost post:urlString HTTPBody:[jsonStr dataUsingEncoding:NSUTF8StringEncoding]];
+        httpPost.delegate = self;
+    }
+    /*
     _userTableView.hidden = NO;
     [UIView beginAnimations:nil context:nil];
     [UIView setAnimationDuration:1];
@@ -97,7 +125,10 @@
     [UIView commitAnimations];
     _logInView.hidden = YES;
     self.navigationItem.title = @"会员中心";
+     */
+    
     [_logInView textFiledResignFirstResponder];
+    
 }
 
 
@@ -209,6 +240,21 @@
         [self.dataArray addObject:model];
     }
 }
+
+
+#pragma mark - 数据处理
+- (void)refresh:(id)data
+{
+    NSLog(@"%@", data);
+    if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
+        
+    }
+}
+- (void)failWithError:(NSError *)error
+{
+    NSLog(@"%@", error);
+}
+
 
 #pragma mark - tabelView
 
@@ -367,14 +413,7 @@
 }
 
 
-- (void)refresh:(id)data
-{
-    NSLog(@"%@", data);
-}
-- (void)failWithError:(NSError *)error
-{
-    NSLog(@"%@", error);
-}
+
 
 /*
 #pragma mark - Navigation

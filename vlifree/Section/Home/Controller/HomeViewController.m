@@ -57,6 +57,8 @@
     self.tableView.tableHeaderView = homeHeaderView;
     [self.tableView registerClass:[HomeViewCell class] forCellReuseIdentifier:CELL_INDENTIFIER];
     
+    [self.tableView addHeaderWithTarget:self action:@selector(headerRereshing)];
+    
     UIButton * locationBT = [UIButton buttonWithType:UIButtonTypeCustom];
     locationBT.frame = CGRectMake(10, 10, LOCATION_BUTTON_WIDTH, BUTTON_HEIGTH);
     locationBT.tag = 1000;
@@ -75,15 +77,17 @@
     locationIG.image = [UIImage imageNamed:@"location.png"];
     [locationBT addSubview:locationIG];
     
-    [MAMapServices sharedServices].apiKey = @"bdb563c4b3d8dae3a9ba228ab0c1f41c";
-    
-    self.aMapView = [[MAMapView alloc] initWithFrame:self.view.bounds];
-    _aMapView.delegate = self;
-    _aMapView.showsUserLocation = YES;
-    _aMapView.userTrackingMode = MAUserTrackingModeNone;
-    [_aMapView setZoomLevel:16.5 animated:YES];
-    _page = 1;
-    _isLOC = NO;
+//    [MAMapServices sharedServices].apiKey = @"bdb563c4b3d8dae3a9ba228ab0c1f41c";
+//
+//    self.aMapView = [[MAMapView alloc] initWithFrame:self.view.bounds];
+//    _aMapView.delegate = self;
+//    _aMapView.showsUserLocation = YES;
+//    _aMapView.userTrackingMode = MAUserTrackingModeNone;
+//    [_aMapView setZoomLevel:16.5 animated:YES];
+//    _page = 1;
+//    _isLOC = NO;
+//    [SVProgressHUD showWithStatus:@"正在加载..." maskType:SVProgressHUDMaskTypeBlack];
+//    [self performSelector:@selector(isLocationsuccess) withObject:nil afterDelay:60];
     /*
     UIButton * searchBT = [UIButton buttonWithType:UIButtonTypeCustom];
     searchBT.frame = CGRectMake(0, (self.navigationController.navigationBar.height - 23) / 2, 100, 23);
@@ -93,7 +97,7 @@
     [searchBT addTarget:self action:@selector(searchAction:) forControlEvents:UIControlEventTouchUpInside];
     [self.navigationController.navigationBar addSubview:searchBT];
     */
-    /*
+    
     self.locationManager = [[CLLocationManager alloc] init];
     self.locationManager.delegate = self;
     self.locationManager.desiredAccuracy = kCLLocationAccuracyBest;
@@ -101,7 +105,7 @@
 //    [self.locationManager requestAlwaysAuthorization];//始终允许访问位置信息
     [self.locationManager requestWhenInUseAuthorization];
     [self.locationManager startUpdatingLocation];//开始更新位置信息
-    */
+    
     /*
     UISearchBar * searchBar = [[UISearchBar alloc] initWithFrame:CGRectMake(0, 5, 100, 30)];
     searchBar.center = CGPointMake(self.view.centerX, searchBar.centerY);
@@ -117,7 +121,25 @@
 }
 
 
+- (void)isLocationsuccess
+{
+    if (![UserLocation shareUserLocation].placemark) {
+        [SVProgressHUD dismiss];
+        UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:@"本应用需要打开定位才能请求数据" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
+        [alert show];
+        [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:1.5];
+    }
+}
 
+- (void)headerRereshing
+{
+    if ([UserLocation shareUserLocation].placemark) {
+        [self downloadDataWithCommand:@1 page:_page count:DATA_COUNT];
+    }else
+    {
+        self.aMapView.showsUserLocation = YES;
+    }
+}
 
 
 - (void)viewWillAppear:(BOOL)animated
@@ -232,10 +254,13 @@
         }
         [self.tableView reloadData];
     }
+    [self.tableView headerEndRefreshing];
+    [SVProgressHUD dismiss];
 }
 
 - (void)failWithError:(NSError *)error
 {
+    [self.tableView headerEndRefreshing];
     NSLog(@"%@", error);
 }
 
@@ -266,6 +291,32 @@ updatingLocation:(BOOL)updatingLocation
         }];
     }
 }
+
+
+- (void)locationManager:(CLLocationManager *)manager
+     didUpdateLocations:(NSArray *)locations
+{
+    CLLocation * location = [locations firstObject];
+    [UserLocation shareUserLocation].location = location;
+    NSLog(@"%f, %f", location.coordinate.latitude, location.coordinate.longitude);
+    CLGeocoder * geocoder = [[CLGeocoder alloc] init];
+    [geocoder reverseGeocodeLocation:location completionHandler:^(NSArray *placemarks, NSError *error) {
+        if (placemarks.count > 0) {
+            CLPlacemark * placemark = [placemarks firstObject];
+            NSLog(@"%@, %@, %@, %@", placemark.locality, placemark.subLocality, placemark.thoroughfare, placemark.subThoroughfare);
+            self.locationLB.text = placemark.locality;
+            [UserLocation shareUserLocation].placemark = placemark;
+            NSLog(@"%@", placemark.name);
+            if (!_isLOC) {
+                [self downloadDataWithCommand:@1 page:_page count:DATA_COUNT];
+                _isLOC = YES;
+            }
+        }
+    }];
+
+    
+}
+
 
 #pragma mark - Table view data source
 

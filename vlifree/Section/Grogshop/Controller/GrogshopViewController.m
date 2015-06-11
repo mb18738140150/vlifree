@@ -98,6 +98,7 @@
     [self.groshopTabelView addFooterWithTarget:self action:@selector(footerRereshing)];
     _page = 1;
     _type = 2;
+    [SVProgressHUD showWithStatus:@"正在加载..." maskType:SVProgressHUDMaskTypeBlack];
     if ([UserLocation shareUserLocation].placemark != nil) {
         [self downloadDataWithCommand:@2 page:_page count:DATA_COUNT];
     }else
@@ -106,18 +107,33 @@
         [_timer fire];
     }
     
+//    [self performSelector:@selector(isLocationsuccess) withObject:nil afterDelay:60];
+    
     // Do any additional setup after loading the view.
 }
 
-
-
+- (void)viewWillAppear:(BOOL)animated
+{
+    if ([CLLocationManager locationServicesEnabled] && [CLLocationManager authorizationStatus] != kCLAuthorizationStatusDenied) {
+        
+    }
+}
+- (void)isLocationsuccess
+{
+    if (![UserLocation shareUserLocation].placemark) {
+        [SVProgressHUD dismiss];
+        UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:@"本应用需要打开定位才能请求数据" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
+        [alert show];
+        [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:1.5];
+    }
+}
 
 - (void)downloadData
 {
     NSLog(@"2222");
     if ([UserLocation shareUserLocation].placemark != nil) {
-//        [self downloadDataWithCommand:@2 page:_page count:DATA_COUNT];
-        [self.groshopTabelView headerBeginRefreshing];
+        [self downloadDataWithCommand:@2 page:_page count:DATA_COUNT];
+//        [self.groshopTabelView headerBeginRefreshing];
         [self.timer invalidate];
     }
 }
@@ -160,7 +176,7 @@
         _type = 5;
     }
     [SVProgressHUD showWithStatus:@"正在加载数据..." maskType:SVProgressHUDMaskTypeBlack];
-    [self.groshopTabelView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:YES];
+//    [self.groshopTabelView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:YES];
 }
 
 #pragma mark - 数据刷新,加载更多
@@ -196,6 +212,7 @@
                                @"Lon":[NSNumber numberWithDouble:[UserLocation shareUserLocation].location.coordinate.longitude]
                                };
     [self playPostWithDictionary:jsonDic];
+    NSLog(@"///////%f, %f", [UserLocation shareUserLocation].location.coordinate.latitude, [UserLocation shareUserLocation].location.coordinate.longitude);
     /*
      //    NSLog(@"%@, %@", self.classifyId, [UserInfo shareUserInfo].userId);
      NSString * jsonStr = [jsonDic JSONString];
@@ -229,7 +246,7 @@
     if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
         NSLog(@"%@", [data objectForKey:@"ErrorMsg"]);
         self.allCount = [data objectForKey:@"AllCount"];
-        NSArray * array = [data objectForKey:@"AllList"];
+        NSArray * array = [data objectForKey:@"HotelList"];
         if(_page == 1)
         {
             _dataArray = nil;
@@ -325,8 +342,10 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
+    HotelModel * hotelMD = [self.dataArray objectAtIndex:indexPath.row];
     DetailsGrogshopViewController * detailsVC = [[DetailsGrogshopViewController alloc] init];
     detailsVC.hidesBottomBarWhenPushed = YES;
+    detailsVC.hotelID = hotelMD.hotelId;
     [self.navigationController pushViewController:detailsVC animated:YES];
 }
 

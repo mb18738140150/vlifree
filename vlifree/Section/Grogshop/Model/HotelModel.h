@@ -12,7 +12,7 @@
 
 
 @property (nonatomic, strong)NSNumber * hotelId;
-@property (nonatomic, copy)NSString * name;
+@property (nonatomic, copy)NSString * hotelName;
 @property (nonatomic, strong)NSNumber * wifiState;
 @property (nonatomic, strong)NSNumber * parkState;
 @property (nonatomic, copy)NSString * icon;
@@ -21,7 +21,7 @@
 @property (nonatomic, copy)NSString * address;
 @property (nonatomic, copy)NSString * hotelLat;
 @property (nonatomic, copy)NSString * hotelLon;
-@property (nonatomic, strong)NSNumber * range;
+@property (nonatomic, strong)NSNumber * distance;
 
 - (id)initWithDictionary:(NSDictionary *)dic;
 
