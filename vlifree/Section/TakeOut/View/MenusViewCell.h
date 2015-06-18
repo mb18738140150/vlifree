@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "MenuModel.h"
 
 @interface MenusViewCell : UITableViewCell
 
@@ -14,6 +15,8 @@
 @property (nonatomic, strong)UILabel * countLabel;
 @property (nonatomic, strong)UIButton * subtractBT;
 @property (nonatomic, strong)UIButton * addButton;
+
+@property (nonatomic, strong)MenuModel * menuModel;
 
 - (void)createSubview:(CGRect)frame;
 + (CGFloat)cellHeight;

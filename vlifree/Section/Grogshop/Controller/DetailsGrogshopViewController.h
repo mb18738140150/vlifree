@@ -11,6 +11,8 @@
 @interface DetailsGrogshopViewController : UIViewController
 
 @property (nonatomic, strong)NSNumber * hotelID;
-
+@property (nonatomic, copy)NSString * lat;
+@property (nonatomic, copy)NSString * lon;
+@property (nonatomic, copy)NSString * icon;
 
 @end

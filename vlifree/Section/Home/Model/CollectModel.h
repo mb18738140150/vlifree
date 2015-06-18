@@ -19,6 +19,11 @@
 @property (nonatomic, copy)NSString * icon;
 @property (nonatomic, strong)NSNumber * price;
 @property (nonatomic, strong)NSNumber * sold;
+@property (nonatomic, copy)NSString * businessLat;
+@property (nonatomic, copy)NSString * businessLon;
+
+
+
 - (id)initWithDictionary:(NSDictionary *)dic;
 
 @end

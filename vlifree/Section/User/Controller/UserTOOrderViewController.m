@@ -10,11 +10,25 @@
 #import "TOOrderViewCell.h"
 #import "DetailsTOOrderViewController.h"
 
-@interface UserTOOrderViewController ()
+@interface UserTOOrderViewController ()<HTTPPostDelegate>
+{
+    int _page;
+}
+
+@property (nonatomic, strong)NSMutableArray * dataArray;
+
 
 @end
 
 @implementation UserTOOrderViewController
+
+- (NSMutableArray *)dataArray
+{
+    if (!_dataArray) {
+        self.dataArray = [NSMutableArray array];
+    }
+    return _dataArray;
+}
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -30,6 +44,8 @@
     [backBT addTarget:self action:@selector(backLastVC:) forControlEvents:UIControlEventTouchUpInside];
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:backBT];
     
+    _page = 1;
+    [self downloadDataWithCommand:@23 page:_page count:COUNT];
     // Uncomment the following line to preserve selection between presentations.
     // self.clearsSelectionOnViewWillAppear = NO;
     
@@ -41,6 +57,71 @@
 {
     [self.navigationController popViewControllerAnimated:YES];
 }
+
+
+#pragma mark - 数据请求
+- (void)downloadDataWithCommand:(NSNumber *)command page:(int)page count:(int)count
+{
+    
+    NSDictionary * jsonDic = @{
+                               @"Command":command,
+                               @"CurPage":[NSNumber numberWithInt:page],
+                               @"CurCount":[NSNumber numberWithInt:count],
+                               @"UserId":[UserInfo shareUserInfo].userId
+                               };
+    [self playPostWithDictionary:jsonDic];
+    /*
+     //    NSLog(@"%@, %@", self.classifyId, [UserInfo shareUserInfo].userId);
+     NSString * jsonStr = [jsonDic JSONString];
+     NSString * str = [NSString stringWithFormat:@"%@231618", jsonStr];
+     NSLog(@"%@", str);
+     NSString * md5Str = [str md5];
+     NSString * urlString = [NSString stringWithFormat:@"http://p.vlifee.com/getdata.ashx?md5=%@",md5Str];
+     
+     HTTPPost * httpPost = [HTTPPost shareHTTPPost];
+     [httpPost post:urlString HTTPBody:[jsonStr dataUsingEncoding:NSUTF8StringEncoding]];
+     httpPost.delegate = self;
+     */
+}
+
+- (void)playPostWithDictionary:(NSDictionary *)dic
+{
+    NSString * jsonStr = [dic JSONString];
+//    NSLog(@"%@", jsonStr);
+    NSString * str = [NSString stringWithFormat:@"%@231618", jsonStr];
+    NSString * md5Str = [str md5];
+    NSString * urlString = [NSString stringWithFormat:@"%@%@", POST_URL, md5Str];
+    
+    HTTPPost * httpPost = [HTTPPost shareHTTPPost];
+    [httpPost post:urlString HTTPBody:[jsonStr dataUsingEncoding:NSUTF8StringEncoding]];
+    httpPost.delegate = self;
+}
+
+- (void)refresh:(id)data
+{
+    NSLog(@"+++%@", data);
+    if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
+        NSLog(@"%@", [data objectForKey:@"ErrorMsg"]);
+        NSArray * array = [data objectForKey:@"WakeOutOrderList"];
+        if(_page == 1)
+        {
+            _dataArray = nil;
+        }
+        for (NSDictionary * dic in array) {
+
+        }
+        [self.tableView reloadData];
+    }
+    [self.tableView headerEndRefreshing];
+    [SVProgressHUD dismiss];
+}
+
+- (void)failWithError:(NSError *)error
+{
+    [self.tableView headerEndRefreshing];
+    NSLog(@"%@", error);
+}
+
 
 
 - (void)didReceiveMemoryWarning {

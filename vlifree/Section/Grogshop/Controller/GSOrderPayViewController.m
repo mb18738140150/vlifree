@@ -70,7 +70,7 @@
     [scrollView addSubview:view1];
     
     UILabel * roomLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, TOP_SPACE, view1.width - 2 * LEFT_SPACE, LABEL_HEIGHT)];
-    roomLB.text = @"房型: 总统套房130平米";
+    roomLB.text = [NSString stringWithFormat:@"房型:%@", self.roomName];
     [view1 addSubview:roomLB];
     
     UILabel * ruzhuLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, roomLB.bottom + TOP_SPACE, 80, LABEL_HEIGHT)];
@@ -206,7 +206,7 @@
     [view3 addSubview:line7];
     
     UILabel * priceLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, view3.bottom + 20, scrollView.width - 3 * LEFT_SPACE - 80, 35)];
-    NSMutableAttributedString * string = [[NSMutableAttributedString alloc] initWithString:@"支付金额¥321"];
+    NSMutableAttributedString * string = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"支付金额¥%@", self.price]];
     [string addAttributes:@{NSForegroundColorAttributeName : [UIColor redColor], NSFontAttributeName : [UIFont systemFontOfSize:24]} range:NSMakeRange(4, string.length - 4)];
     [string addAttributes:@{NSFontAttributeName : [UIFont systemFontOfSize:20]} range:NSMakeRange(0, 4)];
     priceLB.attributedText = [string copy];

@@ -48,6 +48,13 @@
 
 @implementation TakeOutViewController
 
+- (NSMutableArray *)dataArray
+{
+    if (!_dataArray) {
+        self.dataArray = [NSMutableArray array];
+    }
+    return _dataArray;
+}
 
 - (void)viewWillAppear:(BOOL)animated
 {
@@ -284,7 +291,7 @@
     UIButton * typeBT = (UIButton *)[self.view viewWithTag:2000];
     typeBT.selected = NO;
     [SVProgressHUD showWithStatus:@"正在加载..." maskType:SVProgressHUDMaskTypeBlack];
-    [self.takeOutTabelView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:YES];
+//    [self.takeOutTabelView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:YES];
 }
 
 
@@ -292,7 +299,7 @@
 
 - (void)headerRereshing
 {
-    [self downloadDataWithCommand:[NSNumber numberWithInt:_type] page:1 count:DATA_COUNT type:_type];
+    [self downloadDataWithCommand:@6 page:1 count:DATA_COUNT type:_type];
     _page = 1;
 }
 
@@ -357,7 +364,7 @@
     if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
         NSLog(@"%@", [data objectForKey:@"ErrorMsg"]);
         self.allCount = [data objectForKey:@"AllCount"];
-        NSArray * array = [data objectForKey:@"AllList"];
+        NSArray * array = [data objectForKey:@"StoreList"];
         if(_page == 1)
         {
             _dataArray = nil;
@@ -474,12 +481,13 @@ updatingLocation:(BOOL)updatingLocation
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return 10;
+    return _dataArray.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     static NSString * cellIndetifiel = CELL_INDENTIFIER;
+    TakeOutModel * takeOutMD = [self.dataArray objectAtIndex:indexPath.row];
     TakeOutViewCell * cell = [tableView dequeueReusableCellWithIdentifier:cellIndetifiel];
     if (!cell) {
         cell = [[TakeOutViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIndetifiel];
@@ -491,6 +499,7 @@ updatingLocation:(BOOL)updatingLocation
         return YES;
     }]];
     [cell.IconButton addTarget:self action:@selector(lookBigImage:) forControlEvents:UIControlEventTouchUpInside];
+    cell.takeOutModel = takeOutMD;
     cell.IconButton.tag = 5000 + indexPath.row;
     return cell;
 }
@@ -504,7 +513,11 @@ updatingLocation:(BOOL)updatingLocation
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
+    TakeOutModel * takeOutMD = [self.dataArray objectAtIndex:indexPath.row];
     DetailTakeOutViewController * detailTakeOutVC = [[DetailTakeOutViewController alloc] init];
+    detailTakeOutVC.takeOutID = takeOutMD.storeId;
+    detailTakeOutVC.sendPrice = takeOutMD.sendPrice;
+    detailTakeOutVC.outSentMoney = takeOutMD.outSentMoney;
     detailTakeOutVC.hidesBottomBarWhenPushed = YES;
     [self.navigationController pushViewController:detailTakeOutVC animated:YES];
 }
@@ -514,6 +527,7 @@ updatingLocation:(BOOL)updatingLocation
 
 - (void)lookBigImage:(UIButton *)button
 {
+    TakeOutModel * takeOutMd = [self.dataArray objectAtIndex:button.tag - 5000];
     CGPoint point = self.takeOutTabelView.contentOffset;
     CGRect cellRect = [self.takeOutTabelView rectForRowAtIndexPath:[NSIndexPath indexPathForRow:button.tag - 5000 inSection:0]];
     CGRect btFrame = button.frame;
@@ -531,7 +545,7 @@ updatingLocation:(BOOL)updatingLocation
     imageView.image = [UIImage imageNamed:@"superMarket.png"];
     [view addSubview:imageView];
     [self.view.window addSubview:view];
-    
+    [imageView setImageWithURL:[NSURL URLWithString:takeOutMd.icon] placeholderImage:[UIImage imageNamed:@"placeholderIM.png"]];
     [UIView animateWithDuration:1 animations:^{
         imageView.frame = imageFrame;
     }];

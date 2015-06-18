@@ -84,7 +84,7 @@
 //    _aMapView.showsUserLocation = YES;
 //    _aMapView.userTrackingMode = MAUserTrackingModeNone;
 //    [_aMapView setZoomLevel:16.5 animated:YES];
-//    _page = 1;
+    _page = 1;
 //    _isLOC = NO;
 //    [SVProgressHUD showWithStatus:@"正在加载..." maskType:SVProgressHUDMaskTypeBlack];
 //    [self performSelector:@selector(isLocationsuccess) withObject:nil afterDelay:60];
@@ -102,10 +102,13 @@
     self.locationManager.delegate = self;
     self.locationManager.desiredAccuracy = kCLLocationAccuracyBest;
     self.locationManager.distanceFilter = 10;//设置距离过滤器(每过多次距离更新一次)
-//    [self.locationManager requestAlwaysAuthorization];//始终允许访问位置信息
-    [self.locationManager requestWhenInUseAuthorization];
+    if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 8.0) {
+        [self.locationManager requestWhenInUseAuthorization];
+        //    [self.locationManager requestAlwaysAuthorization];//始终允许访问位置信息
+    }
     [self.locationManager startUpdatingLocation];//开始更新位置信息
-    
+
+//    self.locationManager.regionMonitoringAvailable
     /*
     UISearchBar * searchBar = [[UISearchBar alloc] initWithFrame:CGRectMake(0, 5, 100, 30)];
     searchBar.center = CGPointMake(self.view.centerX, searchBar.centerY);
@@ -134,6 +137,7 @@
 - (void)headerRereshing
 {
     if ([UserLocation shareUserLocation].placemark) {
+        _page = 1;
         [self downloadDataWithCommand:@1 page:_page count:DATA_COUNT];
     }else
     {
@@ -311,6 +315,7 @@ updatingLocation:(BOOL)updatingLocation
                 [self downloadDataWithCommand:@1 page:_page count:DATA_COUNT];
                 _isLOC = YES;
             }
+            [self.locationManager stopUpdatingLocation];
         }
     }];
 
@@ -374,6 +379,10 @@ updatingLocation:(BOOL)updatingLocation
     {
         DetailsGrogshopViewController * detailsGSVC = [[DetailsGrogshopViewController alloc] init];
         detailsGSVC.hidesBottomBarWhenPushed = YES;
+        detailsGSVC.hotelID = collectMD.businessId;
+        detailsGSVC.lat = collectMD.businessLat;
+        detailsGSVC.lon = collectMD.businessLon;
+        detailsGSVC.icon = collectMD.icon;
         [self.navigationController pushViewController:detailsGSVC animated:YES];
     }
     

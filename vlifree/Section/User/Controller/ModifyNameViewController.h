@@ -8,6 +8,12 @@
 
 #import <UIKit/UIKit.h>
 
+
+
+typedef void(^RefreshUserInfo)();
 @interface ModifyNameViewController : UIViewController
+
+- (void)refreshUserName:(RefreshUserInfo)refreshBlock;
+
 
 @end

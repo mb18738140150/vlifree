@@ -21,13 +21,15 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    [MAMapServices sharedServices].apiKey = @"bdb563c4b3d8dae3a9ba228ab0c1f41c";
     self.mapView = [[MAMapView alloc] initWithFrame:self.view.bounds];
     _mapView.showsUserLocation = NO;
     _mapView.mapType = MAMapTypeStandard;
     [_mapView setZoomLevel:17.f];
     CLLocationCoordinate2D coor;
-    coor.latitude = 34.753691;
-    coor.longitude = 113.702808;
+    coor.latitude = [self.lat doubleValue];
+    coor.longitude = [self.lon doubleValue];
+    NSLog(@"%f, %f", coor.latitude, coor.longitude);
     MAPointAnnotation * annotation = [[MAPointAnnotation alloc] init];
     annotation.coordinate = coor;
     [_mapView addAnnotation:annotation];

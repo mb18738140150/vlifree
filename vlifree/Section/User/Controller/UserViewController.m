@@ -66,7 +66,7 @@
     [_userTableView registerClass:[UserViewCell class] forCellReuseIdentifier:CELL_INDENTIFIER];
     _userTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     [self.view addSubview:_userTableView];
-    [self fiexdData];
+//    [self fiexdData];
     _userTableView.hidden = YES;
     
     UIView * footView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, 60)];
@@ -104,8 +104,8 @@
         NSDictionary * jsonDic = @{
                                    @"Command":@7,
                                    @"LoginType":@1,
-                                   @"Account":self.logInView.phoneTF,
-                                   @"Password":self.logInView.passwordTF,
+                                   @"Account":self.logInView.phoneTF.text,
+                                   @"Password":self.logInView.passwordTF.text,
                                    };
         NSString * jsonStr = [jsonDic JSONString];
         //    NSLog(@"%@", jsonStr);
@@ -164,6 +164,7 @@
 
     }
     */
+    [self fiexdData];
     _userTableView.hidden = NO;
     [UIView beginAnimations:nil context:nil];
     [UIView setAnimationDuration:1];
@@ -181,6 +182,11 @@
 - (void)registerUser:(UIButton *)button
 {
     RegisterViewController * registerVC = [[RegisterViewController alloc] init];
+    UserViewController * userVC = self;
+    [registerVC returnSucceedRegister:^{
+        [userVC showUserInfoViewWithCode:nil];
+//        [userVC fiexdData];
+    }];
     registerVC.hidesBottomBarWhenPushed= YES;
     [self.navigationController pushViewController:registerVC animated:YES];
 }
@@ -219,17 +225,24 @@
 
 - (void)fiexdData
 {
-    NSArray * titleAry = @[@"可爱小萌娃", @"密码", @"手机号:1374****566", @"外卖订单", @"酒店订单", @"客服电话:400-6492-229"];
+    self.dataArray = nil;
+    NSArray * titleAry = @[[NSString stringWithFormat:@"%@", [UserInfo shareUserInfo].name], @"密码", [NSString stringWithFormat:@"手机号:%@", [UserInfo shareUserInfo].phoneNumber], @"外卖订单", @"酒店订单", [NSString stringWithFormat:@"客服电话:%@", [UserInfo shareUserInfo].servicePhone]];
     for (int i = 0; i < titleAry.count; i++) {
         UserModel * model = [[UserModel alloc] init];
+//        NSLog(@"%@", [titleAry objectAtIndex:i]);
         model.title = [titleAry objectAtIndex:i];
         model.iconStr = [NSString stringWithFormat:@"user_%d", i];
         NSMutableAttributedString * string = [[NSMutableAttributedString alloc] initWithString:@"修改"];
         [string addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithWhite:0.5 alpha:1] range:NSMakeRange(0, string.length)];
         model.buttonStr = [string copy];
-        
-        if (i > 2) {
-            NSString * str = @"0";
+        if (i == 3) {
+            NSString * str = [NSString stringWithFormat:@"%@", [UserInfo shareUserInfo].wakeoutOrderCount];
+            NSMutableAttributedString * attriStr = [[NSMutableAttributedString alloc] initWithString:str];
+            [attriStr addAttribute:NSForegroundColorAttributeName value:[UIColor orangeColor] range:NSMakeRange(0, attriStr.length)];
+            model.buttonStr = [attriStr copy];
+        }
+        if (i == 4) {
+            NSString * str = [NSString stringWithFormat:@"%@", [UserInfo shareUserInfo].hotelOrderCount];
             NSMutableAttributedString * attriStr = [[NSMutableAttributedString alloc] initWithString:str];
             [attriStr addAttribute:NSForegroundColorAttributeName value:[UIColor orangeColor] range:NSMakeRange(0, attriStr.length)];
             model.buttonStr = [attriStr copy];
@@ -239,15 +252,19 @@
         }
         [self.dataArray addObject:model];
     }
+    [self.userTableView reloadData];
+
+//    NSLog(@"ary = %@", _dataArray);
 }
 
 
 #pragma mark - 数据处理
 - (void)refresh:(id)data
 {
-    NSLog(@"%@", data);
+    NSLog(@"%@, error = %@", data, [data objectForKey:@"ErrorMsg"]);
     if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
-        
+        [[UserInfo shareUserInfo] setPropertyWithDictionary:[data objectForKey:@"UserInfo"]];
+        [self showUserInfoViewWithCode:nil];
     }
 }
 - (void)failWithError:(NSError *)error
@@ -271,9 +288,6 @@
     [cell createSubviewWithFrame:tableView.bounds];
     cell.modifyBT.tag = MODIFY_BUTTON_TAG + indexPath.row;
     [cell.modifyBT addTarget:self action:@selector(modifyAction:) forControlEvents:UIControlEventTouchUpInside];
-    if (indexPath.row == 2) {
-        cell.modifyBT .hidden = YES;
-    }
     cell.userModel = userModel;
     return cell;
 }
@@ -299,6 +313,9 @@
         {
             NSLog(@"名称");
             ModifyNameViewController * nameVC = [[ModifyNameViewController alloc] init];
+            [nameVC refreshUserName:^{
+                [self fiexdData];
+            }];
             nameVC.hidesBottomBarWhenPushed = YES;
             [self.navigationController pushViewController:nameVC animated:YES];
         }
@@ -413,6 +430,31 @@
 }
 
 
+#pragma mark - 手机号码验证
++ (BOOL)isTelPhoneNub:(NSString *)str
+{
+    if (str.length < 11)
+    {
+        UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"请输入正确的手机号码" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil];
+        [alert show];
+        return NO;
+    }
+    else
+    {
+        NSString *regex = @"^(0|86|17951)?(13[0-9]|15[012356789]|17[678]|18[0-9]|14[57])[0-9]{8}$";
+        NSPredicate *pred = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", regex];
+        BOOL isMatch = [pred evaluateWithObject:str];
+        if (!isMatch) {
+            UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"请输入正确的手机号码" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil];
+            [alert show];
+            return NO;
+        }
+        else
+        {
+            return YES;
+        }
+    }
+}
 
 
 /*

@@ -100,6 +100,22 @@
     return 2 * TOP_SPACE + IMAGE_SIZE;
 }
 
+- (void)setTakeOutModel:(TakeOutModel *)takeOutModel
+{
+    _takeOutModel = takeOutModel;
+    self.nameLabel.text = takeOutModel.storeName;
+    if ([takeOutModel.storeState isEqualToNumber:@1]) {
+        _stateImage.image = [UIImage imageNamed:@"storeState_k.png"];
+    }else
+    {
+        _stateImage.image = [UIImage imageNamed:@"storeState_g.png"];
+    }
+    self.soldLabel.text = [NSString stringWithFormat:@"月售%@份", takeOutModel.sold];
+    self.sendPriceLabel.text = [NSString stringWithFormat:@"起送价:%@", takeOutModel.sendPrice];
+    self.outsideOrderLB.text = [NSString stringWithFormat:@"外送费:%@", takeOutModel.outSentMoney];
+    self.addressLabel.text = takeOutModel.address;
+    [self.icon setImageWithURL:[NSURL URLWithString:takeOutModel.icon] placeholderImage:[UIImage imageNamed:@"placeholderIM.png"]];
+}
 
 - (void)awakeFromNib {
     // Initialization code

@@ -83,6 +83,14 @@
     return TOP_SPACE * 3 + IMAGE_SIZE + 2 + LABEL_HEIGHT + 10;
 }
 
+- (void)setTakeOutOrderMD:(TakeOutOrderMD *)takeOutOrderMD
+{
+    _takeOutOrderMD = takeOutOrderMD;
+    [self.iconView setImageWithURL:[NSURL URLWithString:takeOutOrderMD.storeIcon] placeholderImage:[UIImage imageNamed:@"placeholderIM.png"]];
+    self.dateLabel.text = takeOutOrderMD.time;
+    self.titleLabel.text = takeOutOrderMD.storeName;
+    self.priceLabel.text = [NSString stringWithFormat:@"¥%@", takeOutOrderMD.money];
+}
 
 - (void)awakeFromNib {
     // Initialization code

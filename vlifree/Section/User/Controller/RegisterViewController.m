@@ -7,6 +7,8 @@
 //
 
 #import "RegisterViewController.h"
+#import "UserInfo.h"
+
 
 #define TOP_SPACE 30
 #define LEFT_SPACE 10
@@ -19,6 +21,7 @@
 
 @property (nonatomic, strong)UITextField * phoneTF;
 @property (nonatomic, strong)UITextField * passwordTF;
+@property (nonatomic, copy)ReturnUserInfo returnBlock;
 
 @end
 
@@ -138,7 +141,7 @@
 - (void)playPostWithDictionary:(NSDictionary *)dic
 {
     NSString * jsonStr = [dic JSONString];
-    //    NSLog(@"%@", jsonStr);
+        NSLog(@"%@", jsonStr);
     NSString * str = [NSString stringWithFormat:@"%@231618", jsonStr];
     NSString * md5Str = [str md5];
     NSString * urlString = [NSString stringWithFormat:@"%@%@", POST_URL, md5Str];
@@ -150,9 +153,12 @@
 
 - (void)refresh:(id)data
 {
-    NSLog(@"+++%@", data);
+    NSLog(@"+++%@, error= %@", data, [data objectForKey:@"ErrorMsg"]);
     if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
-        
+        [[UserInfo shareUserInfo] setPropertyWithDictionary:[data objectForKey:@"UserInfo"]];
+//        NSLog(@"%@", [UserInfo shareUserInfo].phoneNumber);
+        self.returnBlock();
+        [self.navigationController popViewControllerAnimated:YES];
     }
 }
 
@@ -161,6 +167,37 @@
     NSLog(@"%@", error);
 }
 
+- (void)returnSucceedRegister:(ReturnUserInfo)returnBlock
+{
+    self.returnBlock = returnBlock;
+}
+
+
+#pragma mark - 手机号码验证
++ (BOOL)isTelPhoneNub:(NSString *)str
+{
+    if (str.length < 11)
+    {
+        UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"请输入正确的手机号码" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil];
+        [alert show];
+        return NO;
+    }
+    else
+    {
+        NSString *regex = @"^(0|86|17951)?(13[0-9]|15[012356789]|17[678]|18[0-9]|14[57])[0-9]{8}$";
+        NSPredicate *pred = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", regex];
+        BOOL isMatch = [pred evaluateWithObject:str];
+        if (!isMatch) {
+            UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"请输入正确的手机号码" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil];
+            [alert show];
+            return NO;
+        }
+        else
+        {
+            return YES;
+        }
+    }
+}
 
 
 - (void)didReceiveMemoryWarning {

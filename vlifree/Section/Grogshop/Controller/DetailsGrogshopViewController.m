@@ -14,13 +14,13 @@
 #import "GSOrderPayViewController.h"
 #import "DescribeView.h"
 #import "GSMapViewController.h"
-
+#import "RoomModel.h"
 
 #define CELL_INDENTIFIER @"CELL"
 
 #define BUTTON_TAG 1000
 
-@interface DetailsGrogshopViewController ()<UITableViewDataSource, UITableViewDelegate>
+@interface DetailsGrogshopViewController ()<UITableViewDataSource, UITableViewDelegate, HTTPPostDelegate>
 
 @property (nonatomic, strong)UITableView * detailsTableView;
 
@@ -31,6 +31,7 @@
 
 @property (nonatomic, strong)NSMutableArray * dataArray;
 
+@property (nonatomic, strong)NSString * phoneNumber;
 
 @end
 
@@ -65,6 +66,7 @@
     self.headerView = [[DetailsGSHearderView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, 310)];
     [_headerView.addressView.button addTarget:self action:@selector(lookOverMapk:) forControlEvents:UIControlEventTouchUpInside];
     [_headerView.phoneView.button addTarget:self action:@selector(callNumberWithPhone:) forControlEvents:UIControlEventTouchUpInside];
+    [_headerView.hotelImage setImageWithURL:[NSURL URLWithString:self.icon]];
 //    _headerView.backgroundColor = [UIColor grayColor];
     self.detailsTableView.tableHeaderView = _headerView;
     
@@ -119,6 +121,8 @@
 {
     NSLog(@"查看地图");
     GSMapViewController * gsMapVC = [[GSMapViewController alloc] init];
+    gsMapVC.lat = self.lat;
+    gsMapVC.lon = self.lon;
     [self.navigationController pushViewController:gsMapVC animated:YES];
 }
 
@@ -132,7 +136,11 @@
 - (void)reserveGSRoom:(UIButton *)button
 {
     NSLog(@"预定%ld", button.tag - BUTTON_TAG);
+    RoomModel * roomMD = [self.dataArray objectAtIndex:button.tag - BUTTON_TAG];
     GSOrderPayViewController * gsOrderPayVC = [[GSOrderPayViewController alloc] init];
+    gsOrderPayVC.roomName = roomMD.suiteName;
+    gsOrderPayVC.price = roomMD.suitePrice;
+    gsOrderPayVC.roomId = roomMD.suiteId;
     [self.navigationController pushViewController:gsOrderPayVC animated:YES];
 }
 
@@ -178,11 +186,35 @@
     NSLog(@"+++%@", data);
     if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
         NSLog(@"%@", [data objectForKey:@"ErrorMsg"]);
-        NSArray * array = [data objectForKey:@"AllList"];
-        for (NSDictionary * dic in array) {
-//            HotelModel * hotelMD = [[HotelModel alloc] initWithDictionary:dic];
-//            [self.dataArray addObject:hotelMD];
+        NSDictionary * dic = [data objectForKey:@"HotelInfo"];
+            self.headerView.addressView.titleLable.text = [dic objectForKey:@"Address"];
+            self.headerView.phoneView.titleLable.text = [dic objectForKey:@"PhoneNumber"];
+            NSDictionary * stateDic = [dic objectForKey:@"HotelDetail"];
+            if ([[stateDic objectForKey:@"ParkState"] isEqualToNumber:@1]) {
+                self.headerView.parkView.image = [UIImage imageNamed:@"P_on.png"];
+            }else
+            {
+                self.headerView.parkView.image = [UIImage imageNamed:@"P_off.png"];
+            }
+            if ([[stateDic objectForKey:@"RestaurantState"] isEqualToNumber:@1]) {
+                self.headerView.foodView.image = [UIImage imageNamed:@"food_on.png"];
+            }else
+            {
+                self.headerView.foodView.image = [UIImage imageNamed:@"food_off.png"];
+            }
+            if ([[stateDic objectForKey:@"WifiState"] isEqualToNumber:@1]) {
+                self.headerView.wifiView.image = [UIImage imageNamed:@"wifi_on.png"];
+            }else
+            {
+                self.headerView.wifiView.image = [UIImage imageNamed:@"wifi_off.png"];
+            }
+            self.footerView.explainArray = @[[dic objectForKey:@"BookingInstructions"]];
+        NSArray * array = [dic objectForKey:@"SuiteList"];
+        for (NSDictionary * suiteDic in array) {
+            RoomModel * roomMD = [[RoomModel alloc] initWithDictionary:suiteDic];
+            [self.dataArray addObject:roomMD];
         }
+        
         [self.detailsTableView reloadData];
     }
 //    [self.detailsTableView headerEndRefreshing];
@@ -205,17 +237,27 @@
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     if (self.footerView.allButton.selected) {
-        return 10;
+        return self.dataArray.count;
+    }else
+    {
+        if (self.dataArray.count > 2) {
+            return 2;
+        }else
+        {
+            return _dataArray.count;
+        }
     }
-    return 1;
+    return 0;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    RoomModel * roomMD = [self.dataArray objectAtIndex:indexPath.row];
     DetailsGSViewCell * cell = [tableView dequeueReusableCellWithIdentifier:CELL_INDENTIFIER];
     [cell createSubviewWithFrame:tableView.bounds];
     [cell.reserveButton addTarget:self action:@selector(reserveGSRoom:) forControlEvents:UIControlEventTouchUpInside];
     cell.reserveButton.tag = BUTTON_TAG + indexPath.row;
+    cell.roomModel = roomMD;
 //    cell.textLabel.text = @"222";
     return cell;
 }

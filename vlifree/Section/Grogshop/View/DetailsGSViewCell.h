@@ -8,9 +8,10 @@
 
 #import <UIKit/UIKit.h>
 
+@class RoomModel;
 @interface DetailsGSViewCell : UITableViewCell
 
-
+@property (nonatomic, strong)RoomModel * roomModel;
 @property (nonatomic, strong)UIButton * reserveButton;
 
 

@@ -17,13 +17,12 @@
 #define TF_VIEW_LEFT_SPACE 20
 #define VIEW_HEIGHT (TF_HEIGHT + ((TF_VIEW_TOP_SPACE) * 2))
 
-@interface PasswordViewController ()
+@interface PasswordViewController ()<HTTPPostDelegate>
 
 
 @property (nonatomic, strong)UITextField * oldPasswordTF;//当前密码
 @property (nonatomic, strong)UITextField * modifyPasswordTF;//新密码
 @property (nonatomic, strong)UITextField * confirmPasswordTF;//确认密码
-
 
 @end
 
@@ -116,10 +115,17 @@
         UIAlertView * alertView = [[UIAlertView alloc] initWithTitle:@"提示" message:@"请输入确认密码" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
         [alertView show];
         [alertView performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:1];
-    }else if (self.confirmPasswordTF.text.length && self.oldPasswordTF.text.length && self.modifyPasswordTF.text.length){
-        [self.navigationController popViewControllerAnimated:YES];
-
+    }else if (![self.modifyPasswordTF.text isEqualToString:self.confirmPasswordTF.text]){
+        UIAlertView * alertView = [[UIAlertView alloc] initWithTitle:@"提示" message:@"新密码和确认密码不一致" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
+        [alertView show];
+        [alertView performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:1];
+    }else
+    {
+        [self downloadData];
     }
+    [self.oldPasswordTF resignFirstResponder];
+    [self.modifyPasswordTF resignFirstResponder];
+    [self.confirmPasswordTF resignFirstResponder];
 }
 
 
@@ -128,6 +134,62 @@
     [self.oldPasswordTF resignFirstResponder];
     [self.modifyPasswordTF resignFirstResponder];
     [self.confirmPasswordTF resignFirstResponder];
+}
+
+- (void)downloadData
+{
+    NSDictionary * jsonDic = @{
+                               @"Command":@21,
+                               @"UserId":[UserInfo shareUserInfo].userId,
+                               @"OldPassword":self.oldPasswordTF.text,
+                               @"Password":self.confirmPasswordTF.text
+                               };
+    [self playPostWithDictionary:jsonDic];
+    /*
+     //    NSLog(@"%@, %@", self.classifyId, [UserInfo shareUserInfo].userId);
+     NSString * jsonStr = [jsonDic JSONString];
+     NSString * str = [NSString stringWithFormat:@"%@231618", jsonStr];
+     NSLog(@"%@", str);
+     NSString * md5Str = [str md5];
+     NSString * urlString = [NSString stringWithFormat:@"http://p.vlifee.com/getdata.ashx?md5=%@",md5Str];
+     
+     HTTPPost * httpPost = [HTTPPost shareHTTPPost];
+     [httpPost post:urlString HTTPBody:[jsonStr dataUsingEncoding:NSUTF8StringEncoding]];
+     httpPost.delegate = self;
+     */
+}
+
+- (void)playPostWithDictionary:(NSDictionary *)dic
+{
+    NSString * jsonStr = [dic JSONString];
+    //    NSLog(@"%@", jsonStr);
+    NSString * str = [NSString stringWithFormat:@"%@231618", jsonStr];
+    NSString * md5Str = [str md5];
+    NSString * urlString = [NSString stringWithFormat:@"%@%@", POST_URL, md5Str];
+    
+    HTTPPost * httpPost = [HTTPPost shareHTTPPost];
+    [httpPost post:urlString HTTPBody:[jsonStr dataUsingEncoding:NSUTF8StringEncoding]];
+    httpPost.delegate = self;
+}
+
+- (void)refresh:(id)data
+{
+    NSLog(@"+++%@", data);
+    if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
+        [self.navigationController popViewControllerAnimated:YES];
+    }else
+    {
+        UIAlertView * alert = [[UIAlertView alloc] initWithTitle:@"失败" message:[data objectForKey:@"ErrorMsg"] delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
+        [alert show];
+        [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:2];
+    }
+    [SVProgressHUD dismiss];
+}
+
+- (void)failWithError:(NSError *)error
+{
+    [SVProgressHUD dismiss];
+    NSLog(@"%@", error);
 }
 
 

@@ -24,7 +24,7 @@
 #define SHOPPINGCARVIEW_HEIGHT 55
 
 
-@interface DetailTakeOutViewController ()<UITableViewDataSource, UITableViewDelegate>
+@interface DetailTakeOutViewController ()<UITableViewDataSource, UITableViewDelegate, HTTPPostDelegate>
 
 
 @property (nonatomic, strong)UITableView * sectionTableView;
@@ -34,15 +34,58 @@
 @property (nonatomic, strong)ShoppingDetailsCarView * shoppingCarDetailsView;
 
 
+@property (nonatomic, strong)NSMutableArray * classArray;
+@property (nonatomic, strong)NSMutableArray * menusArray;
+
+@property (nonatomic, strong)NSMutableArray * shopArray;
+
 @end
 
 @implementation DetailTakeOutViewController
 
+- (NSMutableArray *)classArray
+{
+    if (!_classArray) {
+        self.classArray = [NSMutableArray array];
+    }
+    return _classArray;
+}
+
+- (NSMutableArray *)menusArray
+{
+    if (!_menusArray) {
+        self.menusArray = [NSMutableArray array];
+    }
+    return _menusArray;
+}
+
+
+- (NSMutableArray *)shopArray
+{
+    if (!_shopArray) {
+        self.shopArray = [NSMutableArray array];
+    }
+    return _shopArray;
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
+{
+    NSLog(@"key = %@,\n object = %@, \n change = %@", keyPath, object, change);
+}
+
+- (void)dealloc
+{
+    [self removeObserver:self forKeyPath:@"shopArray"];
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    self.view.backgroundColor = [UIColor whiteColor];
 
     self.navigationController.navigationBar.barTintColor = [UIColor whiteColor];
+    
+    [self addObserver:self forKeyPath:@"shopArray" options:NSKeyValueObservingOptionNew context:nil];
     
     self.sectionTableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, 80, self.view.height - SHOPPINGCARVIEW_HEIGHT) style:UITableViewStylePlain];
     _sectionTableView.dataSource = self;
@@ -72,6 +115,10 @@
     [backBT setBackgroundImage:[UIImage imageNamed:@"back_r.png"] forState:UIControlStateNormal];
     [backBT addTarget:self action:@selector(backLastVC:) forControlEvents:UIControlEventTouchUpInside];
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:backBT];
+    
+    
+    [self downloadData];
+    
 //    self.navigationController.navigationBar.tintColor = [UIColor clearColor];
     // Do any additional setup after loading the view.
 }
@@ -91,9 +138,101 @@
 
 - (void)addShoppingCarDetailsViewAction:(UIButton *)button
 {
-    self.shoppingCarDetailsView = [[ShoppingDetailsCarView alloc] initWithFrame:[[UIScreen mainScreen] bounds] withMneusArray:[@[@"", @"", @""] mutableCopy]];
-    [self.view.window addSubview:_shoppingCarDetailsView];
+    if (self.shopArray.count > 0) {
+        self.shoppingCarDetailsView = [[ShoppingDetailsCarView alloc] initWithFrame:[[UIScreen mainScreen] bounds] withMneusArray:self.shopArray];
+        self.shoppingCarDetailsView.sendPrice = self.sendPrice;
+        [self.shoppingCarDetailsView.shoppingCarBT addTarget:self action:@selector(removeShoppingCarDetailsViewAction:) forControlEvents:UIControlEventTouchUpInside];
+        [self.view.window addSubview:_shoppingCarDetailsView];
+    }
 }
+
+
+- (void)removeShoppingCarDetailsViewAction:(UIButton *)button
+{
+    [self.shoppingCarDetailsView removeFromSuperview];
+    [self getAllPrice];
+    [self getAllCount];
+}
+
+#pragma mark - 数据请求
+- (void)downloadData
+{
+    
+    NSDictionary * jsonDic = @{
+                               @"Command":@12,
+                               @"StoreId":self.takeOutID
+                               };
+    [self playPostWithDictionary:jsonDic];
+    /*
+     //    NSLog(@"%@, %@", self.classifyId, [UserInfo shareUserInfo].userId);
+     NSString * jsonStr = [jsonDic JSONString];
+     NSString * str = [NSString stringWithFormat:@"%@231618", jsonStr];
+     NSLog(@"%@", str);
+     NSString * md5Str = [str md5];
+     NSString * urlString = [NSString stringWithFormat:@"http://p.vlifee.com/getdata.ashx?md5=%@",md5Str];
+     
+     HTTPPost * httpPost = [HTTPPost shareHTTPPost];
+     [httpPost post:urlString HTTPBody:[jsonStr dataUsingEncoding:NSUTF8StringEncoding]];
+     httpPost.delegate = self;
+     */
+}
+
+- (void)playPostWithDictionary:(NSDictionary *)dic
+{
+    NSString * jsonStr = [dic JSONString];
+    //    NSLog(@"%@", jsonStr);
+    NSString * str = [NSString stringWithFormat:@"%@231618", jsonStr];
+    NSString * md5Str = [str md5];
+    NSString * urlString = [NSString stringWithFormat:@"%@%@", POST_URL, md5Str];
+    
+    HTTPPost * httpPost = [HTTPPost shareHTTPPost];
+    [httpPost post:urlString HTTPBody:[jsonStr dataUsingEncoding:NSUTF8StringEncoding]];
+    httpPost.delegate = self;
+}
+
+- (void)refresh:(id)data
+{
+    NSLog(@"+++%@", data);
+    if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
+        if ([[data objectForKey:@"Command"] intValue] == 10012) {
+            NSArray * array = [data objectForKey:@"CatalogueList"];
+            for (int i = 0; i < array.count; i++) {
+                NSDictionary * dic = [array objectAtIndex:i];
+                ClassModel * classMD = [[ClassModel alloc] initWithDictionary:dic];
+                if (i == 0) {
+                    NSDictionary * jsonDic = @{
+                                               @"Command" : @13,
+                                               @"Id" : classMD.Id
+                                               };
+                    [self playPostWithDictionary:jsonDic];
+                }
+                [self.classArray addObject:classMD];
+            }
+            [self.sectionTableView reloadData];
+            [_sectionTableView selectRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] animated:YES scrollPosition:UITableViewScrollPositionNone];
+        }else if ([[data objectForKey:@"Command"] isEqualToNumber:@10013])
+        {
+            self.menusArray = nil;
+            NSArray * array = [data objectForKey:@"BusinessList"];
+            for (NSDictionary * dic in array) {
+                MenuModel * menuMD = [[MenuModel alloc] initWithDictionary:dic];
+                [self.menusArray addObject:menuMD];
+            }
+            [self.menusTableView reloadData];
+        }
+    }
+
+    [SVProgressHUD dismiss];
+}
+
+- (void)failWithError:(NSError *)error
+{
+    [SVProgressHUD dismiss];
+    NSLog(@"%@", error);
+}
+
+
+
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
@@ -104,26 +243,28 @@
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     if ([tableView isEqual:_sectionTableView]) {
-        return 10;
+        return self.classArray.count;
     }
-    return 15;
+    return self.menusArray.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if ([tableView isEqual:_sectionTableView]) {
+        ClassModel * classMD = [self.classArray objectAtIndex:indexPath.row];
         ClassesViewCell * sectionCell = [tableView dequeueReusableCellWithIdentifier:SECTION_TABLEVIEW_CELL];
         [sectionCell createSubviewWithFrame:tableView.bounds];
-        sectionCell.title = @"注释,饮料,小吃,赠品,我耳机哦荣";
+        sectionCell.classModel = classMD;
         return sectionCell;
     }
-    
+    MenuModel * menuMD = [self.menusArray objectAtIndex:indexPath.row];
     MenusViewCell * cell = [tableView dequeueReusableCellWithIdentifier:MENUS_TABLEVIEW_CELL];
     [cell createSubview:tableView.bounds];
     [cell.subtractBT addTarget:self action:@selector(subtractMenuCount:) forControlEvents:UIControlEventTouchUpInside];
     cell.subtractBT.tag = indexPath.row + SUBTRACT_BUTTON_TAG;
     [cell.addButton addTarget:self action:@selector(addMenuCount:) forControlEvents:UIControlEventTouchUpInside];
     cell.addButton.tag = indexPath.row + ADD_BUTTON_TAG;
+    cell.menuModel = menuMD;
 //    cell.textLabel.text = @"menu";
     return cell;
 }
@@ -132,9 +273,22 @@
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if ([tableView isEqual:_sectionTableView]) {
-        return [ClassesViewCell cellHeightWithString:@"注释,饮料,小吃,赠品,我耳机哦荣" frame:tableView.bounds];
+        ClassModel * classMD = [self.classArray objectAtIndex:indexPath.row];
+        return [ClassesViewCell cellHeightWithString:classMD.title frame:tableView.bounds];
     }
     return [MenusViewCell cellHeight];
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if ([tableView isEqual:self.sectionTableView]) {
+        ClassModel * classMD = [self.classArray objectAtIndex:indexPath.row];
+        NSDictionary * dic = @{
+                               @"Command" : @13,
+                               @"Id" : classMD.Id
+                               };
+        [self playPostWithDictionary:dic];
+    }
 }
 
 - (BOOL)tableView:(UITableView *)tableView shouldHighlightRowAtIndexPath:(NSIndexPath *)indexPath
@@ -150,27 +304,77 @@
 
 - (void)subtractMenuCount:(UIButton *)button
 {
-    MenusViewCell * cell = (MenusViewCell *)[self.menusTableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:button.tag - SUBTRACT_BUTTON_TAG inSection:0]];
-    NSInteger count = [self.shoppingCarView.countLabel.text integerValue];
-    cell.countLabel.text = [NSString stringWithFormat:@"%ld", [cell.countLabel.text integerValue] - 1];
-    if ([cell.countLabel.text integerValue] == 0) {
-        button.hidden = YES;
+//    MenusViewCell * cell = (MenusViewCell *)[self.menusTableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:button.tag - SUBTRACT_BUTTON_TAG inSection:0]];
+    MenuModel * menuMD = [self.menusArray objectAtIndex:button.tag - SUBTRACT_BUTTON_TAG];
+    menuMD.count -= 1;
+//    NSInteger count = [self.shoppingCarView.countLabel.text integerValue];
+//    cell.countLabel.text = [NSString stringWithFormat:@"%ld", [cell.countLabel.text integerValue] - 1];
+//    if ([cell.countLabel.text integerValue] == 0) {
+//        button.hidden = YES;
+//    }
+//    if (count == 1) {
+//        self.shoppingCarView.changeButton.enabled = NO;
+//    }
+    double allPrice = 0;
+//    NSLog(@"/// %@, %@", self.shopArray, [self.shopArray firstObject]);
+    for (int i = 0; i < self.shopArray.count; i++) {
+        NSMutableArray * ary = [self.shopArray objectAtIndex:i];
+        MenuModel * menuMD1 = [ary firstObject];
+        if ([menuMD1 isEqual:menuMD]) {
+            [ary removeLastObject];
+        }
+        if (ary.count == 0) {
+            [self.shopArray removeObject:ary];
+            continue;
+        }
+        for (MenuModel * menuMD2 in ary) {
+            allPrice += [menuMD2.price doubleValue];
+        }
     }
-    if (count == 1) {
+    NSLog(@"-- shop = %@", self.shopArray);
+    if (allPrice < [self.sendPrice doubleValue]) {
         self.shoppingCarView.changeButton.enabled = NO;
     }
+    
+    self.shoppingCarView.priceLabel.text = [NSString stringWithFormat:@"¥%g元", allPrice];
     self.shoppingCarView.countLabel.text = [NSString stringWithFormat:@"%ld", [self.shoppingCarView.countLabel.text integerValue] - 1];
 }
 
 - (void)addMenuCount:(UIButton *)button
 {
-    MenusViewCell * cell = (MenusViewCell *)[self.menusTableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:button.tag - ADD_BUTTON_TAG inSection:0]];
-    NSInteger count = [cell.countLabel.text integerValue];
-    cell.countLabel.text = [NSString stringWithFormat:@"%ld", count + 1];
-    cell.subtractBT.hidden = NO;
+//    MenusViewCell * cell = (MenusViewCell *)[self.menusTableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:button.tag - ADD_BUTTON_TAG inSection:0]];
+    MenuModel * menuMD = [self.menusArray objectAtIndex:button.tag - ADD_BUTTON_TAG];
+    menuMD.count += 1;
+//    NSInteger count = [cell.countLabel.text integerValue];
+//    cell.countLabel.text = [NSString stringWithFormat:@"%ld", count + 1];
+//    cell.subtractBT.hidden = NO;
     self.shoppingCarView.countLabel.text = [NSString stringWithFormat:@"%ld", [self.shoppingCarView.countLabel.text integerValue] + 1];
-    self.shoppingCarView.changeButton.enabled = YES;
-    
+    if (self.shopArray.count == 0) {
+        NSMutableArray * array = [NSMutableArray array];
+        [array addObject:menuMD];
+        [self.shopArray addObject:array];
+        if ([menuMD.price doubleValue] > [self.sendPrice doubleValue] || [menuMD.price doubleValue] == [self.sendPrice doubleValue]) {
+            self.shoppingCarView.changeButton.enabled = YES;
+        }
+        self.shoppingCarView.priceLabel.text = [NSString stringWithFormat:@"¥%@元", menuMD.price];
+    }else
+    {
+        BOOL have = NO;
+        for (NSMutableArray * smallAry in self.shopArray) {
+            if ([[smallAry firstObject] isEqual:menuMD]) {
+                [smallAry addObject:menuMD];
+                have = YES;
+                break;
+            }
+        }
+        if (!have) {
+            NSMutableArray * smallAry = [NSMutableArray array];
+            [smallAry addObject:menuMD];
+            [self.shopArray addObject:smallAry];
+        }
+        [self getAllPrice];
+    }
+    NSLog(@"shop = %@", self.shopArray);
     CGRect cellFrame = [self.menusTableView rectForRowAtIndexPath:[NSIndexPath indexPathForRow:button.tag - ADD_BUTTON_TAG inSection:0]];
     CGRect btFrame = button.frame;
     btFrame.origin.x = btFrame.origin.x + self.menusTableView.left;
@@ -179,6 +383,32 @@
     
 }
 
+- (void)getAllPrice
+{
+    double allPrice = 0;
+    for (NSMutableArray * smallAry in self.shopArray) {
+        for (MenuModel * menuMD1 in smallAry) {
+            allPrice += [menuMD1.price doubleValue];
+        }
+    }
+    if (allPrice < [self.sendPrice doubleValue]) {
+        self.shoppingCarView.changeButton.enabled = NO;
+    }else
+    {
+        self.shoppingCarView.changeButton.enabled = YES;
+    }
+    self.shoppingCarView.priceLabel.text = [NSString stringWithFormat:@"¥%g元", allPrice];
+}
+
+
+- (void)getAllCount
+{
+    NSInteger allCount = 0;
+    for (NSMutableArray * smallAry in self.shopArray) {
+        allCount += smallAry.count;
+    }
+    self.shoppingCarView.countLabel.text = [NSString stringWithFormat:@"%ld", allCount];
+}
 
 - (void)countLBAnimateWithFromeFrame:(CGRect)frame
 {

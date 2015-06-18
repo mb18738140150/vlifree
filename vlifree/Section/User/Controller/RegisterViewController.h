@@ -8,6 +8,9 @@
 
 #import <UIKit/UIKit.h>
 
+typedef void(^ReturnUserInfo)(void);
 @interface RegisterViewController : UIViewController
+
+- (void)returnSucceedRegister:(ReturnUserInfo)returnBlock;
 
 @end

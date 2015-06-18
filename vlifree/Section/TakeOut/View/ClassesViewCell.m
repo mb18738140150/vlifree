@@ -46,12 +46,19 @@
     return size.height + 20;
 }
 
-- (void)setTitle:(NSString *)title
+//- (void)setTitle:(NSString *)title
+//{
+//    _title = title;
+//    _titleLabel.text = title;
+//    [_titleLabel sizeToFit];
+////    [_titleLabel sizeThatFits:CGSizeMake(_titleLabel.width, CGFLOAT_MAX)];
+//}
+
+
+- (void)setClassModel:(ClassModel *)classModel
 {
-    _title = title;
-    _titleLabel.text = title;
-    [_titleLabel sizeToFit];
-//    [_titleLabel sizeThatFits:CGSizeMake(_titleLabel.width, CGFLOAT_MAX)];
+    _classModel = classModel;
+    self.titleLabel.text = classModel.title;
 }
 
 - (void)awakeFromNib {

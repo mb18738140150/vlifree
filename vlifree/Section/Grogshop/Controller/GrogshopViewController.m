@@ -346,6 +346,9 @@
     DetailsGrogshopViewController * detailsVC = [[DetailsGrogshopViewController alloc] init];
     detailsVC.hidesBottomBarWhenPushed = YES;
     detailsVC.hotelID = hotelMD.hotelId;
+    detailsVC.lat = hotelMD.hotelLat;
+    detailsVC.lon = hotelMD.hotelLon;
+    detailsVC.icon = hotelMD.icon;
     [self.navigationController pushViewController:detailsVC animated:YES];
 }
 

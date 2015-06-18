@@ -7,10 +7,13 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "ClassModel.h"
 
 @interface ClassesViewCell : UITableViewCell
 
-@property (nonatomic, copy)NSString * title;
+//@property (nonatomic, copy)NSString * title;
+@property (nonatomic, strong)ClassModel * classModel;
+
 
 - (void)createSubviewWithFrame:(CGRect)frame;
 + (CGFloat)cellHeightWithString:(NSString *)string frame:(CGRect)frame;

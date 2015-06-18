@@ -35,9 +35,42 @@
 @implementation MenusViewCell
 
 
+- (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
+{
+    self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
+    if (self) {
+        [self addObserver:self forKeyPath:@"menuModel.count" options:NSKeyValueObservingOptionNew context:nil];
+    }
+    return self;
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
+{
+//    NSLog(@"---- key = %@,\n object = %@, \n change = %@", keyPath, object, change);
+    MenusViewCell * cell = (MenusViewCell *)object;
+    cell.countLabel.text = [NSString stringWithFormat:@"%@", [change objectForKey:@"new"]];
+    if ([[change objectForKey:@"new"] isEqualToNumber:@0]) {
+        cell.subtractBT.hidden = YES;
+    }else
+    {
+        cell.subtractBT.hidden = NO;
+    }
+}
+
+
+- (void)dealloc
+{
+    [self removeObserver:self forKeyPath:@"menuModel.count"];
+}
+
 - (void)createSubview:(CGRect)frame
 {
     if (!_iconView) {
+        
+        self.separatorInset = UIEdgeInsetsZero;
+        self.preservesSuperviewLayoutMargins = NO;
+        self.layoutMargins = UIEdgeInsetsZero;
+        
         self.iconView = [[UIImageView alloc] initWithFrame:CGRectMake(LEFT_SPACE, TOP_SPACE, IMAGE_SIZE, IMAGE_SIZE)];
         _iconView.backgroundColor = VIEW_COLOR;
         _iconView.image = [UIImage imageNamed:@"home_grogshop.png"];
@@ -85,6 +118,17 @@
 {
     return IMAGE_SIZE + LABEL_HEIGHT + 2 * TOP_SPACE;
 }
+
+
+- (void)setMenuModel:(MenuModel *)menuModel
+{
+    _menuModel = menuModel;
+    [self.iconView setImageWithURL:[NSURL URLWithString:menuModel.icon] placeholderImage:[UIImage imageNamed:@"placeholderIM.png"]];
+    self.nameLabel.text = menuModel.name;
+    self.soldCountLB.text = [NSString stringWithFormat:@"月售%@份", menuModel.soldCount];
+    self.priceLabel.text = [NSString stringWithFormat:@"%@元/份", menuModel.price];
+}
+
 
 - (void)awakeFromNib {
     // Initialization code

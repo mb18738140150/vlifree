@@ -12,6 +12,9 @@
 
 
 @property (nonatomic, strong)NSMutableArray * menusArray;
+@property (nonatomic, strong)UIButton * shoppingCarBT;
+
+@property (nonatomic, strong)NSNumber * sendPrice;
 
 - (instancetype)initWithFrame:(CGRect)frame withMneusArray:(NSMutableArray *)menusArray;
 

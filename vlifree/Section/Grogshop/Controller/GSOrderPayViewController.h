@@ -10,4 +10,9 @@
 
 @interface GSOrderPayViewController : UIViewController
 
+
+@property (nonatomic, copy)NSString * roomName;
+@property (nonatomic, strong)NSNumber * price;
+@property (nonatomic, strong)NSNumber * roomId;
+
 @end

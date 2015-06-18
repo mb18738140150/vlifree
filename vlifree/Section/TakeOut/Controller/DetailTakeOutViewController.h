@@ -10,4 +10,9 @@
 
 @interface DetailTakeOutViewController : UIViewController
 
+@property (nonatomic, strong)NSNumber * takeOutID;
+@property (nonatomic, strong)NSNumber * sendPrice;
+@property (nonatomic, strong)NSNumber * outSentMoney;
+
+
 @end

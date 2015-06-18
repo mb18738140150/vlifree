@@ -17,10 +17,10 @@
 
 #define LABEL_WIDTH 50
 
-@interface ModifyNameViewController ()
+@interface ModifyNameViewController ()<HTTPPostDelegate>
 
 @property (nonatomic, strong)UITextField * nameTF;
-
+@property (nonatomic, copy)RefreshUserInfo refreshBlock;
 
 @end
 
@@ -51,6 +51,7 @@
     
     self.nameTF = [[UITextField alloc] initWithFrame:CGRectMake(nameLB.right + TF_VIEW_SPACE, TF_VIEW_SPACE, aView.width - 3 * TF_VIEW_SPACE - LABEL_WIDTH, TF_HEIGHT)];
     _nameTF.placeholder = @"请输入昵称";
+    _nameTF.text = [UserInfo shareUserInfo].name;
     _nameTF.clearButtonMode = UITextFieldViewModeWhileEditing;
     [aView addSubview:_nameTF];
     
@@ -73,7 +74,16 @@
 
 - (void)determineModifyName:(UIBarButtonItem *)barBT
 {
-    [self.navigationController popViewControllerAnimated:YES];
+    [self.nameTF resignFirstResponder];
+    if (self.nameTF.text.length == 0) {
+        [SVProgressHUD showErrorWithStatus:@"请输入昵称" duration:2];
+    }else if ([self.nameTF.text isEqualToString:[UserInfo shareUserInfo].name])
+    {
+        [self.navigationController popViewControllerAnimated:YES];
+    }else
+    {
+        [self downloadData];
+    }
 }
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
@@ -81,6 +91,63 @@
     [self.nameTF resignFirstResponder];
 }
 
+
+- (void)downloadData
+{
+    NSDictionary * jsonDic = @{
+                               @"Command":@20,
+                               @"UserId":[UserInfo shareUserInfo].userId,
+                               @"Name":self.nameTF.text,
+                               };
+    [self playPostWithDictionary:jsonDic];
+    /*
+     //    NSLog(@"%@, %@", self.classifyId, [UserInfo shareUserInfo].userId);
+     NSString * jsonStr = [jsonDic JSONString];
+     NSString * str = [NSString stringWithFormat:@"%@231618", jsonStr];
+     NSLog(@"%@", str);
+     NSString * md5Str = [str md5];
+     NSString * urlString = [NSString stringWithFormat:@"http://p.vlifee.com/getdata.ashx?md5=%@",md5Str];
+     
+     HTTPPost * httpPost = [HTTPPost shareHTTPPost];
+     [httpPost post:urlString HTTPBody:[jsonStr dataUsingEncoding:NSUTF8StringEncoding]];
+     httpPost.delegate = self;
+     */
+}
+
+- (void)playPostWithDictionary:(NSDictionary *)dic
+{
+    NSString * jsonStr = [dic JSONString];
+    //    NSLog(@"%@", jsonStr);
+    NSString * str = [NSString stringWithFormat:@"%@231618", jsonStr];
+    NSString * md5Str = [str md5];
+    NSString * urlString = [NSString stringWithFormat:@"%@%@", POST_URL, md5Str];
+    
+    HTTPPost * httpPost = [HTTPPost shareHTTPPost];
+    [httpPost post:urlString HTTPBody:[jsonStr dataUsingEncoding:NSUTF8StringEncoding]];
+    httpPost.delegate = self;
+}
+
+- (void)refresh:(id)data
+{
+    NSLog(@"+++%@", data);
+    if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
+        [UserInfo shareUserInfo].name = self.nameTF.text;
+        _refreshBlock();
+        [self.navigationController popViewControllerAnimated:YES];
+    }
+    [SVProgressHUD dismiss];
+}
+
+- (void)failWithError:(NSError *)error
+{
+    [SVProgressHUD dismiss];
+    NSLog(@"%@", error);
+}
+
+- (void)refreshUserName:(RefreshUserInfo)refreshBlock
+{
+    _refreshBlock = refreshBlock;
+}
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];

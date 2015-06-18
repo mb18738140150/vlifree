@@ -7,7 +7,7 @@
 //
 
 #import "DetailsGSViewCell.h"
-
+#import "RoomModel.h"
 
 #define LEFT_SPACE 15
 #define TOP_SPACE 10
@@ -63,7 +63,13 @@
 }
 
 
-
+- (void)setRoomModel:(RoomModel *)roomModel
+{
+    _roomModel = roomModel;
+    [self.iconView setImageWithURL:[NSURL URLWithString:roomModel.icon] placeholderImage:[UIImage imageNamed:@"placeholderIM.png"]];
+    self.nameLable.text = roomModel.suiteName;
+    self.priceLabel.text = [NSString stringWithFormat:@"¥%@", roomModel.suitePrice];
+}
 
 
 

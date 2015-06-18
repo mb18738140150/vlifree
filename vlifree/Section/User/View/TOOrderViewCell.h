@@ -7,11 +7,13 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "TakeOutOrderMD.h"
 
 @interface TOOrderViewCell : UITableViewCell
 
 
 @property (nonatomic, strong)UIButton * cancelButton;
+@property (nonatomic, strong)TakeOutOrderMD * takeOutOrderMD;
 - (void)crateSubview:(CGRect)frame;
 + (CGFloat)cellHeight;
 

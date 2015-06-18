@@ -23,11 +23,8 @@
 
 @property (nonatomic, strong)CycleScrollView * cycleScrollView;//轮播图
 
-@property (nonatomic, strong)UIImageView * hotelImage;
 
-@property (nonatomic, strong)UIImageView * wifiView;
-@property (nonatomic, strong)UIImageView * parkView;
-@property (nonatomic, strong)UIImageView * foodView;
+
 
 
 

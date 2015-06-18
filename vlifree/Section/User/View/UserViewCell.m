@@ -10,11 +10,11 @@
 #import "UserViewCell.h"
 #import "UserModel.h"
 
-#define ICON_SIZE 36
+#define ICON_SIZE 30
 #define BUTTON_WIDTH 40
 #define TOP_SPACE 10
 #define LEFT_SPACE 10
-#define RIGHT_SPACE 30
+#define RIGHT_SPACE 15
 
 //#define VIEW_COLOR [UIColor orangeColor]
 #define VIEW_COLOR [UIColor clearColor]

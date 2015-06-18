@@ -83,6 +83,7 @@
     {
         self.frame = CGRectMake(self.left, self.top, self.width, _allButton.bottom + 2);
     }
+    self.height = _explainView.bottom + 2;
 }
 
 /*
