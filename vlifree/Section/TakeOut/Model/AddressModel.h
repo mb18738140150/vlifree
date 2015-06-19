@@ -10,9 +10,12 @@
 
 @interface AddressModel : NSObject
 
-@property (nonatomic, strong)NSString * address;
-@property (nonatomic, strong)NSString * tel;
+@property (nonatomic, copy)NSString * address;
+@property (nonatomic, copy)NSString * phoneNumber;
+@property (nonatomic, strong)NSNumber * addressId;
+@property (nonatomic, strong)NSNumber * isDefault;
 @property (nonatomic, assign)BOOL selete;
+- (id)initWithDictionary:(NSDictionary *)dic;
 
 
 @end

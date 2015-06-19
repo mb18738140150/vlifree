@@ -16,7 +16,8 @@
 #import "GSOrderViewController.h"
 #import "RegisterViewController.h"
 #import "WXApi.h"
-
+#import "WXLoginViewController.h"
+#import "PhoneViewController.h"
 
 #define CELL_INDENTIFIER @"cell"
 #define MODIFY_BUTTON_TAG 1000
@@ -107,15 +108,7 @@
                                    @"Account":self.logInView.phoneTF.text,
                                    @"Password":self.logInView.passwordTF.text,
                                    };
-        NSString * jsonStr = [jsonDic JSONString];
-        //    NSLog(@"%@", jsonStr);
-        NSString * str = [NSString stringWithFormat:@"%@231618", jsonStr];
-        NSString * md5Str = [str md5];
-        NSString * urlString = [NSString stringWithFormat:@"%@%@", POST_URL, md5Str];
-        
-        HTTPPost * httpPost = [HTTPPost shareHTTPPost];
-        [httpPost post:urlString HTTPBody:[jsonStr dataUsingEncoding:NSUTF8StringEncoding]];
-        httpPost.delegate = self;
+        [self requestDataWithDictionary:jsonDic];
     }
     /*
     _userTableView.hidden = NO;
@@ -134,15 +127,17 @@
 
 - (void)showUserInfoViewWithCode:(NSString *)code
 {
-    /*
-     NSString * urlString = [NSString stringWithFormat:@"https://api.weixin.qq.com/sns/oauth2/access_token?appid=wxaac5e5f7421e84ac&secret=055e7e10c698b7b140511d8d1a73cec4&code=%@&grant_type=authorization_code", code];
+    //根据授权获取 access_token
+    NSString * urlString = [NSString stringWithFormat:@"https://api.weixin.qq.com/sns/oauth2/access_token?appid=wxaac5e5f7421e84ac&secret=055e7e10c698b7b140511d8d1a73cec4&code=%@&grant_type=authorization_code", code];
     NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:urlString]];
     //将请求的url数据放到NSData对象中
     NSData *response = [NSURLConnection sendSynchronousRequest:request returningResponse:nil error:nil];
     if (response) {
         NSDictionary * dic = [NSJSONSerialization JSONObjectWithData:response options:0 error:nil];
-//        NSLog(@"++++++%@", dic);
+        //        NSLog(@"++++++%@", dic);
         if ([dic objectForKey:@"access_token"]) {
+            [[NSUserDefaults standardUserDefaults] setObject:[dic objectForKey:@"refresh_token"] forKey:@"refresh_token"];//保存 refresh_token
+            [self saveAuthorizeDate];//保存获取refresh_token的时间
             //验证授权是否可用(验证access_token)
             NSString * yanzhengURLSTR = [NSString stringWithFormat:@"https://api.weixin.qq.com/sns/auth?access_token=%@&openid=%@", [dic objectForKey:@"access_token"], [dic objectForKey:@"openid"]];
             NSURLRequest * yzRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:yanzhengURLSTR]];
@@ -156,14 +151,35 @@
                     if (infoData) {
                         NSDictionary * infoDic = [NSJSONSerialization JSONObjectWithData:infoData options:0 error:nil];
                         NSLog(@"user info = %@", infoDic);
+                        NSDictionary * jsonDic = @{
+                                                   @"Openid":[infoDic objectForKey:@"openid"],
+                                                   @"Nickname":[infoDic objectForKey:@"nickname"],
+                                                   @"Sex":[infoDic objectForKey:@"sex"],
+                                                   @"City":[infoDic objectForKey:@"city"],
+                                                   @"Province":[infoDic objectForKey:@"province"],
+                                                   @"Country":[infoDic objectForKey:@"country"],
+                                                   @"HeadimgUrl":[infoDic objectForKey:@"headimgurl"],
+                                                   @"Unionid":[infoDic objectForKey:@"unionid"],
+                                                   @"Command":@9,
+                                                   @"LoginType":@2
+                                                   };
+                        [self requestDataWithDictionary:jsonDic];
                     }
-                    
                 }
             }
         }
-
     }
-    */
+    
+}
+- (void)saveAuthorizeDate
+{
+    NSDateFormatter * formater = [[NSDateFormatter alloc] init];
+    [formater setDateFormat:@"yyyy-MM-dd"];
+    NSString * dateStr = [formater stringFromDate:[NSDate date]];
+    [[NSUserDefaults standardUserDefaults] setObject:dateStr forKey:@"tokenDate"];
+}
+
+- (void)removeLogInView{
     [self fiexdData];
     _userTableView.hidden = NO;
     [UIView beginAnimations:nil context:nil];
@@ -173,10 +189,10 @@
     _logInView.hidden = YES;
     self.navigationItem.title = @"会员中心";
     [_logInView textFiledResignFirstResponder];
-//    HTTPPost * http = [HTTPPost shareHTTPPost];
-//    http.delegate = self;
-//    NSString * urlString = [NSString stringWithFormat:@"https://api.weixin.qq.com/sns/oauth2/access_token?appid=wxaac5e5f7421e84ac&secret=055e7e10c698b7b140511d8d1a73cec4&code=%@&grant_type=authorization_code", code];
-//    [http getWithUrlStr:urlString];
+    //    HTTPPost * http = [HTTPPost shareHTTPPost];
+    //    http.delegate = self;
+    //    NSString * urlString = [NSString stringWithFormat:@"https://api.weixin.qq.com/sns/oauth2/access_token?appid=wxaac5e5f7421e84ac&secret=055e7e10c698b7b140511d8d1a73cec4&code=%@&grant_type=authorization_code", code];
+    //    [http getWithUrlStr:urlString];
 }
 
 - (void)registerUser:(UIButton *)button
@@ -184,7 +200,7 @@
     RegisterViewController * registerVC = [[RegisterViewController alloc] init];
     UserViewController * userVC = self;
     [registerVC returnSucceedRegister:^{
-        [userVC showUserInfoViewWithCode:nil];
+        [userVC removeLogInView];
 //        [userVC fiexdData];
     }];
     registerVC.hidesBottomBarWhenPushed= YES;
@@ -206,7 +222,7 @@
     {
         [self weixinAuthorizeLogIn];
     }
-    
+
     
 }
 
@@ -258,14 +274,50 @@
 }
 
 
-#pragma mark - 数据处理
+#pragma mark - 数据请求
+
+- (void)requestDataWithDictionary:(NSDictionary *)dic
+{
+    NSString * jsonStr = [dic JSONString];
+    //    NSLog(@"%@", jsonStr);
+    NSString * str = [NSString stringWithFormat:@"%@231618", jsonStr];
+    NSString * md5Str = [str md5];
+    NSString * urlString = [NSString stringWithFormat:@"%@%@", POST_URL, md5Str];
+    
+    HTTPPost * httpPost = [HTTPPost shareHTTPPost];
+    [httpPost post:urlString HTTPBody:[jsonStr dataUsingEncoding:NSUTF8StringEncoding]];
+    httpPost.delegate = self;
+}
+
 - (void)refresh:(id)data
 {
     NSLog(@"%@, error = %@", data, [data objectForKey:@"ErrorMsg"]);
+//    if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
+//        [[UserInfo shareUserInfo] setPropertyWithDictionary:[data objectForKey:@"UserInfo"]];
+//        [self removeLogInView];
+//    }
     if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
-        [[UserInfo shareUserInfo] setPropertyWithDictionary:[data objectForKey:@"UserInfo"]];
-        [self showUserInfoViewWithCode:nil];
+        [[UserInfo shareUserInfo] setValuesForKeysWithDictionary:[data objectForKey:@"UserInfo"]];
+        if ([[data objectForKey:@"IsFirst"] isEqualToNumber:@YES]) {
+            UserViewController * userVC = self;
+            WXLoginViewController * wxLoginVC = [[WXLoginViewController alloc] init];
+            [wxLoginVC refreshUserInfo:^{
+                [userVC removeLogInView];
+            }];
+            UINavigationController * nav = [[UINavigationController alloc] initWithRootViewController:wxLoginVC];
+            [self.navigationController presentViewController:nav animated:YES completion:nil];
+        }else
+        {
+            [self removeLogInView];
+        }
+        
+    }else
+    {
+        UIAlertView * alert = [[UIAlertView alloc] initWithTitle:@"" message:[data objectForKey:@"ErrorMsg"] delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
+        [alert show];
+        [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:2];
     }
+
 }
 - (void)failWithError:(NSError *)error
 {
@@ -308,13 +360,14 @@
 
 - (void)modifyAction:(UIButton *)button
 {
+    UserViewController * userVC = self;
     switch (button.tag) {
         case MODIFY_BUTTON_TAG:
         {
             NSLog(@"名称");
             ModifyNameViewController * nameVC = [[ModifyNameViewController alloc] init];
             [nameVC refreshUserName:^{
-                [self fiexdData];
+                [userVC fiexdData];
             }];
             nameVC.hidesBottomBarWhenPushed = YES;
             [self.navigationController pushViewController:nameVC animated:YES];
@@ -332,6 +385,11 @@
         case MODIFY_BUTTON_TAG + 2:
         {
              NSLog(@"手机号");
+            PhoneViewController * phoneVC = [[PhoneViewController alloc] init];
+            [phoneVC refreshUserInfo:^{
+                [userVC fiexdData];
+            }];
+            [self.navigationController pushViewController:phoneVC animated:YES];
         }
             break;
         case MODIFY_BUTTON_TAG + 3:
@@ -420,8 +478,21 @@
                     NSData * infoData = [NSURLConnection sendSynchronousRequest:infoRequest returningResponse:nil error:nil];
                     if (infoData) {
                         NSDictionary * infoDic = [NSJSONSerialization JSONObjectWithData:infoData options:0 error:nil];
-                        [self showUserInfoViewWithCode:nil];
+//                        [self removeLogInView];
                         NSLog(@"user info = %@", infoDic);
+                        NSDictionary * jsonDic = @{
+                                                   @"Openid":[infoDic objectForKey:@"openid"],
+                                                   @"Nickname":[infoDic objectForKey:@"nickname"],
+                                                   @"Sex":[infoDic objectForKey:@"sex"],
+                                                   @"City":[infoDic objectForKey:@"city"],
+                                                   @"Province":[infoDic objectForKey:@"province"],
+                                                   @"Country":[infoDic objectForKey:@"country"],
+                                                   @"HeadimgUrl":[infoDic objectForKey:@"headimgurl"],
+                                                   @"Unionid":[infoDic objectForKey:@"unionid"],
+                                                   @"Command":@9,
+                                                   @"LoginType":@2
+                                                   };
+                        [self requestDataWithDictionary:jsonDic];
                     }
                 }
             }
@@ -429,7 +500,7 @@
     }
 }
 
-
+/*
 #pragma mark - 手机号码验证
 + (BOOL)isTelPhoneNub:(NSString *)str
 {
@@ -455,7 +526,7 @@
         }
     }
 }
-
+*/
 
 /*
 #pragma mark - Navigation

@@ -177,6 +177,7 @@
 		734BE0201B0F184A003E2A22 /* milkTea.png in Resources */ = {isa = PBXBuildFile; fileRef = 734BE0181B0F184A003E2A22 /* milkTea.png */; };
 		734BE0211B0F184A003E2A22 /* pasta.png in Resources */ = {isa = PBXBuildFile; fileRef = 734BE0191B0F184A003E2A22 /* pasta.png */; };
 		734BE0221B0F184A003E2A22 /* snacks.png in Resources */ = {isa = PBXBuildFile; fileRef = 734BE01A1B0F184A003E2A22 /* snacks.png */; };
+		7351C27D1B329E4C0086711B /* WXLoginViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7351C27C1B329E4C0086711B /* WXLoginViewController.m */; };
 		7355A2131B2FB62300095764 /* RoomModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 7355A2121B2FB62300095764 /* RoomModel.m */; };
 		7355A2161B2FC79100095764 /* ClassModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 7355A2151B2FC79100095764 /* ClassModel.m */; };
 		7355A2191B2FD0EE00095764 /* MenuModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 7355A2181B2FD0EE00095764 /* MenuModel.m */; };
@@ -186,6 +187,8 @@
 		7357A29E1B2051F600993A87 /* AMap.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7357A29D1B2051F600993A87 /* AMap.bundle */; };
 		7357A2A01B20522000993A87 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7357A29F1B20522000993A87 /* OpenGLES.framework */; };
 		7357A2A21B20527C00993A87 /* libstdc++.6.0.9.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 7357A2A11B20527C00993A87 /* libstdc++.6.0.9.dylib */; };
+		735908431B33ECC6005143E4 /* laba.png in Resources */ = {isa = PBXBuildFile; fileRef = 735908421B33ECC6005143E4 /* laba.png */; };
+		735908451B33EF6C005143E4 /* xx.png in Resources */ = {isa = PBXBuildFile; fileRef = 735908441B33EF6C005143E4 /* xx.png */; };
 		735B75101B21307C0021D2F9 /* UserLocation.m in Sources */ = {isa = PBXBuildFile; fileRef = 735B750F1B21307C0021D2F9 /* UserLocation.m */; };
 		735B75131B2137AD0021D2F9 /* GSMapViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 735B75121B2137AD0021D2F9 /* GSMapViewController.m */; };
 		735B75151B2142FB0021D2F9 /* libsqlite3.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 735B75141B2142FB0021D2F9 /* libsqlite3.0.dylib */; };
@@ -565,6 +568,8 @@
 		734BE0181B0F184A003E2A22 /* milkTea.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = milkTea.png; sourceTree = "<group>"; };
 		734BE0191B0F184A003E2A22 /* pasta.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = pasta.png; sourceTree = "<group>"; };
 		734BE01A1B0F184A003E2A22 /* snacks.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = snacks.png; sourceTree = "<group>"; };
+		7351C27B1B329E4C0086711B /* WXLoginViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXLoginViewController.h; sourceTree = "<group>"; };
+		7351C27C1B329E4C0086711B /* WXLoginViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXLoginViewController.m; sourceTree = "<group>"; };
 		7355A2111B2FB62300095764 /* RoomModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RoomModel.h; sourceTree = "<group>"; };
 		7355A2121B2FB62300095764 /* RoomModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RoomModel.m; sourceTree = "<group>"; };
 		7355A2141B2FC79100095764 /* ClassModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ClassModel.h; sourceTree = "<group>"; };
@@ -579,6 +584,8 @@
 		7357A29D1B2051F600993A87 /* AMap.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = AMap.bundle; sourceTree = "<group>"; };
 		7357A29F1B20522000993A87 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
 		7357A2A11B20527C00993A87 /* libstdc++.6.0.9.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libstdc++.6.0.9.dylib"; path = "usr/lib/libstdc++.6.0.9.dylib"; sourceTree = SDKROOT; };
+		735908421B33ECC6005143E4 /* laba.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = laba.png; sourceTree = "<group>"; };
+		735908441B33EF6C005143E4 /* xx.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = xx.png; sourceTree = "<group>"; };
 		735B750E1B21307C0021D2F9 /* UserLocation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserLocation.h; sourceTree = "<group>"; };
 		735B750F1B21307C0021D2F9 /* UserLocation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserLocation.m; sourceTree = "<group>"; };
 		735B75111B2137AD0021D2F9 /* GSMapViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GSMapViewController.h; sourceTree = "<group>"; };
@@ -911,6 +918,8 @@
 		733819521B0ACE0200E9F8AD /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				735908441B33EF6C005143E4 /* xx.png */,
+				735908421B33ECC6005143E4 /* laba.png */,
 				735DD7CD1B256E3800E3E93E /* placeholderIM.png */,
 				736BB8201B1EFA0800F03419 /* close.png */,
 				736BB8211B1EFA0800F03419 /* open.png */,
@@ -1197,6 +1206,8 @@
 				73461EAA1B0DAB0A0089352E /* PasswordViewController.m */,
 				737377841B311AC900FA668C /* PhoneViewController.h */,
 				737377851B311AC900FA668C /* PhoneViewController.m */,
+				7351C27B1B329E4C0086711B /* WXLoginViewController.h */,
+				7351C27C1B329E4C0086711B /* WXLoginViewController.m */,
 				738B82C81B1960E8008B386D /* UserTOOrderViewController.h */,
 				738B82C91B1960E8008B386D /* UserTOOrderViewController.m */,
 				738B82CE1B196B2D008B386D /* DetailsTOOrderViewController.h */,
@@ -1603,6 +1614,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				734BE0071B0EFCA8003E2A22 /* wifi_off.png in Resources */,
+				735908451B33EF6C005143E4 /* xx.png in Resources */,
 				73D65AC11B1327E1002A22FE /* change_d.png in Resources */,
 				7324923D1B18443000CC5B6C /* address.png in Resources */,
 				7357A29E1B2051F600993A87 /* AMap.bundle in Resources */,
@@ -1645,6 +1657,7 @@
 				7389DB7F1B0C3B0A00F76582 /* sold_n.png in Resources */,
 				734BE01D1B0F184A003E2A22 /* fastFood.png in Resources */,
 				734BE01B1B0F184A003E2A22 /* cake.png in Resources */,
+				735908431B33ECC6005143E4 /* laba.png in Resources */,
 				734BE01C1B0F184A003E2A22 /* dessert.png in Resources */,
 				735DD7D31B258AB900E3E93E /* SVProgressHUD.bundle in Resources */,
 				7338197F1B0AD56D00E9F8AD /* home_s.png in Resources */,
@@ -1831,6 +1844,7 @@
 				7357A26D1B1FDC0100993A87 /* HTTPPost.m in Sources */,
 				733819671B0ACE4100E9F8AD /* MyTabBarController.m in Sources */,
 				730385FD1B26C538007C7ACB /* POPDecayAnimation.mm in Sources */,
+				7351C27D1B329E4C0086711B /* WXLoginViewController.m in Sources */,
 				734657B21B1D4585000C3E9D /* ASIAuthenticationDialog.m in Sources */,
 				73461EF41B0DDCAE0089352E /* NSTimer+Addition.m in Sources */,
 				730385F41B26C538007C7ACB /* POPAnimation.mm in Sources */,

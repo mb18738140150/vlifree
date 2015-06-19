@@ -11,5 +11,6 @@
 @interface NSString (NSString_MD5)
 
 - (NSString *)md5;
++ (BOOL)isTelPhoneNub:(NSString *)str;
 
 @end

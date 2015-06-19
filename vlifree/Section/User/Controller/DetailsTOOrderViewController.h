@@ -7,7 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "TakeOutOrderMD.h"
 
 @interface DetailsTOOrderViewController : UIViewController
+
+
+@property (nonatomic, strong)TakeOutOrderMD * takeOutOrderMD;
 
 @end

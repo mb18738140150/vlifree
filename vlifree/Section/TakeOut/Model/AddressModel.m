@@ -10,4 +10,21 @@
 
 @implementation AddressModel
 
+
+- (id)initWithDictionary:(NSDictionary *)dic
+{
+    self = [super init];
+    if (self) {
+        [self setValuesForKeysWithDictionary:dic];
+    }
+    return self;
+}
+
+- (void)setValue:(id)value forUndefinedKey:(NSString *)key
+{
+    
+}
+
+
+
 @end

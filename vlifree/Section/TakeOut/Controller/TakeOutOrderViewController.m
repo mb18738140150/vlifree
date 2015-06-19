@@ -137,7 +137,11 @@
     UILabel * remarksDetailLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, lineView6.bottom, remarksView.width - 2 * LEFT_SPACE, LABEL_HEIGHT)];
     remarksDetailLB.text = @"请不要放香菜";
     remarksDetailLB.textColor = remarksLB.textColor;
-    [remarksView addSubview:remarksDetailLB];
+//    [remarksView addSubview:remarksDetailLB];
+    
+    UITextView * remarksTV = [[UITextView alloc] initWithFrame:CGRectMake(LEFT_SPACE, lineView6.bottom, remarksView.width - 2 * LEFT_SPACE, 60)];
+    [remarksView addSubview:remarksTV];
+    remarksView.height = remarksTV.bottom + 5;
     
     UIView * lineView7 = [[UIView alloc] initWithFrame:CGRectMake(0, remarksView.bottom, scrollView.width, 1)];
     lineView7.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
@@ -231,12 +235,12 @@
     AddressViewController * addressVC = [[AddressViewController alloc] init];
     [addressVC returnAddressModel:^(AddressModel *addressModel) {
         NSLog(@"%@", addressModel.address);
-        self.addressLB.text = [NSString stringWithFormat:@"送餐地址:%@\n%@", addressModel.address, addressModel.tel];
+        self.addressLB.text = [NSString stringWithFormat:@"送餐地址:%@\n%@", addressModel.address, addressModel.phoneNumber];
         [_addressLB sizeToFit];
         CGRect frame = _addressBT.frame;
         _addressBT.height = _addressLB.frame.size.height + 2 * TOP_SPACE;
         CGFloat addY = _addressBT.height - frame.size.height;
-        self.phoneLable.text = addressModel.tel;
+        self.phoneLable.text = addressModel.phoneNumber;
         [self reloadViewFrameWithAddY:addY];
     }];
     [self.navigationController pushViewController:addressVC animated:YES];

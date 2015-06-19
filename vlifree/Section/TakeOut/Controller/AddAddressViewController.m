@@ -9,11 +9,11 @@
 #import "AddAddressViewController.h"
 #import "AddressModel.h"
 
-@interface AddAddressViewController ()<UITextFieldDelegate>
+@interface AddAddressViewController ()<UITextFieldDelegate, HTTPPostDelegate>
 
 @property (nonatomic, strong)UITextField * addressTF;
 @property (nonatomic, strong)UITextField * telTF;
-
+@property (nonatomic, copy)RefreshDataBlock refreshBlock;
 
 @end
 
@@ -57,7 +57,7 @@
     
     if (_addressModel) {
         _addressTF.text = _addressModel.address;
-        _telTF.text = _addressModel.tel;
+        _telTF.text = _addressModel.phoneNumber;
     }
     
     UIButton * backBT = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -84,7 +84,28 @@
 {
     [self.addressTF resignFirstResponder];
     [self.telTF resignFirstResponder];
-    [self.navigationController popViewControllerAnimated:YES];
+    if (self.addressTF.text.length == 0) {
+        UIAlertView * alert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"请输入地址" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
+        [alert show];
+        [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:2];
+    }else if (self.telTF.text.length == 0)
+    {
+        UIAlertView * alert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"请输入电话号码" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
+        [alert show];
+        [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:2];
+    }else
+    {
+        BOOL isPhoneNum = [NSString isTelPhoneNub:self.telTF.text];
+        if (isPhoneNum) {
+            if (self.addressModel != nil) {
+                [self downloadDataEditAddress];
+            }else
+            {
+                [self downloadDataAddAddress];
+            }
+        }
+    }
+//    [self.navigationController popViewControllerAnimated:YES];
 }
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
@@ -99,6 +120,74 @@
     [self.addressTF resignFirstResponder];
     [self.telTF resignFirstResponder];
     return YES;
+}
+
+
+#pragma mark - 数据请求
+- (void)downloadDataAddAddress
+{
+    NSDictionary * jsonDic = @{
+                               @"Command":@16,
+                               @"UserId":[UserInfo shareUserInfo].userId,
+                               @"Address":self.addressTF.text,
+                               @"PhoneNumber":self.telTF.text,
+                               @"UserName":[UserInfo shareUserInfo].name
+                               };
+    [self playPostWithDictionary:jsonDic];
+}
+
+- (void)downloadDataEditAddress
+{
+    NSDictionary * jsonDic = @{
+                               @"Command":@16,
+                               @"UserId":[UserInfo shareUserInfo].userId,
+                               @"Address":self.addressTF.text,
+                               @"PhoneNumber":self.telTF.text,
+                               @"UserName":[UserInfo shareUserInfo].name,
+                               @"AddressId":self.addressModel.addressId
+                               };
+    [self playPostWithDictionary:jsonDic];
+}
+
+- (void)playPostWithDictionary:(NSDictionary *)dic
+{
+    NSString * jsonStr = [dic JSONString];
+    NSLog(@"%@", jsonStr);
+    NSString * str = [NSString stringWithFormat:@"%@231618", jsonStr];
+    NSString * md5Str = [str md5];
+    NSString * urlString = [NSString stringWithFormat:@"%@%@", POST_URL, md5Str];
+    
+    HTTPPost * httpPost = [HTTPPost shareHTTPPost];
+    [httpPost post:urlString HTTPBody:[jsonStr dataUsingEncoding:NSUTF8StringEncoding]];
+    httpPost.delegate = self;
+}
+
+- (void)refresh:(id)data
+{
+    NSLog(@"+++%@, %@", data, [data objectForKey:@"ErrorMsg"]);
+    if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
+        _refreshBlock();
+        [self.navigationController popViewControllerAnimated:YES];
+    }else
+    {
+        UIAlertView * alert = [[UIAlertView alloc] initWithTitle:@"" message:[data objectForKey:@"ErrorMsg"] delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
+        [alert show];
+        [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:1.5];
+    }
+    
+    [SVProgressHUD dismiss];
+}
+
+- (void)failWithError:(NSError *)error
+{
+    [SVProgressHUD dismiss];
+    NSLog(@"%@", error);
+}
+
+
+- (void)successBack:(RefreshDataBlock)refreshBlock
+{
+    _refreshBlock = refreshBlock;
 }
 
 /*

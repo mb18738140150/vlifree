@@ -87,24 +87,45 @@
     
     [self addObserver:self forKeyPath:@"shopArray" options:NSKeyValueObservingOptionNew context:nil];
     
-    self.sectionTableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, 80, self.view.height - SHOPPINGCARVIEW_HEIGHT) style:UITableViewStylePlain];
+    UIView * noticeView = [[UIView alloc] initWithFrame:CGRectMake(0, self.navigationController.navigationBar.bottom, self.view.width, 30)];
+    noticeView.backgroundColor = [UIColor colorWithRed:254 / 255.0 green:231 / 255.0 blue:232 / 255.0 alpha:1];
+    [self.view addSubview:noticeView];
+    
+    UIImageView * aImageV = [[UIImageView alloc] initWithFrame:CGRectMake(5, 5, 20, 20)];
+    aImageV.image = [UIImage imageNamed:@"laba.png"];
+    [noticeView addSubview:aImageV];
+    
+    UILabel * noticeLB = [[UILabel alloc] initWithFrame:CGRectMake(aImageV.right + 5, 5, noticeView.width - aImageV.right - 40, 20)];
+    noticeLB.text = @"欢迎商家测试使用";
+    [noticeView addSubview:noticeLB];
+    
+    UIButton * button = [UIButton buttonWithType:UIButtonTypeCustom];
+    button.frame = CGRectMake(noticeLB.right + 10, 5, 20, 20);
+    [button setBackgroundImage:[UIImage imageNamed:@"xx.png ≈"] forState:UIControlStateNormal];
+    [noticeView addSubview:button];
+    
+    
+    self.sectionTableView = [[UITableView alloc] initWithFrame:CGRectMake(0, noticeView.bottom, 80, self.view.height - SHOPPINGCARVIEW_HEIGHT - noticeView.height - self.navigationController.navigationBar.bottom) style:UITableViewStylePlain];
     _sectionTableView.dataSource = self;
     _sectionTableView.delegate = self;
+    _sectionTableView.tableFooterView = [[UIView alloc] init];
 //    [_sectionTableView set]
     [_sectionTableView registerClass:[ClassesViewCell class] forCellReuseIdentifier:SECTION_TABLEVIEW_CELL];
     [_sectionTableView selectRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] animated:YES scrollPosition:UITableViewScrollPositionNone];
 //    _sectionTableView.backgroundColor = [UIColor redColor];
     [self.view addSubview:_sectionTableView];
     
-    self.menusTableView = [[UITableView alloc] initWithFrame:CGRectMake(_sectionTableView.right, self.navigationController.navigationBar.bottom, self.view.width - 80, self.view.height - self.navigationController.navigationBar.bottom - SHOPPINGCARVIEW_HEIGHT) style:UITableViewStylePlain];
+    self.menusTableView = [[UITableView alloc] initWithFrame:CGRectMake(_sectionTableView.right, noticeView.bottom, self.view.width - 80, self.view.height - self.navigationController.navigationBar.bottom - SHOPPINGCARVIEW_HEIGHT - noticeView.height) style:UITableViewStylePlain];
     _menusTableView.delegate = self;
     _menusTableView.dataSource = self;
+    _menusTableView.tableFooterView = [[UIView alloc] init];
     [_menusTableView registerClass:[MenusViewCell class] forCellReuseIdentifier:MENUS_TABLEVIEW_CELL];
 //    _menusTableView.backgroundColor = [UIColor orangeColor];
     [self.view addSubview:_menusTableView];
     
     
     self.shoppingCarView = [[ShoppingCartView alloc] initWithFrame:CGRectMake(0, _menusTableView.bottom, self.view.width, SHOPPINGCARVIEW_HEIGHT)];
+    _shoppingCarView.backgroundColor = [UIColor whiteColor];
     [_shoppingCarView.shoppingCarBT addTarget:self action:@selector(addShoppingCarDetailsViewAction:) forControlEvents:UIControlEventTouchUpInside];
     [_shoppingCarView.changeButton addTarget:self action:@selector(confirmMenusAction:) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:_shoppingCarView];
@@ -131,8 +152,21 @@
 
 - (void)confirmMenusAction:(UIButton *)button
 {
-    TakeOutOrderViewController * orderVC = [[TakeOutOrderViewController alloc] init];
-    [self.navigationController pushViewController:orderVC animated:YES];
+    if ([UserInfo shareUserInfo].userId) {
+        if ([button isEqual:_shoppingCarDetailsView.changeBT]) {
+            [self.shoppingCarDetailsView removeFromSuperview];
+            [self getAllPrice];
+            [self getAllCount];
+        }
+        TakeOutOrderViewController * orderVC = [[TakeOutOrderViewController alloc] init];
+        [self.navigationController pushViewController:orderVC animated:YES];
+    }else
+    {
+        UIAlertView * alert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"请先登录" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil];
+        alert.alertViewStyle = UIAlertViewStyleLoginAndPasswordInput;
+        [alert show];
+    }
+    
 }
 
 
@@ -142,6 +176,7 @@
         self.shoppingCarDetailsView = [[ShoppingDetailsCarView alloc] initWithFrame:[[UIScreen mainScreen] bounds] withMneusArray:self.shopArray];
         self.shoppingCarDetailsView.sendPrice = self.sendPrice;
         [self.shoppingCarDetailsView.shoppingCarBT addTarget:self action:@selector(removeShoppingCarDetailsViewAction:) forControlEvents:UIControlEventTouchUpInside];
+        [_shoppingCarDetailsView.changeBT addTarget:self action:@selector(confirmMenusAction:) forControlEvents:UIControlEventTouchUpInside];
         [self.view.window addSubview:_shoppingCarDetailsView];
     }
 }
@@ -244,6 +279,7 @@
 {
     if ([tableView isEqual:_sectionTableView]) {
         return self.classArray.count;
+        return 15;
     }
     return self.menusArray.count;
 }

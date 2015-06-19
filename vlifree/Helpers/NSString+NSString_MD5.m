@@ -22,6 +22,32 @@
     return [hash lowercaseString];
 }
 
-
+#pragma mark - 手机号码验证
++ (BOOL)isTelPhoneNub:(NSString *)str
+{
+    if (str.length < 11)
+    {
+        UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"请输入正确的手机号码" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
+        [alert show];
+        [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:2];
+        return NO;
+    }
+    else
+    {
+        NSString *regex = @"^(0|86|17951)?(13[0-9]|15[012356789]|17[678]|18[0-9]|14[57])[0-9]{8}$";
+        NSPredicate *pred = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", regex];
+        BOOL isMatch = [pred evaluateWithObject:str];
+        if (!isMatch) {
+            UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"请输入正确的手机号码" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
+            [alert show];
+            [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:2];
+            return NO;
+        }
+        else
+        {
+            return YES;
+        }
+    }
+}
 
 @end

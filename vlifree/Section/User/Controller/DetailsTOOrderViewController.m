@@ -7,13 +7,23 @@
 //
 
 #import "DetailsTOOrderViewController.h"
+#import "OrderMenuVIew.h"
 
-@interface DetailsTOOrderViewController ()
+
+@interface DetailsTOOrderViewController ()<HTTPPostDelegate>
 
 
 @property (nonatomic, strong)UIScrollView * scrollView;
 @property (nonatomic, strong)UIImageView * stateImageV;
 @property (nonatomic, strong)UILabel * stateLabel;
+@property (nonatomic, strong)UILabel * otherPriceLB;
+@property (nonatomic, strong)UILabel * totalPriceLB;
+@property (nonatomic, strong)UILabel * storeNameLB;
+@property (nonatomic, strong)UILabel * orderNumberLB;
+@property (nonatomic, strong)UILabel * orderDateLB;
+@property (nonatomic, strong)UILabel * orderPayTypeLB;
+@property (nonatomic, strong)UILabel * orderTelLB;
+@property (nonatomic, strong)UILabel * orderAddressLB;
 
 
 @end
@@ -119,6 +129,7 @@
     
     UIView * view3 = [[UIView alloc] initWithFrame:CGRectMake(0, view2.bottom + 10, _scrollView.width, 100)];
     view3.backgroundColor = [UIColor whiteColor];
+    view3.tag = 3000;
     [_scrollView addSubview:view3];
     
     UIView * lineView4 = [[UIView alloc] initWithFrame:CGRectMake(0, 0, view3.width, 1)];
@@ -129,35 +140,37 @@
     storeIcon.image = [UIImage imageNamed:@"store.png"];
     [view3 addSubview:storeIcon];
     
-    UILabel * storeNameLB = [[UILabel alloc] initWithFrame:CGRectMake(storeIcon.right + 5, storeIcon.top, view3.width - 10 - storeIcon.right, storeIcon.height)];
-    storeNameLB.text = @"哆啦A梦茶餐厅";
-    [view3 addSubview:storeNameLB];
+    self.storeNameLB = [[UILabel alloc] initWithFrame:CGRectMake(storeIcon.right + 5, storeIcon.top, view3.width - 10 - storeIcon.right, storeIcon.height)];
+    _storeNameLB.text = @"哆啦A梦茶餐厅";
+    [view3 addSubview:_storeNameLB];
     
-    UIView * lineView5 = [[UIView alloc] initWithFrame:CGRectMake(10, storeNameLB.bottom, view3.width - 20, 1)];
+    UIView * lineView5 = [[UIView alloc] initWithFrame:CGRectMake(10, _storeNameLB.bottom, view3.width - 20, 1)];
     lineView5.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
+    lineView5.tag = 5005;
     [view3 addSubview:lineView5];
     
-    UILabel * orderLabel = [[UILabel alloc]initWithFrame:CGRectMake(15, lineView5.bottom + 5, view3.width - 130, 20)];
-    orderLabel.text = @"港式下午茶a套餐";
-    [view3 addSubview:orderLabel];
+//    UILabel * orderLabel = [[UILabel alloc]initWithFrame:CGRectMake(15, lineView5.bottom + 5, view3.width - 130, 20)];
+//    orderLabel.text = @"港式下午茶a套餐";
+//    [view3 addSubview:orderLabel];
+//    
+//    UILabel * orderCountLB = [[UILabel alloc] initWithFrame:CGRectMake(orderLabel.right + 5, orderLabel.top, 20, 20)];
+//    orderCountLB.text = @"1";
+//    [view3 addSubview:orderCountLB];
+//    
+//    UILabel * orderPriceLB = [[UILabel alloc] initWithFrame:CGRectMake(orderCountLB.right + 20, orderLabel.top, 55, 20)];
+//    orderPriceLB.text = @"¥23";
+//    orderPriceLB.textAlignment = NSTextAlignmentRight;
+//    [view3 addSubview:orderPriceLB];
     
-    UILabel * orderCountLB = [[UILabel alloc] initWithFrame:CGRectMake(orderLabel.right + 5, orderLabel.top, 20, 20)];
-    orderCountLB.text = @"1";
-    [view3 addSubview:orderCountLB];
+    view3.height = lineView5.bottom + 5;
     
-    UILabel * orderPriceLB = [[UILabel alloc] initWithFrame:CGRectMake(orderCountLB.right + 20, orderLabel.top, 55, 20)];
-    orderPriceLB.text = @"¥23";
-    orderPriceLB.textAlignment = NSTextAlignmentRight;
-    [view3 addSubview:orderPriceLB];
-    
-    view3.height = orderLabel.bottom + 5;
-    
-    UIView * lineView6 = [[UIView alloc] initWithFrame:CGRectMake(0, view3.height - 1, view3.width, 1)];
-    lineView6.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
-    [view3 addSubview:lineView6];
+//    UIView * lineView6 = [[UIView alloc] initWithFrame:CGRectMake(0, view3.height - 1, view3.width, 1)];
+//    lineView6.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
+//    [view3 addSubview:lineView6];
     
     UIView * view4 = [[UIView alloc] initWithFrame:CGRectMake(0, view3.bottom + 10, _scrollView.width, 100)];
     view4.backgroundColor = [UIColor whiteColor];
+    view4.tag = 4000;
     [_scrollView addSubview:view4];
     
     UIView * lineView7 = [[UIView alloc] initWithFrame:CGRectMake(0, 0, view4.width, 1)];
@@ -168,12 +181,12 @@
     otherTitleLB.text = @"配送费";
     [view4 addSubview:otherTitleLB];
     
-    UILabel * otherPriceLB = [[UILabel alloc] initWithFrame:CGRectMake(view4.width - 70, otherTitleLB.top, 50, 25)];
-    otherPriceLB.text = @"¥35";
-    otherPriceLB.textAlignment = NSTextAlignmentRight;
-    [view4 addSubview:otherPriceLB];
+    self.otherPriceLB = [[UILabel alloc] initWithFrame:CGRectMake(view4.width - 70, otherTitleLB.top, 50, 25)];
+    _otherPriceLB.text = @"¥35";
+    _otherPriceLB.textAlignment = NSTextAlignmentRight;
+    [view4 addSubview:_otherPriceLB];
     
-    UIView * lineView8 = [[UIView alloc] initWithFrame:CGRectMake(10, otherPriceLB.bottom, view4.width - 20, 1)];
+    UIView * lineView8 = [[UIView alloc] initWithFrame:CGRectMake(10, _otherPriceLB.bottom, view4.width - 20, 1)];
     lineView8.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
     [view4 addSubview:lineView8];
     
@@ -181,10 +194,10 @@
     totalLB.text = @"合计";
     [view4 addSubview:totalLB];
     
-    UILabel * totalPriceLB = [[UILabel alloc] initWithFrame:CGRectMake(view4.width - 70, totalLB.top, 50, 25)];
-    totalPriceLB.text = @"¥35";
-    totalPriceLB.textAlignment = NSTextAlignmentRight;
-    [view4 addSubview:totalPriceLB];
+    self.totalPriceLB = [[UILabel alloc] initWithFrame:CGRectMake(view4.width - 70, totalLB.top, 50, 25)];
+    _totalPriceLB.text = @"¥35";
+    _totalPriceLB.textAlignment = NSTextAlignmentRight;
+    [view4 addSubview:_totalPriceLB];
     
     UIView * lineView9 = [[UIView alloc] initWithFrame:CGRectMake(10, totalLB.bottom, view4.width - 20, 1)];
     lineView9.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
@@ -207,6 +220,7 @@
     
     UIView * view5 = [[UIView alloc] initWithFrame:CGRectMake(0, view4.bottom + 10, _scrollView.width, 270)];
     view5.backgroundColor = [UIColor whiteColor];
+    view5.tag = 5000;
     [_scrollView addSubview:view5];
     
     UIView * lineView11 = [[UIView alloc] initWithFrame:CGRectMake(0, 0, view5.width, 1)];
@@ -225,32 +239,74 @@
     lineView12.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
     [view5 addSubview:lineView12];
     
-    UILabel * orderNumberLB = [[UILabel alloc] initWithFrame:CGRectMake(15, lineView12.bottom + 5, lineView12.width - 10, 30)];
-    orderNumberLB.text = @"订单号码: 3247693974979";
-    [view5 addSubview:orderNumberLB];
+    self.orderNumberLB = [[UILabel alloc] initWithFrame:CGRectMake(15, lineView12.bottom + 5, lineView12.width - 10, 30)];
+    _orderNumberLB.text = @"订单号码: 3247693974979";
+    [view5 addSubview:_orderNumberLB];
     
     
-    UILabel * orderDateLB = [[UILabel alloc] initWithFrame:CGRectMake(15, orderNumberLB.bottom + 5, lineView12.width - 10, 30)];
-    orderDateLB.text = @"订单时间: 2015年5月16日 11:24:24";
-    [view5 addSubview:orderDateLB];
+    self.orderDateLB = [[UILabel alloc] initWithFrame:CGRectMake(15, _orderNumberLB.bottom + 5, lineView12.width - 10, 30)];
+    _orderDateLB.text = @"订单时间: 2015年5月16日 11:24:24";
+    [view5 addSubview:_orderDateLB];
     
-    UILabel * orderPayTypeLB = [[UILabel alloc] initWithFrame:CGRectMake(15, orderDateLB.bottom + 5, lineView12.width - 10, 30)];
-    orderPayTypeLB.text = @"支付方式: 餐到付款";
-    [view5 addSubview:orderPayTypeLB];
+    self.orderPayTypeLB = [[UILabel alloc] initWithFrame:CGRectMake(15, _orderDateLB.bottom + 5, lineView12.width - 10, 30)];
+    _orderPayTypeLB.text = @"支付方式: 餐到付款";
+    [view5 addSubview:_orderPayTypeLB];
     
-    UILabel * orderTelLB = [[UILabel alloc] initWithFrame:CGRectMake(15, orderPayTypeLB.bottom + 5, lineView12.width - 10, 30)];
-    orderTelLB.text = @"手机号码: 13739443500";
-    [view5 addSubview:orderTelLB];
+    self.orderTelLB = [[UILabel alloc] initWithFrame:CGRectMake(15, _orderPayTypeLB.bottom + 5, lineView12.width - 10, 30)];
+    _orderTelLB.text = @"手机号码: 13739443500";
+    [view5 addSubview:_orderTelLB];
     
     
-    UILabel * orderAddressLB = [[UILabel alloc] initWithFrame:CGRectMake(15, orderTelLB.bottom + 5, lineView12.width - 10, 30)];
-    orderAddressLB.text = @"收餐地址: 未来路1235号590";
-    [view5 addSubview:orderAddressLB];
-    view5.height = orderAddressLB.bottom + 10;
+    self.orderAddressLB = [[UILabel alloc] initWithFrame:CGRectMake(15, _orderTelLB.bottom + 5, lineView12.width - 10, 30)];
+    _orderAddressLB.text = @"收餐地址: 未来路1235号590";
+    [view5 addSubview:_orderAddressLB];
+    view5.height = _orderAddressLB.bottom + 10;
     
     CGSize size = _scrollView.contentSize;
     size.height = view5.bottom;
     _scrollView.contentSize = size;
+    
+    
+    self.stateImageV.image = [UIImage imageNamed:[NSString stringWithFormat:@"orderState%d.png", [_takeOutOrderMD.orderState intValue]]];
+    switch ([_takeOutOrderMD.orderState intValue]) {
+        case 1:
+        {
+            self.stateLabel.text = @"提交订单";
+        }
+            break;
+        case 2:
+        {
+            self.stateLabel.text = @"餐厅接单";
+        }
+            break;
+        case 3:
+        {
+            self.stateLabel.text = @"配送中";
+        }
+            break;
+        case 4:
+        {
+            self.stateLabel.text = @"已完成";
+        }
+            break;
+        default:
+            break;
+    }
+    self.storeNameLB.text = _takeOutOrderMD.storeName;
+    self.otherPriceLB.text = [NSString stringWithFormat:@"¥%@", _takeOutOrderMD.deliveryMoney];
+    self.totalPriceLB.text = [NSString stringWithFormat:@"¥%@", _takeOutOrderMD.allMoney];
+    self.orderNumberLB.text = [NSString stringWithFormat:@"订到号码:%@", _takeOutOrderMD.orderID];
+    self.orderDateLB.text = [NSString stringWithFormat:@"订单时间:%@",_takeOutOrderMD.time];
+    if ([_takeOutOrderMD.payType isEqualToNumber:@3]) {
+        self.orderPayTypeLB.text = @"支付方式:货到付款";
+    }else
+    {
+        self.orderPayTypeLB.text = @"支付方式:在线支付";
+    }
+    self.orderTelLB.text = [NSString stringWithFormat:@"手机号码:%@", _takeOutOrderMD.nextphone];
+    self.orderAddressLB.text = [NSString stringWithFormat:@"收餐地址:%@", _takeOutOrderMD.address];
+    [self downloadData];
+    
     
     UIButton * backBT = [UIButton buttonWithType:UIButtonTypeCustom];
     backBT.frame = CGRectMake(0, 0, 15, 20);
@@ -266,16 +322,111 @@
     [self.navigationController popViewControllerAnimated:YES];
 }
 
+
+
 - (void)callPhone:(UIButton *)button
 {
-    NSLog(@"22222222");
+    NSLog(@"%@", _takeOutOrderMD.busiPhone);
     UIWebView *callWebView = [[UIWebView alloc] init];
     
-    NSURL *telURL = [NSURL URLWithString:@"tel:13788052976"];
+    NSURL *telURL = [NSURL URLWithString:[NSString stringWithFormat:@"tel:%@", _takeOutOrderMD.busiPhone]];
 //    [[UIApplication sharedApplication] openURL:telURL];
     [callWebView loadRequest:[NSURLRequest requestWithURL:telURL]];
     [self.view addSubview:callWebView];
 }
+
+/*
+- (void)setTakeOutOrderMD:(TakeOutOrderMD *)takeOutOrderMD
+{
+    _takeOutOrderMD = takeOutOrderMD;
+    self.stateImageV.image = [UIImage imageNamed:[NSString stringWithFormat:@"orderState%d.png", [takeOutOrderMD.orderState intValue]]];
+    switch ([takeOutOrderMD.orderState intValue]) {
+        case 1:
+        {
+            self.stateLabel.text = @"提交订单";
+        }
+            break;
+        case 2:
+        {
+            self.stateLabel.text = @"餐厅接单";
+        }
+            break;
+        case 3:
+        {
+            self.stateLabel.text = @"配送中";
+        }
+            break;
+        case 4:
+        {
+            self.stateLabel.text = @"已完成";
+        }
+            break;
+        default:
+            break;
+    }
+    self.otherPriceLB.text = [NSString stringWithFormat:@"¥%@", takeOutOrderMD.deliveryMoney];
+    self.totalPriceLB.text = [NSString stringWithFormat:@"¥%@", takeOutOrderMD.allMoney];
+    self.orderNumberLB.text = [NSString stringWithFormat:@"订到号码:%@", takeOutOrderMD.orderID];
+    self.orderDateLB.text = [NSString stringWithFormat:@"订单时间:%@",takeOutOrderMD.time];
+    if ([takeOutOrderMD.payType isEqualToNumber:@3]) {
+        self.orderPayTypeLB.text = @"支付方式:货到付款";
+    }else
+    {
+        self.orderPayTypeLB.text = @"支付方式:在线支付";
+    }
+    self.orderTelLB.text = [NSString stringWithFormat:@"手机号码:%@", takeOutOrderMD.nextPhone];
+    self.orderAddressLB.text = [NSString stringWithFormat:@"收餐地址:%@", takeOutOrderMD.address];
+}
+*/
+
+#pragma mark - 数据请求
+- (void)downloadData
+{
+    
+    NSDictionary * jsonDic = @{
+                               @"Command":@24,
+                               @"Id":_takeOutOrderMD.orderID,
+                               };
+    [self playPostWithDictionary:jsonDic];
+    /*
+     //    NSLog(@"%@, %@", self.classifyId, [UserInfo shareUserInfo].userId);
+     NSString * jsonStr = [jsonDic JSONString];
+     NSString * str = [NSString stringWithFormat:@"%@231618", jsonStr];
+     NSLog(@"%@", str);
+     NSString * md5Str = [str md5];
+     NSString * urlString = [NSString stringWithFormat:@"http://p.vlifee.com/getdata.ashx?md5=%@",md5Str];
+     
+     HTTPPost * httpPost = [HTTPPost shareHTTPPost];
+     [httpPost post:urlString HTTPBody:[jsonStr dataUsingEncoding:NSUTF8StringEncoding]];
+     httpPost.delegate = self;
+     */
+}
+
+
+
+- (void)playPostWithDictionary:(NSDictionary *)dic
+{
+    NSString * jsonStr = [dic JSONString];
+    NSLog(@"%@", jsonStr);
+    NSString * str = [NSString stringWithFormat:@"%@231618", jsonStr];
+    NSString * md5Str = [str md5];
+    NSString * urlString = [NSString stringWithFormat:@"%@%@", POST_URL, md5Str];
+    
+    HTTPPost * httpPost = [HTTPPost shareHTTPPost];
+    [httpPost post:urlString HTTPBody:[jsonStr dataUsingEncoding:NSUTF8StringEncoding]];
+    httpPost.delegate = self;
+}
+
+- (void)refresh:(id)data
+{
+    NSLog(@"+++%@", data);
+    if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
+        UIView * view3 = [self.scrollView viewWithTag:3000];
+        
+    }
+    [SVProgressHUD dismiss];
+}
+
 
 
 - (void)didReceiveMemoryWarning {

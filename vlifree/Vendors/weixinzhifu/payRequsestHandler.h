@@ -46,7 +46,7 @@
 //商户号，填写商户对应参数
 #define MCH_ID          @"1245069702"
 //商户API密钥，填写相应参数
-#define PARTNER_ID      @"p2j4b57gmdk90nd5bla84nkyqldicn32"
+#define PARTNER_ID      @"I57gmdk90nd5bla84nkyqldicn3294Fh"
 //支付结果回调页面
 #define NOTIFY_URL      @"http://wxpay.weixin.qq.com/pub_v2/pay/notify.v2.php"
 //获取服务器端支付数据地址（商户自定义）

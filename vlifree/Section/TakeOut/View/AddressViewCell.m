@@ -59,14 +59,15 @@
     
 //    }
     self.addressLB.text = [NSString stringWithFormat:@"送餐地址:%@", addressModel.address];
+//    [_addressLB sizeToFit];
+//    CGRect rect = [_addressLB.text boundingRectWithSize:CGSizeMake(_addressLB.width, CGFLOAT_MAX) options:(NSStringDrawingUsesFontLeading | NSStringDrawingUsesLineFragmentOrigin) attributes:[NSDictionary dictionaryWithObjectsAndKeys:[UIFont systemFontOfSize:17], NSFontAttributeName, nil] context:nil];
+//    _addressLB.height = rect.size.height;
     CGSize size = [_addressLB sizeThatFits:CGSizeMake(_addressLB.width, CGFLOAT_MAX)];
-    CGRect addressFram = _addressLB.frame;
-    addressFram.size = size;
-    _addressLB.frame = addressFram;
+    _addressLB.height = size.height;
     CGRect frame = _telLabel.frame;
     frame.origin.y = _addressLB.bottom;
     _telLabel.frame = frame;
-    self.telLabel.text = addressModel.tel;
+    self.telLabel.text = addressModel.phoneNumber;
    
 }
 

@@ -108,7 +108,8 @@
             _dataArray = nil;
         }
         for (NSDictionary * dic in array) {
-
+            TakeOutOrderMD * takeOutOrderMD = [[TakeOutOrderMD alloc] initWithDictionary:dic];
+            [self.dataArray addObject:takeOutOrderMD];
         }
         [self.tableView reloadData];
     }
@@ -138,13 +139,15 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     // Return the number of rows in the section.
-    return 10;
+    return self.dataArray.count;
 }
 
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    TakeOutOrderMD * takeOutMD = [self.dataArray objectAtIndex:indexPath.row];
     TOOrderViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell" forIndexPath:indexPath];
     [cell crateSubview:tableView.bounds];
+    cell.takeOutOrderMD = takeOutMD;
     // Configure the cell...
     return cell;
 }
@@ -156,7 +159,9 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    TakeOutOrderMD * takeOutOrderMD = [self.dataArray objectAtIndex:indexPath.row];
     DetailsTOOrderViewController * detailsVC = [[DetailsTOOrderViewController alloc] init];
+    detailsVC.takeOutOrderMD = takeOutOrderMD;
     [self.navigationController pushViewController:detailsVC animated:YES];
 }
 

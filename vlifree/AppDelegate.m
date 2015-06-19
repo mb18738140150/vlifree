@@ -49,6 +49,8 @@
     if ([resp isKindOfClass:[SendAuthResp class]]) {
         SendAuthResp * sendAR = (SendAuthResp *)resp;
         if (sendAR.errCode == 0) {//0代表已授权登陆
+            [self getUserLogInVCWithCode:sendAR.code];
+            /*
             //根据授权获取 access_token
             NSString * urlString = [NSString stringWithFormat:@"https://api.weixin.qq.com/sns/oauth2/access_token?appid=wxaac5e5f7421e84ac&secret=055e7e10c698b7b140511d8d1a73cec4&code=%@&grant_type=authorization_code", sendAR.code];
             NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:urlString]];
@@ -73,12 +75,12 @@
                             if (infoData) {
                                 NSDictionary * infoDic = [NSJSONSerialization JSONObjectWithData:infoData options:0 error:nil];
                                 NSLog(@"user info = %@", infoDic);
-                                [self getUserLogInVCWithCode:sendAR.code];
                             }
                         }
                     }
                 }
             }
+            */
         }
     }else if ([resp isKindOfClass:[PayResp class]])
     {

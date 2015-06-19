@@ -15,7 +15,7 @@
 
 
 
-@interface AddressViewController ()<UITableViewDataSource, UITableViewDelegate>
+@interface AddressViewController ()<UITableViewDataSource, UITableViewDelegate, HTTPPostDelegate>
 
 @property (nonatomic, strong)NSMutableArray * dataArray;
 
@@ -23,6 +23,7 @@
 @property (nonatomic, strong)UILabel * telLabel;
 @property (nonatomic, strong)UIButton * editButton;
 @property (nonatomic, strong)UIButton * sentButton;
+@property (nonatomic, strong)UIButton * deleteButton;
 @property (nonatomic, strong)UITableView * addressTableView;
 
 @property (nonatomic, copy)ReturnAddresssModelBlock returnModelBlock;
@@ -34,15 +35,16 @@
 - (NSMutableArray *)dataArray{
     if (!_dataArray) {
         self.dataArray = [NSMutableArray array];
+        /*
         for (int i = 0; i < 10; i++) {
             AddressModel * model = [[AddressModel alloc] init];
             model.address = [NSString stringWithFormat:@"新西环路科苑小区5号楼20%d", i];
-            model.tel = [NSString stringWithFormat:@"137004478%d", arc4random() % 899 + 100];
+            model.phoneNumber = [NSString stringWithFormat:@"137004478%d", arc4random() % 899 + 100];
             [_dataArray addObject:model];
             [self.addressTableView selectRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] animated:YES scrollPosition:UITableViewScrollPositionNone];
             if (i == 0) {
                 self.addressLB.text = [NSString stringWithFormat:@"送餐地址:%@",  model.address];
-                self.telLabel.text = model.tel;
+                self.telLabel.text = model.phoneNumber;
                 CGSize size = [_addressLB sizeThatFits:CGSizeMake(_addressLB.width, CGFLOAT_MAX)];
                 CGRect frame = _addressLB.frame;
                 frame.size = size;
@@ -50,6 +52,7 @@
                 [self reloadViewsFrame];
             }
         }
+         */
     }
     return _dataArray;
 }
@@ -74,15 +77,16 @@
     UIView * lineView = [[UIView alloc] initWithFrame:CGRectMake(0, addAddressBT.bottom, self.view.width, 1)];
     lineView.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
     [self.view addSubview:lineView];
-    UIView * lineView2 = [[UIView alloc] initWithFrame:CGRectMake(0, lineView.bottom + 10, self.view.width, 1)];
-    lineView2.backgroundColor = [UIColor colorWithWhite:0.7 alpha:0.8];
-    [self.view addSubview:lineView2];
     
-    UIView * addressView = [[UIView alloc] initWithFrame:CGRectMake(0, lineView2.bottom, self.view.width, 60)];
+    
+    UIView * addressView = [[UIView alloc] initWithFrame:CGRectMake(0, addAddressBT.bottom + 10, self.view.width, 60)];
     addressView.tag = 1001;
     addressView.backgroundColor = [UIColor whiteColor];
+    addressView.hidden= YES;
     [self.view addSubview:addressView];
-    
+    UIView * lineView2 = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, 1)];
+    lineView2.backgroundColor = [UIColor colorWithWhite:0.7 alpha:0.8];
+    [addressView addSubview:lineView2];
     
     UIImageView * aImageView = [[UIImageView alloc] initWithFrame:CGRectMake(10, 0, 25, 25)];
     aImageView.image = [UIImage imageNamed:@"didChange.png"];
@@ -106,7 +110,7 @@
     [addressView addSubview:lineView3];
     
     self.editButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    _editButton.frame = CGRectMake(addressView.width - 185, lineView3.bottom + 5, 65, 25);
+    _editButton.frame = CGRectMake(addressView.width - 180, lineView3.bottom + 5, 65, 25);
     [_editButton setTitle:@"编辑" forState:UIControlStateNormal];
     [_editButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     _editButton.layer.borderColor = [UIColor orangeColor].CGColor;
@@ -126,15 +130,24 @@
     [_sentButton addTarget:self action:@selector(sentAddressAndPhoneNumber:) forControlEvents:UIControlEventTouchUpInside];
     [addressView addSubview:_sentButton];
     
+    self.deleteButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    _deleteButton.frame = CGRectMake(addressView.width - 300, _sentButton.top, 60, 25);
+    [_deleteButton setTitle:@"删除" forState:UIControlStateNormal];
+    [_deleteButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+    _deleteButton.layer.borderColor = [UIColor orangeColor].CGColor;
+    _deleteButton.layer.borderWidth = 1.f;
+    _deleteButton.layer.cornerRadius = 3.f;
+    [_deleteButton addTarget:self action:@selector(deleteAddressAndPhoneNumber:) forControlEvents:UIControlEventTouchUpInside];
+    [addressView addSubview:_deleteButton];
     
     CGRect frame = addressView.frame;
     frame.size.height = _editButton.bottom + 5;
     addressView.frame = frame;
     
-    UIView * lineView4 = [[UIView alloc] initWithFrame:CGRectMake(0, addressView.bottom, self.view.width, 1)];
+    UIView * lineView4 = [[UIView alloc] initWithFrame:CGRectMake(0, addressView.height - 1, self.view.width, 1)];
     lineView4.tag = 1003;
     lineView4.backgroundColor = [UIColor colorWithWhite:0.7 alpha:0.8];
-    [self.view addSubview:lineView4];
+    [addressView addSubview:lineView4];
     
     UIView * lineView5 = [[UIView alloc] initWithFrame:CGRectMake(0, addressView.bottom + 10, self.view.width, 1)];
     lineView5.tag = 1004;
@@ -146,6 +159,9 @@
     _addressTableView.delegate = self;
     [_addressTableView registerClass:[AddressViewCell class] forCellReuseIdentifier:@"cell"];
     [self.view addSubview:_addressTableView];
+    
+    [self downloadData];
+    
     
     UIButton * backBT = [UIButton buttonWithType:UIButtonTypeCustom];
     backBT.frame = CGRectMake(0, 0, 15, 20);
@@ -164,16 +180,36 @@
 {
     NSLog(@"添加地址");
     AddAddressViewController * addVC = [[AddAddressViewController alloc] init];
+    AddressViewController * addressVC = self;
+    [addVC successBack:^{
+        [addressVC downloadData];
+    }];
     [self.navigationController pushViewController:addVC animated:YES];
 }
 
 - (void)editAddressAndPhoneNumber:(UIButton *)button
 {
     NSIndexPath * seletedIndexP = [self.addressTableView indexPathForSelectedRow];
+    AddressViewController * addressVC = self;
     AddAddressViewController * addVC = [[AddAddressViewController alloc] init];
     addVC.addressModel = [self.dataArray objectAtIndex:seletedIndexP.row];
+    [addVC successBack:^{
+        [addressVC downloadData];
+    }];
     [self.navigationController pushViewController:addVC animated:YES];
     NSLog(@"编辑");
+}
+
+- (void)deleteAddressAndPhoneNumber:(UIButton *)button
+{
+    NSIndexPath * seletedIndexPath = [self.addressTableView indexPathForSelectedRow];
+    AddressModel * model = [self.dataArray objectAtIndex:seletedIndexPath.row];
+    NSDictionary * jsonDic = @{
+                               @"Command":@30,
+                               @"UserId":[UserInfo shareUserInfo].userId,
+                               @"AddressId":model.addressId
+                               };
+    [self playPostWithDictionary:jsonDic];
 }
 
 - (void)sentAddressAndPhoneNumber:(UIButton *)button
@@ -190,6 +226,90 @@
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
+
+
+#pragma mark - 数据请求
+- (void)downloadData
+{
+    
+    NSDictionary * jsonDic = @{
+                               @"Command":@15,
+                               @"UserId":[UserInfo shareUserInfo].userId
+                               };
+    [self playPostWithDictionary:jsonDic];
+    /*
+     //    NSLog(@"%@, %@", self.classifyId, [UserInfo shareUserInfo].userId);
+     NSString * jsonStr = [jsonDic JSONString];
+     NSString * str = [NSString stringWithFormat:@"%@231618", jsonStr];
+     NSLog(@"%@", str);
+     NSString * md5Str = [str md5];
+     NSString * urlString = [NSString stringWithFormat:@"http://p.vlifee.com/getdata.ashx?md5=%@",md5Str];
+     
+     HTTPPost * httpPost = [HTTPPost shareHTTPPost];
+     [httpPost post:urlString HTTPBody:[jsonStr dataUsingEncoding:NSUTF8StringEncoding]];
+     httpPost.delegate = self;
+     */
+}
+
+- (void)playPostWithDictionary:(NSDictionary *)dic
+{
+    NSString * jsonStr = [dic JSONString];
+    //    NSLog(@"%@", jsonStr);
+    NSString * str = [NSString stringWithFormat:@"%@231618", jsonStr];
+    NSString * md5Str = [str md5];
+    NSString * urlString = [NSString stringWithFormat:@"%@%@", POST_URL, md5Str];
+    
+    HTTPPost * httpPost = [HTTPPost shareHTTPPost];
+    [httpPost post:urlString HTTPBody:[jsonStr dataUsingEncoding:NSUTF8StringEncoding]];
+    httpPost.delegate = self;
+}
+
+- (void)refresh:(id)data
+{
+    NSLog(@"+++%@, %@", data, [data objectForKey:@"ErrorMsg"]);
+    if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
+        if ([[data objectForKey:@"Command"] isEqualToNumber:@10015]) {
+            NSArray * array = [data objectForKey:@"AddressList"];
+            _dataArray = nil;
+            int seletNum = 0;
+            for (int i = 0; i < array.count; i++) {
+                NSDictionary * dic = [array objectAtIndex:i];
+                AddressModel * addressMD = [[AddressModel alloc] initWithDictionary:dic];
+                if ([addressMD.isDefault isEqualToNumber:@1]) {
+                    seletNum = i;
+                }
+                [self.dataArray addObject:addressMD];
+            }
+            UIView * addressView = [self.view viewWithTag:1001];
+            if (self.dataArray.count > 0) {
+                addressView.hidden = NO;
+            }else
+            {
+                addressView.hidden = YES;
+            }
+            [self.addressTableView reloadData];
+            AddressModel * addressMD = [self.dataArray objectAtIndex:seletNum];
+            self.addressLB.text = [NSString stringWithFormat:@"送餐地址:%@", addressMD.address];
+            CGSize size = [_addressLB sizeThatFits:CGSizeMake(_addressLB.width, MAXFLOAT)];
+            _addressLB.height = size.height;
+            self.telLabel.text = addressMD.phoneNumber;
+            [self reloadViewsFrame];
+            [self.addressTableView selectRowAtIndexPath:[NSIndexPath indexPathForRow:seletNum inSection:0] animated:YES scrollPosition:UITableViewScrollPositionNone];
+        }else if ([[data objectForKey:@"Command"] isEqualToNumber:@10030])
+        {
+            [self downloadData];
+        }
+    }
+    [SVProgressHUD dismiss];
+}
+
+- (void)failWithError:(NSError *)error
+{
+    [SVProgressHUD dismiss];
+    NSLog(@"%@", error);
+}
+
+
 
 
 #pragma mark - tableView
@@ -225,8 +345,9 @@
 {
     AddressModel * address = [self.dataArray objectAtIndex:indexPath.row];
     self.addressLB.text = [NSString stringWithFormat:@"送餐地址:%@", address.address];
-    [_addressLB sizeToFit];
-    self.telLabel.text = address.tel;
+    CGSize size = [_addressLB sizeThatFits:CGSizeMake(_addressLB.width, MAXFLOAT)];
+    _addressLB.height = size.height;
+    self.telLabel.text = address.phoneNumber;
     [self reloadViewsFrame];
 }
 
@@ -249,14 +370,15 @@
     CGRect sentFrame = _sentButton.frame;
     sentFrame.origin.y = _editButton.top;
     _sentButton.frame = sentFrame;
+    _deleteButton.top = _editButton.top;
     CGRect addressFrame = addressView.frame;
     addressFrame.size.height = _editButton.bottom + 5;
     addressView.frame = addressFrame;
     CGRect line4Frame = lineView4.frame;
-    line4Frame.origin.y = addressView.bottom;
+    line4Frame.origin.y = addressView.height - 1;
     lineView4.frame = line4Frame;
     CGRect line5Frame = lineView5.frame;
-    line5Frame.origin.y = lineView4.bottom + 10;
+    line5Frame.origin.y = addressView.bottom + 10;
     lineView5.frame = line5Frame;
     CGRect tableViewFrame = _addressTableView.frame;
     tableViewFrame.origin.y = lineView5.bottom;

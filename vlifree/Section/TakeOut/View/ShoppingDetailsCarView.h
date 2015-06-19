@@ -13,6 +13,7 @@
 
 @property (nonatomic, strong)NSMutableArray * menusArray;
 @property (nonatomic, strong)UIButton * shoppingCarBT;
+@property (nonatomic, strong)UIButton * changeBT;
 
 @property (nonatomic, strong)NSNumber * sendPrice;
 

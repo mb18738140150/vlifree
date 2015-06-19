@@ -9,10 +9,12 @@
 #import <UIKit/UIKit.h>
 
 @class AddressModel;
+typedef void(^RefreshDataBlock)();
 @interface AddAddressViewController : UIViewController
 
 
 @property(nonatomic, strong)AddressModel * addressModel;
 
+- (void)successBack:(RefreshDataBlock)refreshBlock;
 
 @end

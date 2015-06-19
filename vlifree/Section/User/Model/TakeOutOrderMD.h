@@ -20,8 +20,9 @@
 @property (nonatomic, strong)NSNumber * orderState;
 @property (nonatomic, strong)NSNumber * deliveryMoney;
 @property (nonatomic, strong)NSNumber * allMoney;
-@property (nonatomic, copy)NSString * nextPhone;
+@property (nonatomic, copy)NSString * nextphone;
 @property (nonatomic, copy)NSString * address;
+@property (nonatomic, strong)NSNumber * payType;
 
 - (id)initWithDictionary:(NSDictionary *)dic;
 

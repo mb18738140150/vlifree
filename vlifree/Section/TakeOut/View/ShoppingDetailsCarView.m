@@ -40,7 +40,6 @@
 @property (nonatomic, strong)UILabel * otherPriceLB;
 @property (nonatomic, strong)UIButton * clearCarBT;
 @property (nonatomic, strong)UILabel * priceLabel;
-@property (nonatomic, strong)UIButton * changeBT;
 @property (nonatomic, strong)UILabel * countLabel;
 
 

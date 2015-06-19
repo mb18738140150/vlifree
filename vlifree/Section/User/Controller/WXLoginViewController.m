@@ -1,19 +1,18 @@
 //
-//  PhoneViewController.m
+//  WXLoginViewController.m
 //  vlifree
 //
-//  Created by 仙林 on 15/6/17.
+//  Created by 仙林 on 15/6/18.
 //  Copyright (c) 2015年 仙林. All rights reserved.
 //
 
-#import "PhoneViewController.h"
+#import "WXLoginViewController.h"
 
 #define TOP_SPACE 30
 #define LEFT_SPACE 10
 #define VIEW_HEIGHT 40
 #define TEXTFILED_HEIGHT 30
 #define IMAGE_SIZE 30
-#define LABEL_WIDTH 80
 #define REGISTER_BUTTON_WIDTH 100
 
 #define WEIXIN_BUTTON_WIDTH 65
@@ -22,20 +21,26 @@
 //#define VIEW_COLOR [UIColor redColor]
 #define VIEW_COLOR [UIColor clearColor]
 
-@interface PhoneViewController ()<HTTPPostDelegate>
+@interface WXLoginViewController ()<HTTPPostDelegate>
 
-@property (nonatomic, copy)RefreshUserInfo refreshBlock;
+
 @property (nonatomic, strong)UITextField * phoneTF;
+@property (nonatomic, strong)UITextField * passwordTF;
+@property (nonatomic, strong)UIButton * logInButton;
+@property (nonatomic, copy)RefreshUserInfo refreshBlock;
 
-@property (nonatomic, copy)NSString * phone;
+
+
 @end
 
-@implementation PhoneViewController
+@implementation WXLoginViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     
     self.view.backgroundColor = [UIColor whiteColor];
+    self.navigationController.navigationBar.barTintColor = MAIN_COLOR;
+    
     UIView * phoneView = [[UIView alloc] initWithFrame:CGRectMake(LEFT_SPACE, TOP_SPACE + self.navigationController.navigationBar.bottom, self.view.width - 2 * LEFT_SPACE, VIEW_HEIGHT)];
     phoneView.layer.borderColor = [UIColor colorWithWhite:0.8 alpha:1].CGColor;
     phoneView.layer.borderWidth = 0.7;
@@ -45,54 +50,75 @@
     UIImageView * phoneImage = [[UIImageView alloc] initWithFrame:CGRectMake(LEFT_SPACE, (VIEW_HEIGHT - IMAGE_SIZE) / 2, IMAGE_SIZE, IMAGE_SIZE)];
     phoneImage.image = [UIImage imageNamed:@"phone.png"];
     phoneImage.backgroundColor = VIEW_COLOR;
-//    [phoneView addSubview:phoneImage];
-    
-    UILabel * phoneLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, (VIEW_HEIGHT - IMAGE_SIZE) / 2, LABEL_WIDTH, IMAGE_SIZE)];
-    phoneLB.text = @"输入手机号:";
-    phoneLB.font = [UIFont systemFontOfSize:15];
-    [phoneView addSubview:phoneLB];
-    
-    self.phoneTF = [[UITextField alloc] initWithFrame:CGRectMake(phoneLB.right + 5, phoneLB.top, phoneView.width - 10 - phoneLB.right, IMAGE_SIZE)];
+    [phoneView addSubview:phoneImage];
+    self.phoneTF = [[UITextField alloc] initWithFrame:CGRectMake(phoneImage.right + 5, phoneImage.top, phoneView.width - 10 - phoneImage.right, IMAGE_SIZE)];
     _phoneTF.placeholder = @"手机号";
     _phoneTF.font = [UIFont systemFontOfSize:22];
-//    _phoneTF.keyboardType = UIKeyboardTypePhonePad;
+    _phoneTF.keyboardType = UIKeyboardTypePhonePad;
     _phoneTF.clearButtonMode = UITextFieldViewModeWhileEditing;
     [phoneView addSubview:_phoneTF];
     
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"确定" style:UIBarButtonItemStylePlain target:self action:@selector(determineModifyPhoneNum:)];
+    UIView * passwordView = [[UIView alloc] initWithFrame:CGRectMake(LEFT_SPACE, TOP_SPACE + phoneView.bottom, self.view.width - 2 * LEFT_SPACE, VIEW_HEIGHT)];
+    passwordView.layer.borderColor = [UIColor colorWithWhite:0.8 alpha:1].CGColor;
+    passwordView.layer.borderWidth = 0.7;
+    passwordView.layer.cornerRadius = 3;
+    [self.view addSubview:passwordView];
+    
+    UIImageView * passwordImage = [[UIImageView alloc] initWithFrame:CGRectMake(LEFT_SPACE, (VIEW_HEIGHT - IMAGE_SIZE) / 2, IMAGE_SIZE, IMAGE_SIZE)];
+    passwordImage.image = [UIImage imageNamed:@"password.png"];
+    passwordImage.backgroundColor = VIEW_COLOR;
+    [passwordView addSubview:passwordImage];
+    self.passwordTF = [[UITextField alloc] initWithFrame:CGRectMake(passwordImage.right + 5, passwordImage.top, passwordView.width - 10 - passwordImage.right, IMAGE_SIZE)];
+    _passwordTF.placeholder = @"密码";
+    _passwordTF.font = [UIFont systemFontOfSize:22];
+    _passwordTF.keyboardType = UIKeyboardTypeNumbersAndPunctuation;
+    _passwordTF.secureTextEntry = YES;
+    _passwordTF.clearButtonMode = UITextFieldViewModeWhileEditing;
+    [passwordView addSubview:_passwordTF];
+    
+    
+    self.logInButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    _logInButton.frame = CGRectMake(LEFT_SPACE, passwordView.bottom + TOP_SPACE, passwordView.width, VIEW_HEIGHT);
+    _logInButton.backgroundColor = MAIN_COLOR;
+    [_logInButton setTitle:@"确认" forState:UIControlStateNormal];
+    [_logInButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    [_logInButton addTarget:self action:@selector(bindingPhonePassword:) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:_logInButton];
     
     
     UIButton * backBT = [UIButton buttonWithType:UIButtonTypeCustom];
     backBT.frame = CGRectMake(0, 0, 15, 20);
     [backBT setBackgroundImage:[UIImage imageNamed:@"back_w.png"] forState:UIControlStateNormal];
-    [backBT addTarget:self action:@selector(backLastVC:) forControlEvents:UIControlEventTouchUpInside];
+    [backBT addTarget:self action:@selector(backLoginVC:) forControlEvents:UIControlEventTouchUpInside];
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:backBT];
     
     // Do any additional setup after loading the view.
 }
 
-- (void)backLastVC:(id)sender
+
+- (void)backLoginVC:(id)sender
 {
-    [self.navigationController popViewControllerAnimated:YES];
+    [self.navigationController dismissViewControllerAnimated:YES completion:nil];
 }
 
 
-- (void)determineModifyPhoneNum:(UIBarButtonItem *)barBT
+
+- (void)bindingPhonePassword:(UIButton *)button
 {
-    [self.phoneTF resignFirstResponder];
-    if (self.phoneTF.text.length == 0) {
+    NSLog(@"0404004");
+    if (_phoneTF.text.length == 0) {
         UIAlertView * alert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"请输入手机号" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
         [alert show];
         [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:2];
-    }else if ([self.phoneTF.text isEqualToString:[NSString stringWithFormat:@"%@", [UserInfo shareUserInfo].phoneNumber]])
+    }else if (_passwordTF.text.length == 0)
     {
-        UIAlertView * alert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"这号码和原号码一样" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
+        UIAlertView * alert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"请输入密码" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
         [alert show];
         [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:2];
-    }else{
+    }else
+    {
         BOOL isPhoneNum = [NSString isTelPhoneNub:_phoneTF.text];
         if (isPhoneNum) {
-            _phone = self.phoneTF.text;
             [self downloadData];
         }
     }
@@ -103,8 +129,10 @@
 - (void)downloadData
 {
     NSDictionary * jsonDic = @{
-                               @"Command":@22,
+                               @"Command":@8,
                                @"UserId":[UserInfo shareUserInfo].userId,
+                               @"LoginType":@2,
+                               @"Password":self.passwordTF.text,
                                @"PhoneNumber":self.phoneTF.text
                                };
     [self playPostWithDictionary:jsonDic];
@@ -139,8 +167,8 @@
 {
     NSLog(@"+++%@", data);
     if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
-        [UserInfo shareUserInfo].phoneNumber = [NSNumber numberWithLongLong:self.phoneTF.text.longLongValue];
-        [self.navigationController popViewControllerAnimated:YES];
+        [[UserInfo shareUserInfo] setValuesForKeysWithDictionary:[data objectForKey:@"UserInfo"]];
+        [self.navigationController dismissViewControllerAnimated:YES completion:nil];
         _refreshBlock();
     }else
     {
@@ -162,6 +190,7 @@
 {
     _refreshBlock = refreshBlock;
 }
+
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];

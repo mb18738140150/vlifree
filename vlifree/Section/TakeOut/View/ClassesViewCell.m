@@ -30,6 +30,7 @@
         self.backgroundColor = [UIColor colorWithWhite:0.95 alpha:0.7];
         self.titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 10, LABEL_WIDTH, 20)];
         _titleLabel.numberOfLines = 0;
+        _titleLabel.text = @"ejoejjeojfooofjjf";
         _titleLabel.lineBreakMode = NSLineBreakByWordWrapping;
 
         _titleLabel.font = [UIFont systemFontOfSize:14];
