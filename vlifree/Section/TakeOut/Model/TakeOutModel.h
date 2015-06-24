@@ -19,7 +19,8 @@
 @property (nonatomic, strong)NSNumber * outSentMoney;
 @property (nonatomic, strong)NSNumber * peyType;
 @property (nonatomic, copy)NSString * address;
-
+@property (nonatomic, strong)NSNumber * isFirstOrder;
+@property (nonatomic, strong)NSNumber * isFull;
 
 
 - (id)initWithDictionary:(NSDictionary *)dic;

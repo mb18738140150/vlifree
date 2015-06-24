@@ -244,18 +244,31 @@
 {
     NSLog(@"+++%@", data);
     if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
-        NSLog(@"%@", [data objectForKey:@"ErrorMsg"]);
-        self.allCount = [data objectForKey:@"AllCount"];
-        NSArray * array = [data objectForKey:@"HotelList"];
-        if(_page == 1)
+        if([[data objectForKey:@"Command"] isEqualToNumber:@10028])
         {
-            _dataArray = nil;
+            UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:@"收藏成功" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
+            [alert show];
+            [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:1.5];
+        }else
+        {
+            self.allCount = [data objectForKey:@"AllCount"];
+            NSArray * array = [data objectForKey:@"HotelList"];
+            if(_page == 1)
+            {
+                _dataArray = nil;
+            }
+            for (NSDictionary * dic in array) {
+                HotelModel * hotelMD = [[HotelModel alloc] initWithDictionary:dic];
+                [self.dataArray addObject:hotelMD];
+            }
+            [self.groshopTabelView reloadData];
         }
-        for (NSDictionary * dic in array) {
-            HotelModel * hotelMD = [[HotelModel alloc] initWithDictionary:dic];
-            [self.dataArray addObject:hotelMD];
-        }
-        [self.groshopTabelView reloadData];
+        NSLog(@"%@", [data objectForKey:@"ErrorMsg"]);
+    }else
+    {
+        UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:[data objectForKey:@"ErrorMsg"] delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
+        [alert show];
+        [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:1.5];
     }
     [self.groshopTabelView headerEndRefreshing];
     [self.groshopTabelView footerEndRefreshing];
@@ -318,8 +331,23 @@
     HotelModel * hotelMD = [self.dataArray objectAtIndex:indexPath.row];
     GrogshopViewCell * cell = [tableView dequeueReusableCellWithIdentifier:CELL_INDENTIFIER];
     [cell createSubiew:tableView.bounds];
+    __weak GrogshopViewController * grogshopVC = self;
     cell.rightButtons = @[[MGSwipeButton buttonWithTitle:@"关注酒店" backgroundColor:[UIColor redColor] callback:^BOOL(MGSwipeTableCell *sender) {
         NSLog(@"111");
+        if ([UserInfo shareUserInfo].userId) {
+            NSDictionary * jsonDic = @{
+                                       @"UserId":[UserInfo shareUserInfo].userId,
+                                       @"Command":@28,
+                                       @"Flag":@1,
+                                       @"Id":hotelMD.hotelId
+                                       };
+            [grogshopVC playPostWithDictionary:jsonDic];
+        }else
+        {
+            UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:@"收藏需要先登录" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
+            [alert show];
+            [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:1.5];
+        }
         return YES;
     }]];
     [cell.IconButton addTarget:self action:@selector(lookBigImage:) forControlEvents:UIControlEventTouchUpInside];

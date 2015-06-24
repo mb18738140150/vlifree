@@ -7,9 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "MGSwipeTableCell.h"
+
 
 @class CollectModel;
-@interface HomeViewCell : UITableViewCell
+@interface HomeViewCell : MGSwipeTableCell
 
 @property (nonatomic, strong)CollectModel * collectModel;
 @property (nonatomic, strong)UIButton * IconButton;

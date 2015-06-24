@@ -49,7 +49,7 @@
         self.icon = [[UIImageView alloc] initWithFrame:CGRectMake(LEFT_SPACE, TOP_SPACE, IMAGE_SIZE, IMAGE_SIZE)];
         _icon.backgroundColor = VIEW_COLOR;
 //        _icon.image = [UIImage imageNamed:@"home_takeOut.png"];
-        [self addSubview:_icon];
+        [self.contentView addSubview:_icon];
         
         self.IconButton = [UIButton buttonWithType:UIButtonTypeCustom];
         _IconButton.frame = _icon.bounds;
@@ -58,33 +58,33 @@
         self.titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(_icon.right + LEFT_SPACE, _icon.top, CENTRE_LABEL_WIDTH, LABEL_HEIGTH)];
         _titleLabel.backgroundColor = VIEW_COLOR;
 //        _titleLabel.text = @"小肥羊";
-        [self addSubview:_titleLabel];
+        [self.contentView addSubview:_titleLabel];
         
         self.detailLabel = [[UILabel alloc] initWithFrame:CGRectMake(_titleLabel.left, _titleLabel.bottom, CENTRE_LABEL_WIDTH, LABEL_HEIGTH)];
         _detailLabel.backgroundColor = VIEW_COLOR;
 //        _detailLabel.text = @"市中心100元可叠加免预约";
         _detailLabel.textColor = [UIColor colorWithWhite:0.5 alpha:1];
         _detailLabel.font = [UIFont systemFontOfSize:14];
-        [self addSubview:_detailLabel];
+        [self.contentView addSubview:_detailLabel];
         
         self.priceLabel = [[UILabel alloc] initWithFrame:CGRectMake(_titleLabel.left, _detailLabel.bottom, RIGHT_LEBEL_WIDTH, LABEL_HEIGTH)];
         _priceLabel.backgroundColor = VIEW_COLOR;
 //        _priceLabel.text = @"¥100";
         _priceLabel.textColor = [UIColor redColor];
-        [self addSubview:_priceLabel];
+        [self.contentView addSubview:_priceLabel];
         
         self.distanceLabel = [[UILabel alloc] initWithFrame:CGRectMake(_titleLabel.right + LEFT_SPACE, _icon.top, RIGHT_LEBEL_WIDTH, LABEL_HEIGTH)];
         _distanceLabel.backgroundColor = VIEW_COLOR;
 //        _distanceLabel.text = @"2.5公里";
         _distanceLabel.font = [UIFont systemFontOfSize:14];
         _distanceLabel.textColor = [UIColor colorWithWhite:0.5 alpha:1];
-        [self addSubview:_distanceLabel];
+        [self.contentView addSubview:_distanceLabel];
         self.soldCountLabel = [[UILabel alloc] initWithFrame:CGRectMake(_titleLabel.right + LEFT_SPACE, _priceLabel.top, RIGHT_LEBEL_WIDTH, LABEL_HEIGTH)];
         _soldCountLabel.backgroundColor = VIEW_COLOR;
         _soldCountLabel.font = [UIFont systemFontOfSize:14];
         _soldCountLabel.textColor = [UIColor colorWithWhite:0.5 alpha:1];
 //        _soldCountLabel.text = @"售出100";
-        [self addSubview:_soldCountLabel];
+        [self.contentView addSubview:_soldCountLabel];
     }
 }
 

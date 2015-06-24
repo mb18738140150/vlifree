@@ -363,17 +363,38 @@
     NSLog(@"+++%@", data);
     if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
         NSLog(@"%@", [data objectForKey:@"ErrorMsg"]);
-        self.allCount = [data objectForKey:@"AllCount"];
-        NSArray * array = [data objectForKey:@"StoreList"];
-        if(_page == 1)
+        if ([[data objectForKey:@"Command"] isEqualToNumber:@10006]) {
+            self.allCount = [data objectForKey:@"AllCount"];
+            NSArray * array = [data objectForKey:@"StoreList"];
+            if(_page == 1)
+            {
+                _dataArray = nil;
+            }
+            NSMutableArray * sendArray = [NSMutableArray array];
+            NSMutableArray * noSendAry = [NSMutableArray array];
+            for (NSDictionary * dic in array) {
+                TakeOutModel * takeOutMD = [[TakeOutModel alloc] initWithDictionary:dic];
+                if ([takeOutMD.peyType isEqualToNumber:@YES]) {
+                    [sendArray addObject:takeOutMD];
+                }else
+                {
+                    [noSendAry addObject:takeOutMD];
+                }
+//                [self.dataArray addObject:takeOutMD];
+            }
+            if (sendArray.count > 0) {
+                [self.dataArray addObject:sendArray];
+            }
+            if (noSendAry.count > 0) {
+                [self.dataArray addObject:noSendAry];
+            }
+            [self.takeOutTabelView reloadData];
+        }else if([[data objectForKey:@"Command"] isEqualToNumber:@10028])
         {
-            _dataArray = nil;
+            UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:@"收藏成功" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
+            [alert show];
+            [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:1.5];
         }
-        for (NSDictionary * dic in array) {
-            TakeOutModel * takeOutMD = [[TakeOutModel alloc] initWithDictionary:dic];
-            [self.dataArray addObject:takeOutMD];
-        }
-        [self.takeOutTabelView reloadData];
     }
     [self.takeOutTabelView headerEndRefreshing];
     [self.takeOutTabelView footerEndRefreshing];
@@ -479,23 +500,45 @@ updatingLocation:(BOOL)updatingLocation
 }
 
 
+#pragma mark - tableView
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
+    return self.dataArray.count;
+}
+
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return _dataArray.count;
+    return [[_dataArray objectAtIndex:section] count];
 }
+
+
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     static NSString * cellIndetifiel = CELL_INDENTIFIER;
-    TakeOutModel * takeOutMD = [self.dataArray objectAtIndex:indexPath.row];
+    TakeOutModel * takeOutMD = [[self.dataArray objectAtIndex:indexPath.section] objectAtIndex:indexPath.row];
     TakeOutViewCell * cell = [tableView dequeueReusableCellWithIdentifier:cellIndetifiel];
     if (!cell) {
         cell = [[TakeOutViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIndetifiel];
         [cell createSubview:tableView.bounds];
     }
-//    cell.rightButtons = @[[MGSwipeButton buttonWithTitle:@"" backgroundColor:[UIColor redColor]]];
+    __weak TakeOutViewController * takeOutVC = self;
     cell.rightButtons = @[[MGSwipeButton buttonWithTitle:@"关注商店" backgroundColor:[UIColor redColor] callback:^BOOL(MGSwipeTableCell *sender) {
-        NSLog(@"111");
+        if ([UserInfo shareUserInfo].userId) {
+            NSDictionary * jsonDic = @{
+                                       @"UserId":[UserInfo shareUserInfo].userId,
+                                       @"Command":@28,
+                                       @"Flag":@2,
+                                       @"Id":takeOutMD.storeId
+                                       };
+            [takeOutVC playPostWithDictionary:jsonDic];
+        }else
+        {
+            UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:@"收藏需要先登录" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
+            [alert show];
+            [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:1.5];
+        }
         return YES;
     }]];
     [cell.IconButton addTarget:self action:@selector(lookBigImage:) forControlEvents:UIControlEventTouchUpInside];
@@ -506,14 +549,33 @@ updatingLocation:(BOOL)updatingLocation
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    return [TakeOutViewCell cellHeight];
+    TakeOutModel * takoOutMD = [[self.dataArray objectAtIndex:indexPath.section] objectAtIndex:indexPath.row];
+    return [TakeOutViewCell cellHeightWithTakeOutModel:takoOutMD];
 }
 
+- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
+{
+    return 30;
+}
+
+- (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
+{
+    NSMutableArray * array = [self.dataArray objectAtIndex:section];
+    TakeOutModel * takeOutMD = [array firstObject];
+    UILabel * label = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, self.view.width, 30)];
+    if ([takeOutMD.peyType isEqualToNumber:@YES]) {
+        label.text = @"在配送范围内";
+    }else
+    {
+        label.text = @"不在配送范围";
+    }
+    return label;
+}
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
-    TakeOutModel * takeOutMD = [self.dataArray objectAtIndex:indexPath.row];
+    TakeOutModel * takeOutMD = [[self.dataArray objectAtIndex:indexPath.section] objectAtIndex:indexPath.row];
     DetailTakeOutViewController * detailTakeOutVC = [[DetailTakeOutViewController alloc] init];
     detailTakeOutVC.takeOutID = takeOutMD.storeId;
     detailTakeOutVC.sendPrice = takeOutMD.sendPrice;

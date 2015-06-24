@@ -9,18 +9,35 @@
 #import "SearchViewController.h"
 #import "ResultViewController.h"
 #import "ZWYPopKeyWordsView.h"
+#import "TakeOutViewCell.h"
+#import "TakeOutModel.h"
 
-@interface SearchViewController ()<UISearchBarDelegate, UISearchResultsUpdating, ZWYSearchShowViewDelegate>
+@interface SearchViewController ()<UISearchBarDelegate, UISearchResultsUpdating, ZWYSearchShowViewDelegate, HTTPPostDelegate>
 
-
+{
+    int _page;
+}
 @property (nonatomic, strong)UISearchBar * searchBar;
 
 @property (nonatomic, strong)UISearchController * searchVC;
 @property (nonatomic, strong)ResultViewController * resultVC;
 
+@property (nonatomic, strong)NSMutableArray * dataArray;
+
+
 @end
 
 @implementation SearchViewController
+
+
+- (NSMutableArray *)dataArray
+{
+    if (!_dataArray) {
+        self.dataArray = [NSMutableArray array];
+    }
+    return _dataArray;
+}
+
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -34,7 +51,7 @@
     searchView.backgroundColor = [UIColor greenColor];
     
     self.resultVC = [[ResultViewController alloc] init];
-    _resultVC.action = @selector(pushSearchListView:);
+    _resultVC.action = @selector(searchHotTaglibWithKeyWord:);
     _resultVC.target = self;
     self.searchVC = [[UISearchController alloc] initWithSearchResultsController:_resultVC];
     _searchVC.hidesNavigationBarDuringPresentation = NO;
@@ -50,7 +67,7 @@
     _searchVC.searchResultsUpdater = self.resultVC;
     _searchVC.searchBar.placeholder = @"请输入关键字";
     
-    [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"cell"];
+    [self.tableView registerClass:[TakeOutViewCell class] forCellReuseIdentifier:@"cell"];
     
     UIButton * backBT = [UIButton buttonWithType:UIButtonTypeCustom];
     backBT.frame = CGRectMake(0, 0, 15, 20);
@@ -70,6 +87,15 @@
 - (void)searchHotTaglibWithKeyWord:(NSString *)keyWords
 {
     NSLog(@"%@", keyWords);
+    _page = 1;
+    NSDictionary * jsonDic = @{
+                               @"Command":@19,
+                               @"KeyWord":keyWords,
+                               @"CurPage":@1,
+                               @"CurCount":[NSNumber numberWithInt:COUNT]
+                               };
+    [self playPostWithDictionary:jsonDic];
+    self.searchVC.active = NO;
 }
 
 
@@ -104,18 +130,43 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return 10;
+    return self.dataArray.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    UITableViewCell * cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
-    
+    TakeOutModel * takeOutModel = [self.dataArray objectAtIndex:indexPath.row];
+    TakeOutViewCell * cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
+    [cell createSubview:tableView.bounds];
+    cell.takeOutModel = takeOutModel;
     return cell;
 }
 
 
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    TakeOutModel * takeOutMD = [self.dataArray objectAtIndex:indexPath.row];
+    return [TakeOutViewCell cellHeightWithTakeOutModel:takeOutMD];
+}
+
 #pragma mark - 搜索
+
+- (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar
+{
+    if (searchBar.text.length) {
+        _page = 1;
+        NSDictionary * jsonDic = @{
+                                   @"Command":@19,
+                                   @"KeyWord":searchBar.text,
+                                   @"CurPage":@1,
+                                   @"CurCount":[NSNumber numberWithInt:COUNT]
+                                   };
+        [self playPostWithDictionary:jsonDic];
+        searchBar.text = nil;
+    }
+    self.searchVC.active = NO;
+}
+
 - (void)updateSearchResultsForSearchController:(UISearchController *)searchController
 {
     
@@ -124,8 +175,46 @@
 
 - (void)pushSearchListView:(NSString *)typeAndQ
 {
-    
+    NSLog(@"%@", typeAndQ);
 }
+
+
+- (void)playPostWithDictionary:(NSDictionary *)dic
+{
+    NSString * jsonStr = [dic JSONString];
+    NSLog(@"%@", jsonStr);
+    NSString * str = [NSString stringWithFormat:@"%@231618", jsonStr];
+    NSString * md5Str = [str md5];
+    NSString * urlString = [NSString stringWithFormat:@"%@%@", POST_URL, md5Str];
+    
+    HTTPPost * httpPost = [HTTPPost shareHTTPPost];
+    [httpPost post:urlString HTTPBody:[jsonStr dataUsingEncoding:NSUTF8StringEncoding]];
+    httpPost.delegate = self;
+}
+
+- (void)refresh:(id)data
+{
+    NSLog(@"+++%@, error = %@", data, [data objectForKey:@"ErrorMsg"]);
+    if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
+        NSArray * array = [data objectForKey:@"StoreList"];
+        if (_page == 1) {
+            self.dataArray = nil;
+        }
+        for (NSDictionary * dic in array) {
+            TakeOutModel * takeOutMD = [[TakeOutModel alloc] initWithDictionary:dic];
+            [self.dataArray addObject:takeOutMD];
+        }
+        [self.tableView reloadData];
+    }
+}
+
+- (void)failWithError:(NSError *)error
+{
+    [SVProgressHUD dismiss];
+    NSLog(@"%@", error);
+}
+
+
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];

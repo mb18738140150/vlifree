@@ -17,7 +17,7 @@
 
 
 - (void)createSubview:(CGRect)frame;
-+ (CGFloat)cellHeight;
++ (CGFloat)cellHeightWithTakeOutModel:(TakeOutModel *)takeOutModel;
 
 
 @end

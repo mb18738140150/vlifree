@@ -10,7 +10,7 @@
 #import "MyTabBarController.h"
 #import "WXApi.h"
 #import "UserViewController.h"
-
+#import "KeyboardManager.h"
 
 @interface AppDelegate ()<WXApiDelegate>
 
@@ -33,7 +33,11 @@
     self.window.rootViewController = _myTabBarVC;
     
     [WXApi registerApp:@"wxaac5e5f7421e84ac"];
-
+    IQKeyboardManager *manager = [IQKeyboardManager sharedManager];
+    manager.enable = YES;
+    manager.shouldResignOnTouchOutside = YES;
+    manager.shouldToolbarUsesTextFieldTintColor = YES;
+    manager.enableAutoToolbar = NO;
     
     return YES;
 }
@@ -85,6 +89,20 @@
     }else if ([resp isKindOfClass:[PayResp class]])
     {
         NSLog(@"支付");
+        PayResp *response = (PayResp *)resp;
+        switch (response.errCode) {
+            case WXSuccess:
+            {
+                //服务器端查询支付通知或查询API返回的结果再提示成功
+                NSLog(@"支付成功");
+                UINavigationController * nav = (UINavigationController *)self.myTabBarVC.selectedViewController;
+                [nav popToRootViewControllerAnimated:YES];
+            }
+                break;
+            default:
+                NSLog(@"支付失败， retcode=%d",resp.errCode);
+                break;
+        }
     }
 }
 

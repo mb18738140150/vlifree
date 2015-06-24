@@ -112,9 +112,9 @@
         {
             _dataArray = nil;
         }
-        for (NSDictionary * dic in array) {
-//            [self.dataArray addObject:takeOutOrderMD];
-        }
+//        for (NSDictionary * dic in array) {
+////            [self.dataArray addObject:takeOutOrderMD];
+//        }
         [self.tableView reloadData];
     }
     [self.tableView headerEndRefreshing];

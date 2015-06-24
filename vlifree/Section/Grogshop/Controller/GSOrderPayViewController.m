@@ -13,7 +13,8 @@
 #import "payRequsestHandler.h"
 #import "BDWalletSDKMainManager.h"
 #import <CommonCrypto/CommonDigest.h>
-
+#import <ifaddrs.h>
+#import <arpa/inet.h>
 #include <sys/socket.h> // Per msqr
 #include <sys/sysctl.h>
 #include <net/if.h>
@@ -24,12 +25,13 @@
 #define LABEL_HEIGHT 30
 
 
-@interface GSOrderPayViewController ()<UITextFieldDelegate>
+@interface GSOrderPayViewController ()<UITextFieldDelegate, HTTPPostDelegate>
 
 @property (nonatomic, strong)PayTypeView * weixinView;
 @property (nonatomic, strong)PayTypeView * baiduView;
 @property (nonatomic, strong)UIDatePicker * datePicker;
 @property (nonatomic, strong)UIView * pickerView;
+@property (nonatomic, strong)NSNumber * payType;
 
 @property (nonatomic, strong)UIButton * dateButton;
 
@@ -42,13 +44,15 @@
 @property (nonatomic, strong)UILabel * daysLB;
 //@property (nonatomic, strong)UILabel 
 
+@property (nonatomic, strong)UILabel * priceLB;
+
 @end
 
 @implementation GSOrderPayViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
+    self.payType = @1;
     self.view.backgroundColor = [UIColor whiteColor];
 //    NSLog(@"%d", self.navigationController.navigationBar.translucent);
     UIScrollView * scrollView = [[UIScrollView alloc] initWithFrame:self.view.bounds];
@@ -205,18 +209,17 @@
     line7.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
     [view3 addSubview:line7];
     
-    UILabel * priceLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, view3.bottom + 20, scrollView.width - 3 * LEFT_SPACE - 80, 35)];
-    NSMutableAttributedString * string = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"支付金额¥%@", self.price]];
-    [string addAttributes:@{NSForegroundColorAttributeName : [UIColor redColor], NSFontAttributeName : [UIFont systemFontOfSize:24]} range:NSMakeRange(4, string.length - 4)];
-    [string addAttributes:@{NSFontAttributeName : [UIFont systemFontOfSize:20]} range:NSMakeRange(0, 4)];
-    priceLB.attributedText = [string copy];
-    [scrollView addSubview:priceLB];
+    self.priceLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, view3.bottom + 20, scrollView.width - 3 * LEFT_SPACE - 80, 35)];
+    
+    _priceLB.attributedText = [self allPriceLBTextWithPrice:self.price];
+    [scrollView addSubview:_priceLB];
     
     UIButton * payButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    payButton.frame = CGRectMake(priceLB.right + LEFT_SPACE, priceLB.top, 80, priceLB.height);
+    payButton.frame = CGRectMake(_priceLB.right + LEFT_SPACE, _priceLB.top, 80, _priceLB.height);
     [payButton setTitle:@"马上支付" forState:UIControlStateNormal];
     [payButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     payButton.backgroundColor = MAIN_COLOR;
+    [payButton addTarget:self action:@selector(payOrderDetails:) forControlEvents:UIControlEventTouchUpInside];
     [scrollView addSubview:payButton];
     scrollView.contentSize = CGSizeMake(scrollView.width, payButton.bottom + 20);
     
@@ -229,6 +232,15 @@
     [self createDatePickerView];
     // Do any additional setup after loading the view.
 }
+
+- (id)allPriceLBTextWithPrice:(NSNumber *)price
+{
+    NSMutableAttributedString * string = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"支付金额¥%@", price]];
+    [string addAttributes:@{NSForegroundColorAttributeName : [UIColor redColor], NSFontAttributeName : [UIFont systemFontOfSize:24]} range:NSMakeRange(4, string.length - 4)];
+    [string addAttributes:@{NSFontAttributeName : [UIFont systemFontOfSize:20]} range:NSMakeRange(0, 4)];
+    return [string copy];
+}
+
 
 - (void)createDatePickerView
 {
@@ -263,6 +275,46 @@
     [self.navigationController popViewControllerAnimated:YES];
 }
 
+#pragma mark - 提交支付
+- (void)payOrderDetails:(UIButton *)button
+{
+    if (self.ruzhuDate == nil) {
+        [self alertMessage:@"请选择入住时间"];
+    }else if (self.lidianDate == nil)
+    {
+        [self alertMessage:@"请选择离店时间"];
+    }else if (self.personTF.text.length == 0)
+    {
+        [self alertMessage:@"请输入入住人名"];
+    }else if (self.telTF.text.length == 0)
+    {
+        [self alertMessage:@"请输入手机号码"];
+    }else
+    {
+        BOOL isPhoneNum = [NSString isTelPhoneNub:self.telTF.text];
+        if (isPhoneNum) {
+            NSDateFormatter* dateFormatter = [[NSDateFormatter alloc] init];
+            [dateFormatter setDateStyle:NSDateFormatterFullStyle];
+            [dateFormatter setDateFormat:@"yyyy-MM-dd"];
+            NSString * ruzhuDateString = [dateFormatter stringFromDate:self.ruzhuDate];
+            NSString * lidianDateString = [dateFormatter stringFromDate:self.lidianDate];
+            NSLog(@"ip = %@", [self getIPAddress]);
+            NSDictionary * jsonDic = @{
+                                       @"Cur_IP":[self getIPAddress],
+                                       @"Command":@11,
+                                       @"SuiteId":self.roomId,
+                                       @"SuitePrice":@100,
+                                       @"CheckInDate":ruzhuDateString,
+                                       @"LeaveDate":lidianDateString,
+                                       @"UserId":[UserInfo shareUserInfo].userId,
+                                       @"PhoneNumber":self.telTF.text,
+                                       @"Demand":self.requireTF.text,
+                                       @"PayType":self.payType
+                                       };
+            [self playPostWithDictionary:jsonDic];
+        }
+    }
+}
 
 #pragma mark - 选择支付方式
 - (void)changePayType:(UIButton *)button
@@ -272,11 +324,12 @@
     }
     if ([button isEqual:self.weixinView.changeButton]) {
         self.baiduView.changeButton.selected = NO;
-        
+        self.payType = @1;
         //        NSLog(@"微信");
     }else if ([button isEqual:self.baiduView.changeButton])
     {
         self.weixinView.changeButton.selected = NO;
+        self.payType = @2;
         //        NSLog(@"百度");
     }
     button.selected = !button.selected;
@@ -318,6 +371,8 @@
     if (self.ruzhuDate != nil & self.lidianDate != nil) {
         NSInteger days = [self calculateAgeFromDate:self.ruzhuDate toDate:self.lidianDate];
         self.daysLB.text = [NSString stringWithFormat:@"住店时长: 共%ld天", days];
+        double price = self.price.doubleValue * days;
+        self.priceLB.attributedText = [self allPriceLBTextWithPrice:[NSNumber numberWithDouble:price]];
     }
     [self.pickerView removeFromSuperview];
     NSDateFormatter* dateFormatter = [[NSDateFormatter alloc] init];
@@ -362,6 +417,64 @@
     return day;
 }
 
+#pragma mark - 数据请求
+- (void)playPostWithDictionary:(NSDictionary *)dic
+{
+    NSString * jsonStr = [dic JSONString];
+    //    NSLog(@"%@", jsonStr);
+    NSString * str = [NSString stringWithFormat:@"%@231618", jsonStr];
+    NSString * md5Str = [str md5];
+    NSString * urlString = [NSString stringWithFormat:@"%@%@", POST_URL, md5Str];
+    
+    HTTPPost * httpPost = [HTTPPost shareHTTPPost];
+    [httpPost post:urlString HTTPBody:[jsonStr dataUsingEncoding:NSUTF8StringEncoding]];
+    httpPost.delegate = self;
+}
+
+- (void)refresh:(id)data
+{
+    NSLog(@"+++%@", data);
+    NSLog(@"%@", [data objectForKey:@"ErrorMsg"]);
+    if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
+        NSString * hotelOrder = [data objectForKey:@"HotelOrder"];
+        if (hotelOrder.length == 0) {
+            
+            NSMutableDictionary *signParams = [NSMutableDictionary dictionary];
+            [signParams setObject: [NSString stringWithFormat:@"%@", [data objectForKey:@"AppId"]]       forKey:@"appid"];
+            [signParams setObject: [NSString stringWithFormat:@"%@", [data objectForKey:@"NonceStr"]]    forKey:@"noncestr"];
+            [signParams setObject: [NSString stringWithFormat:@"%@", [data objectForKey:@"Package"]]      forKey:@"package"];
+            [signParams setObject: [NSString stringWithFormat:@"%@", [data objectForKey:@"PartnerId"]]        forKey:@"partnerid"];
+            [signParams setObject: [data objectForKey:@"TimeStamp"]   forKey:@"timestamp"];
+            [signParams setObject: [NSString stringWithFormat:@"%@", [data objectForKey:@"PrepayId"]]     forKey:@"prepayid"];
+            NSString * sign = [self createMd5Sign:signParams];
+            NSLog(@"md5签名 = %@", sign);
+            NSNumber * stamp = [data objectForKey:@"TimeStamp"];
+            //调起微信支付
+            PayReq* req             = [[PayReq alloc] init];
+            req.openID              =  [NSString stringWithFormat:@"%@", [data objectForKey:@"AppId"]];
+            req.partnerId           = [NSString stringWithFormat:@"%@", [data objectForKey:@"PartnerId"]];
+            req.prepayId            = [NSString stringWithFormat:@"%@", [data objectForKey:@"PrepayId"]];
+            req.nonceStr            = [NSString stringWithFormat:@"%@", [data objectForKey:@"NonceStr"]];
+            req.timeStamp           = stamp.intValue;
+            req.package             = [NSString stringWithFormat:@"%@", [data objectForKey:@"Package"]];
+            req.sign                = sign;
+            
+            BOOL a = [WXApi sendReq:req];
+            NSLog(@"%d", a);
+        }else
+        {
+            
+        }
+    }else
+    {
+        UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:[data objectForKey:@"ErrorMsg"] delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
+        [alert show];
+        [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:1.5];
+    }
+    //    [self.detailsTableView headerEndRefreshing];
+    //    [self.detailsTableView footerEndRefreshing];
+    [SVProgressHUD dismiss];
+}
 
 
 #pragma mark - 百度支付
@@ -405,9 +518,9 @@
     NSString *orderId = [NSString stringWithFormat:@"z2015052713275609521156"];
     [str appendString:@"currency=1&extra="];
     [str appendString:@"&goods_desc="];
-    [str appendString:[self utf8toGbk:@"外卖"]];
+    [str appendString:[self utf8toGbk:self.roomName]];
     [str appendString:@"&goods_name="];
-    [str appendString:[self utf8toGbk:@"外卖商品"]]; // 中文处理1
+    [str appendString:[self utf8toGbk:@"酒店订单"]]; // 中文处理1
     [str appendString:@"&goods_url=http://item.jd.com/736610.html&input_charset=1&order_create_time="];//下单时间
     [str appendString:dateString];//订单生产时间
     [str appendString:@"&order_no="];
@@ -623,12 +736,78 @@
     }
 }
 
+//创建package签名
+-(NSString*) createMd5Sign:(NSMutableDictionary*)dict
+{
+    NSMutableString *contentString  =[NSMutableString string];
+    NSArray *keys = [dict allKeys];
+    //按字母顺序排序
+    NSArray *sortedArray = [keys sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
+        return [obj1 compare:obj2 options:NSNumericSearch];
+    }];
+    //拼接字符串
+    for (NSString *categoryId in sortedArray) {
+        if (   ![[dict objectForKey:categoryId] isEqualToString:@""]
+            && ![categoryId isEqualToString:@"sign"]
+            && ![categoryId isEqualToString:@"key"]
+            )
+        {
+            [contentString appendFormat:@"%@=%@&", categoryId, [dict objectForKey:categoryId]];
+        }
+        
+    }
+    //添加key字段
+    [contentString appendFormat:@"key=I57gmdk90nd5bla84nkyqldicn3294Fh"];
+    //得到MD5 sign签名
+    NSString *md5Sign =[WXUtil md5:contentString];
+    
+    //输出Debug Info
+//    [debugInfo appendFormat:@"MD5签名字符串：\n%@\n\n",contentString];
+    
+    return md5Sign;
+}
+
+
 //客户端提示信息
 - (void)alert:(NSString *)title msg:(NSString *)msg
 {
     UIAlertView *alter = [[UIAlertView alloc] initWithTitle:title message:msg delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
     
     [alter show];
+}
+
+- (void)alertMessage:(NSString *)msg
+{
+    UIAlertView *alter = [[UIAlertView alloc] initWithTitle:nil message:msg delegate:nil cancelButtonTitle:nil otherButtonTitles:nil];
+    [alter show];
+    [alter performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:1.5];
+}
+
+// Get IP Address
+- (NSString *)getIPAddress {
+    NSString *address = @"error";
+    struct ifaddrs *interfaces = NULL;
+    struct ifaddrs *temp_addr = NULL;
+    int success = 0;
+    // retrieve the current interfaces - returns 0 on success
+    success = getifaddrs(&interfaces);
+    if (success == 0) {
+        // Loop through linked list of interfaces
+        temp_addr = interfaces;
+        while(temp_addr != NULL) {
+            if(temp_addr->ifa_addr->sa_family == AF_INET) {
+                // Check if interface is en0 which is the wifi connection on the iPhone
+                if([[NSString stringWithUTF8String:temp_addr->ifa_name] isEqualToString:@"en0"]) {
+                    // Get NSString from C String
+                    address = [NSString stringWithUTF8String:inet_ntoa(((struct sockaddr_in *)temp_addr->ifa_addr)->sin_addr)];
+                }
+            }
+            temp_addr = temp_addr->ifa_next;
+        }
+    }
+    // Free memory
+    freeifaddrs(interfaces);
+    return address;
 }
 
 

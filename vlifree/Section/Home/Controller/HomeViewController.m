@@ -14,6 +14,7 @@
 #import <MAMapKit/MAMapKit.h>
 #import "CollectModel.h"
 #import "DetailsGrogshopViewController.h"
+#import "MGSwipeButton.h"
 
 #define CELL_INDENTIFIER @"cell"
 
@@ -23,7 +24,7 @@
 #define LOCATION_IMAGE_WIDTH BUTTON_HEIGTH
 
 
-@interface HomeViewController ()<CLLocationManagerDelegate, MAMapViewDelegate, HTTPPostDelegate>
+@interface HomeViewController ()<CLLocationManagerDelegate, MAMapViewDelegate, HTTPPostDelegate, UITableViewDataSource, UITableViewDelegate>
 {
     int _page;
     BOOL _isLOC;
@@ -32,7 +33,7 @@
 @property (nonatomic, strong)UILabel * locationLB;
 @property (nonatomic, strong)MAMapView * aMapView;
 @property (nonatomic, strong)NSMutableArray * dataArray;
-
+@property (nonatomic, strong)UITableView * homeTableView;
 
 @end
 
@@ -50,21 +51,46 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    HomeHeaderView * homeHeaderView = [[HomeHeaderView alloc] initWithFrame:CGRectMake(0, 0, self.tableView.width, 120)];
+    self.homeTableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, self.view.height - self.navigationController.navigationBar.bottom) style:UITableViewStylePlain];
+    _homeTableView.dataSource = self;
+    _homeTableView.delegate = self;
+    [self.homeTableView registerClass:[HomeViewCell class] forCellReuseIdentifier:CELL_INDENTIFIER];
+    
+    [self.homeTableView addHeaderWithTarget:self action:@selector(headerRereshing)];
+    [self.view addSubview:_homeTableView];
+    
+    HomeHeaderView * homeHeaderView = [[HomeHeaderView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, 120)];
     [homeHeaderView.grogshopBT addTarget:self action:@selector(grogshopAction:) forControlEvents:UIControlEventTouchUpInside];
     [homeHeaderView.takeOutBT addTarget:self action:@selector(takeOutAction:) forControlEvents:UIControlEventTouchUpInside];
     [homeHeaderView.supermarketBT addTarget:self action:@selector(supermarketAction:) forControlEvents:UIControlEventTouchUpInside];
-    self.tableView.tableHeaderView = homeHeaderView;
-    [self.tableView registerClass:[HomeViewCell class] forCellReuseIdentifier:CELL_INDENTIFIER];
+    self.homeTableView.tableHeaderView = homeHeaderView;
+    self.homeTableView.tableFooterView = [[UIView alloc] init];
+
+    UIView * aView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, 90)];
+    aView.backgroundColor = [UIColor whiteColor];
+    aView.tag = 10009;
+    aView.centerY = self.view.centerY;
+    [self.view addSubview:aView];
     
-    [self.tableView addHeaderWithTarget:self action:@selector(headerRereshing)];
+    UILabel * aLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 10, aView.width - 20, 30)];
+    aLabel.text = @"你还没有登录,请跳转到登录页面登录";
+    aLabel.textAlignment = NSTextAlignmentCenter;
+    [aView addSubview:aLabel];
+    
+    UIButton * button = [UIButton buttonWithType:UIButtonTypeCustom];
+    button.frame = CGRectMake(0, aLabel.bottom + 10, 80, 30);
+    button.centerX = aView.width / 2;
+    [button setTitle:@"登录" forState:UIControlStateNormal];
+    [button addTarget:self action:@selector(skipLoginVC:) forControlEvents:UIControlEventTouchUpInside];
+    button.backgroundColor = MAIN_COLOR;
+    [aView addSubview:button];
     
     UIButton * locationBT = [UIButton buttonWithType:UIButtonTypeCustom];
     locationBT.frame = CGRectMake(10, 10, LOCATION_BUTTON_WIDTH, BUTTON_HEIGTH);
     locationBT.tag = 1000;
     [locationBT addTarget:self action:@selector(locationAction:) forControlEvents:UIControlEventTouchUpInside];
 //    locationBT.backgroundColor = [UIColor greenColor];
-    [self.navigationController.navigationBar addSubview:locationBT];
+//    [self.navigationController.navigationBar addSubview:locationBT];
     self.locationLB = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, LOCATION_LABEL_WIDTH, locationBT.height)];
     _locationLB.text = @"郑州";
     _locationLB.font = [UIFont systemFontOfSize:13];
@@ -77,6 +103,7 @@
     locationIG.image = [UIImage imageNamed:@"location.png"];
     [locationBT addSubview:locationIG];
     
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:locationBT];
 //    [MAMapServices sharedServices].apiKey = @"bdb563c4b3d8dae3a9ba228ab0c1f41c";
 //
 //    self.aMapView = [[MAMapView alloc] initWithFrame:self.view.bounds];
@@ -124,6 +151,11 @@
 }
 
 
+- (void)skipLoginVC:(UIButton *)button
+{
+    self.navigationController.tabBarController.selectedIndex = 3;
+}
+
 - (void)isLocationsuccess
 {
     if (![UserLocation shareUserLocation].placemark) {
@@ -153,6 +185,15 @@
     UIButton * searchBT = (UIButton *)[self.navigationController.navigationBar viewWithTag:2000];
     locationBT.hidden = NO;
     searchBT.hidden = NO;
+    UIView * aView = [self.view viewWithTag:10009];
+    if ([UserInfo shareUserInfo].userId) {
+        self.homeTableView.scrollEnabled = YES;
+        aView.hidden = YES;
+    }else
+    {
+        self.homeTableView.scrollEnabled = NO;
+        aView.hidden = NO;
+    }
 //    NSLog(@"--%@, %@", locationBT, searchBT);
 }
 
@@ -205,6 +246,9 @@
 #pragma mark - 数据请求
 - (void)downloadDataWithCommand:(NSNumber *)command page:(int)page count:(int)count
 {
+    if (![UserInfo shareUserInfo].userId) {
+        return;
+    }
     
     NSDictionary * jsonDic = @{
                                @"Command":command,
@@ -212,7 +256,7 @@
 //                               @"CurCount":[NSNumber numberWithInt:count],
                                @"Lat":[NSNumber numberWithDouble:[UserLocation shareUserLocation].location.coordinate.latitude],
                                @"Lon":[NSNumber numberWithDouble:[UserLocation shareUserLocation].location.coordinate.longitude],
-                               @"UserId":@102
+                               @"UserId":[UserInfo shareUserInfo].userId
                                };
     [self playPostWithDictionary:jsonDic];
     /*
@@ -247,24 +291,38 @@
     NSLog(@"+++%@", data);
     if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
         NSLog(@"%@", [data objectForKey:@"ErrorMsg"]);
-        NSArray * array = [data objectForKey:@"BusinessList"];
-        if(_page == 1)
+        if ([[data objectForKey:@"Command"] isEqualToNumber:@10001]) {
+            NSArray * array = [data objectForKey:@"BusinessList"];
+            if(_page == 1)
+            {
+                _dataArray = nil;
+            }
+            for (NSDictionary * dic in array) {
+                CollectModel * collectMD = [[CollectModel alloc] initWithDictionary:dic];
+                [self.dataArray addObject:collectMD];
+            }
+            [self.homeTableView reloadData];
+        }else if([[data objectForKey:@"Command"] isEqualToNumber:@10029])
         {
-            _dataArray = nil;
+            UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:@"删除成功" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
+            [alert show];
+            [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:1.5];
+            [self downloadDataWithCommand:@1 page:_page count:COUNT];
         }
-        for (NSDictionary * dic in array) {
-            CollectModel * collectMD = [[CollectModel alloc] initWithDictionary:dic];
-            [self.dataArray addObject:collectMD];
-        }
-        [self.tableView reloadData];
+        
+    }else
+    {
+        UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:[data objectForKey:@"ErrorMsg"] delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
+        [alert show];
+        [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:1.5];
     }
-    [self.tableView headerEndRefreshing];
+    [self.homeTableView headerEndRefreshing];
     [SVProgressHUD dismiss];
 }
 
 - (void)failWithError:(NSError *)error
 {
-    [self.tableView headerEndRefreshing];
+    [self.homeTableView headerEndRefreshing];
     NSLog(@"%@", error);
 }
 
@@ -346,6 +404,19 @@ updatingLocation:(BOOL)updatingLocation
     cell.collectModel = collectMD;
     [cell.IconButton addTarget:self action:@selector(lookBigImage:) forControlEvents:UIControlEventTouchUpInside];
     cell.IconButton.tag = 5000 + indexPath.row;
+    __weak HomeViewController * homeVC = self;
+    cell.rightButtons = @[[MGSwipeButton buttonWithTitle:@"取消收藏" backgroundColor:[UIColor redColor] callback:^BOOL(MGSwipeTableCell *sender) {
+        if ([UserInfo shareUserInfo].userId) {
+            NSDictionary * jsonDic = @{
+                                       @"UserId":[UserInfo shareUserInfo].userId,
+                                       @"Command":@29,
+                                       @"Flag":collectMD.businessType,
+                                       @"Id":collectMD.businessId
+                                       };
+            [homeVC playPostWithDictionary:jsonDic];
+        }
+        return YES;
+    }]];
 //    cell.textLabel.text = @"23";
     // Configure the cell...
     
@@ -370,9 +441,11 @@ updatingLocation:(BOOL)updatingLocation
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
     CollectModel * collectMD = [self.dataArray objectAtIndex:indexPath.row];
-    if ([collectMD.businessType isEqualToNumber:@1]) {
+    if ([collectMD.businessType isEqualToNumber:@2]) {
         DetailTakeOutViewController * detaiTOVC = [[DetailTakeOutViewController alloc] init];
+        detaiTOVC.takeOutID = collectMD.businessId;
         detaiTOVC.hidesBottomBarWhenPushed = YES;
         [self.navigationController pushViewController:detaiTOVC animated:YES];
     }else
@@ -392,8 +465,8 @@ updatingLocation:(BOOL)updatingLocation
 - (void)lookBigImage:(UIButton *)button
 {
     CollectModel * collectMD = [self.dataArray objectAtIndex:button.tag - 5000];
-    CGPoint point = self.tableView.contentOffset;
-    CGRect cellRect = [self.tableView rectForRowAtIndexPath:[NSIndexPath indexPathForRow:button.tag - 5000 inSection:0]];
+    CGPoint point = self.homeTableView.contentOffset;
+    CGRect cellRect = [self.homeTableView rectForRowAtIndexPath:[NSIndexPath indexPathForRow:button.tag - 5000 inSection:0]];
     CGRect btFrame = button.frame;
     btFrame.origin.y = cellRect.origin.y - point.y + button.frame.origin.y;
     UITapGestureRecognizer * tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(removeBigImage)];

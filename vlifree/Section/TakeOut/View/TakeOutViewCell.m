@@ -31,7 +31,8 @@
 @property (nonatomic, strong)UILabel * outsideOrderLB;
 @property (nonatomic, strong)UILabel * addressLabel;
 @property (nonatomic, strong)UIImageView * stateImage;
-
+@property (nonatomic, strong)UIView * firstOrderV;
+@property (nonatomic, strong)UIView * fullOrderV;
 
 @end
 
@@ -90,14 +91,42 @@
         _addressLabel.textColor = LABEL_TEXTCOLOR;
         _addressLabel.backgroundColor = LABEL_COLOR;
         [self.contentView addSubview:_addressLabel];
+        self.firstOrderV = [[UIView alloc] initWithFrame:CGRectMake(_addressLabel.left, _addressLabel.bottom, _addressLabel.width, _addressLabel.height)];
+        UIImageView * firstIM = [[UIImageView alloc] initWithFrame:CGRectMake(0, 3, _firstOrderV.height - 6, _firstOrderV.height - 6)];
+        firstIM.image = [UIImage imageNamed:@"shou.png"];
+        [_firstOrderV addSubview:firstIM];
+        UILabel * firstLB = [[UILabel alloc] initWithFrame:CGRectMake(firstIM.right + 3, firstIM.top, _firstOrderV.width - 6 - firstIM.right, firstIM.height)];
+        firstLB.text = @"首单减免";
+        firstLB.textColor = [UIColor colorWithWhite:0.7 alpha:1];
+        firstLB.font = [UIFont systemFontOfSize:13];
+        [_firstOrderV addSubview:firstLB];
+        [self.contentView addSubview:_firstOrderV];
+        
+        self.fullOrderV = [[UIView alloc] initWithFrame:CGRectMake(_firstOrderV.left, _firstOrderV.bottom, _firstOrderV.width, _firstOrderV.height)];
+        UIImageView * fullIM = [[UIImageView alloc] initWithFrame:CGRectMake(0, 3, _fullOrderV.height - 6, _fullOrderV.height - 6)];
+        fullIM.image = [UIImage imageNamed:@"jian.png"];
+        [_fullOrderV addSubview:fullIM];
+        UILabel * fullLB = [[UILabel alloc] initWithFrame:CGRectMake(firstIM.right + 3, firstIM.top, _fullOrderV.width - 6 - firstIM.right, firstIM.height)];
+        fullLB.text = @"满单减免";
+        fullLB.textColor = [UIColor colorWithWhite:0.7 alpha:1];
+        fullLB.font = [UIFont systemFontOfSize:13];
+        [_fullOrderV addSubview:fullLB];
+        [self.contentView addSubview:_fullOrderV];
         
     }
 }
 
 
-+ (CGFloat)cellHeight
++ (CGFloat)cellHeightWithTakeOutModel:(TakeOutModel *)takeOutModel
 {
-    return 2 * TOP_SPACE + IMAGE_SIZE;
+    CGFloat height = 2 * TOP_SPACE + IMAGE_SIZE;
+    if ([takeOutModel.isFirstOrder isEqualToNumber:@YES]) {
+        height += LABEL_HEIGTH;
+    }
+    if ([takeOutModel.isFull isEqualToNumber:@YES]) {
+        height += LABEL_HEIGTH;
+    }
+    return height;
 }
 
 - (void)setTakeOutModel:(TakeOutModel *)takeOutModel
@@ -115,6 +144,22 @@
     self.outsideOrderLB.text = [NSString stringWithFormat:@"外送费:%@", takeOutModel.outSentMoney];
     self.addressLabel.text = takeOutModel.address;
     [self.icon setImageWithURL:[NSURL URLWithString:takeOutModel.icon] placeholderImage:[UIImage imageNamed:@"placeholderIM.png"]];
+    if ([takeOutModel.isFirstOrder isEqualToNumber:@YES]) {
+        self.firstOrderV.frame = CGRectMake(_addressLabel.left, _addressLabel.bottom, _addressLabel.width, _addressLabel.height);
+        self.firstOrderV.hidden = NO;
+    }else
+    {
+        self.firstOrderV.frame = CGRectMake(_addressLabel.left, _addressLabel.bottom, _addressLabel.width, 0);
+        self.firstOrderV.hidden = YES;
+    }
+    if ([takeOutModel.isFull isEqualToNumber:@YES]) {
+        self.fullOrderV.frame = CGRectMake(_firstOrderV.left, _firstOrderV.bottom, _firstOrderV.width, _addressLabel.height);
+        self.fullOrderV.hidden = NO;
+    }else
+    {
+        self.fullOrderV.frame = CGRectMake(_firstOrderV.left, _firstOrderV.bottom, _firstOrderV.width, 0);
+        self.fullOrderV.hidden = YES;
+    }
 }
 
 - (void)awakeFromNib {
