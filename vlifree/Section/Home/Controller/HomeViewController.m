@@ -188,6 +188,7 @@
     searchBT.hidden = NO;
     UIView * aView = [self.view viewWithTag:10009];
     if ([UserInfo shareUserInfo].userId) {
+        [self.homeTableView headerBeginRefreshing];
         self.homeTableView.scrollEnabled = YES;
         aView.hidden = YES;
     }else
@@ -202,11 +203,11 @@
 
 - (void)viewWillDisappear:(BOOL)animated
 {
-    UIButton * locationBT = (UIButton *)[self.navigationController.navigationBar viewWithTag:1000];
-    UIButton * searchBT = (UIButton *)[self.navigationController.navigationBar viewWithTag:2000];
-//    NSLog(@"%@, %@", locationBT, searchBT);
-    locationBT.hidden = YES;
-    searchBT.hidden = YES;
+//    UIButton * locationBT = (UIButton *)[self.navigationController.navigationBar viewWithTag:1000];
+//    UIButton * searchBT = (UIButton *)[self.navigationController.navigationBar viewWithTag:2000];
+////    NSLog(@"%@, %@", locationBT, searchBT);
+//    locationBT.hidden = YES;
+//    searchBT.hidden = YES;
 }
 
 
@@ -485,7 +486,14 @@ updatingLocation:(BOOL)updatingLocation
     view.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.3];
     UIImageView * imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, self.view.width - 100, self.view.width - 100)];
     imageView.center = view.center;
-    [imageView setImageWithURL:[NSURL URLWithString:collectMD.icon] placeholderImage:[UIImage imageNamed:@"placeholderIM.png"]];
+    imageView.layer.cornerRadius = 30;
+    imageView.layer.masksToBounds = YES;
+    __weak UIImageView * imageV = imageView;
+    [imageView setImageWithURL:[NSURL URLWithString:collectMD.icon] placeholderImage:[UIImage imageNamed:@"placeholderIM.png"] completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType) {
+        if (error) {
+            imageV.image = [UIImage imageNamed:@"load_fail.png"];
+        }
+    }];
     CGRect imageFrame = imageView.frame;
     imageView.frame = btFrame;
     //    imageView.image = [UIImage imageNamed:@"superMarket.png"];

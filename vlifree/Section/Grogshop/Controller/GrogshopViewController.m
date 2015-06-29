@@ -110,13 +110,14 @@
         [_timer fire];
     }
     
-//    [self performSelector:@selector(isLocationsuccess) withObject:nil afterDelay:60];
+    [self performSelector:@selector(isLocationsuccess) withObject:nil afterDelay:40];
     
     // Do any additional setup after loading the view.
 }
 
 - (void)viewWillAppear:(BOOL)animated
 {
+    self.navigationController.navigationBar.barTintColor = MAIN_COLOR;
     if ([CLLocationManager locationServicesEnabled] && [CLLocationManager authorizationStatus] != kCLAuthorizationStatusDenied) {
         
     }

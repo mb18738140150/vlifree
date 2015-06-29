@@ -35,8 +35,15 @@
 {
     if (!_iconView) {
         self.iconView = [[UIImageView alloc] initWithFrame:CGRectMake(LEFT_SPACE, TOP_SPACE, IMAGE_SIZE, IMAGE_SIZE)];
+        _iconView.layer.cornerRadius = 10;
+        _iconView.layer.masksToBounds = YES;
         _iconView.image = [UIImage imageNamed:@"home_grogshop.png"];
         [self addSubview:_iconView];
+        
+        self.iconButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        _iconButton.frame = _iconView.frame;
+        [self addSubview:_iconButton];
+        
         self.nameLable = [[UILabel alloc] initWithFrame:CGRectMake(_iconView.right + LEFT_SPACE, _iconView.top, LABEL_WIDTH, LABEL_HEIGHT)];
         _nameLable.text = @"总统套房";
         [self addSubview:_nameLable];
@@ -66,7 +73,12 @@
 - (void)setRoomModel:(RoomModel *)roomModel
 {
     _roomModel = roomModel;
-    [self.iconView setImageWithURL:[NSURL URLWithString:roomModel.icon] placeholderImage:[UIImage imageNamed:@"placeholderIM.png"]];
+    __weak DetailsGSViewCell * cell = self;
+    [self.iconView setImageWithURL:[NSURL URLWithString:roomModel.icon] placeholderImage:[UIImage imageNamed:@"placeholderIM.png"] completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType) {
+        if (error != nil || image == nil) {
+            cell.iconView.image = [UIImage imageNamed:@"load_fail.png"];
+        }
+    }];
     self.nameLable.text = roomModel.suiteName;
     self.priceLabel.text = [NSString stringWithFormat:@"¥%@", roomModel.suitePrice];
 }

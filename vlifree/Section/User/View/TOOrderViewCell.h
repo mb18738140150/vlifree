@@ -12,8 +12,11 @@
 @interface TOOrderViewCell : UITableViewCell
 
 
-@property (nonatomic, strong)UIButton * cancelButton;
+//@property (nonatomic, strong)UIButton * cancelButton;
 @property (nonatomic, strong)TakeOutOrderMD * takeOutOrderMD;
+@property (nonatomic, strong)UIButton * iconButton;
+
+
 - (void)crateSubview:(CGRect)frame;
 + (CGFloat)cellHeight;
 

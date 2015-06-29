@@ -177,6 +177,8 @@
     TOOrderViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell" forIndexPath:indexPath];
     [cell crateSubview:tableView.bounds];
     cell.takeOutOrderMD = takeOutMD;
+    [cell.iconButton addTarget:self action:@selector(lookBigImage:) forControlEvents:UIControlEventTouchUpInside];
+    cell.iconButton.tag = 10000 + indexPath.row;
     // Configure the cell...
     return cell;
 }
@@ -193,6 +195,56 @@
     detailsVC.takeOutOrderMD = takeOutOrderMD;
     [self.navigationController pushViewController:detailsVC animated:YES];
 }
+
+
+#pragma mark - 点击图片放大
+
+- (void)lookBigImage:(UIButton *)button
+{
+    int section = 0;
+    int row = button.tag - 10000;
+    TakeOutOrderMD * takeOutOrderMd = [self.dataArray objectAtIndex:row];
+    CGPoint point = self.tableView.contentOffset;
+    CGRect cellRect = [self.tableView rectForRowAtIndexPath:[NSIndexPath indexPathForRow:row inSection:section]];
+    CGRect btFrame = button.frame;
+    btFrame.origin.y = cellRect.origin.y - point.y + button.frame.origin.y + self.tableView.top;
+    btFrame.origin.x = self.tableView.left + button.left;
+    UITapGestureRecognizer * tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(removeBigImage)];
+    
+    UIView * view = [[UIView alloc] initWithFrame:[UIScreen mainScreen].bounds];
+    view.tag = 70000;
+    [view addGestureRecognizer:tapGesture];
+    view.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.3];
+    UIImageView * imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 200, 200)];
+    imageView.center = view.center;
+    imageView.layer.cornerRadius = 30;
+    imageView.layer.masksToBounds = YES;
+    CGRect imageFrame = imageView.frame;
+    imageView.frame = btFrame;
+    imageView.image = [UIImage imageNamed:@"superMarket.png"];
+    [view addSubview:imageView];
+    [self.view.window addSubview:view];
+    __weak UIImageView * imageV = imageView;
+    [imageView setImageWithURL:[NSURL URLWithString:takeOutOrderMd.storeIcon] placeholderImage:[UIImage imageNamed:@"placeholderIM.png"] completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType) {
+        if (error) {
+            imageV.image = [UIImage imageNamed:@"load_fail.png"];
+        }
+    }];
+    [UIView animateWithDuration:1 animations:^{
+        imageView.frame = imageFrame;
+    }];
+    
+    NSLog(@",  %g, %g", cellRect.origin.x, cellRect.origin.y);
+}
+
+- (void)removeBigImage
+{
+    UIView * view = [self.view.window viewWithTag:70000];
+    [view removeFromSuperview];
+}
+
+
+
 
 /*
 // Override to support conditional editing of the table view.

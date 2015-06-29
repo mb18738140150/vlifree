@@ -86,8 +86,10 @@
     
     self.footerView = [[DetailsFooterView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, 100)];
     [_footerView.allButton addTarget:self action:@selector(unfoldAllRoom:) forControlEvents:UIControlEventTouchUpInside];
-    _footerView.explainArray = @[@"bb", @"22", @"ww"];
+//    _footerView.explainArray = @[@"bb", @"22", @"ww"];
     self.detailsTableView.tableFooterView = _footerView;
+    
+    
     UIButton * backBT = [UIButton buttonWithType:UIButtonTypeCustom];
     backBT.frame = CGRectMake(0, 0, 15, 20);
     [backBT setBackgroundImage:[UIImage imageNamed:@"back_r.png"] forState:UIControlStateNormal];
@@ -283,7 +285,7 @@
             {
                 self.headerView.wifiView.image = [UIImage imageNamed:@"wifi_off.png"];
             }
-            self.footerView.explainArray = @[[dic objectForKey:@"BookingInstructions"]];
+            self.footerView.explainString = [dic objectForKey:@"BookingInstructions"];
             NSArray * array = [dic objectForKey:@"SuiteList"];
             for (NSDictionary * suiteDic in array) {
                 RoomModel * roomMD = [[RoomModel alloc] initWithDictionary:suiteDic];
@@ -340,6 +342,8 @@
     [cell.reserveButton addTarget:self action:@selector(reserveGSRoom:) forControlEvents:UIControlEventTouchUpInside];
     cell.reserveButton.tag = BUTTON_TAG + indexPath.row;
     cell.roomModel = roomMD;
+    [cell.iconButton addTarget:self action:@selector(lookBigImage:) forControlEvents:UIControlEventTouchUpInside];
+    cell.iconButton.tag = 10000 + indexPath.row;
 //    cell.textLabel.text = @"222";
     return cell;
 }
@@ -499,6 +503,54 @@
     NSString * dateStr = [formater stringFromDate:[NSDate date]];
     [[NSUserDefaults standardUserDefaults] setObject:dateStr forKey:@"tokenDate"];
 }
+
+
+#pragma mark - 点击图片放大
+
+- (void)lookBigImage:(UIButton *)button
+{
+    int section = 0;
+    int row = button.tag - 10000;
+    RoomModel * roomMd = [self.dataArray objectAtIndex:row];
+    CGPoint point = self.detailsTableView.contentOffset;
+    CGRect cellRect = [self.detailsTableView rectForRowAtIndexPath:[NSIndexPath indexPathForRow:row inSection:section]];
+    CGRect btFrame = button.frame;
+    btFrame.origin.y = cellRect.origin.y - point.y + button.frame.origin.y + self.detailsTableView.top;
+    btFrame.origin.x = self.detailsTableView.left + button.left;
+    UITapGestureRecognizer * tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(removeBigImage)];
+    
+    UIView * view = [[UIView alloc] initWithFrame:[UIScreen mainScreen].bounds];
+    view.tag = 70000;
+    [view addGestureRecognizer:tapGesture];
+    view.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.3];
+    UIImageView * imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 200, 200)];
+    imageView.center = view.center;
+    imageView.layer.cornerRadius = 30;
+    imageView.layer.masksToBounds = YES;
+    CGRect imageFrame = imageView.frame;
+    imageView.frame = btFrame;
+    imageView.image = [UIImage imageNamed:@"superMarket.png"];
+    [view addSubview:imageView];
+    [self.view.window addSubview:view];
+    __weak UIImageView * imageV = imageView;
+    [imageView setImageWithURL:[NSURL URLWithString:roomMd.icon] placeholderImage:[UIImage imageNamed:@"placeholderIM.png"] completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType) {
+        if (error) {
+            imageV.image = [UIImage imageNamed:@"load_fail.png"];
+        }
+    }];
+    [UIView animateWithDuration:1 animations:^{
+        imageView.frame = imageFrame;
+    }];
+    
+    NSLog(@",  %g, %g", cellRect.origin.x, cellRect.origin.y);
+}
+
+- (void)removeBigImage
+{
+    UIView * view = [self.view.window viewWithTag:70000];
+    [view removeFromSuperview];
+}
+
 
 /*
 #pragma mark - Navigation

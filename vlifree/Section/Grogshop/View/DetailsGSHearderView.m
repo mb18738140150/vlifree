@@ -16,7 +16,7 @@
 #define DESCRIBEVIEW_HEIGHT 50
 #define LABEL_HEIGHT 30
 
-#define IMAGE_SIZE 15
+#define IMAGE_SIZE 10
 
 @interface DetailsGSHearderView ()
 
@@ -80,16 +80,16 @@
     aLabel.text = @"查看详情";
     [labelView addSubview:aLabel];
     
-    self.wifiView = [[UIImageView alloc] initWithFrame:CGRectMake(aLabel.right, (labelView.height - IMAGE_SIZE) / 2, IMAGE_SIZE, IMAGE_SIZE)];
+    self.wifiView = [[UIImageView alloc] initWithFrame:CGRectMake(aLabel.right + 5, (labelView.height - IMAGE_SIZE) / 2, IMAGE_SIZE, IMAGE_SIZE)];
     _wifiView.image = [UIImage imageNamed:@"wifi_on.png"];
     [labelView addSubview:_wifiView];
     
     
-    self.parkView = [[UIImageView alloc] initWithFrame:CGRectMake(_wifiView.right, _wifiView.top, IMAGE_SIZE, IMAGE_SIZE)];
+    self.parkView = [[UIImageView alloc] initWithFrame:CGRectMake(_wifiView.right + 5, _wifiView.top, IMAGE_SIZE, IMAGE_SIZE)];
     _parkView.image = [UIImage imageNamed:@"P_on.png"];
     [labelView addSubview:_parkView];
     
-    self.foodView = [[UIImageView alloc] initWithFrame:CGRectMake(_parkView.right, _wifiView.top, IMAGE_SIZE, IMAGE_SIZE)];
+    self.foodView = [[UIImageView alloc] initWithFrame:CGRectMake(_parkView.right + 5, _wifiView.top, IMAGE_SIZE, IMAGE_SIZE)];
     _foodView.image = [UIImage imageNamed:@"food_on.png"];
     [labelView addSubview:_foodView];
     

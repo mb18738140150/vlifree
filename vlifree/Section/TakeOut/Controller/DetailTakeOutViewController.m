@@ -90,6 +90,7 @@
     [self addObserver:self forKeyPath:@"shopArray" options:NSKeyValueObservingOptionNew context:nil];
     
     UIView * noticeView = [[UIView alloc] initWithFrame:CGRectMake(0, self.navigationController.navigationBar.bottom, self.view.width, 30)];
+    noticeView.tag = 80000;
     noticeView.backgroundColor = [UIColor colorWithRed:254 / 255.0 green:231 / 255.0 blue:232 / 255.0 alpha:1];
     [self.view addSubview:noticeView];
     
@@ -103,7 +104,8 @@
     
     UIButton * button = [UIButton buttonWithType:UIButtonTypeCustom];
     button.frame = CGRectMake(noticeLB.right + 10, 5, 20, 20);
-    [button setBackgroundImage:[UIImage imageNamed:@"xx.png ≈"] forState:UIControlStateNormal];
+    [button setBackgroundImage:[UIImage imageNamed:@"xx.png"] forState:UIControlStateNormal];
+    [button addTarget:self action:@selector(removeNoticeView:) forControlEvents:UIControlEventTouchUpInside];
     [noticeView addSubview:button];
     
     
@@ -151,6 +153,14 @@
     [self.navigationController popViewControllerAnimated:YES];
 }
 
+- (void)removeNoticeView:(UIButton *)button
+{
+    UIView * noticeView = button.superview;
+    self.sectionTableView.top = noticeView.top;
+    self.menusTableView.top = noticeView.top;
+    self.sectionTableView.height += noticeView.height;
+    self.menusTableView.height += noticeView.height;
+}
 
 - (void)confirmMenusAction:(UIButton *)button
 {
@@ -337,9 +347,10 @@
 {
     if ([tableView isEqual:_sectionTableView]) {
         return self.classArray.count;
-        return 15;
+//        return 15;
     }
     return self.menusArray.count;
+//    return 15;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -357,6 +368,8 @@
     [cell.subtractBT addTarget:self action:@selector(subtractMenuCount:) forControlEvents:UIControlEventTouchUpInside];
     cell.subtractBT.tag = indexPath.row + SUBTRACT_BUTTON_TAG;
     [cell.addButton addTarget:self action:@selector(addMenuCount:) forControlEvents:UIControlEventTouchUpInside];
+    [cell.iconButton addTarget:self action:@selector(lookBigImage:) forControlEvents:UIControlEventTouchUpInside];
+    cell.iconButton.tag = indexPath.row + 10000;
     cell.addButton.tag = indexPath.row + ADD_BUTTON_TAG;
     cell.menuModel = menuMD;
 //    cell.textLabel.text = @"menu";
@@ -369,6 +382,7 @@
     if ([tableView isEqual:_sectionTableView]) {
         ClassModel * classMD = [self.classArray objectAtIndex:indexPath.row];
         return [ClassesViewCell cellHeightWithString:classMD.title frame:tableView.bounds];
+//        return [ClassesViewCell cellHeightWithString:@"和覅和合格后二极管" frame:tableView.bounds];
     }
     return [MenusViewCell cellHeight];
 }
@@ -673,6 +687,54 @@
     NSString * dateStr = [formater stringFromDate:[NSDate date]];
     [[NSUserDefaults standardUserDefaults] setObject:dateStr forKey:@"tokenDate"];
 }
+
+
+#pragma mark - 点击图片放大
+
+- (void)lookBigImage:(UIButton *)button
+{
+    int section = 0;
+    int row = button.tag - 10000;
+    MenuModel * menuMd = [self.menusArray objectAtIndex:row];
+    CGPoint point = self.menusTableView.contentOffset;
+    CGRect cellRect = [self.menusTableView rectForRowAtIndexPath:[NSIndexPath indexPathForRow:row inSection:section]];
+    CGRect btFrame = button.frame;
+    btFrame.origin.y = cellRect.origin.y - point.y + button.frame.origin.y + self.menusTableView.top;
+    btFrame.origin.x = self.menusTableView.left + button.left;
+    UITapGestureRecognizer * tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(removeBigImage)];
+    
+    UIView * view = [[UIView alloc] initWithFrame:[UIScreen mainScreen].bounds];
+    view.tag = 70000;
+    [view addGestureRecognizer:tapGesture];
+    view.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.3];
+    UIImageView * imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 200, 200)];
+    imageView.center = view.center;
+    imageView.layer.cornerRadius = 30;
+    imageView.layer.masksToBounds = YES;
+    CGRect imageFrame = imageView.frame;
+    imageView.frame = btFrame;
+    imageView.image = [UIImage imageNamed:@"superMarket.png"];
+    [view addSubview:imageView];
+    [self.view.window addSubview:view];
+    __weak UIImageView * imageV = imageView;
+    [imageView setImageWithURL:[NSURL URLWithString:menuMd.icon] placeholderImage:[UIImage imageNamed:@"placeholderIM.png"] completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType) {
+        if (error) {
+            imageV.image = [UIImage imageNamed:@"load_fail.png"];
+        }
+    }];
+    [UIView animateWithDuration:1 animations:^{
+        imageView.frame = imageFrame;
+    }];
+    
+    NSLog(@",  %g, %g", cellRect.origin.x, cellRect.origin.y);
+}
+
+- (void)removeBigImage
+{
+    UIView * view = [self.view.window viewWithTag:70000];
+    [view removeFromSuperview];
+}
+
 
 /*
 #pragma mark - Navigation

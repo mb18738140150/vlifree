@@ -49,19 +49,25 @@
         _dateLabel.text = @"05月13日 14:34";
         [view addSubview:_dateLabel];
         
-        self.cancelButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        _cancelButton.frame = CGRectMake(frame.size.width - BUTTON_WIDTH - LEFT_SPACE, TOP_SPACE, BUTTON_WIDTH, LABEL_HEIGHT);
-        [_cancelButton setTitle:@"取消订单" forState:UIControlStateNormal];
-        [_cancelButton setTitleColor:[UIColor colorWithWhite:0.7 alpha:1] forState:UIControlStateNormal];
-        [view addSubview:_cancelButton];
+//        self.cancelButton = [UIButton buttonWithType:UIButtonTypeCustom];
+//        _cancelButton.frame = CGRectMake(frame.size.width - BUTTON_WIDTH - LEFT_SPACE, TOP_SPACE, BUTTON_WIDTH, LABEL_HEIGHT);
+//        [_cancelButton setTitle:@"取消订单" forState:UIControlStateNormal];
+//        [_cancelButton setTitleColor:[UIColor colorWithWhite:0.7 alpha:1] forState:UIControlStateNormal];
+//        [view addSubview:_cancelButton];
         
         UIView * lineView2 = [[UIView alloc] initWithFrame:CGRectMake(LEFT_SPACE, _dateLabel.bottom, frame.size.width - 2 * LEFT_SPACE, 1)];
         lineView2.backgroundColor = [UIColor colorWithWhite:0.9 alpha:0.8];
         [view addSubview:lineView2];
         
         self.iconView = [[UIImageView alloc] initWithFrame:CGRectMake(LEFT_SPACE, lineView2.bottom + TOP_SPACE, IMAGE_SIZE, IMAGE_SIZE)];
+        _iconView.layer.cornerRadius = 10;
+        _iconView.layer.masksToBounds = YES;
         _iconView.image = [UIImage imageNamed:@"home_takeOut.png"];
         [view addSubview:_iconView];
+        
+        self.iconButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        _iconButton.frame = _iconView.frame;
+        [self.contentView addSubview:_iconButton];
         
         self.titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(_iconView.right + 5, _iconView.top, frame.size.width - _iconView.right - 30, LABEL_HEIGHT)];
         _titleLabel.text = @"打牌小当1好套餐";
@@ -86,10 +92,15 @@
 - (void)setTakeOutOrderMD:(TakeOutOrderMD *)takeOutOrderMD
 {
     _takeOutOrderMD = takeOutOrderMD;
-    [self.iconView setImageWithURL:[NSURL URLWithString:takeOutOrderMD.storeIcon] placeholderImage:[UIImage imageNamed:@"placeholderIM.png"]];
+    __weak TOOrderViewCell * cell = self;
+    [self.iconView setImageWithURL:[NSURL URLWithString:takeOutOrderMD.storeIcon] placeholderImage:[UIImage imageNamed:@"placeholderIM.png"] completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType) {
+        if (error != nil || image == nil) {
+            cell.iconView.image = [UIImage imageNamed:@"load_fail.png"];
+        }
+    }];
     self.dateLabel.text = takeOutOrderMD.time;
     self.titleLabel.text = takeOutOrderMD.storeName;
-    self.priceLabel.text = [NSString stringWithFormat:@"¥%@", takeOutOrderMD.money];
+    self.priceLabel.text = [NSString stringWithFormat:@"¥%@", takeOutOrderMD.allMoney];
 }
 
 - (void)awakeFromNib {

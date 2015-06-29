@@ -87,8 +87,8 @@
     UIButton * ruzhuBT = [UIButton buttonWithType:UIButtonTypeCustom];
     ruzhuBT.frame = CGRectMake(ruzhuLB.right, ruzhuLB.top, view1.width - 2 * LEFT_SPACE - ruzhuLB.width, ruzhuLB.height);
     ruzhuBT.tag = 10001;
-    ruzhuBT.layer.borderColor = [UIColor colorWithWhite:0.7 alpha:0.9].CGColor;
-    ruzhuBT.layer.borderWidth = 0.5;
+//    ruzhuBT.layer.borderColor = [UIColor colorWithWhite:0.7 alpha:0.9].CGColor;
+//    ruzhuBT.layer.borderWidth = 0.5;
     [ruzhuBT setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
 //    ruzhuBT.backgroundColor = [UIColor redColor];
     [ruzhuBT addTarget:self action:@selector(changeDate:) forControlEvents:UIControlEventTouchUpInside];
@@ -103,8 +103,8 @@
     UIButton * lidianBT = [UIButton buttonWithType:UIButtonTypeCustom];
     lidianBT.frame = CGRectMake(lidianLB.right, lidianLB.top, view1.width - 2 * LEFT_SPACE - lidianLB.width, lidianLB.height);
     lidianBT.tag = 10002;
-    lidianBT.layer.borderColor = [UIColor colorWithWhite:0.7 alpha:0.9].CGColor;
-    lidianBT.layer.borderWidth = 0.5;
+//    lidianBT.layer.borderColor = [UIColor colorWithWhite:0.7 alpha:0.9].CGColor;
+//    lidianBT.layer.borderWidth = 0.5;
     [lidianBT setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     //    ruzhuBT.backgroundColor = [UIColor redColor];
     [lidianBT addTarget:self action:@selector(changeDate:) forControlEvents:UIControlEventTouchUpInside];
@@ -141,7 +141,7 @@
     [view2 addSubview:personLB];
     
     self.personTF = [[UITextField alloc] initWithFrame:CGRectMake(personLB.right, personLB.top, view2.width - LEFT_SPACE - personLB.right, personLB.height)];
-    _personTF.borderStyle = UITextBorderStyleRoundedRect;
+    _personTF.borderStyle = UITextBorderStyleNone;
     _personTF.delegate = self;
     [view2 addSubview:_personTF];
     
@@ -151,7 +151,7 @@
     [view2 addSubview:telLB];
     
     self.telTF = [[UITextField alloc] initWithFrame:CGRectMake(telLB.right, telLB.top, view2.width - LEFT_SPACE - telLB.right, telLB.height)];
-    _telTF.borderStyle = UITextBorderStyleRoundedRect;
+    _telTF.borderStyle = UITextBorderStyleNone;
     _telTF.delegate = self;
     [view2 addSubview:_telTF];
     
@@ -164,7 +164,7 @@
     
     
     self.requireTF = [[UITextField alloc] initWithFrame:CGRectMake(requireLB.right, requireLB.top, view2.width - LEFT_SPACE - requireLB.right, requireLB.height)];
-    _requireTF.borderStyle = UITextBorderStyleRoundedRect;
+    _requireTF.borderStyle = UITextBorderStyleNone;
     _requireTF.delegate = self;
     [view2 addSubview:_requireTF];
     

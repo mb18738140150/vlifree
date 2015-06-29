@@ -151,6 +151,7 @@
     if ([UserLocation shareUserLocation].placemark) {
         if (!_isSupermark) {
             [self downloadDataWithCommand:@6 page:_page count:DATA_COUNT type:0];
+            [SVProgressHUD showWithStatus:@"加载中..." maskType:SVProgressHUDMaskTypeBlack];
         }
         _isLoc = YES;
     }else
@@ -324,7 +325,6 @@
 - (void)downloadDataWithCommand:(NSNumber *)command page:(int)page count:(int)count type:(int)type
 {
     _type = type;
-    [SVProgressHUD showWithStatus:@"加载中..." maskType:SVProgressHUDMaskTypeBlack];
     NSDictionary * jsonDic = @{
                                @"Command":command,
                                @"CurPage":[NSNumber numberWithInt:page],
@@ -351,7 +351,7 @@
 - (void)playPostWithDictionary:(NSDictionary *)dic
 {
     NSString * jsonStr = [dic JSONString];
-    //    NSLog(@"%@", jsonStr);
+    NSLog(@"%@", jsonStr);
     NSString * str = [NSString stringWithFormat:@"%@231618", jsonStr];
     NSString * md5Str = [str md5];
     NSString * urlString = [NSString stringWithFormat:@"%@%@", POST_URL, md5Str];

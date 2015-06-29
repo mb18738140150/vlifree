@@ -11,8 +11,9 @@
 @interface DetailsFooterView : UIView
 
 
-@property (nonatomic, copy)NSArray * explainArray;
+//@property (nonatomic, copy)NSArray * explainArray;
 @property (nonatomic, strong)UIButton * allButton;
 
+@property (nonatomic, copy)NSString * explainString;
 
 @end

@@ -47,6 +47,8 @@
 {
     if (!_icon) {
         self.icon = [[UIImageView alloc] initWithFrame:CGRectMake(LEFT_SPACE, TOP_SPACE, IMAGE_SIZE, IMAGE_SIZE)];
+        _icon.layer.cornerRadius = 10;
+        _icon.layer.masksToBounds = YES;
         _icon.backgroundColor = VIEW_COLOR;
 //        _icon.image = [UIImage imageNamed:@"home_takeOut.png"];
         [self.contentView addSubview:_icon];
@@ -112,9 +114,9 @@
     
     self.priceLabel.text = [NSString stringWithFormat:@"¥%@", collectModel.price];
     self.soldCountLabel.text = [NSString stringWithFormat:@"月售%@", collectModel.sold];
-//    HomeViewCell * cell = self;
+    __weak HomeViewCell * cell = self;
     [self.icon setImageWithURL:[NSURL URLWithString:collectModel.icon] placeholderImage:[UIImage imageNamed:@"placeholderIM.png"] completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType) {
-        
+        cell.icon.image = [UIImage imageNamed:@"load_fail.png"];
     }];
 }
 

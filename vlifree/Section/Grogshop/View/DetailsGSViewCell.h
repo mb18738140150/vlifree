@@ -13,7 +13,7 @@
 
 @property (nonatomic, strong)RoomModel * roomModel;
 @property (nonatomic, strong)UIButton * reserveButton;
-
+@property (nonatomic, strong)UIButton * iconButton;
 
 - (void)createSubviewWithFrame:(CGRect)frame;
 

@@ -72,9 +72,15 @@
         self.layoutMargins = UIEdgeInsetsZero;
         
         self.iconView = [[UIImageView alloc] initWithFrame:CGRectMake(LEFT_SPACE, TOP_SPACE, IMAGE_SIZE, IMAGE_SIZE)];
+        _iconView.layer.cornerRadius = 10;
+        _iconView.layer.masksToBounds = YES;
         _iconView.backgroundColor = VIEW_COLOR;
         _iconView.image = [UIImage imageNamed:@"home_grogshop.png"];
         [self.contentView addSubview:_iconView];
+        
+        self.iconButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        _iconButton.frame = _iconView.frame;
+        [self.contentView addSubview:_iconButton];
         
         self.nameLabel = [[UILabel alloc] initWithFrame:CGRectMake(_iconView.right + LEFT_SPACE, TOP_SPACE, frame.size.width - 2 * LEFT_SPACE - _iconView.right, LABEL_HEIGHT)];
         _nameLabel.text = @"双人套餐水煮牛肉套餐";
