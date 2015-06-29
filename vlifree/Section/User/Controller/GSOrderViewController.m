@@ -17,7 +17,7 @@
 }
 
 @property (nonatomic, strong)NSMutableArray * dataArray;
-
+@property (nonatomic, strong)NSNumber * allCount;
 
 @end
 
@@ -38,7 +38,9 @@
     [self.tableView registerClass:[GSOrderViewCell class] forCellReuseIdentifier:@"cell"];
     _page = 1;
     [self downloadDataWithCommand:@25 page:_page count:COUNT];
-    
+    [SVProgressHUD showWithStatus:@"加载中..." maskType:SVProgressHUDMaskTypeBlack];
+    [self.tableView addHeaderWithTarget:self action:@selector(headerRereshing)];
+    [self.tableView addFooterWithTarget:self action:@selector(footerRereshing)];
     
     UIButton * backBT = [UIButton buttonWithType:UIButtonTypeCustom];
     backBT.frame = CGRectMake(0, 0, 15, 20);
@@ -64,10 +66,31 @@
     // Dispose of any resources that can be recreated.
 }
 
+
+#pragma mark - 数据刷新,加载更多
+
+- (void)headerRereshing
+{
+    _page = 1;
+    [self downloadDataWithCommand:@25 page:_page count:COUNT];
+}
+
+- (void)footerRereshing
+{
+    if (self.dataArray.count < [_allCount integerValue]) {
+        self.tableView.footerRefreshingText = @"正在加载数据";
+        [self downloadDataWithCommand:@25 page:++_page count:COUNT];
+    }else
+    {
+        self.tableView.footerRefreshingText = @"数据已经加载完";
+        [self.tableView performSelector:@selector(footerEndRefreshing) withObject:nil afterDelay:1.5];
+    }
+    
+}
+
 #pragma mark - 数据请求
 - (void)downloadDataWithCommand:(NSNumber *)command page:(int)page count:(int)count
 {
-    
     NSDictionary * jsonDic = @{
                                @"Command":command,
                                @"CurPage":[NSNumber numberWithInt:page],
@@ -107,23 +130,30 @@
     NSLog(@"+++%@", data);
     if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
         NSLog(@"%@", [data objectForKey:@"ErrorMsg"]);
-        NSArray * array = [data objectForKey:@"WakeOutOrderList"];
+        self.allCount = [data objectForKey:@"AllCount"];
+        NSArray * array = [data objectForKey:@"HotelOrderList"];
         if(_page == 1)
         {
-            _dataArray = nil;
+            self.dataArray = nil;
         }
-//        for (NSDictionary * dic in array) {
-////            [self.dataArray addObject:takeOutOrderMD];
-//        }
+        for (NSDictionary * dic in array) {
+            GrogshopOrderMD * grogshopMD = [[GrogshopOrderMD alloc] initWithDictionary:dic];
+            
+            [self.dataArray addObject:grogshopMD];
+        }
         [self.tableView reloadData];
+        NSLog(@"%d", _dataArray.count);
     }
     [self.tableView headerEndRefreshing];
+    [self.tableView footerEndRefreshing];
     [SVProgressHUD dismiss];
 }
 
 - (void)failWithError:(NSError *)error
 {
     [self.tableView headerEndRefreshing];
+    [self.tableView footerEndRefreshing];
+    [SVProgressHUD dismiss];
     NSLog(@"%@", error);
 }
 
@@ -139,13 +169,17 @@
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
 
     // Return the number of rows in the section.
-    return 10;
+    return self.dataArray.count;
 }
 
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    GrogshopOrderMD * grogshopMD = [self.dataArray objectAtIndex:indexPath.row];
     GSOrderViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell" forIndexPath:indexPath];
     [cell createSubview:tableView.bounds];
+    [cell.payButton addTarget:self action:@selector(payAction:) forControlEvents:UIControlEventTouchUpInside];
+    cell.payButton.tag = indexPath.row + 4000;
+    cell.grogshopOrderMD = grogshopMD;
 //    cell.textLabel.text = @"244";
     // Configure the cell...
     return cell;
@@ -154,7 +188,15 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    GrogshopOrderMD * grogshopMD = [self.dataArray objectAtIndex:indexPath.row];
     DetailsGSOrderViewController * detailsGSODVC = [[DetailsGSOrderViewController alloc] init];
+    detailsGSODVC.orderID = grogshopMD.orderSn;
+    if ([grogshopMD.payState isEqualToNumber:@1]) {
+        detailsGSODVC.isPay = YES;
+    }else
+    {
+        detailsGSODVC.isPay = NO;
+    }
     [self.navigationController pushViewController:detailsGSODVC animated:YES];
 }
 
@@ -162,6 +204,18 @@
 {
     return 110;
 }
+
+
+- (void)payAction:(UIButton *)button
+{
+    NSLog(@"支付%d", button.tag - 4000);
+    GrogshopOrderMD * grogshopMD = [self.dataArray objectAtIndex:button.tag - 4000];
+    DetailsGSOrderViewController * detailsGSODVC = [[DetailsGSOrderViewController alloc] init];
+    detailsGSODVC.orderID = grogshopMD.orderSn;
+    detailsGSODVC.isPay = NO;
+    [self.navigationController pushViewController:detailsGSODVC animated:YES];
+}
+
 
 /*
 // Override to support conditional editing of the table view.

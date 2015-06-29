@@ -8,7 +8,7 @@
 
 #import "DetailsTOOrderViewController.h"
 #import "OrderMenuVIew.h"
-
+#import "OrderMenuMD.h"
 
 @interface DetailsTOOrderViewController ()<HTTPPostDelegate>
 
@@ -26,9 +26,21 @@
 @property (nonatomic, strong)UILabel * orderAddressLB;
 
 
+@property (nonatomic, strong)NSMutableArray * orderArray;
+
 @end
 
 @implementation DetailsTOOrderViewController
+
+
+- (NSMutableArray *)orderArray
+{
+    if (!_orderArray) {
+        self.orderArray = [NSMutableArray array];
+    }
+    return _orderArray;
+}
+
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -73,6 +85,14 @@
     cancelBT.layer.cornerRadius = 3;
     [view1 addSubview:cancelBT];
     
+    if ([self.takeOutOrderMD.orderState isEqualToNumber:@1]) {
+        cancelBT.hidden = NO;
+    }else
+    {
+        cancelBT.hidden = YES;
+    }
+    
+    
     UIButton * confirmBT = [UIButton buttonWithType:UIButtonTypeCustom];
     confirmBT.frame = CGRectMake(view1.width - 100, aLabel.bottom + 10, 80, 25);
     [confirmBT setTitle:@"确认订单" forState:UIControlStateNormal];
@@ -99,7 +119,7 @@
     [view2 addSubview:lineView2];
     
     NSArray * array = @[@"提交订单", @"餐厅接单", @"配送中", @"已收货"];
-    
+    int state = self.takeOutOrderMD.orderState.intValue - 1;
     for (int i = 0; i < 4; i++) {
         UIImageView * aImageView = [[UIImageView alloc] initWithFrame:CGRectMake((view2.width - 200) / 5 * (i + 1) + 50 * i, 10, 50, 50)];
         aImageView.image = [UIImage imageNamed:[NSString stringWithFormat:@"orderState%d.png", i + 1]];
@@ -116,10 +136,17 @@
             [view2 addSubview:line];
         }else
         {
-            label.textColor = [UIColor greenColor];
+//            label.textColor = [UIColor greenColor];
             view2.height = label.bottom + 5;
         }
-        
+        if (i == state) {
+            if (state == 3) {
+                label.textColor = [UIColor greenColor];
+            }else
+            {
+                label.textColor = [UIColor redColor];
+            }
+        }
     }
     
     UIView * lineView3 = [[UIView alloc] initWithFrame:CGRectMake(0, view2.height - 1, view2.width, 1)];
@@ -211,6 +238,7 @@
     againBT.layer.borderColor = [UIColor orangeColor].CGColor;
     againBT.layer.borderWidth = 1;
     againBT.layer.cornerRadius = 5;
+    [againBT addTarget:self action:@selector(againOrdor:) forControlEvents:UIControlEventTouchUpInside];
     [view4 addSubview:againBT];
     view4.height = againBT.bottom + 5;
     
@@ -322,7 +350,10 @@
     [self.navigationController popViewControllerAnimated:YES];
 }
 
-
+- (void)againOrdor:(UIButton *)button
+{
+    self.navigationController.tabBarController.selectedIndex = 2;
+}
 
 - (void)callPhone:(UIButton *)button
 {
@@ -382,7 +413,7 @@
 #pragma mark - 数据请求
 - (void)downloadData
 {
-    
+    [SVProgressHUD showWithStatus:@"加载中..." maskType:SVProgressHUDMaskTypeBlack];
     NSDictionary * jsonDic = @{
                                @"Command":@24,
                                @"Id":_takeOutOrderMD.orderID,
@@ -422,11 +453,38 @@
     NSLog(@"+++%@", data);
     if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
         UIView * view3 = [self.scrollView viewWithTag:3000];
-        
+        UIView * view4 = [self.scrollView viewWithTag:4000];
+        UIView * view5 = [self.scrollView viewWithTag:5000];
+        NSArray * array = [data objectForKey:@"WakeOutOrderDetail"];
+        for (NSDictionary * dic in array) {
+            OrderMenuMD * orderMenuMD = [[OrderMenuMD alloc] initWithDictionary:dic];
+            [self.orderArray addObject:orderMenuMD];
+        }
+        for (int i = 0 ; i < self.orderArray.count; i++) {
+            OrderMenuMD * orderMneuMD = [self.orderArray objectAtIndex:i];
+            OrderMenuVIew * menuView = [[OrderMenuVIew alloc] initWithFrame:CGRectMake(15, self.storeNameLB.bottom + 5 + i * 25, view3.width - 30, 25)];
+            menuView.menuNameLB.text = orderMneuMD.name;
+            menuView.countLabel.text = [NSString stringWithFormat:@"%@", orderMneuMD.count];
+            menuView.priceLabel.text = [NSString stringWithFormat:@"¥%@", orderMneuMD.money];
+            [view3 addSubview:menuView];
+        }
+        view3.height += 25 * self.orderArray.count + 5;
+        UIView * lineView6 = [[UIView alloc] initWithFrame:CGRectMake(0, view3.height - 1, view3.width, 1)];
+        lineView6.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
+        [view3 addSubview:lineView6];
+        view4.top += 25 * self.orderArray.count + 5;
+        view5.top += 25 * self.orderArray.count + 5;
+        CGSize size = _scrollView.contentSize;
+        size.height += 25 * self.orderArray.count + 5;
+        _scrollView.contentSize = size;
     }
     [SVProgressHUD dismiss];
 }
-
+- (void)failWithError:(NSError *)error
+{
+    [SVProgressHUD dismiss];
+    NSLog(@"error = %@", error);
+}
 
 
 - (void)didReceiveMemoryWarning {

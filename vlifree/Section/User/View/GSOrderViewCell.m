@@ -63,6 +63,28 @@
 }
 
 
+- (void)setGrogshopOrderMD:(GrogshopOrderMD *)grogshopOrderMD
+{
+    _grogshopOrderMD = grogshopOrderMD;
+    self.gsNameLB.text = grogshopOrderMD.name;
+    NSString * priceStr = [NSString stringWithFormat:@"%@", grogshopOrderMD.money];
+    NSString * roomStr = [NSString stringWithFormat:@"房型:%@", grogshopOrderMD.roomType];
+    NSMutableAttributedString * string = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@   %@", priceStr, roomStr]];
+    [string addAttributes:@{NSFontAttributeName : [UIFont systemFontOfSize:20]} range:NSMakeRange(0, priceStr.length)];
+    [string addAttributes:@{NSForegroundColorAttributeName : [UIColor redColor]} range:NSMakeRange(0, priceStr.length)];
+    self.priceLB.attributedText = [string copy];
+    NSString * ruzhuDate = [grogshopOrderMD.checkinTime substringToIndex:9];
+    NSString * lidianDate = [grogshopOrderMD.leaveTime substringToIndex:9];
+    self.dateLB.text = [NSString stringWithFormat:@"入住:%@  离店:%@", ruzhuDate, lidianDate];
+    if ([grogshopOrderMD.payState isEqualToNumber:@1]) {
+        self.payButton.hidden = YES;
+    }else
+    {
+        self.payButton.hidden = NO;
+    }
+}
+
+
 - (void)awakeFromNib {
     // Initialization code
 }

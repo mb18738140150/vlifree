@@ -44,6 +44,8 @@
 {
     if (!_icon) {
         self.icon = [[UIImageView alloc] initWithFrame:CGRectMake(LEFT_SPACE, TOP_SPACE, IMAGE_SIZE, IMAGE_SIZE)];
+        _icon.layer.cornerRadius = 10;
+        _icon.layer.masksToBounds = YES;
         _icon.image = [UIImage imageNamed:@"home_takeOut.png"];
         [self.contentView addSubview:_icon];
         
@@ -143,7 +145,13 @@
     self.sendPriceLabel.text = [NSString stringWithFormat:@"起送价:%@", takeOutModel.sendPrice];
     self.outsideOrderLB.text = [NSString stringWithFormat:@"外送费:%@", takeOutModel.outSentMoney];
     self.addressLabel.text = takeOutModel.address;
-    [self.icon setImageWithURL:[NSURL URLWithString:takeOutModel.icon] placeholderImage:[UIImage imageNamed:@"placeholderIM.png"]];
+    __weak TakeOutViewCell * cell = self;
+    [self.icon setImageWithURL:[NSURL URLWithString:takeOutModel.icon] placeholderImage:[UIImage imageNamed:@"placeholderIM.png"] completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType) {
+        if (error) {
+            cell.icon.image = [UIImage imageNamed:@"load_fail.png"];
+        }
+    }];
+    
     if ([takeOutModel.isFirstOrder isEqualToNumber:@YES]) {
         self.firstOrderV.frame = CGRectMake(_addressLabel.left, _addressLabel.bottom, _addressLabel.width, _addressLabel.height);
         self.firstOrderV.hidden = NO;

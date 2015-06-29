@@ -15,6 +15,7 @@
 #import "CollectModel.h"
 #import "DetailsGrogshopViewController.h"
 #import "MGSwipeButton.h"
+#import "TakeOutViewController.h"
 
 #define CELL_INDENTIFIER @"cell"
 
@@ -192,6 +193,8 @@
     }else
     {
         self.homeTableView.scrollEnabled = NO;
+        self.dataArray = nil;
+        [self.homeTableView reloadData];
         aView.hidden = NO;
     }
 //    NSLog(@"--%@, %@", locationBT, searchBT);
@@ -223,6 +226,11 @@
 - (void)supermarketAction:(UIButton *)button
 {
     self.navigationController.tabBarController.selectedIndex = 2;
+    UINavigationController * nav = (UINavigationController *)self.navigationController.tabBarController.selectedViewController;
+    TakeOutViewController * takeOutVC = (TakeOutViewController *)nav.topViewController;
+    takeOutVC.isSupermark = YES;
+    [takeOutVC downloadDataWithCommand:@6 page:1 count:COUNT type:3];
+    
     NSLog(@"超市");
 }
 

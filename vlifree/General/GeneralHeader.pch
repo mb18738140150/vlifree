@@ -17,6 +17,7 @@
 #import "MJRefresh.h"
 #import "SVProgressHUD.h"
 #import "UserInfo.h"
+#import "WXApi.h"
 
 #define COUNT 15
 #define APP_ID_WX @"wxaac5e5f7421e84ac"

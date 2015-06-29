@@ -16,7 +16,7 @@
 }
 
 @property (nonatomic, strong)NSMutableArray * dataArray;
-
+@property (nonatomic, strong)NSNumber * allCount;
 
 @end
 
@@ -46,6 +46,11 @@
     
     _page = 1;
     [self downloadDataWithCommand:@23 page:_page count:COUNT];
+    [self.tableView addHeaderWithTarget:self action:@selector(headerRereshing)];
+    [self.tableView addFooterWithTarget:self action:@selector(footerRereshing)];
+    [SVProgressHUD showWithStatus:@"加载中..." maskType:SVProgressHUDMaskTypeBlack];
+
+
     // Uncomment the following line to preserve selection between presentations.
     // self.clearsSelectionOnViewWillAppear = NO;
     
@@ -58,6 +63,26 @@
     [self.navigationController popViewControllerAnimated:YES];
 }
 
+#pragma mark - 数据刷新,加载更多
+
+- (void)headerRereshing
+{
+    _page = 1;
+    [self downloadDataWithCommand:@23 page:_page count:COUNT];
+}
+
+- (void)footerRereshing
+{
+    if (self.dataArray.count < [_allCount integerValue]) {
+        self.tableView.footerRefreshingText = @"正在加载数据";
+        [self downloadDataWithCommand:@23 page:++_page count:COUNT];
+    }else
+    {
+        self.tableView.footerRefreshingText = @"数据已经加载完";
+        [self.tableView performSelector:@selector(footerEndRefreshing) withObject:nil afterDelay:1.5];
+    }
+    
+}
 
 #pragma mark - 数据请求
 - (void)downloadDataWithCommand:(NSNumber *)command page:(int)page count:(int)count
@@ -103,6 +128,7 @@
     if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
         NSLog(@"%@", [data objectForKey:@"ErrorMsg"]);
         NSArray * array = [data objectForKey:@"WakeOutOrderList"];
+        self.allCount = [data objectForKey:@"AllCount"];
         if(_page == 1)
         {
             _dataArray = nil;
@@ -114,12 +140,15 @@
         [self.tableView reloadData];
     }
     [self.tableView headerEndRefreshing];
+    [self.tableView footerEndRefreshing];
     [SVProgressHUD dismiss];
 }
 
 - (void)failWithError:(NSError *)error
 {
     [self.tableView headerEndRefreshing];
+    [self.tableView footerEndRefreshing];
+    [SVProgressHUD dismiss];
     NSLog(@"%@", error);
 }
 

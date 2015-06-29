@@ -23,6 +23,7 @@
 @property (nonatomic, copy)NSString * nextphone;
 @property (nonatomic, copy)NSString * address;
 @property (nonatomic, strong)NSNumber * payType;
+@property (nonatomic, strong)NSNumber * isDeal;
 
 - (id)initWithDictionary:(NSDictionary *)dic;
 

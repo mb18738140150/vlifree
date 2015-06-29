@@ -7,12 +7,14 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "GrogshopOrderMD.h"
 
 @interface GSOrderViewCell : UITableViewCell
 
 
 
 @property (nonatomic, strong)UIButton * payButton;
+@property (nonatomic, strong)GrogshopOrderMD * grogshopOrderMD;
 - (void)createSubview:(CGRect)frame;
 
 

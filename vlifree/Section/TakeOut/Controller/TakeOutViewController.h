@@ -10,4 +10,7 @@
 
 @interface TakeOutViewController : UIViewController
 
+@property(nonatomic, assign)BOOL isSupermark;
+- (void)downloadDataWithCommand:(NSNumber *)command page:(int)page count:(int)count type:(int)type;
+
 @end

@@ -149,7 +149,9 @@
     _isLoc = NO;
     _type = 0;
     if ([UserLocation shareUserLocation].placemark) {
-        [self downloadDataWithCommand:@6 page:_page count:DATA_COUNT type:0];
+        if (!_isSupermark) {
+            [self downloadDataWithCommand:@6 page:_page count:DATA_COUNT type:0];
+        }
         _isLoc = YES;
     }else
     {
@@ -321,7 +323,8 @@
 #pragma mark - 数据请求
 - (void)downloadDataWithCommand:(NSNumber *)command page:(int)page count:(int)count type:(int)type
 {
-    
+    _type = type;
+    [SVProgressHUD showWithStatus:@"加载中..." maskType:SVProgressHUDMaskTypeBlack];
     NSDictionary * jsonDic = @{
                                @"Command":command,
                                @"CurPage":[NSNumber numberWithInt:page],
@@ -543,7 +546,7 @@ updatingLocation:(BOOL)updatingLocation
     }]];
     [cell.IconButton addTarget:self action:@selector(lookBigImage:) forControlEvents:UIControlEventTouchUpInside];
     cell.takeOutModel = takeOutMD;
-    cell.IconButton.tag = 5000 + indexPath.row;
+    cell.IconButton.tag = 5000000 + indexPath.row + indexPath.section * 1000;
     return cell;
 }
 
@@ -589,9 +592,11 @@ updatingLocation:(BOOL)updatingLocation
 
 - (void)lookBigImage:(UIButton *)button
 {
-    TakeOutModel * takeOutMd = [self.dataArray objectAtIndex:button.tag - 5000];
+    int section = (button.tag - 5000000) / 1000;
+    int row = (button.tag - 5000000) % 1000;
+    TakeOutModel * takeOutMd = [[self.dataArray objectAtIndex:section] objectAtIndex:row];
     CGPoint point = self.takeOutTabelView.contentOffset;
-    CGRect cellRect = [self.takeOutTabelView rectForRowAtIndexPath:[NSIndexPath indexPathForRow:button.tag - 5000 inSection:0]];
+    CGRect cellRect = [self.takeOutTabelView rectForRowAtIndexPath:[NSIndexPath indexPathForRow:row inSection:section]];
     CGRect btFrame = button.frame;
     btFrame.origin.y = cellRect.origin.y - point.y + button.frame.origin.y + self.takeOutTabelView.top;
     UITapGestureRecognizer * tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(removeBigImage)];
@@ -602,12 +607,19 @@ updatingLocation:(BOOL)updatingLocation
     view.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.3];
     UIImageView * imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 200, 200)];
     imageView.center = view.center;
+    imageView.layer.cornerRadius = 30;
+    imageView.layer.masksToBounds = YES;
     CGRect imageFrame = imageView.frame;
     imageView.frame = btFrame;
     imageView.image = [UIImage imageNamed:@"superMarket.png"];
     [view addSubview:imageView];
     [self.view.window addSubview:view];
-    [imageView setImageWithURL:[NSURL URLWithString:takeOutMd.icon] placeholderImage:[UIImage imageNamed:@"placeholderIM.png"]];
+    __weak UIImageView * imageV = imageView;
+    [imageView setImageWithURL:[NSURL URLWithString:takeOutMd.icon] placeholderImage:[UIImage imageNamed:@"placeholderIM.png"] completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType) {
+        if (error) {
+            imageV.image = [UIImage imageNamed:@"load_fail.png"];
+        }
+    }];
     [UIView animateWithDuration:1 animations:^{
         imageView.frame = imageFrame;
     }];

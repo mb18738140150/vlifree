@@ -10,8 +10,8 @@
 
 
 #define LEFT_SPACE 20
-#define PRICE_LABEL_WIDTH 40
-#define COUNT_LABEL_WIDTH 20
+#define PRICE_LABEL_WIDTH 70
+#define COUNT_LABEL_WIDTH 40
 #define LABEL_HEIGHT 25
 //#define VIEW_COLOR [UIColor orangeColor]
 #define VIEW_COLOR [UIColor clearColor]
@@ -36,7 +36,7 @@
         _countLabel.backgroundColor = VIEW_COLOR;
         [self addSubview:_countLabel];
         
-        self.priceLabel = [[UILabel alloc] initWithFrame:CGRectMake(_countLabel.right + 2 * LEFT_SPACE, 0, COUNT_LABEL_WIDTH, LABEL_HEIGHT)];
+        self.priceLabel = [[UILabel alloc] initWithFrame:CGRectMake(_countLabel.right + 2 * LEFT_SPACE, 0, PRICE_LABEL_WIDTH, LABEL_HEIGHT)];
         _priceLabel.text = @"23";
         _priceLabel.textColor = [UIColor colorWithWhite:0.1 alpha:1];
         _priceLabel.backgroundColor = VIEW_COLOR;

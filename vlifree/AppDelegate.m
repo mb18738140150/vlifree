@@ -11,6 +11,8 @@
 #import "WXApi.h"
 #import "UserViewController.h"
 #import "KeyboardManager.h"
+#import "DetailsGrogshopViewController.h"
+#import "DetailTakeOutViewController.h"
 
 @interface AppDelegate ()<WXApiDelegate>
 
@@ -53,7 +55,18 @@
     if ([resp isKindOfClass:[SendAuthResp class]]) {
         SendAuthResp * sendAR = (SendAuthResp *)resp;
         if (sendAR.errCode == 0) {//0代表已授权登陆
-            [self getUserLogInVCWithCode:sendAR.code];
+            UINavigationController * userNav = (UINavigationController *)[self.myTabBarVC selectedViewController];
+            UIViewController * logInVC = [userNav.viewControllers lastObject];
+            if ([logInVC isKindOfClass:[UserViewController class]]) {
+                [self getUserLogInVCWithCode:sendAR.code];
+            }else if([logInVC isKindOfClass:[DetailsGrogshopViewController class]])
+            {
+                [(DetailsGrogshopViewController *)logInVC getAccessToken:sendAR.code];
+            }else if([logInVC isKindOfClass:[DetailTakeOutViewController class]])
+            {
+                NSLog(@"外卖登陆");
+                [(DetailTakeOutViewController *)logInVC getAccessToken:sendAR.code];
+            }
             /*
             //根据授权获取 access_token
             NSString * urlString = [NSString stringWithFormat:@"https://api.weixin.qq.com/sns/oauth2/access_token?appid=wxaac5e5f7421e84ac&secret=055e7e10c698b7b140511d8d1a73cec4&code=%@&grant_type=authorization_code", sendAR.code];
@@ -85,6 +98,9 @@
                 }
             }
             */
+        }else
+        {
+            [SVProgressHUD dismiss];
         }
     }else if ([resp isKindOfClass:[PayResp class]])
     {

@@ -25,8 +25,10 @@
 #define LABEL_HEIGHT 30
 
 
-@interface GSOrderPayViewController ()<UITextFieldDelegate, HTTPPostDelegate>
-
+@interface GSOrderPayViewController ()<UITextFieldDelegate, HTTPPostDelegate, BDWalletSDKMainManagerDelegate>
+{
+    double _allMoney;
+}
 @property (nonatomic, strong)PayTypeView * weixinView;
 @property (nonatomic, strong)PayTypeView * baiduView;
 @property (nonatomic, strong)UIDatePicker * datePicker;
@@ -299,17 +301,19 @@
             NSString * ruzhuDateString = [dateFormatter stringFromDate:self.ruzhuDate];
             NSString * lidianDateString = [dateFormatter stringFromDate:self.lidianDate];
             NSLog(@"ip = %@", [self getIPAddress]);
+            
             NSDictionary * jsonDic = @{
                                        @"Cur_IP":[self getIPAddress],
                                        @"Command":@11,
                                        @"SuiteId":self.roomId,
-                                       @"SuitePrice":@100,
+                                       @"SuitePrice":[NSNumber numberWithDouble:_allMoney],
                                        @"CheckInDate":ruzhuDateString,
                                        @"LeaveDate":lidianDateString,
                                        @"UserId":[UserInfo shareUserInfo].userId,
                                        @"PhoneNumber":self.telTF.text,
                                        @"Demand":self.requireTF.text,
-                                       @"PayType":self.payType
+                                       @"PayType":self.payType,
+                                       @"CheckInName":self.personTF.text
                                        };
             [self playPostWithDictionary:jsonDic];
         }
@@ -372,6 +376,7 @@
         NSInteger days = [self calculateAgeFromDate:self.ruzhuDate toDate:self.lidianDate];
         self.daysLB.text = [NSString stringWithFormat:@"住店时长: 共%ld天", days];
         double price = self.price.doubleValue * days;
+        _allMoney = price;
         self.priceLB.attributedText = [self allPriceLBTextWithPrice:[NSNumber numberWithDouble:price]];
     }
     [self.pickerView removeFromSuperview];
@@ -421,7 +426,7 @@
 - (void)playPostWithDictionary:(NSDictionary *)dic
 {
     NSString * jsonStr = [dic JSONString];
-    //    NSLog(@"%@", jsonStr);
+    NSLog(@"%@", jsonStr);
     NSString * str = [NSString stringWithFormat:@"%@231618", jsonStr];
     NSString * md5Str = [str md5];
     NSString * urlString = [NSString stringWithFormat:@"%@%@", POST_URL, md5Str];
@@ -438,16 +443,15 @@
     if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
         NSString * hotelOrder = [data objectForKey:@"HotelOrder"];
         if (hotelOrder.length == 0) {
-            
             NSMutableDictionary *signParams = [NSMutableDictionary dictionary];
             [signParams setObject: [NSString stringWithFormat:@"%@", [data objectForKey:@"AppId"]]       forKey:@"appid"];
             [signParams setObject: [NSString stringWithFormat:@"%@", [data objectForKey:@"NonceStr"]]    forKey:@"noncestr"];
             [signParams setObject: [NSString stringWithFormat:@"%@", [data objectForKey:@"Package"]]      forKey:@"package"];
             [signParams setObject: [NSString stringWithFormat:@"%@", [data objectForKey:@"PartnerId"]]        forKey:@"partnerid"];
             [signParams setObject: [data objectForKey:@"TimeStamp"]   forKey:@"timestamp"];
-            [signParams setObject: [NSString stringWithFormat:@"%@", [data objectForKey:@"PrepayId"]]     forKey:@"prepayid"];
-            NSString * sign = [self createMd5Sign:signParams];
-            NSLog(@"md5签名 = %@", sign);
+            [signParams setObject: [data objectForKey:@"PrepayId"]    forKey:@"prepayid"];
+            
+//            NSString * sign = [self createMd5Sign:signParams];
             NSNumber * stamp = [data objectForKey:@"TimeStamp"];
             //调起微信支付
             PayReq* req             = [[PayReq alloc] init];
@@ -457,13 +461,16 @@
             req.nonceStr            = [NSString stringWithFormat:@"%@", [data objectForKey:@"NonceStr"]];
             req.timeStamp           = stamp.intValue;
             req.package             = [NSString stringWithFormat:@"%@", [data objectForKey:@"Package"]];
-            req.sign                = sign;
-            
+            req.sign                = [NSString stringWithFormat:@"%@", [data objectForKey:@"Sign"]];
+//            req.sign = sign;
             BOOL a = [WXApi sendReq:req];
             NSLog(@"%d", a);
         }else
         {
-            
+            BDWalletSDKMainManager* payMainManager = [BDWalletSDKMainManager getInstance];
+            NSLog(@"order_no = %@", [data objectForKey:@"HotelOrder"]);
+            NSString *orderInfo = [self buildOrderInfoWithOrderID:[data objectForKey:@"HotelOrder"]];
+            [payMainManager doPayWithOrderInfo:orderInfo params:nil delegate:self];
         }
     }else
     {
@@ -479,7 +486,7 @@
 
 #pragma mark - 百度支付
 
-
+/*
 -(void)dopay
 {
     BDWalletSDKMainManager* payMainManager = [BDWalletSDKMainManager getInstance];
@@ -497,72 +504,76 @@
     [payMainManager doPayWithOrderInfo:orderInfo params:nil delegate:self];
     
 }
-
+*/
 /*
  此处生成的订单OrderInfo为测试专用，请接入的商户兄弟使用自己的订单，并且是按首字母排序的
  */
--(NSString*)buildOrderInfoTest
+-(NSString*)buildOrderInfoWithOrderID:(NSString *)orderId
 {
+    int money = (int)(_allMoney * 100);
     NSMutableString *str = [[NSMutableString alloc]init];
     
-    static NSString *spNo = @"3400000001";//测试专用，请勿使用
-    static NSString *key = @"Au88LPiP5vaN5FNABBa7NC4aQV28awRK";//测试专用，请勿使用
+    static NSString *spNo = @"1000011124";
+    static NSString *key = @"vwD28fhc8p4cQzFjnfLaJRSvHFrsCBa7";
     NSDateFormatter * dateFM = [[NSDateFormatter alloc] init];
-    [dateFM setDateFormat:@"YYYYMMDDHHMMSS"];
+    [dateFM setDateFormat:@"yyyyMMddHHmmss"];
     NSString * dateString = [dateFM stringFromDate:[NSDate date]];
     NSLog(@"11111--%@", dateString);
     /*
      如有中文相关，步骤一 GBK ；步骤二 MD5 GBK ； 步骤三 URLEncode GBK
      详见以下注释
      */
-    NSString *orderId = [NSString stringWithFormat:@"z2015052713275609521156"];
-    [str appendString:@"currency=1&extra="];
+//    NSString *orderId = [NSString stringWithFormat:@"z2015052713275609521156"];
+    [str appendString:@"currency=1&extra=ios123"];
     [str appendString:@"&goods_desc="];
     [str appendString:[self utf8toGbk:self.roomName]];
     [str appendString:@"&goods_name="];
-    [str appendString:[self utf8toGbk:@"酒店订单"]]; // 中文处理1
-    [str appendString:@"&goods_url=http://item.jd.com/736610.html&input_charset=1&order_create_time="];//下单时间
+    [str appendString:[self utf8toGbk:self.roomName]]; // 中文处理1
+    [str appendString:@"&input_charset=1&order_create_time="];//下单时间
     [str appendString:dateString];//订单生产时间
     [str appendString:@"&order_no="];
     [str appendString:orderId];
     [str appendString:@"&pay_type=2"];
-    [str appendString:@"&return_url=http://item.jd.com/736610.html&service_code=1&sign_method=1&sp_no="];
+    [str appendString:@"&return_url=http://wap.vlifee.com/NotifyUrl.aspx&service_code=1&sign_method=1&sp_no="];
     [str appendString:spNo];
     [str appendString:@"&sp_request_type="];
-    [str appendString:@"1"];//收银类型
+    [str appendString:@"0"];//收银类型
     [str appendString:@"&sp_uno="];
-    [str appendString:@""];//用户的id(用来绑定快捷支付)
+    [str appendString:[NSString stringWithFormat:@"%@", [UserInfo shareUserInfo].userId]];//用户的id(用来绑定快捷支付)
     [str appendString:@"&total_amount="];
-    [str appendString:@"1"];//总金额(以分为单位)
+    [str appendString:[NSString stringWithFormat:@"%d", money]];//总金额(以分为单位)
     [str appendString:@"&transport_amount=0&unit_amount="];
-    [str appendString:@"1"];//商品单价(以分为单位)
-    [str appendString:@"&unit_count=1"];//商品数量
+    [str appendString:[NSString stringWithFormat:@"%d", money]];//商品单价(以分为单位)
+    [str appendString:@"&unit_count=1&version=2"];//商品数量
     
     NSString *md5CapPwd = [self mD5GBK:[NSString stringWithFormat:@"%@&key=%@" , str, key]]; // 中文处理2
     
     NSMutableString *str1 = [[NSMutableString alloc]init];
     
-    [str1 appendString:@"currency=1&extra="];
+    [str1 appendString:@"currency=1&extra=ios123"];
     [str1 appendString:@"&goods_desc="];
-    [str1 appendString:[self encodeURL:[self utf8toGbk:@"外卖"]]];
+    [str1 appendString:[self encodeURL:[self utf8toGbk:self.roomName]]];
     [str1 appendString:@"&goods_name="];
-    [str1 appendString:[self encodeURL:[self utf8toGbk:@"外卖商品"]]];// 中文处理3
-    [str1 appendString:@"&goods_url=http://item.jd.com/736610.html&input_charset=1&order_create_time=20130508131702&order_no="];
+    [str1 appendString:[self encodeURL:[self utf8toGbk:self.roomName]]]; // 中文处理3
+    [str1 appendString:@"&input_charset=1&order_create_time="];//下单时间
+    [str1 appendString:dateString];//订单生产时间
+    [str1 appendString:@"&order_no="];
     [str1 appendString:orderId];
     [str1 appendString:@"&pay_type=2"];
-    [str1 appendString:@"&return_url=http://item.jd.com/736610.html&service_code=1&sign_method=1&sp_no="];
+    [str1 appendString:@"&return_url=http://wap.vlifee.com/NotifyUrl.aspx&service_code=1&sign_method=1&sp_no="];
     [str1 appendString:spNo];
     [str1 appendString:@"&sp_request_type="];
-    [str1 appendString:@"1"];//收银类型
+    [str1 appendString:@"0"];//收银类型
     [str1 appendString:@"&sp_uno="];
-    [str1 appendString:@""];
+    [str1 appendString:[NSString stringWithFormat:@"%@", [UserInfo shareUserInfo].userId]];//用户的id(用来绑定快捷支付)
     [str1 appendString:@"&total_amount="];
-    [str1 appendString:@"1"];//总金额(以分为单位)
+    [str1 appendString:[NSString stringWithFormat:@"%d", money]];//总金额(以分为单位)
     [str1 appendString:@"&transport_amount=0&unit_amount="];
-    [str1 appendString:@"1"];//商品单价(以分为单位)
-    [str1 appendString:@"&unit_count=1"];//商品数量
-    NSLog(@"+++%@", [NSString stringWithFormat:@"%@&sign=%@" , str1 , md5CapPwd]);
-    return [NSString stringWithFormat:@"%@&sign=%@" , str1 , md5CapPwd];
+    [str1 appendString:[NSString stringWithFormat:@"%d", money]];//商品单价(以分为单位)
+    [str1 appendString:@"&unit_count=1&version=2"];//商品数量
+    NSLog(@"%@", str);
+//    NSLog(@"+++%@", [NSString stringWithFormat:@"%@&sign=%@" , str1 , md5CapPwd]);
+    return [NSString stringWithFormat:@"%@&sign=%@" , str1, md5CapPwd];
 }
 
 - (NSString *)mD5GBK:(NSString *)src
@@ -757,7 +768,7 @@
         
     }
     //添加key字段
-    [contentString appendFormat:@"key=I57gmdk90nd5bla84nkyqldicn3294Fh"];
+    [contentString appendFormat:@"I57gmdk90nd5bla84nkyqldicn3294Fh"];
     //得到MD5 sign签名
     NSString *md5Sign =[WXUtil md5:contentString];
     

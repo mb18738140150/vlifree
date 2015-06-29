@@ -27,6 +27,8 @@
 @property (nonatomic, strong)NSTimer * timer;
 @property (nonatomic, strong)NSNumber * allCount;
 
+@property (nonatomic, copy)NSString * keyWord;
+
 @end
 
 @implementation GrogshopViewController
@@ -99,8 +101,9 @@
     _page = 1;
     _type = 2;
     [SVProgressHUD showWithStatus:@"正在加载..." maskType:SVProgressHUDMaskTypeBlack];
+    self.keyWord = nil;
     if ([UserLocation shareUserLocation].placemark != nil) {
-        [self downloadDataWithCommand:@2 page:_page count:DATA_COUNT];
+        [self downloadDataWithCommand:@2 page:_page count:DATA_COUNT keyWord:nil];
     }else
     {
         self.timer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(downloadData) userInfo:nil repeats:YES];
@@ -132,7 +135,7 @@
 {
     NSLog(@"2222");
     if ([UserLocation shareUserLocation].placemark != nil) {
-        [self downloadDataWithCommand:@2 page:_page count:DATA_COUNT];
+        [self downloadDataWithCommand:@2 page:_page count:DATA_COUNT keyWord:nil];
 //        [self.groshopTabelView headerBeginRefreshing];
         [self.timer invalidate];
     }
@@ -163,18 +166,19 @@
     button.selected = !button.selected;
     _page = 1;
     if ([button isEqual:gsView.allButton]) {
-        [self downloadDataWithCommand:@2 page:_page count:DATA_COUNT];
+        [self downloadDataWithCommand:@2 page:_page count:DATA_COUNT keyWord:nil];
         _type = 2;
     }else if ([button isEqual:gsView.priceButton]) {
-        [self downloadDataWithCommand:@3 page:_page count:DATA_COUNT];
+        [self downloadDataWithCommand:@3 page:_page count:DATA_COUNT keyWord:nil];
         _type = 3;
     }else if ([button isEqual:gsView.distanceButton]) {
-        [self downloadDataWithCommand:@4 page:_page count:DATA_COUNT];
+        [self downloadDataWithCommand:@4 page:_page count:DATA_COUNT keyWord:nil];
         _type = 4;
     }else if ([button isEqual:gsView.soldButton]) {
-        [self downloadDataWithCommand:@5 page:_page count:DATA_COUNT];
+        [self downloadDataWithCommand:@5 page:_page count:DATA_COUNT keyWord:nil];
         _type = 5;
     }
+    self.keyWord = nil;
     [SVProgressHUD showWithStatus:@"正在加载数据..." maskType:SVProgressHUDMaskTypeBlack];
 //    [self.groshopTabelView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:YES];
 }
@@ -183,7 +187,7 @@
 
 - (void)headerRereshing
 {
-    [self downloadDataWithCommand:[NSNumber numberWithInt:_type] page:1 count:DATA_COUNT];
+    [self downloadDataWithCommand:[NSNumber numberWithInt:_type] page:1 count:DATA_COUNT keyWord:self.keyWord];
     _page = 1;
 }
 
@@ -191,7 +195,7 @@
 {
     if (self.dataArray.count < [_allCount integerValue]) {
         self.groshopTabelView.footerRefreshingText = @"正在加载数据";
-        [self downloadDataWithCommand:@1 page:++_page count:DATA_COUNT];
+        [self downloadDataWithCommand:[NSNumber numberWithInt:_type] page:++_page count:DATA_COUNT keyWord:self.keyWord];
     }else
     {
         self.groshopTabelView.footerRefreshingText = @"数据已经加载完";
@@ -201,16 +205,29 @@
 }
 
 #pragma mark - 数据请求
-- (void)downloadDataWithCommand:(NSNumber *)command page:(int)page count:(int)count
+- (void)downloadDataWithCommand:(NSNumber *)command page:(int)page count:(int)count keyWord:(NSString *)keyWord
 {
-    
-    NSDictionary * jsonDic = @{
-                               @"Command":command,
-                               @"CurPage":[NSNumber numberWithInt:page],
-                               @"CurCount":[NSNumber numberWithInt:count],
-                               @"Lat":[NSNumber numberWithDouble:[UserLocation shareUserLocation].location.coordinate.latitude],
-                               @"Lon":[NSNumber numberWithDouble:[UserLocation shareUserLocation].location.coordinate.longitude]
-                               };
+    NSDictionary * jsonDic = nil;
+    if (keyWord == nil) {
+        jsonDic = @{
+                    @"Command":command,
+                    @"CurPage":[NSNumber numberWithInt:page],
+                    @"CurCount":[NSNumber numberWithInt:count],
+                    @"Lat":[NSNumber numberWithDouble:[UserLocation shareUserLocation].location.coordinate.latitude],
+                    @"Lon":[NSNumber numberWithDouble:[UserLocation shareUserLocation].location.coordinate.longitude]
+                    };
+    }else
+    {
+        jsonDic = @{
+                    @"Command":command,
+                    @"CurPage":[NSNumber numberWithInt:page],
+                    @"CurCount":[NSNumber numberWithInt:count],
+                    @"Lat":[NSNumber numberWithDouble:[UserLocation shareUserLocation].location.coordinate.latitude],
+                    @"Lon":[NSNumber numberWithDouble:[UserLocation shareUserLocation].location.coordinate.longitude],
+                    @"KeyWord":keyWord
+                    };
+        self.keyWord = keyWord;
+    }
     [self playPostWithDictionary:jsonDic];
     NSLog(@"///////%f, %f", [UserLocation shareUserLocation].location.coordinate.latitude, [UserLocation shareUserLocation].location.coordinate.longitude);
     /*
@@ -316,6 +333,9 @@
 
 - (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar
 {
+    _page = 1;
+    [self downloadDataWithCommand:@33 page:_page count:COUNT keyWord:searchBar.text];
+    _type = 33;
     searchBar.text = nil;
     [searchBar resignFirstResponder];
 }
@@ -398,7 +418,14 @@
     view.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.3];
     UIImageView * imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 200, 200)];
     imageView.center = view.center;
-    [imageView setImageWithURL:[NSURL URLWithString:hotelMD.icon] placeholderImage:[UIImage imageNamed:@"placeholderIM.png"]];
+    imageView.layer.cornerRadius = 30;
+    imageView.layer.masksToBounds = YES;
+    __weak UIImageView * imageV = imageView;
+    [imageView setImageWithURL:[NSURL URLWithString:hotelMD.icon] placeholderImage:[UIImage imageNamed:@"placeholderIM.png"] completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType) {
+        if (error) {
+            imageV.image = [UIImage imageNamed:@"load_fail.png"];
+        }
+    }];
     CGRect imageFrame = imageView.frame;
     imageView.frame = btFrame;
 //    imageView.image = [UIImage imageNamed:@"superMarket.png"];

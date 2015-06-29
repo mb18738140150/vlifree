@@ -14,5 +14,6 @@
 @property (nonatomic, copy)NSString * lat;
 @property (nonatomic, copy)NSString * lon;
 @property (nonatomic, copy)NSString * icon;
+- (void)getAccessToken:(NSString *)code;
 
 @end

@@ -15,6 +15,8 @@
 #import "DescribeView.h"
 #import "GSMapViewController.h"
 #import "RoomModel.h"
+#import "AlertLoginView.h"
+#import "WXLoginViewController.h"
 
 #define CELL_INDENTIFIER @"CELL"
 
@@ -31,7 +33,9 @@
 
 @property (nonatomic, strong)NSMutableArray * dataArray;
 
-@property (nonatomic, strong)NSString * phoneNumber;
+@property (nonatomic, copy)NSString * phoneNumber;
+
+@property (nonatomic, strong)AlertLoginView * alertLoginV;
 
 @end
 
@@ -138,19 +142,71 @@
 - (void)reserveGSRoom:(UIButton *)button
 {
     NSLog(@"预定%ld", button.tag - BUTTON_TAG);
-    RoomModel * roomMD = [self.dataArray objectAtIndex:button.tag - BUTTON_TAG];
-    GSOrderPayViewController * gsOrderPayVC = [[GSOrderPayViewController alloc] init];
-    gsOrderPayVC.roomName = roomMD.suiteName;
-    gsOrderPayVC.price = roomMD.suitePrice;
-    gsOrderPayVC.roomId = roomMD.suiteId;
-    [self.navigationController pushViewController:gsOrderPayVC animated:YES];
+    if ([UserInfo shareUserInfo].userId) {
+        RoomModel * roomMD = [self.dataArray objectAtIndex:button.tag - BUTTON_TAG];
+        GSOrderPayViewController * gsOrderPayVC = [[GSOrderPayViewController alloc] init];
+        gsOrderPayVC.roomName = roomMD.suiteName;
+        gsOrderPayVC.price = roomMD.suitePrice;
+        gsOrderPayVC.roomId = roomMD.suiteId;
+        [self.navigationController pushViewController:gsOrderPayVC animated:YES];
+    }else
+    {
+//        UIView * view = [[UIView alloc] initWithFrame:[UIScreen mainScreen].bounds];
+//        view.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.2];
+//        [self.view.window addSubview:view];
+        self.alertLoginV = [[AlertLoginView alloc] initWithFrame:[UIScreen mainScreen].bounds];
+        [_alertLoginV.logInButton addTarget:self action:@selector(userLogInAction:) forControlEvents:UIControlEventTouchUpInside];
+        [_alertLoginV.weixinButton addTarget:self action:@selector(weixinLogIn:) forControlEvents:UIControlEventTouchUpInside];
+        [self.detailsTableView.window addSubview:_alertLoginV];
+    }
+    
 }
 
+- (void)userLogInAction:(UIButton *)button
+{
+    if (self.alertLoginV.phoneTF.text.length == 0) {
+        UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:@"请输入手机号" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
+        [alert show];
+        [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:2];
+    }else if (self.alertLoginV.passwordTF.text.length == 0)
+    {
+        UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:@"请输入密码" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
+        [alert show];
+        [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:2];
+    }else
+    {
+        NSDictionary * jsonDic = @{
+                                   @"Command":@7,
+                                   @"LoginType":@1,
+                                   @"Account":self.alertLoginV.phoneTF.text,
+                                   @"Password":self.alertLoginV.passwordTF.text,
+                                   };
+        [self playPostWithDictionary:jsonDic];
+        [SVProgressHUD showWithStatus:@"登陆中..." maskType:SVProgressHUDMaskTypeBlack];
+    }
+}
+
+- (void)weixinLogIn:(UIButton *)button//微信登陆
+{
+    NSLog(@"微信登陆");
+    [SVProgressHUD showWithStatus:@"登陆中..." maskType:SVProgressHUDMaskTypeBlack];
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:@"refresh_token"]) {
+        if ([self compareDate]) {
+            [self avoidweixinAuthorizeLogIn];
+        }else
+        {
+            [self weixinAuthorizeLogIn];
+        }
+    }else
+    {
+        [self weixinAuthorizeLogIn];
+    }
+}
 
 #pragma mark - 数据请求
 - (void)downloadDataWithCommand
 {
-    
+    [SVProgressHUD showWithStatus:@"加载中..." maskType:SVProgressHUDMaskTypeBlack];
     NSDictionary * jsonDic = @{
                                @"Command":@10,
                                @"HotelId":self.hotelID
@@ -186,9 +242,26 @@
 - (void)refresh:(id)data
 {
     NSLog(@"+++%@", data);
+    NSLog(@"%@", [data objectForKey:@"ErrorMsg"]);
     if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
-        NSLog(@"%@", [data objectForKey:@"ErrorMsg"]);
-        NSDictionary * dic = [data objectForKey:@"HotelInfo"];
+        if ([[data objectForKey:@"Command"] isEqualToNumber:@10009] || [[data objectForKey:@"Command"] isEqualToNumber:@10007]) {
+            [[UserInfo shareUserInfo] setValuesForKeysWithDictionary:[data objectForKey:@"UserInfo"]];
+            if ([[data objectForKey:@"IsFirst"] isEqualToNumber:@YES]) {
+//                DetailsGrogshopViewController * detailsGSVC = self;
+                WXLoginViewController * wxLoginVC = [[WXLoginViewController alloc] init];
+                [wxLoginVC refreshUserInfo:^{
+                    [self.alertLoginV removeFromSuperview];
+                }];
+                UINavigationController * nav = [[UINavigationController alloc] initWithRootViewController:wxLoginVC];
+                [self.navigationController presentViewController:nav animated:YES completion:nil];
+            }else
+            {
+                [self.alertLoginV removeFromSuperview];
+            }
+
+        }else if ([[data objectForKey:@"Command"] isEqualToNumber:@10010])
+        {
+            NSDictionary * dic = [data objectForKey:@"HotelInfo"];
             self.headerView.addressView.titleLable.text = [dic objectForKey:@"Address"];
             self.headerView.phoneView.titleLable.text = [dic objectForKey:@"PhoneNumber"];
             NSDictionary * stateDic = [dic objectForKey:@"HotelDetail"];
@@ -211,13 +284,15 @@
                 self.headerView.wifiView.image = [UIImage imageNamed:@"wifi_off.png"];
             }
             self.footerView.explainArray = @[[dic objectForKey:@"BookingInstructions"]];
-        NSArray * array = [dic objectForKey:@"SuiteList"];
-        for (NSDictionary * suiteDic in array) {
-            RoomModel * roomMD = [[RoomModel alloc] initWithDictionary:suiteDic];
-            [self.dataArray addObject:roomMD];
+            NSArray * array = [dic objectForKey:@"SuiteList"];
+            for (NSDictionary * suiteDic in array) {
+                RoomModel * roomMD = [[RoomModel alloc] initWithDictionary:suiteDic];
+                [self.dataArray addObject:roomMD];
+            }
+            
+            [self.detailsTableView reloadData];
         }
-        
-        [self.detailsTableView reloadData];
+       
     }else
     {
         UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:[data objectForKey:@"ErrorMsg"] delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
@@ -307,6 +382,123 @@
     return NO;
 }
 
+#pragma marc - 微信登陆
+
+//发送授权请求
+- (void)weixinAuthorizeLogIn
+{
+    if ([WXApi isWXAppInstalled] && [WXApi isWXAppSupportApi]) {
+        SendAuthReq * req = [[SendAuthReq alloc] init];
+        req.scope = @"snsapi_userinfo";
+        req.state = @"123456789";
+        BOOL isSend = [WXApi sendReq:req];
+        if (!isSend) {
+            [SVProgressHUD dismiss];
+        }
+//        [WXApi sendAuthReq:req viewController:self delegate:self];
+    }else if([WXApi isWXAppInstalled] == NO)
+    {
+        [SVProgressHUD dismiss];
+        UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:@"你的设备还没安装微信,请先安装微信" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
+        [alert show];
+        [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:2];
+    }else if([WXApi isWXAppSupportApi] == NO)
+    {
+        [SVProgressHUD dismiss];
+        UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:@"你的微信版本不支持,请更新微信" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
+        [alert show];
+        [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:2];
+    }
+    
+}
+
+
+- (BOOL)compareDate
+{
+    NSString * dateStr = [[NSUserDefaults standardUserDefaults] objectForKey:@"tokenDate"];
+    NSDateFormatter * formatter = [[NSDateFormatter alloc] init];
+    [formatter setDateFormat:@"yyyy-MM-dd"];
+    NSDate * date = [formatter dateFromString:dateStr];
+    
+    NSCalendar *userCalendar = [NSCalendar currentCalendar];
+    unsigned int unitFlags = NSCalendarUnitDay;
+    NSDateComponents *components = [userCalendar components:unitFlags fromDate:date toDate:[NSDate date] options:0];
+    NSInteger days = [components day];
+    if (days > 28) {
+        return NO;
+    }
+    return YES;
+}
+
+
+- (void)avoidweixinAuthorizeLogIn
+{
+    NSString * tokenUrl = [NSString stringWithFormat:@"https://api.weixin.qq.com/sns/oauth2/refresh_token?appid=%@&grant_type=refresh_token&refresh_token=%@", APP_ID_WX, [[NSUserDefaults standardUserDefaults] objectForKey:@"refresh_token"]];
+    NSURLRequest * tokenRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:tokenUrl]];
+    //将请求的url数据放到NSData对象中
+    NSData * tokenData = [NSURLConnection sendSynchronousRequest:tokenRequest returningResponse:nil error:nil];
+    if (tokenData) {
+        NSDictionary * tokenDic = [NSJSONSerialization JSONObjectWithData:tokenData options:0 error:nil];
+        if ([tokenDic objectForKey:@"access_token"]) {
+            NSString * yanzhengURLSTR = [NSString stringWithFormat:@"https://api.weixin.qq.com/sns/auth?access_token=%@&openid=%@", [tokenDic objectForKey:@"access_token"], [tokenDic objectForKey:@"openid"]];
+            NSURLRequest * yzRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:yanzhengURLSTR]];
+            NSData * yzData = [NSURLConnection sendSynchronousRequest:yzRequest returningResponse:nil error:nil];
+            if (yzData) {
+                NSDictionary * yzDic = [NSJSONSerialization JSONObjectWithData:yzData options:0 error:nil];
+                if ([[yzDic objectForKey:@"errcode"] isEqual:@0]) {
+                    NSString * infoURLSTR = [NSString stringWithFormat:@"https://api.weixin.qq.com/sns/userinfo?access_token=%@&openid=%@", [tokenDic objectForKey:@"access_token"], [tokenDic objectForKey:@"openid"]];
+                    NSURLRequest * infoRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:infoURLSTR]];
+                    NSData * infoData = [NSURLConnection sendSynchronousRequest:infoRequest returningResponse:nil error:nil];
+                    if (infoData) {
+                        NSDictionary * infoDic = [NSJSONSerialization JSONObjectWithData:infoData options:0 error:nil];
+                        //                        [self removeLogInView];
+                        NSLog(@"user info = %@", infoDic);
+                        NSDictionary * jsonDic = @{
+                                                   @"Openid":[infoDic objectForKey:@"openid"],
+                                                   @"Nickname":[infoDic objectForKey:@"nickname"],
+                                                   @"Sex":[infoDic objectForKey:@"sex"],
+                                                   @"City":[infoDic objectForKey:@"city"],
+                                                   @"Province":[infoDic objectForKey:@"province"],
+                                                   @"Country":[infoDic objectForKey:@"country"],
+                                                   @"HeadimgUrl":[infoDic objectForKey:@"headimgurl"],
+                                                   @"Unionid":[infoDic objectForKey:@"unionid"],
+                                                   @"Command":@9,
+                                                   @"LoginType":@2
+                                                   };
+                        [self playPostWithDictionary:jsonDic];
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+- (void)getAccessToken:(NSString *)code
+{
+    //根据授权获取 access_token
+    NSString * urlString = [NSString stringWithFormat:@"https://api.weixin.qq.com/sns/oauth2/access_token?appid=wxaac5e5f7421e84ac&secret=055e7e10c698b7b140511d8d1a73cec4&code=%@&grant_type=authorization_code", code];
+    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:urlString]];
+    //将请求的url数据放到NSData对象中
+    NSData *response = [NSURLConnection sendSynchronousRequest:request returningResponse:nil error:nil];
+    if (response) {
+        NSDictionary * dic = [NSJSONSerialization JSONObjectWithData:response options:0 error:nil];
+        //        NSLog(@"++++++%@", dic);
+        if ([dic objectForKey:@"access_token"]) {
+            [[NSUserDefaults standardUserDefaults] setObject:[dic objectForKey:@"refresh_token"] forKey:@"refresh_token"];//保存 refresh_token
+            [self saveAuthorizeDate];
+            [self avoidweixinAuthorizeLogIn];
+        }
+    }
+}
+
+- (void)saveAuthorizeDate
+{
+    NSDateFormatter * formater = [[NSDateFormatter alloc] init];
+    [formater setDateFormat:@"yyyy-MM-dd"];
+    NSString * dateStr = [formater stringFromDate:[NSDate date]];
+    [[NSUserDefaults standardUserDefaults] setObject:dateStr forKey:@"tokenDate"];
+}
 
 /*
 #pragma mark - Navigation

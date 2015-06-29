@@ -15,7 +15,7 @@
 #import "UserTOOrderViewController.h"
 #import "GSOrderViewController.h"
 #import "RegisterViewController.h"
-#import "WXApi.h"
+
 #import "WXLoginViewController.h"
 #import "PhoneViewController.h"
 
@@ -80,13 +80,20 @@
     [exitButton addTarget:self action:@selector(exitLogInAciton:) forControlEvents:UIControlEventTouchUpInside];
     [footView addSubview:exitButton];
     _userTableView.tableFooterView = footView;
-    
     // Do any additional setup after loading the view.
 }
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    if ([UserInfo shareUserInfo].userId) {
+        [self removeLogInView];
+    }
+
 }
 
 - (void)userLogInAction:(UIButton *)button
@@ -169,7 +176,6 @@
             }
         }
     }
-    
 }
 - (void)saveAuthorizeDate
 {
@@ -197,6 +203,9 @@
 
 - (void)registerUser:(UIButton *)button
 {
+    UIAlertView * alert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"请使用微信登陆注册" delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
+    [alert show];
+    /*
     RegisterViewController * registerVC = [[RegisterViewController alloc] init];
     UserViewController * userVC = self;
     [registerVC returnSucceedRegister:^{
@@ -205,6 +214,7 @@
     }];
     registerVC.hidesBottomBarWhenPushed= YES;
     [self.navigationController pushViewController:registerVC animated:YES];
+    */
 }
 
 
@@ -222,8 +232,6 @@
     {
         [self weixinAuthorizeLogIn];
     }
-
-    
 }
 
 - (void)exitLogInAciton:(UIButton *)button
@@ -236,6 +244,7 @@
     [UIView commitAnimations];
     self.navigationItem.title = @"会员中心";
     NSLog(@"退出登录");
+    [UserInfo shareUserInfo].userId = nil;
     self.title = @"登陆";
 }
 

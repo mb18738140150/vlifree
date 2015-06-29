@@ -51,6 +51,9 @@
     if (!_icon) {
         self.icon = [[UIImageView alloc] initWithFrame:CGRectMake(LEFT_SPACE, TOP_SPACE, IMAGE_SIZE, IMAGE_SIZE)];
         _icon.image = [UIImage imageNamed:@"superMarket.png"];
+        _icon.layer.cornerRadius = 10;
+        _icon.layer.masksToBounds = YES;
+//        _icon.backgroundColor = [UIColor blueColor];
 //        _icon.userInteractionEnabled = YES;
         [self.contentView addSubview:_icon];
         
@@ -125,10 +128,12 @@
         self.distanceLabel.text = [NSString stringWithFormat:@"%.1fM", r];
     }
     [self.icon setImageWithURL:[NSURL URLWithString:hotelModel.icon]];
-    self.IconButton.enabled = NO;
     GrogshopViewCell * cell = self;
     [self.icon setImageWithURL:[NSURL URLWithString:hotelModel.icon] placeholderImage:[UIImage imageNamed:@"placeholderIM.png"] completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType) {
         cell.IconButton.enabled = YES;
+        if (error) {
+            cell.icon.image = [UIImage imageNamed:@"load_fail.png"];
+        }
     }];
 }
 

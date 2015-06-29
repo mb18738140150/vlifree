@@ -21,7 +21,7 @@
 @property (nonatomic, copy)NSString * address;
 @property (nonatomic, strong)NSNumber * isFirstOrder;
 @property (nonatomic, strong)NSNumber * isFull;
-
+@property (nonatomic, strong)NSNumber * mealBoxMoney;
 
 - (id)initWithDictionary:(NSDictionary *)dic;
 

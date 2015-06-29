@@ -10,4 +10,8 @@
 
 @interface DetailsGSOrderViewController : UIViewController
 
+@property (nonatomic, assign)BOOL isPay;
+@property (nonatomic, copy)NSString * orderID;
+
+
 @end

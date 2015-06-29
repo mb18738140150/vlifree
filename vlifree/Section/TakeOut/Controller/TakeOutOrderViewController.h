@@ -10,4 +10,11 @@
 
 @interface TakeOutOrderViewController : UIViewController
 
+
+@property (nonatomic, copy)NSDictionary * orderDic;
+
+@property (nonatomic, strong)NSMutableArray * shopArray;
+
+@property (nonatomic, strong)NSNumber * takeOutId;
+
 @end
