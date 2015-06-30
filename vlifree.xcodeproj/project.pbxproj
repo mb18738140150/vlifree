@@ -236,6 +236,7 @@
 		736360041B12BCA200EE8F56 /* DetailTakeOutViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 736360031B12BCA200EE8F56 /* DetailTakeOutViewController.m */; };
 		7363600A1B12C71900EE8F56 /* MGSwipeButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 736360071B12C71900EE8F56 /* MGSwipeButton.m */; };
 		7363600B1B12C71900EE8F56 /* MGSwipeTableCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 736360091B12C71900EE8F56 /* MGSwipeTableCell.m */; };
+		736556151B423158009BE98A /* ActivityReduce.m in Sources */ = {isa = PBXBuildFile; fileRef = 736556141B423158009BE98A /* ActivityReduce.m */; };
 		7368445E1B3B9D5D00E486AC /* AlertLoginView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7368445D1B3B9D5D00E486AC /* AlertLoginView.m */; };
 		736BB81E1B1E9DF100F03419 /* back_r.png in Resources */ = {isa = PBXBuildFile; fileRef = 736BB81C1B1E9DF100F03419 /* back_r.png */; };
 		736BB81F1B1E9DF100F03419 /* back_w.png in Resources */ = {isa = PBXBuildFile; fileRef = 736BB81D1B1E9DF100F03419 /* back_w.png */; };
@@ -694,6 +695,8 @@
 		736360071B12C71900EE8F56 /* MGSwipeButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGSwipeButton.m; sourceTree = "<group>"; };
 		736360081B12C71900EE8F56 /* MGSwipeTableCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGSwipeTableCell.h; sourceTree = "<group>"; };
 		736360091B12C71900EE8F56 /* MGSwipeTableCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGSwipeTableCell.m; sourceTree = "<group>"; };
+		736556131B423158009BE98A /* ActivityReduce.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ActivityReduce.h; sourceTree = "<group>"; };
+		736556141B423158009BE98A /* ActivityReduce.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ActivityReduce.m; sourceTree = "<group>"; };
 		7368445C1B3B9D5D00E486AC /* AlertLoginView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlertLoginView.h; sourceTree = "<group>"; };
 		7368445D1B3B9D5D00E486AC /* AlertLoginView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlertLoginView.m; sourceTree = "<group>"; };
 		736BB81C1B1E9DF100F03419 /* back_r.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = back_r.png; sourceTree = "<group>"; };
@@ -1212,6 +1215,8 @@
 				7324923F1B1844EF00CC5B6C /* AddressModel.m */,
 				730384E01B267CFF007C7ACB /* TakeOutModel.h */,
 				730384E11B267CFF007C7ACB /* TakeOutModel.m */,
+				736556131B423158009BE98A /* ActivityReduce.h */,
+				736556141B423158009BE98A /* ActivityReduce.m */,
 				7355A2141B2FC79100095764 /* ClassModel.h */,
 				7355A2151B2FC79100095764 /* ClassModel.m */,
 				7355A2171B2FD0EE00095764 /* MenuModel.h */,
@@ -1833,6 +1838,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				736556151B423158009BE98A /* ActivityReduce.m in Sources */,
 				738B82E11B19BAB8008B386D /* GSOrderViewController.m in Sources */,
 				734657C41B1D4585000C3E9D /* CFilteringJSONSerializer.m in Sources */,
 				735D945E1B1415D2002B0980 /* ShoppingDetailsCarView.m in Sources */,

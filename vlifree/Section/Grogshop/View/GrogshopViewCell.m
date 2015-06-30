@@ -103,7 +103,7 @@
 {
     _hotelModel = hotelModel;
     self.nameLabel.text = hotelModel.hotelName;
-    self.priceLabel.attributedText = [self customAttributedStringWithString:[NSString stringWithFormat:@"¥%@元", hotelModel.price]];
+    self.priceLabel.attributedText = [self customAttributedStringWithString:[NSString stringWithFormat:@"¥%@起", hotelModel.price]];
     self.addressLabel.text = hotelModel.address;
     self.soldLabel.text = [NSString stringWithFormat:@"月售:%@", hotelModel.sold];
     if ([hotelModel.wifiState isEqual:@YES]) {

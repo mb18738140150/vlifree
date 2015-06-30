@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "ActivityReduce.h"
 
 @interface TakeOutModel : NSObject
 
@@ -22,6 +23,7 @@
 @property (nonatomic, strong)NSNumber * isFirstOrder;
 @property (nonatomic, strong)NSNumber * isFull;
 @property (nonatomic, strong)NSNumber * mealBoxMoney;
+@property (nonatomic, strong)NSMutableArray * ActivityArray;
 
 - (id)initWithDictionary:(NSDictionary *)dic;
 

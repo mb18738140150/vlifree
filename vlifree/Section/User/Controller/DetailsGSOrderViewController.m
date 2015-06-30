@@ -44,7 +44,8 @@
     
     
     self.priceLB = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, view1.width, 50)];
-    _priceLB.backgroundColor = [UIColor redColor];
+    _priceLB.backgroundColor = [UIColor orangeColor];
+//    _priceLB.backgroundColor = MAIN_COLOR;
     _priceLB.text = @"    订单金额: ¥298";
     _priceLB.font = [UIFont systemFontOfSize:22];
     _priceLB.textColor = [UIColor whiteColor];

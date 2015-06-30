@@ -18,6 +18,7 @@
 #import "AlertLoginView.h"
 #import "WXLoginViewController.h"
 
+
 #define CELL_INDENTIFIER @"CELL"
 
 #define BUTTON_TAG 1000
@@ -28,6 +29,7 @@
 
 @property (nonatomic, strong)DetailsGSHearderView * headerView;
 @property (nonatomic, strong)DetailsFooterView * footerView;
+@property (nonatomic, strong)UIButton * allButton;
 
 //@property (nonatomic, strong)CycleScrollView * cycleScrollView;//轮播图
 
@@ -83,9 +85,20 @@
 //    }
 //    _headerView.cycleViews = [imageViewAry copy];
     
+    self.allButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    _allButton.frame = CGRectMake(0, 0, self.view.width, 50);
+    [_allButton addTarget:self action:@selector(unfoldAllRoom:) forControlEvents:UIControlEventTouchUpInside];
+    [_allButton setTitle:@"展开全部房型" forState:UIControlStateNormal];
+    [_allButton setTitleColor:[UIColor grayColor] forState:UIControlStateNormal];
+    [_allButton setTitle:@"折叠全部房型" forState:UIControlStateSelected];
+    [_allButton setTitleColor:[UIColor grayColor] forState:UIControlStateSelected];
+    _allButton.backgroundColor = [UIColor colorWithWhite:0.9 alpha:0.6];
+    _allButton.layer.borderColor = [UIColor colorWithWhite:0.7 alpha:0.4].CGColor;
+    _allButton.layer.borderWidth = 1;
     
     self.footerView = [[DetailsFooterView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, 100)];
-    [_footerView.allButton addTarget:self action:@selector(unfoldAllRoom:) forControlEvents:UIControlEventTouchUpInside];
+    _footerView.explainString = @"无";
+//    [_footerView.allButton addTarget:self action:@selector(unfoldAllRoom:) forControlEvents:UIControlEventTouchUpInside];
 //    _footerView.explainArray = @[@"bb", @"22", @"ww"];
     self.detailsTableView.tableFooterView = _footerView;
     
@@ -110,6 +123,7 @@
 - (void)unfoldAllRoom:(UIButton *)button
 {
     button.selected = !button.selected;
+    NSLog(@"%d", button.selected);
     [self.detailsTableView reloadData];
 }
 
@@ -285,7 +299,9 @@
             {
                 self.headerView.wifiView.image = [UIImage imageNamed:@"wifi_off.png"];
             }
+            self.footerView = [[DetailsFooterView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, 100)];
             self.footerView.explainString = [dic objectForKey:@"BookingInstructions"];
+            self.detailsTableView.tableFooterView = _footerView;
             NSArray * array = [dic objectForKey:@"SuiteList"];
             for (NSDictionary * suiteDic in array) {
                 RoomModel * roomMD = [[RoomModel alloc] initWithDictionary:suiteDic];
@@ -318,9 +334,10 @@
 
 #pragma mark - tableView 
 
+
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    if (self.footerView.allButton.selected) {
+    if (self.allButton.selected) {
         return self.dataArray.count;
     }else
     {
@@ -364,7 +381,7 @@
 
 - (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section
 {
-    return 0.01;
+    return 40;
 }
 
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
@@ -380,6 +397,10 @@
     return sectionView;
 }
 
+- (UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section
+{
+    return self.allButton;
+}
 
 - (BOOL)tableView:(UITableView *)tableView shouldHighlightRowAtIndexPath:(NSIndexPath *)indexPath
 {

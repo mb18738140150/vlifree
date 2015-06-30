@@ -52,24 +52,30 @@
     _allButton.backgroundColor = [UIColor colorWithWhite:0.9 alpha:0.6];
     _allButton.layer.borderColor = [UIColor colorWithWhite:0.7 alpha:0.4].CGColor;
     _allButton.layer.borderWidth = 1;
-    [self addSubview:_allButton];
-    UIView * lineView = [[UIView alloc] initWithFrame:CGRectMake(0, _allButton.bottom + BUTTON_VIEW_TOP_SPACE - 1, self.width, 1)];
+//    [self addSubview:_allButton];
+    
+    UIView * lineView = [[UIView alloc] initWithFrame:CGRectMake(0, BUTTON_VIEW_TOP_SPACE - 1, self.width, 1)];
     lineView.backgroundColor = [UIColor colorWithWhite:0.7 alpha:0.4];
     [self addSubview:lineView];
-    UILabel * titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, lineView.bottom, 100, LABEL_HEIGHT)];
+    self.explainView = [[UIView alloc] initWithFrame:CGRectMake(0, BUTTON_VIEW_TOP_SPACE, self.width, 10)];
+    _explainView.backgroundColor = [UIColor whiteColor];
+    [self addSubview:_explainView];
+    
+    
+    UILabel * titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, 0, 100, LABEL_HEIGHT)];
     titleLabel.text = @"订房说明";
-//    titleLabel.font = [UIFont systemFontOfSize:25];
-    [self addSubview:titleLabel];
+//    titleLabel.backgroundColor = [UIColor whiteColor];
+    //    titleLabel.font = [UIFont systemFontOfSize:25];
+    [self.explainView addSubview:titleLabel];
     UIView * lineView1 = [[UIView alloc] initWithFrame:CGRectMake(LEFT_SPACE, titleLabel.bottom + TOP_SPACE, _explainView.width - 2 * LEFT_SPACE, 1.5)];
     lineView1.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.4];
     [self addSubview:lineView1];
     self.explainLabel = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, lineView1.bottom, lineView1.width, 20)];
     _explainLabel.text = @"无";
-    [self addSubview:_explainLabel];
-    
-//    self.explainView = [[UIView alloc] initWithFrame:CGRectMake(0, _allButton.bottom + BUTTON_VIEW_TOP_SPACE, self.width, 100)];
-//    _explainView.backgroundColor = [UIColor whiteColor];
-//    [self addSubview:_explainView];
+//    _explainLabel.backgroundColor = [UIColor whiteColor];
+    [self.explainView addSubview:_explainLabel];
+
+    _explainView.height = _explainLabel.bottom + TOP_SPACE;
 }
 
 - (void)setExplainString:(NSString *)explainString
@@ -79,9 +85,9 @@
         self.explainLabel.text = explainString;
         CGSize size = [_explainLabel sizeThatFits:CGSizeMake(_explainLabel.width, CGFLOAT_MAX)];
         _explainLabel.height = size.height;
-        self.height = _explainLabel.bottom + 5;
+        _explainView.height = _explainLabel.bottom + TOP_SPACE;
     }
-    
+    self.height = _explainView.bottom;
 }
 
 /*

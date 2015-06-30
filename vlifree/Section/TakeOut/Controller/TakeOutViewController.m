@@ -206,6 +206,8 @@
 {
     UIButton * button = (UIButton *)[self.view viewWithTag:2000];
     self.typeView = [[TypeView alloc] initWithFrame:CGRectMake(0, button.bottom, self.view.width, self.view.height - button.bottom)];
+    UITapGestureRecognizer * tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(hiddenTypeView)];
+    [_typeView addGestureRecognizer:tapGesture];
     for (int i = 0; i < 8; i++) {
         UIButton * button = (UIButton *)[self.typeView viewWithTag:9000 + i];
         [button addTarget:self action:@selector(selectTakeOutType:) forControlEvents:UIControlEventTouchUpInside];
@@ -218,10 +220,17 @@
 - (void)changeTakeOutType:(UIButton *)button
 {
 //    NSLog(@"3333");
+//    button.selected = !button.selected;
+//    self.typeView.hidden = !button.selected;
+    [self hiddenTypeView];
+}
+
+- (void)hiddenTypeView
+{
+    UIButton * button = (UIButton *)[self.view viewWithTag:2000];
     button.selected = !button.selected;
     self.typeView.hidden = !button.selected;
 }
-
 
 - (void)selectTakeOutType:(UIButton *)button
 {

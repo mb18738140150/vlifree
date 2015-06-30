@@ -57,7 +57,7 @@
     self.payType = @1;
     self.view.backgroundColor = [UIColor whiteColor];
 //    NSLog(@"%d", self.navigationController.navigationBar.translucent);
-    UIScrollView * scrollView = [[UIScrollView alloc] initWithFrame:self.view.bounds];
+    UIScrollView * scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, self.view.height - 75)];
     scrollView.backgroundColor = [UIColor colorWithWhite:0.9 alpha:0.7];
     [self.view addSubview:scrollView];
     
@@ -128,11 +128,11 @@
     line2.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
     [view2 addSubview:line2];
     
-    UILabel * datumLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, 0, view2.width - 2 * LEFT_SPACE, 40)];
-    datumLB.text = @"入住资料";
-    [view2 addSubview:datumLB];
+//    UILabel * datumLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, 0, view2.width - 2 * LEFT_SPACE, 40)];
+//    datumLB.text = @"入住资料";
+//    [view2 addSubview:datumLB];
     
-    UIView * line3 = [[UIView alloc] initWithFrame:CGRectMake(LEFT_SPACE, datumLB.bottom, view2.width - 2 * LEFT_SPACE, 1)];
+    UIView * line3 = [[UIView alloc] initWithFrame:CGRectMake(LEFT_SPACE, 0, view2.width - 2 * LEFT_SPACE, 1)];
     line3.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
     [view2 addSubview:line3];
     
@@ -211,10 +211,13 @@
     line7.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
     [view3 addSubview:line7];
     
-    self.priceLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, view3.bottom + 20, scrollView.width - 3 * LEFT_SPACE - 80, 35)];
+    UIView * view4 = [[UIView alloc] initWithFrame:CGRectMake(0, scrollView.bottom, scrollView.width, 75)];
+    [self.view addSubview:view4];
+    
+    self.priceLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, 20, scrollView.width - 3 * LEFT_SPACE - 80, 35)];
     
     _priceLB.attributedText = [self allPriceLBTextWithPrice:self.price];
-    [scrollView addSubview:_priceLB];
+    [view4 addSubview:_priceLB];
     
     UIButton * payButton = [UIButton buttonWithType:UIButtonTypeCustom];
     payButton.frame = CGRectMake(_priceLB.right + LEFT_SPACE, _priceLB.top, 80, _priceLB.height);
@@ -222,8 +225,9 @@
     [payButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     payButton.backgroundColor = MAIN_COLOR;
     [payButton addTarget:self action:@selector(payOrderDetails:) forControlEvents:UIControlEventTouchUpInside];
-    [scrollView addSubview:payButton];
-    scrollView.contentSize = CGSizeMake(scrollView.width, payButton.bottom + 20);
+    [view4 addSubview:payButton];
+    
+    scrollView.contentSize = CGSizeMake(scrollView.width, view3.bottom);
     
     UIButton * backBT = [UIButton buttonWithType:UIButtonTypeCustom];
     backBT.frame = CGRectMake(0, 0, 15, 20);

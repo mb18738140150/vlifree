@@ -27,7 +27,7 @@
 #define POST_URL @"http://test.vlifee.com/User_getdata.ashx?md5="
 #define DATA_COUNT 15
 
-#define MAIN_COLOR [UIColor colorWithRed:226 / 250.0 green:74 / 250.0 blue:10 / 250.0 alpha:1]
+#define MAIN_COLOR [UIColor colorWithRed:251 / 250.0 green:51 / 250.0 blue:46 / 250.0 alpha:1]
 
 #ifndef vlifree_GeneralHeader_pch
 #define vlifree_GeneralHeader_pch
