@@ -9,10 +9,10 @@
 #import "ShoppingCartView.h"
 
 
-#define LEFT_SPACE 30
+#define LEFT_SPACE 10
 #define IMAGE_TOP (-10)
 #define IMAGE_SIZE 45
-#define LABEL_WIDTH 80
+#define LABEL_WIDTH 150
 #define LABEL_HEIGHT 25
 #define BUTTON_WIDTH 80
 #define BUTTON_HEIGHT 25

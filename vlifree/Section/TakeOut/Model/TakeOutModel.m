@@ -25,10 +25,10 @@
 {
     if ([key isEqualToString:@"ActivityReduce"]) {
         NSArray * array = (NSArray *)value;
-        self.ActivityArray = [NSMutableArray array];
+        self.activityArray = [NSMutableArray array];
         for (NSDictionary * dic in array) {
             ActivityReduce * activityRD = [[ActivityReduce alloc] initWithDictionary:dic];
-            [self.ActivityArray addObject:activityRD];
+            [self.activityArray addObject:activityRD];
         }
     }
 }

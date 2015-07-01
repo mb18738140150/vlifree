@@ -16,14 +16,17 @@
 @property (nonatomic, copy)NSString * storeName;
 @property (nonatomic, copy)NSString * time;
 @property (nonatomic, copy)NSString * busiPhone;
-@property (nonatomic, strong)NSNumber * money;
-@property (nonatomic, strong)NSNumber * orderState;
+//@property (nonatomic, strong)NSNumber * money;
+//@property (nonatomic, strong)NSNumber * orderState;
 @property (nonatomic, strong)NSNumber * deliveryMoney;
 @property (nonatomic, strong)NSNumber * allMoney;
 @property (nonatomic, copy)NSString * nextphone;
 @property (nonatomic, copy)NSString * address;
-@property (nonatomic, strong)NSNumber * payType;
-@property (nonatomic, strong)NSNumber * isDeal;
+//@property (nonatomic, strong)NSNumber * payType;
+//@property (nonatomic, strong)NSNumber * isDeal;
+@property (nonatomic, strong)NSNumber * firstReduce;
+@property (nonatomic, strong)NSNumber * fullReduce;
+@property (nonatomic, strong)NSNumber * mealBoxMoney;
 
 - (id)initWithDictionary:(NSDictionary *)dic;
 

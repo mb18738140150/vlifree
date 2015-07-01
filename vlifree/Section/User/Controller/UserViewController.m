@@ -91,7 +91,13 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     if ([UserInfo shareUserInfo].userId) {
-        [self removeLogInView];
+//        [self removeLogInView];
+        [self fiexdData];
+        _userTableView.hidden = NO;
+        _logInView.hidden = YES;
+        self.navigationItem.title = @"会员中心";
+        self.navigationController.tabBarItem.title = @"我的";
+        [_logInView textFiledResignFirstResponder];
     }
 
 }
@@ -116,6 +122,7 @@
                                    @"Password":self.logInView.passwordTF.text,
                                    };
         [self requestDataWithDictionary:jsonDic];
+        [SVProgressHUD showWithStatus:@"登录中..." maskType:SVProgressHUDMaskTypeBlack];
     }
     /*
     _userTableView.hidden = NO;
@@ -194,6 +201,7 @@
     [UIView commitAnimations];
     _logInView.hidden = YES;
     self.navigationItem.title = @"会员中心";
+    self.navigationController.tabBarItem.title = @"我的";
     [_logInView textFiledResignFirstResponder];
     //    HTTPPost * http = [HTTPPost shareHTTPPost];
     //    http.delegate = self;

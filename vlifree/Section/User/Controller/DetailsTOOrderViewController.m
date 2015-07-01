@@ -25,6 +25,10 @@
 @property (nonatomic, strong)UILabel * orderTelLB;
 @property (nonatomic, strong)UILabel * orderAddressLB;
 
+@property (nonatomic, strong)UIButton * confirmBT;
+@property (nonatomic, strong)UIButton * cancelBT;
+
+@property (nonatomic, strong)NSNumber * payType;
 
 @property (nonatomic, strong)NSMutableArray * orderArray;
 
@@ -75,42 +79,48 @@
     aLabel.font = [UIFont systemFontOfSize:15];
     [view1 addSubview:aLabel];
     
-    UIButton * cancelBT = [UIButton buttonWithType:UIButtonTypeCustom];
-    cancelBT.frame = CGRectMake(view1.width - 200, aLabel.bottom + 10, 80, 25);
-    [cancelBT setTitle:@"取消订单" forState:UIControlStateNormal];
-    cancelBT.titleLabel.font = [UIFont systemFontOfSize:15];
-    [cancelBT setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-    cancelBT.layer.borderColor = [UIColor colorWithWhite:0.8 alpha:0.8].CGColor;
-    cancelBT.layer.borderWidth = 1;
-    cancelBT.layer.cornerRadius = 3;
-    [view1 addSubview:cancelBT];
+    self.cancelBT = [UIButton buttonWithType:UIButtonTypeCustom];
+//    _cancelBT.frame = CGRectMake(view1.width - 200, aLabel.bottom + 10, 80, 25);
+    _cancelBT.frame = CGRectMake(view1.width - 100, aLabel.bottom + 10, 80, 25);
+    [_cancelBT setTitle:@"取消订单" forState:UIControlStateNormal];
+    _cancelBT.titleLabel.font = [UIFont systemFontOfSize:15];
+    [_cancelBT setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+    _cancelBT.layer.borderColor = [UIColor colorWithWhite:0.8 alpha:0.8].CGColor;
+    _cancelBT.layer.borderWidth = 1;
+    _cancelBT.layer.cornerRadius = 3;
+    [_cancelBT addTarget:self action:@selector(cancelOrder:) forControlEvents:UIControlEventTouchUpInside];
+    _cancelBT.hidden = YES;
+    [view1 addSubview:_cancelBT];
     
-    if ([self.takeOutOrderMD.orderState isEqualToNumber:@1]) {
-        cancelBT.hidden = NO;
-    }else
-    {
-        cancelBT.hidden = YES;
-    }
+//    if ([self.takeOutOrderMD.orderState isEqualToNumber:@1]) {
+//        cancelBT.hidden = NO;
+//    }else
+//    {
+//        cancelBT.hidden = YES;
+//    }
     
     
-    UIButton * confirmBT = [UIButton buttonWithType:UIButtonTypeCustom];
-    confirmBT.frame = CGRectMake(view1.width - 100, aLabel.bottom + 10, 80, 25);
-    [confirmBT setTitle:@"确认订单" forState:UIControlStateNormal];
-    confirmBT.titleLabel.font = [UIFont systemFontOfSize:15];
-    [confirmBT setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-    confirmBT.layer.borderColor = [UIColor colorWithWhite:0.8 alpha:0.8].CGColor;
-    confirmBT.layer.backgroundColor = [UIColor orangeColor].CGColor;
-    confirmBT.layer.borderWidth = 1;
-    confirmBT.layer.cornerRadius = 3;
-    [view1 addSubview:confirmBT];
+    self.confirmBT = [UIButton buttonWithType:UIButtonTypeCustom];
+    _confirmBT.frame = CGRectMake(view1.width - 100, aLabel.bottom + 10, 80, 25);
+    [_confirmBT setTitle:@"确认订单" forState:UIControlStateNormal];
+    _confirmBT.titleLabel.font = [UIFont systemFontOfSize:15];
+    [_confirmBT setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    _confirmBT.layer.borderColor = [UIColor colorWithWhite:0.8 alpha:0.8].CGColor;
+    _confirmBT.layer.backgroundColor = [UIColor orangeColor].CGColor;
+    _confirmBT.layer.borderWidth = 1;
+    _confirmBT.layer.cornerRadius = 3;
+    [_confirmBT addTarget:self action:@selector(confirmOrder:) forControlEvents:UIControlEventTouchUpInside];
+    _confirmBT.hidden = YES;
+    [view1 addSubview:_confirmBT];
     
-    view1.height = confirmBT.bottom + 10;
+    view1.height = _confirmBT.bottom + 10;
     
     UIView * lineView1 = [[UIView alloc] initWithFrame:CGRectMake(0, view1.height - 1, view1.width, 1)];
     lineView1.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
     [view1 addSubview:lineView1];
     
     UIView * view2 = [[UIView alloc] initWithFrame:CGRectMake(0, view1.bottom + 10, _scrollView.width, 100)];
+    view2.tag = 2000;
     view2.backgroundColor = [UIColor whiteColor];
     [_scrollView addSubview:view2];
     
@@ -119,12 +129,14 @@
     [view2 addSubview:lineView2];
     
     NSArray * array = @[@"提交订单", @"餐厅接单", @"配送中", @"已收货"];
-    int state = self.takeOutOrderMD.orderState.intValue - 1;
+//    int state = self.takeOutOrderMD.orderState.intValue - 1;
     for (int i = 0; i < 4; i++) {
         UIImageView * aImageView = [[UIImageView alloc] initWithFrame:CGRectMake((view2.width - 200) / 5 * (i + 1) + 50 * i, 10, 50, 50)];
         aImageView.image = [UIImage imageNamed:[NSString stringWithFormat:@"orderState%d.png", i + 1]];
+        aImageView.tag = 10001 + i;
         [view2 addSubview:aImageView];
         UILabel * label = [[UILabel alloc] initWithFrame:CGRectMake(aImageView.left, aImageView.bottom, aImageView.width, 20)];
+        label.tag = 20001 + i;
         label.text = [array objectAtIndex:i];
         label.textAlignment = NSTextAlignmentCenter;
         label.font = [UIFont systemFontOfSize:12];
@@ -139,14 +151,14 @@
 //            label.textColor = [UIColor greenColor];
             view2.height = label.bottom + 5;
         }
-        if (i == state) {
-            if (state == 3) {
-                label.textColor = [UIColor greenColor];
-            }else
-            {
-                label.textColor = [UIColor redColor];
-            }
-        }
+//        if (i == state) {
+//            if (state == 3) {
+//                label.textColor = [UIColor greenColor];
+//            }else
+//            {
+//                label.textColor = [UIColor redColor];
+//            }
+//        }
     }
     
     UIView * lineView3 = [[UIView alloc] initWithFrame:CGRectMake(0, view2.height - 1, view2.width, 1)];
@@ -168,7 +180,7 @@
     [view3 addSubview:storeIcon];
     
     self.storeNameLB = [[UILabel alloc] initWithFrame:CGRectMake(storeIcon.right + 5, storeIcon.top, view3.width - 10 - storeIcon.right, storeIcon.height)];
-    _storeNameLB.text = @"哆啦A梦茶餐厅";
+    _storeNameLB.text = self.takeOutOrderMD.storeName;
     [view3 addSubview:_storeNameLB];
     
     UIView * lineView5 = [[UIView alloc] initWithFrame:CGRectMake(10, _storeNameLB.bottom, view3.width - 20, 1)];
@@ -204,20 +216,77 @@
     lineView7.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
     [view4 addSubview:lineView7];
     
-    UILabel * otherTitleLB = [[UILabel alloc] initWithFrame:CGRectMake(15, 5, 100, 25)];
-    otherTitleLB.text = @"配送费";
-    [view4 addSubview:otherTitleLB];
+    CGFloat top = 5;
+    if (![self.takeOutOrderMD.firstReduce isEqualToNumber:@0]) {
+        UILabel * firstTitleLB = [[UILabel alloc] initWithFrame:CGRectMake(15, top, 100, 25)];
+        firstTitleLB.text = @"首单减免";
+        [view4 addSubview:firstTitleLB];
+        
+        UILabel * firstJLB = [[UILabel alloc] initWithFrame:CGRectMake(view4.width - 70, firstTitleLB.top, 50, 25)];
+        firstJLB.text = [NSString stringWithFormat:@"-%@", self.takeOutOrderMD.firstReduce];
+        firstJLB.textAlignment = NSTextAlignmentRight;
+        [view4 addSubview:firstJLB];
+        
+        UIView * firstlineView = [[UIView alloc] initWithFrame:CGRectMake(10, firstJLB.bottom, view4.width - 20, 1)];
+        firstlineView.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
+        [view4 addSubview:firstlineView];
+        top = firstlineView.bottom + 5;
+    }
     
-    self.otherPriceLB = [[UILabel alloc] initWithFrame:CGRectMake(view4.width - 70, otherTitleLB.top, 50, 25)];
-    _otherPriceLB.text = @"¥35";
-    _otherPriceLB.textAlignment = NSTextAlignmentRight;
-    [view4 addSubview:_otherPriceLB];
+    if (![self.takeOutOrderMD.fullReduce isEqualToNumber:@0])
+    {
+        UILabel * fullTitleLB = [[UILabel alloc] initWithFrame:CGRectMake(15, top, 100, 25)];
+        fullTitleLB.text = @"满减优惠";
+        [view4 addSubview:fullTitleLB];
+        
+        UILabel * fullJLB = [[UILabel alloc] initWithFrame:CGRectMake(view4.width - 70, fullTitleLB.top, 50, 25)];
+        fullJLB.text = [NSString stringWithFormat:@"-%@", self.takeOutOrderMD.fullReduce];
+        fullJLB.textAlignment = NSTextAlignmentRight;
+        [view4 addSubview:fullJLB];
+        
+        UIView * fullLineView = [[UIView alloc] initWithFrame:CGRectMake(10, fullJLB.bottom, view4.width - 20, 1)];
+        fullLineView.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
+        [view4 addSubview:fullLineView];
+    }
     
-    UIView * lineView8 = [[UIView alloc] initWithFrame:CGRectMake(10, _otherPriceLB.bottom, view4.width - 20, 1)];
-    lineView8.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
-    [view4 addSubview:lineView8];
+    if (![self.takeOutOrderMD.mealBoxMoney isEqualToNumber:@0])
+    {
+        UILabel * boxTitleLB = [[UILabel alloc] initWithFrame:CGRectMake(15, top, 100, 25)];
+        boxTitleLB.text = @"餐具费";
+        [view4 addSubview:boxTitleLB];
+        
+        UILabel * boxPriceLB = [[UILabel alloc] initWithFrame:CGRectMake(view4.width - 70, boxTitleLB.top, 50, 25)];
+        boxPriceLB.text = [NSString stringWithFormat:@"+%@", self.takeOutOrderMD.mealBoxMoney];
+        boxPriceLB.textAlignment = NSTextAlignmentRight;
+        [view4 addSubview:boxPriceLB];
+        
+        UIView * boxLineView = [[UIView alloc] initWithFrame:CGRectMake(10, _otherPriceLB.bottom, view4.width - 20, 1)];
+        boxLineView.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
+        [view4 addSubview:boxLineView];
+        top = boxLineView.bottom + 5;
+    }
     
-    UILabel * totalLB = [[UILabel alloc] initWithFrame:CGRectMake(15, lineView8.bottom + 5, 100, 25)];
+    
+    if (![self.takeOutOrderMD.deliveryMoney isEqualToNumber:@0])
+    {
+        UILabel * otherTitleLB = [[UILabel alloc] initWithFrame:CGRectMake(15, top, 100, 25)];
+        otherTitleLB.text = @"配送费";
+        [view4 addSubview:otherTitleLB];
+        
+        self.otherPriceLB = [[UILabel alloc] initWithFrame:CGRectMake(view4.width - 70, otherTitleLB.top, 50, 25)];
+        _otherPriceLB.text = [NSString stringWithFormat:@"+%@", self.takeOutOrderMD.deliveryMoney];
+        _otherPriceLB.textAlignment = NSTextAlignmentRight;
+        [view4 addSubview:_otherPriceLB];
+        
+        UIView * lineView8 = [[UIView alloc] initWithFrame:CGRectMake(10, _otherPriceLB.bottom, view4.width - 20, 1)];
+        lineView8.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
+        [view4 addSubview:lineView8];
+        
+        top = lineView8.bottom + 5;
+    }
+    
+    
+    UILabel * totalLB = [[UILabel alloc] initWithFrame:CGRectMake(15, top, 100, 25)];
     totalLB.text = @"合计";
     [view4 addSubview:totalLB];
     
@@ -268,12 +337,12 @@
     [view5 addSubview:lineView12];
     
     self.orderNumberLB = [[UILabel alloc] initWithFrame:CGRectMake(15, lineView12.bottom + 5, lineView12.width - 10, 30)];
-    _orderNumberLB.text = @"订单号码: 3247693974979";
+    _orderNumberLB.text = [NSString stringWithFormat:@"订单号:%@", self.takeOutOrderMD.orderID];
     [view5 addSubview:_orderNumberLB];
     
     
     self.orderDateLB = [[UILabel alloc] initWithFrame:CGRectMake(15, _orderNumberLB.bottom + 5, lineView12.width - 10, 30)];
-    _orderDateLB.text = @"订单时间: 2015年5月16日 11:24:24";
+    _orderDateLB.text = [NSString stringWithFormat:@"下单时间: %@", self.takeOutOrderMD.time];
     [view5 addSubview:_orderDateLB];
     
     self.orderPayTypeLB = [[UILabel alloc] initWithFrame:CGRectMake(15, _orderDateLB.bottom + 5, lineView12.width - 10, 30)];
@@ -281,12 +350,14 @@
     [view5 addSubview:_orderPayTypeLB];
     
     self.orderTelLB = [[UILabel alloc] initWithFrame:CGRectMake(15, _orderPayTypeLB.bottom + 5, lineView12.width - 10, 30)];
-    _orderTelLB.text = @"手机号码: 13739443500";
+    _orderTelLB.text = [NSString stringWithFormat:@"手机号码: %@", self.takeOutOrderMD.nextphone];
     [view5 addSubview:_orderTelLB];
     
     
     self.orderAddressLB = [[UILabel alloc] initWithFrame:CGRectMake(15, _orderTelLB.bottom + 5, lineView12.width - 10, 30)];
-    _orderAddressLB.text = @"收餐地址: 未来路1235号590";
+    _orderAddressLB.text = [NSString stringWithFormat:@"收餐地址: %@", self.takeOutOrderMD.address];
+    _orderAddressLB.numberOfLines = 0;
+    [_orderAddressLB sizeToFit];
     [view5 addSubview:_orderAddressLB];
     view5.height = _orderAddressLB.bottom + 10;
     
@@ -294,8 +365,8 @@
     size.height = view5.bottom;
     _scrollView.contentSize = size;
     
-    
-    self.stateImageV.image = [UIImage imageNamed:[NSString stringWithFormat:@"orderState%d.png", [_takeOutOrderMD.orderState intValue]]];
+    /*
+//    self.stateImageV.image = [UIImage imageNamed:[NSString stringWithFormat:@"orderState%d.png", [_takeOutOrderMD.orderState intValue]]];
     switch ([_takeOutOrderMD.orderState intValue]) {
         case 1:
         {
@@ -320,17 +391,20 @@
         default:
             break;
     }
+     */
     self.storeNameLB.text = _takeOutOrderMD.storeName;
     self.otherPriceLB.text = [NSString stringWithFormat:@"¥%@", _takeOutOrderMD.deliveryMoney];
     self.totalPriceLB.text = [NSString stringWithFormat:@"¥%@", _takeOutOrderMD.allMoney];
     self.orderNumberLB.text = [NSString stringWithFormat:@"订到号码:%@", _takeOutOrderMD.orderID];
     self.orderDateLB.text = [NSString stringWithFormat:@"订单时间:%@",_takeOutOrderMD.time];
+    /*
     if ([_takeOutOrderMD.payType isEqualToNumber:@3]) {
         self.orderPayTypeLB.text = @"支付方式:货到付款";
     }else
     {
         self.orderPayTypeLB.text = @"支付方式:在线支付";
     }
+     */
     self.orderTelLB.text = [NSString stringWithFormat:@"手机号码:%@", _takeOutOrderMD.nextphone];
     self.orderAddressLB.text = [NSString stringWithFormat:@"收餐地址:%@", _takeOutOrderMD.address];
     [self downloadData];
@@ -452,33 +526,117 @@
 {
     NSLog(@"+++%@", data);
     if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
-        UIView * view3 = [self.scrollView viewWithTag:3000];
-        UIView * view4 = [self.scrollView viewWithTag:4000];
-        UIView * view5 = [self.scrollView viewWithTag:5000];
-        NSArray * array = [data objectForKey:@"WakeOutOrderDetail"];
-        for (NSDictionary * dic in array) {
-            OrderMenuMD * orderMenuMD = [[OrderMenuMD alloc] initWithDictionary:dic];
-            [self.orderArray addObject:orderMenuMD];
+        if ([[data objectForKey:@"Command"] isEqualToNumber:@10024]) {
+            UIView * view3 = [self.scrollView viewWithTag:3000];
+            UIView * view4 = [self.scrollView viewWithTag:4000];
+            UIView * view5 = [self.scrollView viewWithTag:5000];
+            NSArray * array = [data objectForKey:@"WakeOutOrderDetail"];
+            self.orderArray = nil;
+            for (NSDictionary * dic in array) {
+                OrderMenuMD * orderMenuMD = [[OrderMenuMD alloc] initWithDictionary:dic];
+                [self.orderArray addObject:orderMenuMD];
+            }
+            for (int i = 0 ; i < self.orderArray.count; i++) {
+                OrderMenuMD * orderMneuMD = [self.orderArray objectAtIndex:i];
+                OrderMenuVIew * menuView = [[OrderMenuVIew alloc] initWithFrame:CGRectMake(15, self.storeNameLB.bottom + 5 + i * 25, view3.width - 30, 25)];
+                menuView.menuNameLB.text = orderMneuMD.name;
+                menuView.countLabel.text = [NSString stringWithFormat:@"%@", orderMneuMD.count];
+                menuView.priceLabel.text = [NSString stringWithFormat:@"¥%@", orderMneuMD.money];
+                [view3 addSubview:menuView];
+            }
+            view3.height += 25 * self.orderArray.count + 5;
+            UIView * lineView6 = [[UIView alloc] initWithFrame:CGRectMake(0, view3.height - 1, view3.width, 1)];
+            lineView6.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
+            [view3 addSubview:lineView6];
+            view4.top += 25 * self.orderArray.count + 5;
+            view5.top += 25 * self.orderArray.count + 5;
+            CGSize size = _scrollView.contentSize;
+            size.height += 25 * self.orderArray.count + 5;
+            _scrollView.contentSize = size;
+            self.payType = [data objectForKey:@"PeyType"];
+            switch (_payType.intValue) {
+                case 1:
+                {
+                    self.orderPayTypeLB.text = @"支付方式:微信支付";
+                }
+                    break;
+                case 2:
+                {
+                    self.orderPayTypeLB.text = @"支付方式:百度支付";
+                }
+                    break;
+                case 3:
+                {
+                    self.orderPayTypeLB.text = @"支付方式:餐到付款";
+                }
+                    break;
+                default:
+                    break;
+            }
+            NSNumber * orderState = [data objectForKey:@"OrderState"];
+            [self orderState:orderState.intValue];
+            _cancelBT.hidden = YES;
+            _confirmBT.hidden = YES;
+            switch (orderState.intValue) {
+                case 1:
+                {
+                    if ([[data objectForKey:@"IsPey"] isEqualToNumber:@YES]) {
+                        self.stateLabel.text = @"已支付";
+                    }else
+                    {
+                        self.stateLabel.text = @"未支付";
+                    }
+                    _cancelBT.hidden = NO;
+                    
+                }
+                    break;
+                case 2:
+                {
+                    self.stateLabel.text = @"餐厅已经接单";
+                    _cancelBT.hidden = YES;
+                }
+                    break;
+                case 3:
+                {
+                    self.stateLabel.text = @"订单已经在配送";
+                    self.confirmBT.hidden = NO;
+                }
+                    break;
+                case 4:
+                {
+                    self.stateLabel.text = @"订单已作废";
+                }
+                    break;
+                case 5:
+                {
+                    self.stateLabel.text = @"申请退款";
+                }
+                    break;
+                case 6:
+                {
+                    self.stateLabel.text = @"退款成功";
+                }
+                    break;
+                case 7:
+                {
+                    self.stateLabel.text = @"订单已完成";
+                }
+                    break;
+                    
+                default:
+                    break;
+            }
+            [SVProgressHUD dismiss];
+            [SVProgressHUD showSuccessWithStatus:@"操作成功" duration:1.5];
+        }else if ([[data objectForKey:@"Command"] isEqualToNumber:@10032])
+        {
+            [self downloadData];
+        }else if ([[data objectForKey:@"Command"] isEqualToNumber:@10035])
+        {
+            [self downloadData];
         }
-        for (int i = 0 ; i < self.orderArray.count; i++) {
-            OrderMenuMD * orderMneuMD = [self.orderArray objectAtIndex:i];
-            OrderMenuVIew * menuView = [[OrderMenuVIew alloc] initWithFrame:CGRectMake(15, self.storeNameLB.bottom + 5 + i * 25, view3.width - 30, 25)];
-            menuView.menuNameLB.text = orderMneuMD.name;
-            menuView.countLabel.text = [NSString stringWithFormat:@"%@", orderMneuMD.count];
-            menuView.priceLabel.text = [NSString stringWithFormat:@"¥%@", orderMneuMD.money];
-            [view3 addSubview:menuView];
-        }
-        view3.height += 25 * self.orderArray.count + 5;
-        UIView * lineView6 = [[UIView alloc] initWithFrame:CGRectMake(0, view3.height - 1, view3.width, 1)];
-        lineView6.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
-        [view3 addSubview:lineView6];
-        view4.top += 25 * self.orderArray.count + 5;
-        view5.top += 25 * self.orderArray.count + 5;
-        CGSize size = _scrollView.contentSize;
-        size.height += 25 * self.orderArray.count + 5;
-        _scrollView.contentSize = size;
+        
     }
-    [SVProgressHUD dismiss];
 }
 - (void)failWithError:(NSError *)error
 {
@@ -486,6 +644,48 @@
     NSLog(@"error = %@", error);
 }
 
+- (void)orderState:(int)state
+{
+    UIView * view2 = [self.scrollView viewWithTag:2000];
+    for (int i = 0; i < 4; i++) {
+        UIImageView * stateIV = (UIImageView *)[view2 viewWithTag:10001 + i];
+        UILabel * stateLB = (UILabel *)[view2 viewWithTag:20001 + i];
+        if (state == i + 1 && state != 4) {
+            stateLB.textColor = [UIColor greenColor];
+        }else if (state == 7)
+        {
+            stateIV.image = [UIImage imageNamed:[NSString stringWithFormat:@"orderState%d.png", i + 1]];
+            if (i == 3) {
+                stateLB.textColor = [UIColor greenColor];
+            }
+        }
+    }
+}
+
+
+- (void)cancelOrder:(UIButton *)button
+{
+    NSDictionary * dic = @{
+                           @"Command":@32,
+                           @"UserId":[UserInfo shareUserInfo].userId,
+                           @"TakeoutOrderId":self.takeOutOrderMD.orderID
+                           };
+    [self playPostWithDictionary:dic];
+    [SVProgressHUD showWithStatus:@"取消请求中..." maskType:SVProgressHUDMaskTypeBlack];
+}
+
+
+- (void)confirmOrder:(UIButton *)button
+{
+    NSDictionary * dic = @{
+                           @"Command":@35,
+                           @"UserId":[UserInfo shareUserInfo].userId,
+                           @"OrderId":self.takeOutOrderMD.orderID,
+                           @"PayType":self.payType
+                           };
+    [self playPostWithDictionary:dic];
+    [SVProgressHUD showWithStatus:@"确认中..." maskType:SVProgressHUDMaskTypeBlack];
+}
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];

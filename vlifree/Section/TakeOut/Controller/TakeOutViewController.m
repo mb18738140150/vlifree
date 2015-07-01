@@ -70,7 +70,7 @@
     self.navigationController.navigationBar.translucent = YES;
     self.navigationController.navigationBar.tintColor = [UIColor whiteColor];
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSearch target:self action:@selector(searchTakeOut:)];
-    
+
     self.addressBT = [UIButton buttonWithType:UIButtonTypeCustom];
 //    _addressBT.frame = CGRectMake(0, 5, 200, 30);
 //    _addressBT.backgroundColor = [UIColor greenColor];
@@ -533,8 +533,8 @@ updatingLocation:(BOOL)updatingLocation
     TakeOutViewCell * cell = [tableView dequeueReusableCellWithIdentifier:cellIndetifiel];
     if (!cell) {
         cell = [[TakeOutViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIndetifiel];
-        [cell createSubview:tableView.bounds];
     }
+    [cell createSubview:tableView.bounds activityCount:takeOutMD.activityArray.count];
     __weak TakeOutViewController * takeOutVC = self;
     cell.rightButtons = @[[MGSwipeButton buttonWithTitle:@"关注商店" backgroundColor:[UIColor redColor] callback:^BOOL(MGSwipeTableCell *sender) {
         if ([UserInfo shareUserInfo].userId) {
@@ -592,6 +592,8 @@ updatingLocation:(BOOL)updatingLocation
     detailTakeOutVC.takeOutID = takeOutMD.storeId;
     detailTakeOutVC.sendPrice = takeOutMD.sendPrice;
     detailTakeOutVC.outSentMoney = takeOutMD.outSentMoney;
+    detailTakeOutVC.storeName = takeOutMD.storeName;
+    detailTakeOutVC.navigationItem.title = takeOutMD.storeName;
     detailTakeOutVC.hidesBottomBarWhenPushed = YES;
     [self.navigationController pushViewController:detailTakeOutVC animated:YES];
 }

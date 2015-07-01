@@ -137,7 +137,7 @@
 {
     TakeOutModel * takeOutModel = [self.dataArray objectAtIndex:indexPath.row];
     TakeOutViewCell * cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
-    [cell createSubview:tableView.bounds];
+    [cell createSubview:tableView.bounds activityCount:takeOutModel.activityArray.count];
     cell.takeOutModel = takeOutModel;
     return cell;
 }

@@ -262,11 +262,13 @@
     if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
         if ([[data objectForKey:@"Command"] isEqualToNumber:@10009] || [[data objectForKey:@"Command"] isEqualToNumber:@10007]) {
             [[UserInfo shareUserInfo] setValuesForKeysWithDictionary:[data objectForKey:@"UserInfo"]];
+            UITabBarItem * item = [self.navigationController.tabBarController.tabBar.items lastObject];
+            item.title = @"我的";
             if ([[data objectForKey:@"IsFirst"] isEqualToNumber:@YES]) {
-//                DetailsGrogshopViewController * detailsGSVC = self;
+                __weak DetailsGrogshopViewController * detailsGSVC = self;
                 WXLoginViewController * wxLoginVC = [[WXLoginViewController alloc] init];
                 [wxLoginVC refreshUserInfo:^{
-                    [self.alertLoginV removeFromSuperview];
+                    [detailsGSVC.alertLoginV removeFromSuperview];
                 }];
                 UINavigationController * nav = [[UINavigationController alloc] initWithRootViewController:wxLoginVC];
                 [self.navigationController presentViewController:nav animated:YES completion:nil];

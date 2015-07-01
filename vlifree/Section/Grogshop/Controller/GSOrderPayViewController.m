@@ -89,6 +89,7 @@
     ruzhuBT.tag = 10001;
 //    ruzhuBT.layer.borderColor = [UIColor colorWithWhite:0.7 alpha:0.9].CGColor;
 //    ruzhuBT.layer.borderWidth = 0.5;
+    [ruzhuBT setTitle:@"选择入住时间" forState:UIControlStateNormal];
     [ruzhuBT setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
 //    ruzhuBT.backgroundColor = [UIColor redColor];
     [ruzhuBT addTarget:self action:@selector(changeDate:) forControlEvents:UIControlEventTouchUpInside];
@@ -105,6 +106,7 @@
     lidianBT.tag = 10002;
 //    lidianBT.layer.borderColor = [UIColor colorWithWhite:0.7 alpha:0.9].CGColor;
 //    lidianBT.layer.borderWidth = 0.5;
+    [lidianBT setTitle:@"选择离店时间" forState:UIControlStateNormal];
     [lidianBT setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     //    ruzhuBT.backgroundColor = [UIColor redColor];
     [lidianBT addTarget:self action:@selector(changeDate:) forControlEvents:UIControlEventTouchUpInside];
@@ -142,6 +144,7 @@
     
     self.personTF = [[UITextField alloc] initWithFrame:CGRectMake(personLB.right, personLB.top, view2.width - LEFT_SPACE - personLB.right, personLB.height)];
     _personTF.borderStyle = UITextBorderStyleNone;
+    _personTF.placeholder = @"请输入入住人";
     _personTF.delegate = self;
     [view2 addSubview:_personTF];
     
@@ -152,6 +155,7 @@
     
     self.telTF = [[UITextField alloc] initWithFrame:CGRectMake(telLB.right, telLB.top, view2.width - LEFT_SPACE - telLB.right, telLB.height)];
     _telTF.borderStyle = UITextBorderStyleNone;
+    _telTF.placeholder = @"请输入手机号";
     _telTF.delegate = self;
     [view2 addSubview:_telTF];
     
@@ -165,6 +169,7 @@
     
     self.requireTF = [[UITextField alloc] initWithFrame:CGRectMake(requireLB.right, requireLB.top, view2.width - LEFT_SPACE - requireLB.right, requireLB.height)];
     _requireTF.borderStyle = UITextBorderStyleNone;
+    _requireTF.placeholder = @"请输入其他要求";
     _requireTF.delegate = self;
     [view2 addSubview:_requireTF];
     
@@ -221,9 +226,10 @@
     
     UIButton * payButton = [UIButton buttonWithType:UIButtonTypeCustom];
     payButton.frame = CGRectMake(_priceLB.right + LEFT_SPACE, _priceLB.top, 80, _priceLB.height);
-    [payButton setTitle:@"马上支付" forState:UIControlStateNormal];
-    [payButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-    payButton.backgroundColor = MAIN_COLOR;
+//    [payButton setTitle:@"马上支付" forState:UIControlStateNormal];
+//    [payButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+//    payButton.backgroundColor = MAIN_COLOR;
+    [payButton setBackgroundImage:[UIImage imageNamed:@"change_n.png"] forState:UIControlStateNormal];
     [payButton addTarget:self action:@selector(payOrderDetails:) forControlEvents:UIControlEventTouchUpInside];
     [view4 addSubview:payButton];
     

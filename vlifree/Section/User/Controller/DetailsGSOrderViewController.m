@@ -26,12 +26,16 @@
 @property (nonatomic, strong)UILabel * addressLB;
 @property (nonatomic, strong)UILabel * telGSLB;
 
+@property (nonatomic, strong)NSNumber * payType;
+
 @end
 
 @implementation DetailsGSOrderViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    self.view.backgroundColor = [UIColor colorWithWhite:0.9 alpha:0.7];
     
     UIScrollView * scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, self.view.height)];
     scrollView.backgroundColor = [UIColor colorWithWhite:0.9 alpha:0.7];
@@ -130,17 +134,19 @@
     _telGSLB.text = @"13589645969";
     [view2 addSubview:_telGSLB];
     
-    
     view2.height = _telGSLB.bottom + TOP_SPACE;
     
-    UIButton * payButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    payButton.frame = CGRectMake(scrollView.width - 100, view2.bottom + 5, 80, 30);
-    [payButton setTitle:@"马上支付" forState:UIControlStateNormal];
-    payButton.backgroundColor = MAIN_COLOR;
-    [scrollView addSubview:payButton];
+    scrollView.contentSize = CGSizeMake(scrollView.width, view2.bottom + 10);
+
+    
+//    UIButton * payButton = [UIButton buttonWithType:UIButtonTypeCustom];
+//    payButton.frame = CGRectMake(50, self.view.height - 40, self.view.width - 100, 30);
+//    [payButton setTitle:@"马上支付" forState:UIControlStateNormal];
+//    payButton.layer.backgroundColor = MAIN_COLOR.CGColor;
+//    payButton.layer.cornerRadius = 10;
+//    [self.view addSubview:payButton];
     
     
-    scrollView.contentSize = CGSizeMake(scrollView.width, payButton.bottom + 10);
     
     NSDictionary * jsonDic = @{
                                @"Command":@26,
@@ -189,6 +195,7 @@
         self.leaveLB.text = [NSString stringWithFormat:@"离店时间:%@", [data objectForKey:@"LeaveTime"]];
         self.roomLB.text = [NSString stringWithFormat:@"房型:%@", [data objectForKey:@"RoomType"]];
         self.countLB.text = [NSString stringWithFormat:@"预定房间:%@间", [data objectForKey:@"RoomCount"]];
+        self.payType = [data objectForKey:@"PeyType"];
         if ([[data objectForKey:@"PeyType"] isEqualToNumber:@1]) {
             self.payLB.text = @"支付方式:微信支付";
         }else{
@@ -205,6 +212,18 @@
 - (void)failWithError:(NSError *)error
 {
     NSLog(@"%@", error);
+}
+
+
+- (void)payGSOrder:(UIButton *)button
+{
+    NSDictionary * dic = @{
+                           @"Command":@35,
+                           @"UserId":[UserInfo shareUserInfo].userId,
+                           @"PayType":self.payType,
+                           @"OrderId":self.orderID
+                           };
+    [self playPostWithDictionary:dic];
 }
 
 

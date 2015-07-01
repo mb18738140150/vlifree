@@ -37,6 +37,7 @@
 
 @property (nonatomic, strong)NSMutableArray * classArray;
 @property (nonatomic, strong)NSMutableArray * menusArray;
+@property (nonatomic, strong)NSNumber * mealBoxMoney;//餐盒费
 
 @property (nonatomic, strong)NSMutableArray * shopArray;
 @property (nonatomic, strong)AlertLoginView * alertLoginV;
@@ -130,6 +131,8 @@
     
     self.shoppingCarView = [[ShoppingCartView alloc] initWithFrame:CGRectMake(0, _menusTableView.bottom, self.view.width, SHOPPINGCARVIEW_HEIGHT)];
     _shoppingCarView.backgroundColor = [UIColor whiteColor];
+    _shoppingCarView.priceLabel.text = [NSString stringWithFormat:@"¥0(%@起送)", self.sendPrice];
+    NSLog(@"=====%@", self.sendPrice);
     [_shoppingCarView.shoppingCarBT addTarget:self action:@selector(addShoppingCarDetailsViewAction:) forControlEvents:UIControlEventTouchUpInside];
     [_shoppingCarView.changeButton addTarget:self action:@selector(confirmMenusAction:) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:_shoppingCarView];
@@ -188,6 +191,7 @@
                                    @"ShoppingList":array
                                    };
         [self playPostWithDictionary:jsonDic];
+        [SVProgressHUD showWithStatus:@"正在提交..." maskType:SVProgressHUDMaskTypeBlack];
     }else
     {
         self.alertLoginV = [[AlertLoginView alloc] initWithFrame:[UIScreen mainScreen].bounds];
@@ -206,9 +210,11 @@
 {
     if (self.shopArray.count > 0) {
         self.shoppingCarDetailsView = [[ShoppingDetailsCarView alloc] initWithFrame:[[UIScreen mainScreen] bounds] withMneusArray:self.shopArray];
+        self.shoppingCarDetailsView.mealBoxMoney = self.mealBoxMoney;//这个赋值许在sendPrice前面
         self.shoppingCarDetailsView.sendPrice = self.sendPrice;
         [self.shoppingCarDetailsView.shoppingCarBT addTarget:self action:@selector(removeShoppingCarDetailsViewAction:) forControlEvents:UIControlEventTouchUpInside];
         [_shoppingCarDetailsView.changeBT addTarget:self action:@selector(confirmMenusAction:) forControlEvents:UIControlEventTouchUpInside];
+        [_shoppingCarDetailsView.clearCarBT addTarget:self action:@selector(clearShoppingCar:) forControlEvents:UIControlEventTouchUpInside];
         [self.view.window addSubview:_shoppingCarDetailsView];
     }
 }
@@ -224,7 +230,7 @@
 #pragma mark - 数据请求
 - (void)downloadData
 {
-    
+    [SVProgressHUD showWithStatus:@"加载中..." maskType:SVProgressHUDMaskTypeBlack];
     NSDictionary * jsonDic = @{
                                @"Command":@12,
                                @"StoreId":self.takeOutID
@@ -262,6 +268,8 @@
     NSLog(@"+++%@", data);
     if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
         if ([[data objectForKey:@"Command"] intValue] == 10012) {
+            self.mealBoxMoney = [data objectForKey:@"MealBoxMoney"];
+            NSLog(@"餐具费  %@", self.mealBoxMoney);
             NSArray * array = [data objectForKey:@"CatalogueList"];
             for (int i = 0; i < array.count; i++) {
                 NSDictionary * dic = [array objectAtIndex:i];
@@ -294,8 +302,11 @@
                 [self.menusArray addObject:menuMD];
             }
             [self.menusTableView reloadData];
+//            [SVProgressHUD dismiss];
         }else if ([[data objectForKey:@"Command"] isEqualToNumber:@10009] || [[data objectForKey:@"Command"] isEqualToNumber:@10007]) {
             [[UserInfo shareUserInfo] setValuesForKeysWithDictionary:[data objectForKey:@"UserInfo"]];
+            UITabBarItem * item = [self.navigationController.tabBarController.tabBar.items lastObject];
+            item.title = @"我的";
             if ([[data objectForKey:@"IsFirst"] isEqualToNumber:@YES]) {
                 //                DetailsGrogshopViewController * detailsGSVC = self;
                 WXLoginViewController * wxLoginVC = [[WXLoginViewController alloc] init];
@@ -315,6 +326,8 @@
             orderVC.orderDic = data;
             orderVC.shopArray = self.shopArray;
             orderVC.takeOutId = self.takeOutID;
+            orderVC.storeName = self.storeName;
+            orderVC.mealBoxMoney = self.mealBoxMoney;
             [self.navigationController pushViewController:orderVC animated:YES];
         }
     }else
@@ -423,8 +436,8 @@
 //    if (count == 1) {
 //        self.shoppingCarView.changeButton.enabled = NO;
 //    }
-    double allPrice = 0;
-//    NSLog(@"/// %@, %@", self.shopArray, [self.shopArray firstObject]);
+//    double allPrice = 0;
+////    NSLog(@"/// %@, %@", self.shopArray, [self.shopArray firstObject]);
     for (int i = 0; i < self.shopArray.count; i++) {
         NSMutableArray * ary = [self.shopArray objectAtIndex:i];
         MenuModel * menuMD1 = [ary firstObject];
@@ -435,17 +448,18 @@
             [self.shopArray removeObject:ary];
             continue;
         }
-        for (MenuModel * menuMD2 in ary) {
-            allPrice += [menuMD2.price doubleValue];
-        }
+//        for (MenuModel * menuMD2 in ary) {
+//            allPrice += [menuMD2.price doubleValue];
+//        }
     }
     NSLog(@"-- shop = %@", self.shopArray);
-    if (allPrice < [self.sendPrice doubleValue]) {
-        self.shoppingCarView.changeButton.enabled = NO;
-    }
-    
-    self.shoppingCarView.priceLabel.text = [NSString stringWithFormat:@"¥%g元", allPrice];
-    self.shoppingCarView.countLabel.text = [NSString stringWithFormat:@"%ld", [self.shoppingCarView.countLabel.text integerValue] - 1];
+    [self getAllPrice];
+    [self getAllCount];
+//    if (allPrice < [self.sendPrice doubleValue]) {
+//        self.shoppingCarView.changeButton.enabled = NO;
+//    }
+//    self.shoppingCarView.priceLabel.text = [NSString stringWithFormat:@"¥%g(%@起送)", allPrice, self.sendPrice];
+//    self.shoppingCarView.countLabel.text = [NSString stringWithFormat:@"%ld", [self.shoppingCarView.countLabel.text integerValue] - 1];
 }
 
 - (void)addMenuCount:(UIButton *)button
@@ -464,7 +478,7 @@
         if ([menuMD.price doubleValue] > [self.sendPrice doubleValue] || [menuMD.price doubleValue] == [self.sendPrice doubleValue]) {
             self.shoppingCarView.changeButton.enabled = YES;
         }
-        self.shoppingCarView.priceLabel.text = [NSString stringWithFormat:@"¥%@元", menuMD.price];
+//        self.shoppingCarView.priceLabel.text = [NSString stringWithFormat:@"¥%g(%@起送)", menuMD.price.doubleValue + self.mealBoxMoney.doubleValue, self.sendPrice];
     }else
     {
         BOOL have = NO;
@@ -480,8 +494,8 @@
             [smallAry addObject:menuMD];
             [self.shopArray addObject:smallAry];
         }
-        [self getAllPrice];
     }
+    [self getAllPrice];
     NSLog(@"shop = %@", self.shopArray);
     CGRect cellFrame = [self.menusTableView rectForRowAtIndexPath:[NSIndexPath indexPathForRow:button.tag - ADD_BUTTON_TAG inSection:0]];
     CGRect btFrame = button.frame;
@@ -491,7 +505,19 @@
     
 }
 
-- (void)getAllPrice
+- (void)clearShoppingCar:(UIButton *)button
+{
+    for (NSMutableArray * array in self.shopArray) {
+        MenuModel * menuMD = [array firstObject];
+        menuMD.count = 0;
+    }
+    [self.shopArray removeAllObjects];
+    [self.shoppingCarDetailsView removeFromSuperview];
+    [self getAllCount];
+    [self getAllPrice];
+}
+
+- (NSInteger)getAllPrice
 {
     double allPrice = 0;
     for (NSMutableArray * smallAry in self.shopArray) {
@@ -499,23 +525,26 @@
             allPrice += [menuMD1.price doubleValue];
         }
     }
-    if (allPrice < [self.sendPrice doubleValue]) {
+    if (allPrice < [self.sendPrice doubleValue] || [self getAllCount] == 0) {
         self.shoppingCarView.changeButton.enabled = NO;
     }else
     {
         self.shoppingCarView.changeButton.enabled = YES;
     }
-    self.shoppingCarView.priceLabel.text = [NSString stringWithFormat:@"¥%g元", allPrice];
+//    allPrice += self.mealBoxMoney.doubleValue * [self getAllCount] + self.outSentMoney.doubleValue;
+    self.shoppingCarView.priceLabel.text = [NSString stringWithFormat:@"¥%g(¥%@起送)", allPrice, self.sendPrice];
+    return allPrice;
 }
 
 
-- (void)getAllCount
+- (NSInteger)getAllCount
 {
     NSInteger allCount = 0;
     for (NSMutableArray * smallAry in self.shopArray) {
         allCount += smallAry.count;
     }
     self.shoppingCarView.countLabel.text = [NSString stringWithFormat:@"%ld", allCount];
+    return allCount;
 }
 
 - (void)countLBAnimateWithFromeFrame:(CGRect)frame
@@ -566,6 +595,7 @@
     NSLog(@"微信登陆");
     if ([[NSUserDefaults standardUserDefaults] objectForKey:@"refresh_token"]) {
         if ([self compareDate]) {
+            [SVProgressHUD showWithStatus:@"登录中..." maskType:SVProgressHUDMaskTypeBlack];
             [self avoidweixinAuthorizeLogIn];
         }else
         {
@@ -655,10 +685,22 @@
                                                    };
                         [self playPostWithDictionary:jsonDic];
                         [SVProgressHUD showWithStatus:@"登录中..." maskType:SVProgressHUDMaskTypeBlack];
+                    }else
+                    {
+                        [SVProgressHUD dismiss];
                     }
+                }else
+                {
+                    [SVProgressHUD dismiss];
                 }
             }
+        }else
+        {
+            [SVProgressHUD dismiss];
         }
+    }else
+    {
+        [SVProgressHUD dismiss];
     }
 }
 

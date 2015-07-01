@@ -23,7 +23,7 @@
 @property (nonatomic, strong)NSNumber * isFirstOrder;
 @property (nonatomic, strong)NSNumber * isFull;
 @property (nonatomic, strong)NSNumber * mealBoxMoney;
-@property (nonatomic, strong)NSMutableArray * ActivityArray;
+@property (nonatomic, strong)NSMutableArray * activityArray;
 
 - (id)initWithDictionary:(NSDictionary *)dic;
 

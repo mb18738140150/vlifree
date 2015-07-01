@@ -20,7 +20,7 @@
 #define TOP_SPACE 10
 
 #define OTHER_LABEL_WIDTH 80
-#define PRICE_LABEL_WIDTH 80
+#define PRICE_LABEL_WIDTH 150
 #define PRICE_LABEL_HEIGHT 25
 #define LABEL_HEIGHT 20
 #define CHANGE_BUTTON_WIDTH 80
@@ -38,7 +38,6 @@
 @interface ShoppingDetailsCarView ()
 
 @property (nonatomic, strong)UILabel * otherPriceLB;
-@property (nonatomic, strong)UIButton * clearCarBT;
 @property (nonatomic, strong)UILabel * priceLabel;
 @property (nonatomic, strong)UILabel * countLabel;
 
@@ -133,6 +132,7 @@
     _clearCarBT.frame = CGRectMake(otherView.width - LEFT_SPACE - CLEAR_BUTTON_WIDTH, _otherPriceLB.top, CLEAR_BUTTON_WIDTH, LABEL_HEIGHT);
     [_clearCarBT setTitle:@"清空购物车" forState:UIControlStateNormal];
     [_clearCarBT setTitleColor:[UIColor colorWithWhite:0.6 alpha:1] forState:UIControlStateNormal];
+//    [_clearCarBT addTarget:self action:@selector(clearShoppingCar:) forControlEvents:UIControlEventTouchUpInside];
     [otherView addSubview:_clearCarBT];
     [self addSubview:otherView];
     
@@ -165,7 +165,7 @@
     [smallAry addObject:menu];
     ShoppingMenuView * menuView = (ShoppingMenuView *)button.superview;
     menuView.countLabel.text = [NSString stringWithFormat:@"%ld", smallAry.count];
-    self.priceLabel.text = [NSString stringWithFormat:@"¥%g", [self getAllPrice]];
+    self.priceLabel.text = [NSString stringWithFormat:@"¥%g(%@起送)", [self getAllPrice], self.sendPrice];
     self.countLabel.text = [NSString stringWithFormat:@"¥%ld", [self getAllCount]];
 }
 
@@ -177,7 +177,7 @@
     [smallAry removeLastObject];
     ShoppingMenuView * menuView = (ShoppingMenuView *)button.superview;
     menuView.countLabel.text = [NSString stringWithFormat:@"%ld", smallAry.count];
-    self.priceLabel.text = [NSString stringWithFormat:@"¥%g", [self getAllPrice]];
+    self.priceLabel.text = [NSString stringWithFormat:@"¥%g(%@起送)", [self getAllPrice], self.sendPrice];
     self.countLabel.text = [NSString stringWithFormat:@"¥%ld", [self getAllCount]];
     if (smallAry.count == 0) {
         UIView * view = [self viewWithTag:1000];
@@ -211,11 +211,14 @@
         MenuModel * menu = [ary firstObject];
         allPrice += [menu.price doubleValue] * ary.count;
     }
-    if (allPrice < [self.sendPrice doubleValue]) {
+    if (allPrice < [self.sendPrice doubleValue] || [self getAllCount] == 0) {
         self.changeBT.enabled = NO;
     }else
     {
         self.changeBT.enabled = YES;
+    }
+    if (self.mealBoxMoney) {
+//        allPrice += [self getAllCount] * self.mealBoxMoney.doubleValue;
     }
     return allPrice;
 }
@@ -228,12 +231,20 @@
         NSMutableArray * ary = [self.menusArray objectAtIndex:i];
         allCount += ary.count;
     }
+    self.otherPriceLB.text = [NSString stringWithFormat:@"餐具费¥%g", self.mealBoxMoney.doubleValue * allCount];
     return allCount;
 }
 
 - (void)setSendPrice:(NSNumber *)sendPrice
 {
     _sendPrice = sendPrice;
+    self.priceLabel.text = [NSString stringWithFormat:@"¥%g(%@起送)", [self getAllPrice], sendPrice];
+}
+
+- (void)setMealBoxMoney:(NSNumber *)mealBoxMoney
+{
+    _mealBoxMoney = mealBoxMoney;
+    self.otherPriceLB.text = [NSString stringWithFormat:@"餐具费¥%@", mealBoxMoney];
     [self getAllPrice];
 }
 
@@ -241,6 +252,8 @@
 {
     [self removeFromSuperview];
 }
+
+
 
 
 - (void)dealloc

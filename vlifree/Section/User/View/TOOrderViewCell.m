@@ -94,7 +94,7 @@
     _takeOutOrderMD = takeOutOrderMD;
     __weak TOOrderViewCell * cell = self;
     [self.iconView setImageWithURL:[NSURL URLWithString:takeOutOrderMD.storeIcon] placeholderImage:[UIImage imageNamed:@"placeholderIM.png"] completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType) {
-        if (error != nil || image == nil) {
+        if (error != nil) {
             cell.iconView.image = [UIImage imageNamed:@"load_fail.png"];
         }
     }];

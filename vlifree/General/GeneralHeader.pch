@@ -29,6 +29,19 @@
 
 #define MAIN_COLOR [UIColor colorWithRed:251 / 250.0 green:51 / 250.0 blue:46 / 250.0 alpha:1]
 
+#pragma mark -- 系统和设备区分
+#define ios7 ([[UIDevice currentDevice].systemVersion doubleValue] >= 7.0)
+#define ios8 ([[UIDevice currentDevice].systemVersion doubleValue] >= 8.0)
+#define ios6 ([[UIDevice currentDevice].systemVersion doubleValue] >= 6.0 && [[UIDevice currentDevice].systemVersion doubleValue] < 7.0)
+#define ios5 ([[UIDevice currentDevice].systemVersion doubleValue] < 6.0)
+#define iphone5  ([UIScreen mainScreen].bounds.size.height == 568)
+#define iphone6  ([UIScreen mainScreen].bounds.size.height == 667)
+#define iphone6Plus  ([UIScreen mainScreen].bounds.size.height == 736)
+#define iphone4  ([UIScreen mainScreen].bounds.size.height == 480)
+#define ipadMini2  ([UIScreen mainScreen].bounds.size.height == 1024)
+
+
+
 #ifndef vlifree_GeneralHeader_pch
 #define vlifree_GeneralHeader_pch
 

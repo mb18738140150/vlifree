@@ -42,6 +42,7 @@
 
 @property (nonatomic, strong)PayTypeView * weixinView;
 @property (nonatomic, strong)PayTypeView * baiduView;
+@property (nonatomic, strong)PayTypeView * candaoView;
 
 @property (nonatomic, strong)UILabel * addressLB;
 @property (nonatomic, strong)UILabel * phoneLable;
@@ -60,9 +61,9 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    self.view.backgroundColor = [UIColor colorWithWhite:0.9 alpha:0.9];
     
-    
-    UIScrollView * scrollView = [[UIScrollView alloc] initWithFrame:self.view.bounds];
+    UIScrollView * scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, self.view.height - 40 - 2 * TOP_SPACE)];
     scrollView.backgroundColor = [UIColor colorWithWhite:0.9 alpha:0.9];
     scrollView.tag = 10001;
     [self.view addSubview:scrollView];
@@ -114,15 +115,16 @@
     [menusView addSubview:lineView2];
     
     double allMoney = 0;
-    
+    NSInteger allCount = 0;
     for (int i = 0; i < self.shopArray.count; i++) {
         NSMutableArray * array = [self.shopArray objectAtIndex:i];
         MenuModel * menuMD = [array firstObject];
         allMoney += menuMD.price.doubleValue * array.count;
+        allCount += array.count;
         OrderMenuVIew * orderMenuV = [[OrderMenuVIew alloc] initWithFrame:CGRectMake(0, lineView2.bottom + i * ORDER_MENU_VIEW_HEIGHT, menusView.width, ORDER_MENU_VIEW_HEIGHT)];
         orderMenuV.menuNameLB.text = menuMD.name;
         orderMenuV.countLabel.text = [NSString stringWithFormat:@"%d份", menuMD.count];
-        orderMenuV.priceLabel.text = [NSString stringWithFormat:@"¥%g", menuMD.price.doubleValue * array.count];
+        orderMenuV.priceLabel.text = [NSString stringWithFormat:@"+%g", menuMD.price.doubleValue * array.count];
         [menusView addSubview:orderMenuV];
     }
     _allMoney = allMoney;
@@ -133,21 +135,31 @@
     UILabel * firstOrderLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, lineView3.bottom, 80, LABEL_HEIGHT)];
     firstOrderLB.text = @"首单减免";
     UILabel * firstPriceLB = [[UILabel alloc] initWithFrame:CGRectMake(menusView.width - 50 - LEFT_SPACE, lineView3.bottom, 50, LABEL_HEIGHT)];
-    firstPriceLB.text = [NSString stringWithFormat:@"¥%@", [self.orderDic objectForKey:@"FirstReduce"]];
+    firstPriceLB.text = [NSString stringWithFormat:@"-%@", [self.orderDic objectForKey:@"FirstReduce"]];
     
     UILabel * fullOrderLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, lineView3.bottom, 80, LABEL_HEIGHT)];
     fullOrderLB.text = @"满单减免";
     UILabel * fullPriceLB = [[UILabel alloc] initWithFrame:CGRectMake(menusView.width - 50 - LEFT_SPACE, lineView3.bottom, 50, LABEL_HEIGHT)];
-    fullPriceLB.text = [NSString stringWithFormat:@"¥%@", [self.orderDic objectForKey:@"FullReduce"]];
+    fullPriceLB.text = [NSString stringWithFormat:@"-%@", [self.orderDic objectForKey:@"FullReduce"]];
+    
+    UILabel * mealBoxLabel = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, lineView3.bottom, 80, LABEL_HEIGHT)];
+    mealBoxLabel.text = @"餐具费";
+    [menusView addSubview:mealBoxLabel];
+    
+    UILabel * mealBoxPriceLB = [[UILabel alloc] initWithFrame:CGRectMake(menusView.width - 50 - LEFT_SPACE, lineView3.bottom, 50, LABEL_HEIGHT)];
+    mealBoxPriceLB.text = [NSString stringWithFormat:@"+%g", self.mealBoxMoney.doubleValue * allCount];
+    [menusView addSubview:mealBoxPriceLB];
+    
+    allMoney += self.mealBoxMoney.doubleValue * allCount;
     
     UILabel * deliveryLabel = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, lineView3.bottom, 80, LABEL_HEIGHT)];
     deliveryLabel.text = @"配送费";
     [menusView addSubview:deliveryLabel];
     
     UILabel * deliveryPriceLB = [[UILabel alloc] initWithFrame:CGRectMake(menusView.width - 50 - LEFT_SPACE, lineView3.bottom, 50, LABEL_HEIGHT)];
-    deliveryPriceLB.text = [NSString stringWithFormat:@"¥%@", [self.orderDic objectForKey:@"DeliveryFee"]];
+    deliveryPriceLB.text = [NSString stringWithFormat:@"+%@", [self.orderDic objectForKey:@"DeliveryFee"]];
     [menusView addSubview:deliveryPriceLB];
-    
+    allMoney += [[self.orderDic objectForKey:@"DeliveryFee"] doubleValue];
     
     UILabel * totalLabel = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, deliveryLabel.bottom, 80, LABEL_HEIGHT)];
     totalLabel.text = @"合计";
@@ -162,8 +174,10 @@
         [menusView addSubview:firstPriceLB];
         fullOrderLB.top = firstPriceLB.bottom;
         fullPriceLB.top = fullOrderLB.top;
-        deliveryLabel.top = firstOrderLB.bottom;
-        deliveryPriceLB.top = firstOrderLB.bottom;
+        mealBoxLabel.top = firstOrderLB.bottom;
+        mealBoxPriceLB.top = firstOrderLB.bottom;
+        deliveryLabel.top = mealBoxLabel.bottom;
+        deliveryPriceLB.top = mealBoxLabel.bottom;
         totalLabel.top = deliveryLabel.bottom;
         allPriceLB.top = deliveryLabel.bottom;
         NSNumber * firstPrice = [self.orderDic objectForKey:@"FirstReduce"];
@@ -173,8 +187,10 @@
     if ([[self.orderDic objectForKey:@"IsFull"] isEqualToNumber:@YES]) {
         [menusView addSubview:fullOrderLB];
         [menusView addSubview:fullOrderLB];
-        deliveryLabel.top = fullOrderLB.bottom;
-        deliveryPriceLB.top = fullOrderLB.bottom;
+        mealBoxLabel.top = fullOrderLB.bottom;
+        mealBoxLabel.top = fullOrderLB.bottom;
+        deliveryLabel.top = mealBoxLabel.bottom;
+        deliveryPriceLB.top = mealBoxLabel.bottom;
         totalLabel.top = deliveryLabel.bottom;
         allPriceLB.top = deliveryLabel.bottom;
         NSNumber * fullPrice = [self.orderDic objectForKey:@"FullReduce"];
@@ -182,10 +198,11 @@
     }
     _totalMoney = allMoney;
     allPriceLB.text = [NSString stringWithFormat:@"¥%g", allMoney];
-
-    CGRect frame = menusView.frame;
-    frame.size.height = allPriceLB.bottom + TOP_SPACE;
-    menusView.frame = frame;
+    menusView.height = allPriceLB.bottom + TOP_SPACE;
+//    CGRect frame = menusView.frame;
+//    frame.size.height = allPriceLB.bottom + TOP_SPACE;
+//    menusView.frame = frame;
+    
     UIView * lineView4 = [[UIView alloc] initWithFrame:CGRectMake(0, menusView.bottom, scrollView.width, 1)];
     lineView4.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
     [scrollView addSubview:lineView4];
@@ -230,7 +247,7 @@
     
     
     UILabel * payLabel = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, 0, payView.width - 2 * LEFT_SPACE, LABEL_HEIGHT)];
-    payLabel.text = @"在线支付";
+    payLabel.text = @"支付方式";
     payLabel.textColor = remarksLB.textColor;
     [payView addSubview:payLabel];
     
@@ -252,18 +269,25 @@
     [_baiduView.changeButton addTarget:self action:@selector(changePayType:) forControlEvents:UIControlEventTouchUpInside];
     [payView addSubview:_baiduView];
     
+    self.candaoView = [[PayTypeView alloc] initWithFrame:CGRectMake(0, _baiduView.bottom, payView.width, _baiduView.height)];
+    _candaoView.iconView.image = [UIImage imageNamed:@"delivery.png"];
+    _candaoView.titleLabel.text = @"百度钱包";
+    [_candaoView.changeButton addTarget:self action:@selector(changePayType:) forControlEvents:UIControlEventTouchUpInside];
+    [payView addSubview:_candaoView];
+    payView.height = _candaoView.bottom;
+    
     UIView * lineView10 = [[UIView alloc] initWithFrame:CGRectMake(0, payView.bottom, payView.width, 1)];
     lineView10.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
     [scrollView addSubview:lineView10];
     UIButton * confirmBT = [UIButton buttonWithType:UIButtonTypeCustom];
-    confirmBT.frame = CGRectMake(LEFT_SPACE, lineView10.bottom + TOP_SPACE, scrollView.width - 2 * LEFT_SPACE, 40);
+    confirmBT.frame = CGRectMake(LEFT_SPACE, self.view.height - TOP_SPACE - 40, self.view.width - 2 * LEFT_SPACE, 40);
     confirmBT.backgroundColor = MAIN_COLOR;
     [confirmBT setTitle:@"确认支付" forState:UIControlStateNormal];
     [confirmBT setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     [confirmBT addTarget:self action:@selector(confirmOrderAndPayType:) forControlEvents:UIControlEventTouchUpInside];
-    [scrollView addSubview:confirmBT];
+    [self.view addSubview:confirmBT];
     
-    scrollView.contentSize = CGSizeMake(scrollView.width, confirmBT.bottom + TOP_SPACE);
+    scrollView.contentSize = CGSizeMake(scrollView.width, lineView10.bottom);
     
     _payType = 1;
     
@@ -272,7 +296,7 @@
     [backBT setBackgroundImage:[UIImage imageNamed:@"back_r.png"] forState:UIControlStateNormal];
     [backBT addTarget:self action:@selector(backLastVC:) forControlEvents:UIControlEventTouchUpInside];
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:backBT];
-#pragma mark - 微信注册app_id
+//#pragma mark - 微信注册app_id
 //    [WXApi registerApp:@"wxaac5e5f7421e84ac"];
     // Do any additional setup after loading the view.
 }
@@ -289,13 +313,20 @@
     }
     if ([button isEqual:self.weixinView.changeButton]) {
         self.baiduView.changeButton.selected = NO;
+        self.candaoView.changeButton.selected = NO;
         _payType = 1;
 //        NSLog(@"微信");
     }else if ([button isEqual:self.baiduView.changeButton])
     {
         self.weixinView.changeButton.selected = NO;
+        self.candaoView.changeButton.selected = NO;
         _payType = 2;
 //        NSLog(@"百度");
+    }else if ([button isEqual:self.candaoView.changeButton])
+    {
+        self.baiduView.changeButton.selected = NO;
+        self.weixinView.changeButton.selected = NO;
+        _payType = 3;
     }
     button.selected = !button.selected;
 }
@@ -389,7 +420,7 @@
     }
 }
 
-
+#pragma mark - 数据请求
 - (void)playPostWithDictionary:(NSDictionary *)dic
 {
     NSString * jsonStr = [dic JSONString];
@@ -409,8 +440,8 @@
     [SVProgressHUD dismiss];
     if ([[data objectForKey:@"Result"] isEqualToNumber:@1])
     {
-        NSString * ordorId = [data objectForKey:@"WakeOutOrder"];
-        if (ordorId.length == 0) {
+        NSNumber * payType = [data objectForKey:@"PayType"];
+        if ([payType isEqualToNumber:@1]) {
             NSMutableDictionary *signParams = [NSMutableDictionary dictionary];
             [signParams setObject: [NSString stringWithFormat:@"%@", [data objectForKey:@"AppId"]]       forKey:@"appid"];
             [signParams setObject: [NSString stringWithFormat:@"%@", [data objectForKey:@"NonceStr"]]    forKey:@"noncestr"];
@@ -421,18 +452,35 @@
             
             //            NSString * sign = [self createMd5Sign:signParams];
             NSNumber * stamp = [data objectForKey:@"TimeStamp"];
-            //调起微信支付
-            PayReq* req             = [[PayReq alloc] init];
-            req.openID              =  [NSString stringWithFormat:@"%@", [data objectForKey:@"AppId"]];
-            req.partnerId           = [NSString stringWithFormat:@"%@", [data objectForKey:@"PartnerId"]];
-            req.prepayId            = [NSString stringWithFormat:@"%@", [data objectForKey:@"PrepayId"]];
-            req.nonceStr            = [NSString stringWithFormat:@"%@", [data objectForKey:@"NonceStr"]];
-            req.timeStamp           = stamp.intValue;
-            req.package             = [NSString stringWithFormat:@"%@", [data objectForKey:@"Package"]];
-            req.sign                = [NSString stringWithFormat:@"%@", [data objectForKey:@"Sign"]];
-            //            req.sign = sign;
-            BOOL a = [WXApi sendReq:req];
-            NSLog(@"%d", a);
+            if ([WXApi isWXAppInstalled] && [WXApi isWXAppSupportApi]) {
+                //调起微信支付
+                PayReq* req             = [[PayReq alloc] init];
+                req.openID              =  [NSString stringWithFormat:@"%@", [data objectForKey:@"AppId"]];
+                req.partnerId           = [NSString stringWithFormat:@"%@", [data objectForKey:@"PartnerId"]];
+                req.prepayId            = [NSString stringWithFormat:@"%@", [data objectForKey:@"PrepayId"]];
+                req.nonceStr            = [NSString stringWithFormat:@"%@", [data objectForKey:@"NonceStr"]];
+                req.timeStamp           = stamp.intValue;
+                req.package             = [NSString stringWithFormat:@"%@", [data objectForKey:@"Package"]];
+                req.sign                = [NSString stringWithFormat:@"%@", [data objectForKey:@"Sign"]];
+                //            req.sign = sign;
+                BOOL a = [WXApi sendReq:req];
+                NSLog(@"%d", a);
+            }else if([WXApi isWXAppInstalled] == NO)
+            {
+                UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:@"你的设备还没安装微信,请先安装微信" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
+                [alert show];
+                [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:2];
+            }else if([WXApi isWXAppSupportApi] == NO)
+            {
+                UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:@"你的微信版本不支持,请更新微信" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
+                [alert show];
+                [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:2];
+            }
+        }else if ([payType isEqualToNumber:@2])
+        {
+            BDWalletSDKMainManager* payMainManager = [BDWalletSDKMainManager getInstance];
+            NSString *orderInfo = [self buildOrderInfoWithOrderID:[data objectForKey:@"WakeOutOrder"]];
+            [payMainManager doPayWithOrderInfo:orderInfo params:nil delegate:self];
         }else
         {
             
@@ -478,6 +526,75 @@
 /*
  此处生成的订单OrderInfo为测试专用，请接入的商户兄弟使用自己的订单，并且是按首字母排序的
  */
+-(NSString*)buildOrderInfoWithOrderID:(NSString *)orderId
+{
+    int money = (int)(_totalMoney * 100);
+    NSMutableString *str = [[NSMutableString alloc]init];
+    
+    static NSString *spNo = @"1000011124";
+    static NSString *key = @"vwD28fhc8p4cQzFjnfLaJRSvHFrsCBa7";
+    NSDateFormatter * dateFM = [[NSDateFormatter alloc] init];
+    [dateFM setDateFormat:@"yyyyMMddHHmmss"];
+    NSString * dateString = [dateFM stringFromDate:[NSDate date]];
+    NSLog(@"11111--%@", dateString);
+    /*
+     如有中文相关，步骤一 GBK ；步骤二 MD5 GBK ； 步骤三 URLEncode GBK
+     详见以下注释
+     */
+    //    NSString *orderId = [NSString stringWithFormat:@"z2015052713275609521156"];
+    [str appendString:@"currency=1&extra=ios123"];
+    [str appendString:@"&goods_desc="];
+    [str appendString:[self utf8toGbk:self.storeName]];
+    [str appendString:@"&goods_name="];
+    [str appendString:[self utf8toGbk:self.storeName]]; // 中文处理1
+    [str appendString:@"&input_charset=1&order_create_time="];//下单时间
+    [str appendString:dateString];//订单生产时间
+    [str appendString:@"&order_no="];
+    [str appendString:orderId];
+    [str appendString:@"&pay_type=2"];
+    [str appendString:@"&return_url=http://wap.vlifee.com/NotifyUrl.aspx&service_code=1&sign_method=1&sp_no="];
+    [str appendString:spNo];
+    [str appendString:@"&sp_request_type="];
+    [str appendString:@"0"];//收银类型
+    [str appendString:@"&sp_uno="];
+    [str appendString:[NSString stringWithFormat:@"%@", [UserInfo shareUserInfo].userId]];//用户的id(用来绑定快捷支付)
+    [str appendString:@"&total_amount="];
+    [str appendString:[NSString stringWithFormat:@"%d", money]];//总金额(以分为单位)
+    [str appendString:@"&transport_amount=0&unit_amount="];
+    [str appendString:[NSString stringWithFormat:@"%d", money]];//商品单价(以分为单位)
+    [str appendString:@"&unit_count=1&version=2"];//商品数量
+    
+    NSString *md5CapPwd = [self mD5GBK:[NSString stringWithFormat:@"%@&key=%@" , str, key]]; // 中文处理2
+    
+    NSMutableString *str1 = [[NSMutableString alloc]init];
+    
+    [str1 appendString:@"currency=1&extra=ios123"];
+    [str1 appendString:@"&goods_desc="];
+    [str1 appendString:[self encodeURL:[self utf8toGbk:self.storeName]]];
+    [str1 appendString:@"&goods_name="];
+    [str1 appendString:[self encodeURL:[self utf8toGbk:self.storeName]]]; // 中文处理3
+    [str1 appendString:@"&input_charset=1&order_create_time="];//下单时间
+    [str1 appendString:dateString];//订单生产时间
+    [str1 appendString:@"&order_no="];
+    [str1 appendString:orderId];
+    [str1 appendString:@"&pay_type=2"];
+    [str1 appendString:@"&return_url=http://wap.vlifee.com/NotifyUrl.aspx&service_code=1&sign_method=1&sp_no="];
+    [str1 appendString:spNo];
+    [str1 appendString:@"&sp_request_type="];
+    [str1 appendString:@"0"];//收银类型
+    [str1 appendString:@"&sp_uno="];
+    [str1 appendString:[NSString stringWithFormat:@"%@", [UserInfo shareUserInfo].userId]];//用户的id(用来绑定快捷支付)
+    [str1 appendString:@"&total_amount="];
+    [str1 appendString:[NSString stringWithFormat:@"%d", money]];//总金额(以分为单位)
+    [str1 appendString:@"&transport_amount=0&unit_amount="];
+    [str1 appendString:[NSString stringWithFormat:@"%d", money]];//商品单价(以分为单位)
+    [str1 appendString:@"&unit_count=1&version=2"];//商品数量
+    NSLog(@"%@", str);
+    //    NSLog(@"+++%@", [NSString stringWithFormat:@"%@&sign=%@" , str1 , md5CapPwd]);
+    return [NSString stringWithFormat:@"%@&sign=%@" , str1, md5CapPwd];
+}
+
+
 -(NSString*)buildOrderInfoTest
 {
     NSMutableString *str = [[NSMutableString alloc]init];

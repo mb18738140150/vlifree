@@ -10,11 +10,14 @@
 
 @interface TakeOutOrderViewController : UIViewController
 
+@property (nonatomic, copy)NSString * storeName;
 
 @property (nonatomic, copy)NSDictionary * orderDic;
 
 @property (nonatomic, strong)NSMutableArray * shopArray;
 
 @property (nonatomic, strong)NSNumber * takeOutId;
+
+@property (nonatomic, strong)NSNumber * mealBoxMoney;
 
 @end

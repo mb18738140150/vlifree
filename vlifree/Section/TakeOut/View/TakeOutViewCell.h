@@ -16,7 +16,8 @@
 @property (nonatomic, strong)TakeOutModel * takeOutModel;
 
 
-- (void)createSubview:(CGRect)frame;
+
+- (void)createSubview:(CGRect)frame activityCount:(int)count;
 + (CGFloat)cellHeightWithTakeOutModel:(TakeOutModel *)takeOutModel;
 
 

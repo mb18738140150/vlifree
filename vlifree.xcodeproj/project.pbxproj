@@ -237,6 +237,7 @@
 		7363600A1B12C71900EE8F56 /* MGSwipeButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 736360071B12C71900EE8F56 /* MGSwipeButton.m */; };
 		7363600B1B12C71900EE8F56 /* MGSwipeTableCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 736360091B12C71900EE8F56 /* MGSwipeTableCell.m */; };
 		736556151B423158009BE98A /* ActivityReduce.m in Sources */ = {isa = PBXBuildFile; fileRef = 736556141B423158009BE98A /* ActivityReduce.m */; };
+		736556171B42A00A009BE98A /* delivery.png in Resources */ = {isa = PBXBuildFile; fileRef = 736556161B42A00A009BE98A /* delivery.png */; };
 		7368445E1B3B9D5D00E486AC /* AlertLoginView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7368445D1B3B9D5D00E486AC /* AlertLoginView.m */; };
 		736BB81E1B1E9DF100F03419 /* back_r.png in Resources */ = {isa = PBXBuildFile; fileRef = 736BB81C1B1E9DF100F03419 /* back_r.png */; };
 		736BB81F1B1E9DF100F03419 /* back_w.png in Resources */ = {isa = PBXBuildFile; fileRef = 736BB81D1B1E9DF100F03419 /* back_w.png */; };
@@ -697,6 +698,7 @@
 		736360091B12C71900EE8F56 /* MGSwipeTableCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGSwipeTableCell.m; sourceTree = "<group>"; };
 		736556131B423158009BE98A /* ActivityReduce.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ActivityReduce.h; sourceTree = "<group>"; };
 		736556141B423158009BE98A /* ActivityReduce.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ActivityReduce.m; sourceTree = "<group>"; };
+		736556161B42A00A009BE98A /* delivery.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = delivery.png; sourceTree = "<group>"; };
 		7368445C1B3B9D5D00E486AC /* AlertLoginView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlertLoginView.h; sourceTree = "<group>"; };
 		7368445D1B3B9D5D00E486AC /* AlertLoginView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlertLoginView.m; sourceTree = "<group>"; };
 		736BB81C1B1E9DF100F03419 /* back_r.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = back_r.png; sourceTree = "<group>"; };
@@ -982,6 +984,7 @@
 		733819521B0ACE0200E9F8AD /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				736556161B42A00A009BE98A /* delivery.png */,
 				7356C0E41B40DDFB00D24B41 /* change_d.png */,
 				7356C0E51B40DDFB00D24B41 /* change_n.png */,
 				7356C0E21B40DD9000D24B41 /* load_fail.png */,
@@ -1753,6 +1756,7 @@
 				735908661B33F69E005143E4 /* IQKeyboardManager.bundle in Resources */,
 				734BDFFE1B0EFCA8003E2A22 /* food_on.png in Resources */,
 				7324922F1B1836CB00CC5B6C /* weixinzhifu.png in Resources */,
+				736556171B42A00A009BE98A /* delivery.png in Resources */,
 				733819381B0ACB1E00E9F8AD /* LaunchScreen.xib in Resources */,
 				734BDFFF1B0EFCA8003E2A22 /* food_on@2x.png in Resources */,
 				735857B21B394AD80005F5AF /* jian.png in Resources */,

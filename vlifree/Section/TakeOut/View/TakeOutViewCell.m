@@ -40,8 +40,9 @@
 @implementation TakeOutViewCell
 
 
-- (void)createSubview:(CGRect)frame
+- (void)createSubview:(CGRect)frame activityCount:(int)count
 {
+//    [self.contentView removeAllSubviews];
     if (!_icon) {
         self.icon = [[UIImageView alloc] initWithFrame:CGRectMake(LEFT_SPACE, TOP_SPACE, IMAGE_SIZE, IMAGE_SIZE)];
         _icon.layer.cornerRadius = 10;
@@ -93,12 +94,26 @@
         _addressLabel.textColor = LABEL_TEXTCOLOR;
         _addressLabel.backgroundColor = LABEL_COLOR;
         [self.contentView addSubview:_addressLabel];
+    /*
+    for (int i = 0; i < count; i++) {
+        UIImageView * activityIcon = [[UIImageView alloc] initWithFrame:CGRectMake(_addressLabel.left, _addressLabel.bottom + _addressLabel.height * i + 3, _addressLabel.height - 6, _addressLabel.height - 6)];
+        activityIcon.tag = 2000 + i;
+        [self.contentView addSubview:activityIcon];
+        UILabel * activityLB = [[UILabel alloc] initWithFrame:CGRectMake(activityIcon.right + 3, activityIcon.top, _addressLabel.width - activityIcon.width - 3, activityIcon.height)];
+        activityLB.tag = 3000 + i;
+        activityLB.font = [UIFont systemFontOfSize:13];
+        [self.contentView addSubview:activityLB];
+    }
+    */
+    
+        
         self.firstOrderV = [[UIView alloc] initWithFrame:CGRectMake(_addressLabel.left, _addressLabel.bottom, _addressLabel.width, _addressLabel.height)];
         UIImageView * firstIM = [[UIImageView alloc] initWithFrame:CGRectMake(0, 3, _firstOrderV.height - 6, _firstOrderV.height - 6)];
         firstIM.image = [UIImage imageNamed:@"shou.png"];
         [_firstOrderV addSubview:firstIM];
         UILabel * firstLB = [[UILabel alloc] initWithFrame:CGRectMake(firstIM.right + 3, firstIM.top, _firstOrderV.width - 6 - firstIM.right, firstIM.height)];
         firstLB.text = @"首单减免";
+        firstLB.tag = 2000;
         firstLB.textColor = [UIColor colorWithWhite:0.7 alpha:1];
         firstLB.font = [UIFont systemFontOfSize:13];
         [_firstOrderV addSubview:firstLB];
@@ -110,6 +125,8 @@
         [_fullOrderV addSubview:fullIM];
         UILabel * fullLB = [[UILabel alloc] initWithFrame:CGRectMake(firstIM.right + 3, firstIM.top, _fullOrderV.width - 6 - firstIM.right, firstIM.height)];
         fullLB.text = @"满单减免";
+        fullLB.tag = 3000;
+        fullLB.numberOfLines = 0;
         fullLB.textColor = [UIColor colorWithWhite:0.7 alpha:1];
         fullLB.font = [UIFont systemFontOfSize:13];
         [_fullOrderV addSubview:fullLB];
@@ -121,12 +138,20 @@
 
 + (CGFloat)cellHeightWithTakeOutModel:(TakeOutModel *)takeOutModel
 {
+//    CGFloat height = 2 * TOP_SPACE + IMAGE_SIZE + takeOutModel.activityArray.count * LABEL_HEIGTH;
     CGFloat height = 2 * TOP_SPACE + IMAGE_SIZE;
     if ([takeOutModel.isFirstOrder isEqualToNumber:@YES]) {
         height += LABEL_HEIGTH;
     }
     if ([takeOutModel.isFull isEqualToNumber:@YES]) {
-        height += LABEL_HEIGTH;
+        NSMutableString * string = [NSMutableString string];
+        for (ActivityReduce * activity in takeOutModel.activityArray) {
+            if ([activity.activeType isEqualToNumber:@1]) {
+                [string appendFormat:@"满%@减%@;", activity.mMoney, activity.jMoney];
+            }
+        }
+        CGSize size = [string boundingRectWithSize:CGSizeMake([UIScreen mainScreen].bounds.size.width - LEFT_SPACE - IMAGE_SIZE, CGFLOAT_MAX) options:(NSStringDrawingUsesFontLeading | NSStringDrawingUsesLineFragmentOrigin) attributes:[NSDictionary dictionaryWithObjectsAndKeys:[UIFont systemFontOfSize:14], NSFontAttributeName, nil] context:nil].size;
+        height += size.height + 6;
     }
     return height;
 }
@@ -151,10 +176,31 @@
             cell.icon.image = [UIImage imageNamed:@"load_fail.png"];
         }
     }];
+    /*
+    for (int i = 0; i < takeOutModel.activityArray.count; i++) {
+        ActivityReduce * activityRD = [takeOutModel.activityArray objectAtIndex:i];
+        UIImageView * imageV = (UIImageView *)[self.contentView viewWithTag:2000 + i];
+        UILabel * aLabel = (UILabel *)[self.contentView viewWithTag:3000 + i];
+        if ([activityRD.activeType isEqualToNumber:@2]) {
+            imageV.image = [UIImage imageNamed:@"shou.png"];
+            aLabel.text = [NSString stringWithFormat:@"首单减%@", activityRD.sMoney];
+        }else
+        {
+            imageV.image = [UIImage imageNamed:@"jian.png"];
+            aLabel.text = [NSString stringWithFormat:@"满%@减%@", activityRD.mMoney, activityRD.jMoney];
+        }
+    }
+    */
     
     if ([takeOutModel.isFirstOrder isEqualToNumber:@YES]) {
         self.firstOrderV.frame = CGRectMake(_addressLabel.left, _addressLabel.bottom, _addressLabel.width, _addressLabel.height);
         self.firstOrderV.hidden = NO;
+        UILabel * aLabel = (UILabel *)[self.firstOrderV viewWithTag:2000];
+        for (ActivityReduce * activity in takeOutModel.activityArray) {
+            if ([activity.activeType isEqualToNumber:@2]) {
+                aLabel.text = [NSString stringWithFormat:@"首单减免%@", activity.sMoney];
+            }
+        }
     }else
     {
         self.firstOrderV.frame = CGRectMake(_addressLabel.left, _addressLabel.bottom, _addressLabel.width, 0);
@@ -163,11 +209,23 @@
     if ([takeOutModel.isFull isEqualToNumber:@YES]) {
         self.fullOrderV.frame = CGRectMake(_firstOrderV.left, _firstOrderV.bottom, _firstOrderV.width, _addressLabel.height);
         self.fullOrderV.hidden = NO;
+        UILabel * aLabel = (UILabel *)[self.fullOrderV viewWithTag:3000];
+        NSMutableString * string = [NSMutableString string];
+        for (ActivityReduce * activity in takeOutModel.activityArray) {
+            if ([activity.activeType isEqualToNumber:@1]) {
+                [string appendFormat:@"满%@减%@;", activity.mMoney, activity.jMoney];
+            }
+        }
+        aLabel.text = [string copy];
+        CGSize size = [aLabel sizeThatFits:CGSizeMake(aLabel.width, CGFLOAT_MAX)];
+        aLabel.height = size.height;
+        _firstOrderV.height = aLabel.bottom + 3;
     }else
     {
         self.fullOrderV.frame = CGRectMake(_firstOrderV.left, _firstOrderV.bottom, _firstOrderV.width, 0);
         self.fullOrderV.hidden = YES;
     }
+    
 }
 
 

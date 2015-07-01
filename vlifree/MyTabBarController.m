@@ -46,7 +46,7 @@
     UINavigationController * takeOutNavc = [[UINavigationController alloc] initWithRootViewController:takeOutVC];
     takeOutNavc.navigationBar.barTintColor = MAIN_COLOR;
     UserViewController * userVC = [[UserViewController alloc] init];
-    userVC.tabBarItem.title = @"我的";
+    userVC.tabBarItem.title = @"登录";
     userVC.tabBarItem.image = [[UIImage imageNamed:@"user_n.png"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
     userVC.tabBarItem.selectedImage = [[UIImage imageNamed:@"user_s.png"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
     UINavigationController * userNavc = [[UINavigationController alloc] initWithRootViewController:userVC];

@@ -10,10 +10,11 @@
 
 @interface ShoppingDetailsCarView : UIView
 
-
+@property (nonatomic, strong)NSNumber * mealBoxMoney;
 @property (nonatomic, strong)NSMutableArray * menusArray;
 @property (nonatomic, strong)UIButton * shoppingCarBT;
 @property (nonatomic, strong)UIButton * changeBT;
+@property (nonatomic, strong)UIButton * clearCarBT;
 
 @property (nonatomic, strong)NSNumber * sendPrice;
 
