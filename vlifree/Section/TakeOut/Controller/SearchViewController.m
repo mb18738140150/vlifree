@@ -11,6 +11,7 @@
 #import "ZWYPopKeyWordsView.h"
 #import "TakeOutViewCell.h"
 #import "TakeOutModel.h"
+#import "DetailTakeOutViewController.h"
 
 @interface SearchViewController ()<UISearchBarDelegate, UISearchResultsUpdating, ZWYSearchShowViewDelegate, HTTPPostDelegate>
 
@@ -84,6 +85,8 @@
     // Do any additional setup after loading the view.
 }
 
+
+
 - (void)searchHotTaglibWithKeyWord:(NSString *)keyWords
 {
     NSLog(@"%@", keyWords);
@@ -106,8 +109,7 @@
 
 - (void)viewWillAppear:(BOOL)animated
 {
-//    self.searchBar.hidden = NO;
-//    NSLog(@"--%@", self.searchBar);
+    self.navigationController.navigationBar.barTintColor = MAIN_COLOR;
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -147,6 +149,20 @@
 {
     TakeOutModel * takeOutMD = [self.dataArray objectAtIndex:indexPath.row];
     return [TakeOutViewCell cellHeightWithTakeOutModel:takeOutMD];
+}
+
+
+-(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
+    TakeOutModel * takeOutMD = [self.dataArray objectAtIndex:indexPath.row];
+    DetailTakeOutViewController * detailTakeOutVC = [[DetailTakeOutViewController alloc] init];
+    detailTakeOutVC.takeOutID = takeOutMD.storeId;
+    detailTakeOutVC.sendPrice = takeOutMD.sendPrice;
+    detailTakeOutVC.outSentMoney = takeOutMD.outSentMoney;
+    detailTakeOutVC.storeName = takeOutMD.storeName;
+    detailTakeOutVC.navigationItem.title = takeOutMD.storeName;
+    [self.navigationController pushViewController:detailTakeOutVC animated:YES];
 }
 
 #pragma mark - 搜索
