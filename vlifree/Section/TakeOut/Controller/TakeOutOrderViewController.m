@@ -17,6 +17,7 @@
 #import "payRequsestHandler.h"
 #import "MenuModel.h"
 #import "OrderMenuVIew.h"
+#import "FinishOrderViewController.h"
 
 #import "BDWalletSDKMainManager.h"
 #import <CommonCrypto/CommonDigest.h>
@@ -53,6 +54,7 @@
 
 @property (nonatomic, assign)NSInteger payType; //支付方式 1,微信  2,百度(默认1)
 
+@property (nonatomic, copy)NSString * orderID;
 
 @end
 
@@ -132,43 +134,67 @@
     lineView3.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
     [menusView addSubview:lineView3];
     
-    UILabel * firstOrderLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, lineView3.bottom, 80, LABEL_HEIGHT)];
-    firstOrderLB.text = @"首单减免";
-    UILabel * firstPriceLB = [[UILabel alloc] initWithFrame:CGRectMake(menusView.width - 50 - LEFT_SPACE, lineView3.bottom, 50, LABEL_HEIGHT)];
-    firstPriceLB.text = [NSString stringWithFormat:@"-%@", [self.orderDic objectForKey:@"FirstReduce"]];
+    CGFloat top = lineView3.bottom;
     
-    UILabel * fullOrderLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, lineView3.bottom, 80, LABEL_HEIGHT)];
-    fullOrderLB.text = @"满单减免";
-    UILabel * fullPriceLB = [[UILabel alloc] initWithFrame:CGRectMake(menusView.width - 50 - LEFT_SPACE, lineView3.bottom, 50, LABEL_HEIGHT)];
-    fullPriceLB.text = [NSString stringWithFormat:@"-%@", [self.orderDic objectForKey:@"FullReduce"]];
+    if ([[self.orderDic objectForKey:@"IsFirstOrder"] isEqualToNumber:@YES]) {
+        UILabel * firstOrderLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, top, 80, LABEL_HEIGHT)];
+        firstOrderLB.text = @"首单减免";
+        [menusView addSubview:firstOrderLB];
+        UILabel * firstPriceLB = [[UILabel alloc] initWithFrame:CGRectMake(menusView.width - 50 - LEFT_SPACE, firstOrderLB.top, 50, LABEL_HEIGHT)];
+        firstPriceLB.text = [NSString stringWithFormat:@"-%@", [self.orderDic objectForKey:@"FirstReduce"]];
+        [menusView addSubview:firstPriceLB];
+        NSNumber * firstPrice = [self.orderDic objectForKey:@"FirstReduce"];
+        allMoney -= firstPrice.doubleValue;
+        top = firstOrderLB.bottom;
+    }
     
-    UILabel * mealBoxLabel = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, lineView3.bottom, 80, LABEL_HEIGHT)];
-    mealBoxLabel.text = @"餐具费";
-    [menusView addSubview:mealBoxLabel];
+    if ([[self.orderDic objectForKey:@"IsFull"] isEqualToNumber:@YES])
+    {
+        UILabel * fullOrderLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, top, 80, LABEL_HEIGHT)];
+        fullOrderLB.text = @"满单减免";
+        [menusView addSubview:fullOrderLB];
+        UILabel * fullPriceLB = [[UILabel alloc] initWithFrame:CGRectMake(menusView.width - 50 - LEFT_SPACE, fullOrderLB.top, 50, LABEL_HEIGHT)];
+        fullPriceLB.text = [NSString stringWithFormat:@"-%@", [self.orderDic objectForKey:@"FullReduce"]];
+        [menusView addSubview:fullPriceLB];
+        top = fullOrderLB.bottom;
+        NSNumber * fullPrice = [self.orderDic objectForKey:@"FullReduce"];
+        allMoney -= fullPrice.doubleValue;
+    }
     
-    UILabel * mealBoxPriceLB = [[UILabel alloc] initWithFrame:CGRectMake(menusView.width - 50 - LEFT_SPACE, lineView3.bottom, 50, LABEL_HEIGHT)];
-    mealBoxPriceLB.text = [NSString stringWithFormat:@"+%g", self.mealBoxMoney.doubleValue * allCount];
-    [menusView addSubview:mealBoxPriceLB];
     
-    allMoney += self.mealBoxMoney.doubleValue * allCount;
+    if (![self.mealBoxMoney isEqualToNumber:@0]) {
+        UILabel * mealBoxLabel = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, top, 80, LABEL_HEIGHT)];
+        mealBoxLabel.text = @"餐具费";
+        [menusView addSubview:mealBoxLabel];
+        
+        UILabel * mealBoxPriceLB = [[UILabel alloc] initWithFrame:CGRectMake(menusView.width - 50 - LEFT_SPACE, mealBoxLabel.top, 50, LABEL_HEIGHT)];
+        mealBoxPriceLB.text = [NSString stringWithFormat:@"+%g", self.mealBoxMoney.doubleValue * allCount];
+        [menusView addSubview:mealBoxPriceLB];
+        top = mealBoxLabel.bottom;
+        allMoney += self.mealBoxMoney.doubleValue * allCount;
+    }
     
-    UILabel * deliveryLabel = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, lineView3.bottom, 80, LABEL_HEIGHT)];
-    deliveryLabel.text = @"配送费";
-    [menusView addSubview:deliveryLabel];
+    if (![[self.orderDic objectForKey:@"DeliveryFee"] isEqualToNumber:@0]) {
+        UILabel * deliveryLabel = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, top, 80, LABEL_HEIGHT)];
+        deliveryLabel.text = @"配送费";
+        [menusView addSubview:deliveryLabel];
+        
+        UILabel * deliveryPriceLB = [[UILabel alloc] initWithFrame:CGRectMake(menusView.width - 50 - LEFT_SPACE, deliveryLabel.top, 50, LABEL_HEIGHT)];
+        deliveryPriceLB.text = [NSString stringWithFormat:@"+%@", [self.orderDic objectForKey:@"DeliveryFee"]];
+        [menusView addSubview:deliveryPriceLB];
+        allMoney += [[self.orderDic objectForKey:@"DeliveryFee"] doubleValue];
+        top = deliveryLabel.bottom;
+    }
     
-    UILabel * deliveryPriceLB = [[UILabel alloc] initWithFrame:CGRectMake(menusView.width - 50 - LEFT_SPACE, lineView3.bottom, 50, LABEL_HEIGHT)];
-    deliveryPriceLB.text = [NSString stringWithFormat:@"+%@", [self.orderDic objectForKey:@"DeliveryFee"]];
-    [menusView addSubview:deliveryPriceLB];
-    allMoney += [[self.orderDic objectForKey:@"DeliveryFee"] doubleValue];
     
-    UILabel * totalLabel = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, deliveryLabel.bottom, 80, LABEL_HEIGHT)];
+    UILabel * totalLabel = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, top, 80, LABEL_HEIGHT)];
     totalLabel.text = @"合计";
     [menusView addSubview:totalLabel];
     
     UILabel * allPriceLB = [[UILabel alloc] initWithFrame:CGRectMake(menusView.width - 50 - LEFT_SPACE, totalLabel.top, 50, LABEL_HEIGHT)];
     [menusView addSubview:allPriceLB];
     
-    
+    /*
     if ([[self.orderDic objectForKey:@"IsFirstOrder"] isEqualToNumber:@YES]) {
         [menusView addSubview:firstOrderLB];
         [menusView addSubview:firstPriceLB];
@@ -196,6 +222,7 @@
         NSNumber * fullPrice = [self.orderDic objectForKey:@"FullReduce"];
         allMoney -= fullPrice.doubleValue;
     }
+     */
     _totalMoney = allMoney;
     allPriceLB.text = [NSString stringWithFormat:@"¥%g", allMoney];
     menusView.height = allPriceLB.bottom + TOP_SPACE;
@@ -271,7 +298,7 @@
     
     self.candaoView = [[PayTypeView alloc] initWithFrame:CGRectMake(0, _baiduView.bottom, payView.width, _baiduView.height)];
     _candaoView.iconView.image = [UIImage imageNamed:@"delivery.png"];
-    _candaoView.titleLabel.text = @"百度钱包";
+    _candaoView.titleLabel.text = @"餐到付款";
     [_candaoView.changeButton addTarget:self action:@selector(changePayType:) forControlEvents:UIControlEventTouchUpInside];
     [payView addSubview:_candaoView];
     payView.height = _candaoView.bottom;
@@ -357,12 +384,22 @@
 {
     NSLog(@"确认支付");
     if (self.address) {
-//        if (_payType == 1) {
+        if (_payType == 1) {
 //            [self sendPay_demo];//微信支付
-//        }else if (_payType == 2)
-//        {
-//            [self dopay];//百度支付
-//        }
+             if([WXApi isWXAppInstalled] == NO)
+            {
+                UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:@"你的设备还没安装微信,请先安装微信" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
+                [alert show];
+                [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:2];
+                return;
+            }else if([WXApi isWXAppSupportApi] == NO)
+            {
+                UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:@"你的微信版本不支持,请更新微信" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
+                [alert show];
+                [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:2];
+                return;
+            }
+        }
         NSMutableArray * array = [NSMutableArray array];
         for (NSMutableArray * smallAry in self.shopArray) {
             MenuModel * menuMD = [smallAry firstObject];
@@ -440,6 +477,7 @@
     [SVProgressHUD dismiss];
     if ([[data objectForKey:@"Result"] isEqualToNumber:@1])
     {
+        self.orderID = [data objectForKey:@"WakeOutOrder"];
         NSNumber * payType = [data objectForKey:@"PayType"];
         if ([payType isEqualToNumber:@1]) {
             NSMutableDictionary *signParams = [NSMutableDictionary dictionary];
@@ -450,32 +488,20 @@
             [signParams setObject: [data objectForKey:@"TimeStamp"]   forKey:@"timestamp"];
             [signParams setObject: [data objectForKey:@"PrepayId"]    forKey:@"prepayid"];
             
-            //            NSString * sign = [self createMd5Sign:signParams];
+            NSString * sign = [self createMd5Sign:signParams];
             NSNumber * stamp = [data objectForKey:@"TimeStamp"];
-            if ([WXApi isWXAppInstalled] && [WXApi isWXAppSupportApi]) {
-                //调起微信支付
-                PayReq* req             = [[PayReq alloc] init];
-                req.openID              =  [NSString stringWithFormat:@"%@", [data objectForKey:@"AppId"]];
-                req.partnerId           = [NSString stringWithFormat:@"%@", [data objectForKey:@"PartnerId"]];
-                req.prepayId            = [NSString stringWithFormat:@"%@", [data objectForKey:@"PrepayId"]];
-                req.nonceStr            = [NSString stringWithFormat:@"%@", [data objectForKey:@"NonceStr"]];
-                req.timeStamp           = stamp.intValue;
-                req.package             = [NSString stringWithFormat:@"%@", [data objectForKey:@"Package"]];
-                req.sign                = [NSString stringWithFormat:@"%@", [data objectForKey:@"Sign"]];
-                //            req.sign = sign;
-                BOOL a = [WXApi sendReq:req];
-                NSLog(@"%d", a);
-            }else if([WXApi isWXAppInstalled] == NO)
-            {
-                UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:@"你的设备还没安装微信,请先安装微信" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
-                [alert show];
-                [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:2];
-            }else if([WXApi isWXAppSupportApi] == NO)
-            {
-                UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:@"你的微信版本不支持,请更新微信" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
-                [alert show];
-                [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:2];
-            }
+            //调起微信支付
+            PayReq* req             = [[PayReq alloc] init];
+            req.openID              =  [NSString stringWithFormat:@"%@", [data objectForKey:@"AppId"]];
+            req.partnerId           = [NSString stringWithFormat:@"%@", [data objectForKey:@"PartnerId"]];
+            req.prepayId            = [NSString stringWithFormat:@"%@", [data objectForKey:@"PrepayId"]];
+            req.nonceStr            = [NSString stringWithFormat:@"%@", [data objectForKey:@"NonceStr"]];
+            req.timeStamp           = stamp.intValue;
+            req.package             = [NSString stringWithFormat:@"%@", [data objectForKey:@"Package"]];
+            req.sign                = [NSString stringWithFormat:@"%@", [data objectForKey:@"Sign"]];
+            req.sign = sign;
+            BOOL a = [WXApi sendReq:req];
+            NSLog(@"%d", a);
         }else if ([payType isEqualToNumber:@2])
         {
             BDWalletSDKMainManager* payMainManager = [BDWalletSDKMainManager getInstance];
@@ -483,7 +509,7 @@
             [payMainManager doPayWithOrderInfo:orderInfo params:nil delegate:self];
         }else
         {
-            
+            [self pushFinishOrderVC];
         }
     }else
     {
@@ -491,7 +517,6 @@
         [alert show];
         [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:1.5];
     }
-    
     [SVProgressHUD dismiss];
 }
 
@@ -501,6 +526,14 @@
     NSLog(@"%@", error);
 }
 
+#pragma mark - 支付成功跳转到订单页面
+
+- (void)pushFinishOrderVC
+{
+    FinishOrderViewController * finishOrderVC = [[FinishOrderViewController alloc] init];
+    finishOrderVC.orderID = self.orderID;
+    [self.navigationController pushViewController:finishOrderVC animated:YES];
+}
 
 #pragma mark - 百度支付
 
@@ -700,6 +733,12 @@
 -(void)BDWalletPayResultWithCode:(int)statusCode payDesc:(NSString*)payDesc;
 {
     NSLog(@"支付结束 接口 code:%d desc:%@",statusCode,payDesc);
+    if (statusCode == 0) {
+        [self pushFinishOrderVC];
+    }else
+    {
+        [SVProgressHUD showErrorWithStatus:@"支付失败" duration:2];
+    }
 }
 
 - (void)logEventId:(NSString*)eventId eventDesc:(NSString*)eventDesc;
@@ -816,7 +855,7 @@
                 req.sign                = [dict objectForKey:@"sign"];
                 
                 BOOL a = [WXApi sendReq:req];
-//                NSLog(@"%d", a);
+                NSLog(@"%d", a);
             }else
             {
                 UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:@"你的微信版本太低,不支持支付调用,请更新微信" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
@@ -840,6 +879,38 @@
     
     [alter show];
 }
+
+//创建package签名
+-(NSString*) createMd5Sign:(NSMutableDictionary*)dict
+{
+    NSMutableString *contentString  =[NSMutableString string];
+    NSArray *keys = [dict allKeys];
+    //按字母顺序排序
+    NSArray *sortedArray = [keys sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
+        return [obj1 compare:obj2 options:NSNumericSearch];
+    }];
+    //拼接字符串
+    for (NSString *categoryId in sortedArray) {
+        if (   ![[dict objectForKey:categoryId] isEqualToString:@""]
+            && ![categoryId isEqualToString:@"sign"]
+            && ![categoryId isEqualToString:@"key"]
+            )
+        {
+            [contentString appendFormat:@"%@=%@&", categoryId, [dict objectForKey:categoryId]];
+        }
+        
+    }
+    //添加key字段
+    [contentString appendFormat:@"key=I57gmdk90nd5bla84nkyqldicn3294Fh"];
+    //得到MD5 sign签名
+    NSString *md5Sign =[[WXUtil md5:contentString] uppercaseString];
+    //    NSString * md5Sign = [contentString md5];
+    NSLog(@"%@", [NSString stringWithFormat:@"MD5签名字符串：\n%@\n\n",contentString]);
+    
+    return md5Sign;
+}
+
+
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];

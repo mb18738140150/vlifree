@@ -81,6 +81,7 @@
 		733819A31B0B2A7C00E9F8AD /* storeState_k.png in Resources */ = {isa = PBXBuildFile; fileRef = 733819A21B0B2A7C00E9F8AD /* storeState_k.png */; };
 		733819A51B0B2AC900E9F8AD /* storeState_g.png in Resources */ = {isa = PBXBuildFile; fileRef = 733819A41B0B2AC900E9F8AD /* storeState_g.png */; };
 		7339C74F1B1F076200B0D5A2 /* HotelModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 7339C74E1B1F076200B0D5A2 /* HotelModel.m */; };
+		7345C8611B450DE1006368FB /* GSPayViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7345C8601B450DE1006368FB /* GSPayViewController.m */; };
 		73461EA81B0D6E290089352E /* ModifyNameViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 73461EA71B0D6E290089352E /* ModifyNameViewController.m */; };
 		73461EAB1B0DAB0A0089352E /* PasswordViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 73461EAA1B0DAB0A0089352E /* PasswordViewController.m */; };
 		73461EAE1B0DBFB90089352E /* DetailsGrogshopViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 73461EAD1B0DBFB90089352E /* DetailsGrogshopViewController.m */; };
@@ -152,6 +153,8 @@
 		734658081B1D63AA000C3E9D /* libBaiduMobStatForSDK.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 734658071B1D63AA000C3E9D /* libBaiduMobStatForSDK.a */; };
 		7346580A1B1D63C4000C3E9D /* libBaiduWalletSDK.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 734658091B1D63C4000C3E9D /* libBaiduWalletSDK.a */; };
 		7346580D1B1D8AEB000C3E9D /* BaiduWalletSDKBundle.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7346580B1B1D8AEB000C3E9D /* BaiduWalletSDKBundle.bundle */; };
+		7349C2D51B44D13100A5A10A /* FinishOrderViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7349C2D41B44D13100A5A10A /* FinishOrderViewController.m */; };
+		7349C2D81B44D1C700A5A10A /* OrderDetailsMD.m in Sources */ = {isa = PBXBuildFile; fileRef = 7349C2D71B44D1C700A5A10A /* OrderDetailsMD.m */; };
 		734B71A31B214CA10056B58D /* libWeChatSDK.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 734B71A01B214CA10056B58D /* libWeChatSDK.a */; };
 		734BDFE11B0EB773003E2A22 /* DetailsGSHearderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 734BDFE01B0EB773003E2A22 /* DetailsGSHearderView.m */; };
 		734BDFE41B0EC8C5003E2A22 /* addressIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 734BDFE21B0EC8C5003E2A22 /* addressIcon.png */; };
@@ -439,6 +442,8 @@
 		733819A41B0B2AC900E9F8AD /* storeState_g.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = storeState_g.png; sourceTree = "<group>"; };
 		7339C74D1B1F076200B0D5A2 /* HotelModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HotelModel.h; sourceTree = "<group>"; };
 		7339C74E1B1F076200B0D5A2 /* HotelModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HotelModel.m; sourceTree = "<group>"; };
+		7345C85F1B450DE1006368FB /* GSPayViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GSPayViewController.h; sourceTree = "<group>"; };
+		7345C8601B450DE1006368FB /* GSPayViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GSPayViewController.m; sourceTree = "<group>"; };
 		73461EA61B0D6E290089352E /* ModifyNameViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ModifyNameViewController.h; sourceTree = "<group>"; };
 		73461EA71B0D6E290089352E /* ModifyNameViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ModifyNameViewController.m; sourceTree = "<group>"; };
 		73461EA91B0DAB0A0089352E /* PasswordViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PasswordViewController.h; sourceTree = "<group>"; };
@@ -561,6 +566,10 @@
 		734658091B1D63C4000C3E9D /* libBaiduWalletSDK.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libBaiduWalletSDK.a; path = ../vlifree/Vendors/Baiduzhifu/BaiduMobStat/BaiduMobStat/libBaiduWalletSDK.a; sourceTree = "<group>"; };
 		7346580B1B1D8AEB000C3E9D /* BaiduWalletSDKBundle.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = BaiduWalletSDKBundle.bundle; path = vlifree/Vendors/Baiduzhifu/BaiduWalletSDKBundle.bundle; sourceTree = SOURCE_ROOT; };
 		7346580C1B1D8AEB000C3E9D /* BDWalletSDKMainManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BDWalletSDKMainManager.h; path = vlifree/Vendors/Baiduzhifu/BDWalletSDKMainManager.h; sourceTree = SOURCE_ROOT; };
+		7349C2D31B44D13100A5A10A /* FinishOrderViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FinishOrderViewController.h; sourceTree = "<group>"; };
+		7349C2D41B44D13100A5A10A /* FinishOrderViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FinishOrderViewController.m; sourceTree = "<group>"; };
+		7349C2D61B44D1C700A5A10A /* OrderDetailsMD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OrderDetailsMD.h; sourceTree = "<group>"; };
+		7349C2D71B44D1C700A5A10A /* OrderDetailsMD.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OrderDetailsMD.m; sourceTree = "<group>"; };
 		734B71A01B214CA10056B58D /* libWeChatSDK.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libWeChatSDK.a; sourceTree = "<group>"; };
 		734B71A11B214CA10056B58D /* WXApi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXApi.h; sourceTree = "<group>"; };
 		734B71A21B214CA10056B58D /* WXApiObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXApiObject.h; sourceTree = "<group>"; };
@@ -1199,6 +1208,8 @@
 				736360031B12BCA200EE8F56 /* DetailTakeOutViewController.m */,
 				735D94621B145B5E002B0980 /* TakeOutOrderViewController.h */,
 				735D94631B145B5E002B0980 /* TakeOutOrderViewController.m */,
+				7349C2D31B44D13100A5A10A /* FinishOrderViewController.h */,
+				7349C2D41B44D13100A5A10A /* FinishOrderViewController.m */,
 				732492341B183D1800CC5B6C /* AddressViewController.h */,
 				732492351B183D1800CC5B6C /* AddressViewController.m */,
 				732492481B18694A00CC5B6C /* AddAddressViewController.h */,
@@ -1218,6 +1229,8 @@
 				7324923F1B1844EF00CC5B6C /* AddressModel.m */,
 				730384E01B267CFF007C7ACB /* TakeOutModel.h */,
 				730384E11B267CFF007C7ACB /* TakeOutModel.m */,
+				7349C2D61B44D1C700A5A10A /* OrderDetailsMD.h */,
+				7349C2D71B44D1C700A5A10A /* OrderDetailsMD.m */,
 				736556131B423158009BE98A /* ActivityReduce.h */,
 				736556141B423158009BE98A /* ActivityReduce.m */,
 				7355A2141B2FC79100095764 /* ClassModel.h */,
@@ -1288,6 +1301,8 @@
 				738B82E01B19BAB8008B386D /* GSOrderViewController.m */,
 				7329E3881B1BE8AC0058137E /* DetailsGSOrderViewController.h */,
 				7329E3891B1BE8AC0058137E /* DetailsGSOrderViewController.m */,
+				7345C85F1B450DE1006368FB /* GSPayViewController.h */,
+				7345C8601B450DE1006368FB /* GSPayViewController.m */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -1916,11 +1931,13 @@
 				734657B91B1D4585000C3E9D /* ASINetworkQueue.m in Sources */,
 				7355A2191B2FD0EE00095764 /* MenuModel.m in Sources */,
 				730385F81B26C538007C7ACB /* POPAnimationTracer.mm in Sources */,
+				7349C2D51B44D13100A5A10A /* FinishOrderViewController.m in Sources */,
 				735DD7EA1B258AEF00E3E93E /* MJRefreshHeaderView.m in Sources */,
 				732492471B184F3000CC5B6C /* AddressViewCell.m in Sources */,
 				734657C61B1D4585000C3E9D /* CJSONSerialization.m in Sources */,
 				734657EE1B1D4585000C3E9D /* SDImageCache.m in Sources */,
 				735D94611B14168D002B0980 /* ShoppingMenuView.m in Sources */,
+				7349C2D81B44D1C700A5A10A /* OrderDetailsMD.m in Sources */,
 				730385141B269145007C7ACB /* SearchViewController.m in Sources */,
 				735908711B33F69E005143E4 /* IQUIViewController+Additions.m in Sources */,
 				734657C51B1D4585000C3E9D /* CJSONDeserializer_BlocksExtensions.m in Sources */,
@@ -1959,6 +1976,7 @@
 				734657ED1B1D4585000C3E9D /* NSData+ImageContentType.m in Sources */,
 				734657D61B1D4585000C3E9D /* CJSONDeserializer.m in Sources */,
 				730385FC1B26C538007C7ACB /* POPCustomAnimation.mm in Sources */,
+				7345C8611B450DE1006368FB /* GSPayViewController.m in Sources */,
 				734657CE1B1D4585000C3E9D /* NSDictionary_JSONExtensions.m in Sources */,
 				733819701B0AD18000E9F8AD /* TakeOutViewController.m in Sources */,
 				7359086D1B33F69E005143E4 /* IQToolbar.m in Sources */,

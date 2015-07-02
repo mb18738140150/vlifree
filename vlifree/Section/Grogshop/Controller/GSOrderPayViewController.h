@@ -15,4 +15,6 @@
 @property (nonatomic, strong)NSNumber * price;
 @property (nonatomic, strong)NSNumber * roomId;
 
+- (void)pushOrderDetailsVC;
+
 @end

@@ -20,4 +20,7 @@
 
 @property (nonatomic, strong)NSNumber * mealBoxMoney;
 
+
+- (void)pushFinishOrderVC;
+
 @end

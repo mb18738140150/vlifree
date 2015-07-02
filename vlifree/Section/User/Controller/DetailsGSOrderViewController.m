@@ -165,7 +165,12 @@
 
 - (void)backLastVC:(id)sender
 {
-    [self.navigationController popViewControllerAnimated:YES];
+    if (self.isPay) {
+        [self.navigationController popToRootViewControllerAnimated:YES];
+    }else
+    {
+        [self.navigationController popViewControllerAnimated:YES];
+    }
 }
 
 
@@ -191,8 +196,10 @@
         self.priceLB.text = [NSString stringWithFormat:@"     订单金额:%@", [data objectForKey:@"Price"]];
         self.personLB.text = [NSString stringWithFormat:@"预定人:%@", [data objectForKey:@"Name"]];
         self.telLB.text = [NSString stringWithFormat:@"预定号码:%@", [data objectForKey:@"PhoneNumber"]];
-        self.checkInDateLB.text = [NSString stringWithFormat:@"入住时间:%@", [data objectForKey:@"CheckInTime"]];
-        self.leaveLB.text = [NSString stringWithFormat:@"离店时间:%@", [data objectForKey:@"LeaveTime"]];
+        NSString * checkInTime = [data objectForKey:@"CheckInTime"];
+        self.checkInDateLB.text = [NSString stringWithFormat:@"入住时间:%@", [checkInTime substringToIndex:10]];
+        NSString * leaveTime = [data objectForKey:@"LeaveTime"];
+        self.leaveLB.text = [NSString stringWithFormat:@"离店时间:%@", [leaveTime substringToIndex:10]];
         self.roomLB.text = [NSString stringWithFormat:@"房型:%@", [data objectForKey:@"RoomType"]];
         self.countLB.text = [NSString stringWithFormat:@"预定房间:%@间", [data objectForKey:@"RoomCount"]];
         self.payType = [data objectForKey:@"PeyType"];

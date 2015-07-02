@@ -119,7 +119,7 @@
 {
     self.navigationController.navigationBar.barTintColor = MAIN_COLOR;
     if ([CLLocationManager locationServicesEnabled] && [CLLocationManager authorizationStatus] != kCLAuthorizationStatusDenied) {
-        
+
     }
 }
 - (void)isLocationsuccess

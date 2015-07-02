@@ -9,6 +9,7 @@
 #import "GSOrderViewController.h"
 #import "GSOrderViewCell.h"
 #import "DetailsGSOrderViewController.h"
+#import "GSPayViewController.h"
 
 @interface GSOrderViewController ()<HTTPPostDelegate>
 
@@ -210,10 +211,15 @@
 {
     NSLog(@"支付%d", button.tag - 4000);
     GrogshopOrderMD * grogshopMD = [self.dataArray objectAtIndex:button.tag - 4000];
+    GSPayViewController * gsPayVC = [[GSPayViewController alloc] init];
+    gsPayVC.orderID = grogshopMD.orderSn;
+    [self.navigationController pushViewController:gsPayVC animated:YES];
+    /*
     DetailsGSOrderViewController * detailsGSODVC = [[DetailsGSOrderViewController alloc] init];
     detailsGSODVC.orderID = grogshopMD.orderSn;
     detailsGSODVC.isPay = NO;
     [self.navigationController pushViewController:detailsGSODVC animated:YES];
+     */
 }
 
 

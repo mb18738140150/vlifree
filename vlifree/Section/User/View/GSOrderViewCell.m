@@ -55,7 +55,7 @@
         [_payButton setTitle:@"马上支付" forState:UIControlStateNormal];
         _payButton.titleLabel.font = [UIFont systemFontOfSize:14];
         _payButton.backgroundColor = MAIN_COLOR;
-        _payButton.layer.cornerRadius = 3;
+        _payButton.layer.cornerRadius = 5;
         _payButton.enabled = NO;
         [self.contentView addSubview:_payButton];
         
@@ -77,10 +77,14 @@
     NSString * lidianDate = [grogshopOrderMD.leaveTime substringToIndex:9];
     self.dateLB.text = [NSString stringWithFormat:@"入住:%@  离店:%@", ruzhuDate, lidianDate];
     if ([grogshopOrderMD.payState isEqualToNumber:@1]) {
-        self.payButton.hidden = YES;
+        [self.payButton setTitle:@"完成支付" forState:UIControlStateDisabled];
+        self.payButton.enabled = NO;
+        _payButton.backgroundColor = [UIColor colorWithWhite:0.7 alpha:1];
     }else
     {
-        self.payButton.hidden = NO;
+        [self.payButton setTitle:@"马上支付" forState:UIControlStateDisabled];
+        _payButton.backgroundColor = MAIN_COLOR;
+        self.payButton.enabled = YES;
     }
 }
 

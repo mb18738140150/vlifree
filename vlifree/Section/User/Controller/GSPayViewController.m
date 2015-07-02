@@ -1,14 +1,13 @@
 //
-//  GSOrderPayViewController.m
+//  GSPayViewController.m
 //  vlifree
 //
-//  Created by 仙林 on 15/6/1.
+//  Created by 仙林 on 15/7/2.
 //  Copyright (c) 2015年 仙林. All rights reserved.
 //
 
-#import "GSOrderPayViewController.h"
+#import "GSPayViewController.h"
 #import "PayTypeView.h"
-#import "DetailsGSOrderViewController.h"
 
 #import "WXApi.h"
 #import "payRequsestHandler.h"
@@ -21,171 +20,148 @@
 #include <net/if.h>
 #include <net/if_dl.h>
 
-#define LEFT_SPACE 15
+
+#define LEFT_SPACE 20
 #define TOP_SPACE 5
-#define LABEL_HEIGHT 30
+@interface GSPayViewController ()<HTTPPostDelegate, BDWalletSDKMainManagerDelegate>
 
 
-@interface GSOrderPayViewController ()<UITextFieldDelegate, HTTPPostDelegate, BDWalletSDKMainManagerDelegate>
-{
-    double _allMoney;
-}
+
 @property (nonatomic, strong)PayTypeView * weixinView;
 @property (nonatomic, strong)PayTypeView * baiduView;
-@property (nonatomic, strong)UIDatePicker * datePicker;
-@property (nonatomic, strong)UIView * pickerView;
+@property (nonatomic, strong)UILabel * priceLB;
+@property (nonatomic, strong)UILabel * personLB;
+@property (nonatomic, strong)UILabel * telLB;
+@property (nonatomic, strong)UILabel * checkInDateLB;
+@property (nonatomic, strong)UILabel * leaveLB;
+@property (nonatomic, strong)UILabel * roomLB;
+@property (nonatomic, strong)UILabel * countLB;
+@property (nonatomic, strong)UILabel * payLB;
+@property (nonatomic, strong)UILabel * requireLB;
+@property (nonatomic, strong)UILabel * grogshopLB;
+@property (nonatomic, strong)UILabel * addressLB;
+@property (nonatomic, strong)UILabel * telGSLB;
+
 @property (nonatomic, strong)NSNumber * payType;
 
-@property (nonatomic, strong)UIButton * dateButton;
+@property (nonatomic, copy)NSString * roomName;
+@property (nonatomic, assign)double price;
 
-@property (nonatomic, strong)UITextField * personTF;
-@property (nonatomic, strong)UITextField * telTF;
-@property (nonatomic, strong)UITextField * requireTF;
-@property (nonatomic, strong)NSDate * ruzhuDate;
-@property (nonatomic, strong)NSDate * lidianDate;
-
-@property (nonatomic, strong)UILabel * daysLB;
-//@property (nonatomic, strong)UILabel 
-
-@property (nonatomic, strong)UILabel * priceLB;
-
-@property (nonatomic, copy)NSString * orderId;
 
 @end
 
-@implementation GSOrderPayViewController
+@implementation GSPayViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.payType = @1;
-    self.view.backgroundColor = [UIColor whiteColor];
-//    NSLog(@"%d", self.navigationController.navigationBar.translucent);
-    UIScrollView * scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, self.view.height - 75)];
+    
+    self.view.backgroundColor = [UIColor colorWithWhite:0.9 alpha:0.7];
+    
+    UIScrollView * scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, self.view.height - 50)];
     scrollView.backgroundColor = [UIColor colorWithWhite:0.9 alpha:0.7];
+    
     [self.view addSubview:scrollView];
     
-    UILabel * aLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, scrollView.width, 30)];
-    aLabel.text = @"订单确认后不可取消，该订单不可变更。如未入住扣除全部房费";
-    aLabel.font = [UIFont systemFontOfSize:11];
-    aLabel.textAlignment = NSTextAlignmentCenter;
-    aLabel.textColor = [UIColor colorWithRed:227 / 255.0 green:185 / 255.0 blue:16 / 255.0 alpha:1];
-    aLabel.layer.borderColor = [UIColor colorWithWhite:0.8 alpha:1].CGColor;
-    aLabel.layer.borderWidth = 1.5;
-    aLabel.backgroundColor = [UIColor colorWithRed:255 / 255.0 green:254 / 255.0 blue:242 / 255.0 alpha:1];
-    [scrollView addSubview:aLabel];
-    
-    UIView * view1 = [[UIView alloc] initWithFrame:CGRectMake(0, aLabel.bottom, scrollView.width, 100)];
+    UIView * view1 = [[UIView alloc] initWithFrame:CGRectMake(0, 0, scrollView.width, 200)];
     view1.backgroundColor = [UIColor whiteColor];
     [scrollView addSubview:view1];
     
-    UILabel * roomLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, TOP_SPACE, view1.width - 2 * LEFT_SPACE, LABEL_HEIGHT)];
-    roomLB.text = [NSString stringWithFormat:@"房型:%@", self.roomName];
-    [view1 addSubview:roomLB];
     
-    UILabel * ruzhuLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, roomLB.bottom + TOP_SPACE, 80, LABEL_HEIGHT)];
-//    dateLB.font = [UIFont systemFontOfSize:14];
-    ruzhuLB.text = @"入住时间:";
-    [view1 addSubview:ruzhuLB];
+    self.priceLB = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, view1.width, 50)];
+    _priceLB.backgroundColor = [UIColor orangeColor];
+    //    _priceLB.backgroundColor = MAIN_COLOR;
+    _priceLB.text = @"    订单金额: ¥298";
+    _priceLB.font = [UIFont systemFontOfSize:22];
+    _priceLB.textColor = [UIColor whiteColor];
+    [view1 addSubview:_priceLB];
     
-    UIButton * ruzhuBT = [UIButton buttonWithType:UIButtonTypeCustom];
-    ruzhuBT.frame = CGRectMake(ruzhuLB.right, ruzhuLB.top, view1.width - 2 * LEFT_SPACE - ruzhuLB.width, ruzhuLB.height);
-    ruzhuBT.tag = 10001;
-//    ruzhuBT.layer.borderColor = [UIColor colorWithWhite:0.7 alpha:0.9].CGColor;
-//    ruzhuBT.layer.borderWidth = 0.5;
-    [ruzhuBT setTitle:@"选择入住时间" forState:UIControlStateNormal];
-    [ruzhuBT setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-//    ruzhuBT.backgroundColor = [UIColor redColor];
-    [ruzhuBT addTarget:self action:@selector(changeDate:) forControlEvents:UIControlEventTouchUpInside];
-    [view1 addSubview:ruzhuBT];
+    self.personLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, _priceLB.bottom + TOP_SPACE, view1.width  - 2 * LEFT_SPACE, 30)];
+    _personLB.text = @"预定人:马哥";
+    [view1 addSubview:_personLB];
     
     
-    UILabel * lidianLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, ruzhuLB.bottom + TOP_SPACE, 80, LABEL_HEIGHT)];
-    //    dateLB.font = [UIFont systemFontOfSize:14];
-    lidianLB.text = @"离店时间:";
-    [view1 addSubview:lidianLB];
+    UILabel * telLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, _personLB.bottom + TOP_SPACE, view1.width - 2 * LEFT_SPACE, 30)];
+    telLB.text = @"预定电话: 13456772457";
+    [view1 addSubview:telLB];
     
-    UIButton * lidianBT = [UIButton buttonWithType:UIButtonTypeCustom];
-    lidianBT.frame = CGRectMake(lidianLB.right, lidianLB.top, view1.width - 2 * LEFT_SPACE - lidianLB.width, lidianLB.height);
-    lidianBT.tag = 10002;
-//    lidianBT.layer.borderColor = [UIColor colorWithWhite:0.7 alpha:0.9].CGColor;
-//    lidianBT.layer.borderWidth = 0.5;
-    [lidianBT setTitle:@"选择离店时间" forState:UIControlStateNormal];
-    [lidianBT setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-    //    ruzhuBT.backgroundColor = [UIColor redColor];
-    [lidianBT addTarget:self action:@selector(changeDate:) forControlEvents:UIControlEventTouchUpInside];
-    [view1 addSubview:lidianBT];
     
-    self.daysLB = [[UILabel alloc] initWithFrame:CGRectMake(lidianLB.left, lidianLB.bottom, lidianLB.width * 2, lidianLB.height)];
-    _daysLB.text = @"住店时长: ";
-    [view1 addSubview:_daysLB];
-    view1.height = _daysLB.bottom + TOP_SPACE;
+    self.checkInDateLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, telLB.bottom + TOP_SPACE, view1.width - 2 * LEFT_SPACE, 30)];
+    _checkInDateLB.text = @"入住时间: 2015年5月15日 19:52:15";
+    [view1 addSubview:_checkInDateLB];
+    
+    self.leaveLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, _checkInDateLB.bottom + TOP_SPACE, view1.width - 2 * LEFT_SPACE, 30)];
+    _leaveLB.text = @"离开时间: 2015年5月17日 19:52:15";
+    [view1 addSubview:_leaveLB];
+    
+    
+    self.roomLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, _leaveLB.bottom + TOP_SPACE, view1.width - 2 * LEFT_SPACE, 30)];
+    _roomLB.text = @"总统大套房";
+    [view1 addSubview:_roomLB];
+    
+    
+    self.countLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, _roomLB.bottom + TOP_SPACE, view1.width - 2 * LEFT_SPACE, 30)];
+    _countLB.text = @"预定房间: 1间";
+    [view1 addSubview:_countLB];
+    
+    
+    self.payLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, _countLB.bottom + TOP_SPACE, view1.width - 2 * LEFT_SPACE, 30)];
+    _payLB.text = @"支付方式: 在线支付";
+    [view1 addSubview:_payLB];
+    
+    
+    self.requireLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, _payLB.bottom + TOP_SPACE, view1.width - 2 * LEFT_SPACE, 30)];
+    _requireLB.text = @"特殊要求";
+    [view1 addSubview:_requireLB];
+    
+    view1.height = _requireLB.bottom + TOP_SPACE;
     
     UIView * line1 = [[UIView alloc] initWithFrame:CGRectMake(0, view1.height - 1, view1.width, 1)];
     line1.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
     [view1 addSubview:line1];
     
-    
-    UIView * view2 = [[UIView alloc] initWithFrame:CGRectMake(0, view1.bottom + 10, scrollView.width, 140)];
-    view2.backgroundColor = [UIColor  whiteColor];
+    /*
+    UIView * view2 = [[UIView alloc] initWithFrame:CGRectMake(0, view1.bottom + 10, scrollView.width, 200)];
+    view2.backgroundColor = [UIColor whiteColor];
     [scrollView addSubview:view2];
     
     UIView * line2 = [[UIView alloc] initWithFrame:CGRectMake(0, 0, view2.width, 1)];
     line2.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
     [view2 addSubview:line2];
     
-//    UILabel * datumLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, 0, view2.width - 2 * LEFT_SPACE, 40)];
-//    datumLB.text = @"入住资料";
-//    [view2 addSubview:datumLB];
     
-    UIView * line3 = [[UIView alloc] initWithFrame:CGRectMake(LEFT_SPACE, 0, view2.width - 2 * LEFT_SPACE, 1)];
+    self.grogshopLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, 0, view2.width - 2 * LEFT_SPACE, 40)];
+    _grogshopLB.text = @"柳州新世纪酒店";
+    _grogshopLB.font = [UIFont systemFontOfSize:23];
+    [view2 addSubview:_grogshopLB];
+    
+    UIView * line3 = [[UIView alloc] initWithFrame:CGRectMake(LEFT_SPACE, _grogshopLB.bottom, view2.width - 2 * LEFT_SPACE, 1)];
     line3.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
     [view2 addSubview:line3];
     
-    UILabel * personLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, line3.bottom + TOP_SPACE, 80, LABEL_HEIGHT)];
-    personLB.text = @"入住人名:";
-    [view2 addSubview:personLB];
+    UIImageView * addressIcon = [[UIImageView alloc] initWithFrame:CGRectMake(LEFT_SPACE, line3.bottom + TOP_SPACE, 30, 30)];
+    addressIcon.image = [UIImage imageNamed:@"addressIcon.png"];
+    [view2 addSubview:addressIcon];
     
-    self.personTF = [[UITextField alloc] initWithFrame:CGRectMake(personLB.right, personLB.top, view2.width - LEFT_SPACE - personLB.right, personLB.height)];
-    _personTF.borderStyle = UITextBorderStyleNone;
-    _personTF.placeholder = @"请输入入住人";
-    _personTF.delegate = self;
-    [view2 addSubview:_personTF];
+    self.addressLB = [[UILabel alloc] initWithFrame:CGRectMake(addressIcon.right + 5, addressIcon.top, view2.width - addressIcon.right - LEFT_SPACE - 5, 30)];
+    _addressLB.text = @"新环西路1000弄5号903";
+    [view2 addSubview:_addressLB];
     
+    UIImageView * telIcon = [[UIImageView alloc] initWithFrame:CGRectMake(LEFT_SPACE, addressIcon.bottom + TOP_SPACE, 30, 30)];
+    telIcon.image = [UIImage imageNamed:@"phoneIcon.png"];
+    [view2 addSubview:telIcon];
     
-    UILabel * telLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, personLB.bottom + TOP_SPACE, personLB.width, LABEL_HEIGHT)];
-    telLB.text = @"手机号码:";
-    [view2 addSubview:telLB];
+    self.telGSLB = [[UILabel alloc] initWithFrame:CGRectMake(telIcon.right + 5, telIcon.top, view2.width - addressIcon.right - LEFT_SPACE - 5, 30)];
+    _telGSLB.text = @"13589645969";
+    [view2 addSubview:_telGSLB];
     
-    self.telTF = [[UITextField alloc] initWithFrame:CGRectMake(telLB.right, telLB.top, view2.width - LEFT_SPACE - telLB.right, telLB.height)];
-    _telTF.borderStyle = UITextBorderStyleNone;
-    _telTF.placeholder = @"请输入手机号";
-    _telTF.delegate = self;
-    [view2 addSubview:_telTF];
+    view2.height = _telGSLB.bottom + TOP_SPACE;
+    */
     
-    UILabel * requireLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, telLB.bottom + TOP_SPACE, 80, LABEL_HEIGHT)];
-    requireLB.text = @"特殊需求:";
-//    requireLB.numberOfLines = 0;
-//    requireLB.lineBreakMode = NSLineBreakByWordWrapping;
-//    [requireLB sizeToFit];
-    [view2 addSubview:requireLB];
-    
-    
-    self.requireTF = [[UITextField alloc] initWithFrame:CGRectMake(requireLB.right, requireLB.top, view2.width - LEFT_SPACE - requireLB.right, requireLB.height)];
-    _requireTF.borderStyle = UITextBorderStyleNone;
-    _requireTF.placeholder = @"请输入其他要求";
-    _requireTF.delegate = self;
-    [view2 addSubview:_requireTF];
-    
-    view2.height = requireLB.bottom + TOP_SPACE * 2;
-    UIView * line4 = [[UIView alloc] initWithFrame:CGRectMake(0, view2.height - 1, view2.width, 1)];
-    line4.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
-    [view2 addSubview:line4];
-    
-    UIView * view3 = [[UIView alloc] initWithFrame:CGRectMake(0, view2.bottom + 10, scrollView.width, 100)];
+    UIView * view3 = [[UIView alloc] initWithFrame:CGRectMake(0, view1.bottom + 10, scrollView.width, 100)];
     view3.backgroundColor = [UIColor whiteColor];
     [scrollView addSubview:view3];
     
-    UIView * line5 = [[UIView alloc] initWithFrame:CGRectMake(0, 0, view2.width, 1)];
+    UIView * line5 = [[UIView alloc] initWithFrame:CGRectMake(0, 0, view3.width, 1)];
     line5.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
     [view3 addSubview:line5];
     
@@ -199,7 +175,7 @@
     [view3 addSubview:line6];
     
     
-    
+    self.payType = @1;
     self.weixinView = [[PayTypeView alloc] initWithFrame:CGRectMake(0, line6.bottom + TOP_SPACE, view3.width, 40)];
     _weixinView.changeButton.selected = YES;
     [_weixinView.changeButton addTarget:self action:@selector(changePayType:) forControlEvents:UIControlEventTouchUpInside];
@@ -214,124 +190,71 @@
     [view3 addSubview:_baiduView];
     
     view3.height = _baiduView.bottom + TOP_SPACE;
+        
+    scrollView.contentSize = CGSizeMake(scrollView.width, view3.bottom + 10);
     
-    UIView * line7 = [[UIView alloc] initWithFrame:CGRectMake(0, view3.height - 1, view3.width, 1)];
-    line7.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
-    [view3 addSubview:line7];
-    
-    UIView * view4 = [[UIView alloc] initWithFrame:CGRectMake(0, scrollView.bottom, scrollView.width, 75)];
-    [self.view addSubview:view4];
-    
-    self.priceLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, 20, scrollView.width - 3 * LEFT_SPACE - 80, 35)];
-    
-    _priceLB.attributedText = [self allPriceLBTextWithPrice:self.price];
-    [view4 addSubview:_priceLB];
     
     UIButton * payButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    payButton.frame = CGRectMake(_priceLB.right + LEFT_SPACE, _priceLB.top, 80, _priceLB.height);
-//    [payButton setTitle:@"马上支付" forState:UIControlStateNormal];
-//    [payButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-//    payButton.backgroundColor = MAIN_COLOR;
-    [payButton setBackgroundImage:[UIImage imageNamed:@"change_n.png"] forState:UIControlStateNormal];
-    [payButton addTarget:self action:@selector(payOrderDetails:) forControlEvents:UIControlEventTouchUpInside];
-    [view4 addSubview:payButton];
+    payButton.frame = CGRectMake(50, self.view.height - 40, self.view.width - 100, 30);
+    [payButton setTitle:@"马上支付" forState:UIControlStateNormal];
+    payButton.layer.backgroundColor = MAIN_COLOR.CGColor;
+    payButton.layer.cornerRadius = 10;
+    [payButton addTarget:self action:@selector(payOrder:) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:payButton];
     
-    scrollView.contentSize = CGSizeMake(scrollView.width, view3.bottom);
+    
+    
+    NSDictionary * jsonDic = @{
+                               @"Command":@26,
+                               @"Id":self.orderID
+                               };
+    [self playPostWithDictionary:jsonDic];
     
     UIButton * backBT = [UIButton buttonWithType:UIButtonTypeCustom];
     backBT.frame = CGRectMake(0, 0, 15, 20);
-    [backBT setBackgroundImage:[UIImage imageNamed:@"back_r.png"] forState:UIControlStateNormal];
+    [backBT setBackgroundImage:[UIImage imageNamed:@"back_w.png"] forState:UIControlStateNormal];
     [backBT addTarget:self action:@selector(backLastVC:) forControlEvents:UIControlEventTouchUpInside];
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:backBT];
     
-    [self createDatePickerView];
+    
+    
     // Do any additional setup after loading the view.
 }
 
-- (id)allPriceLBTextWithPrice:(NSNumber *)price
-{
-    NSMutableAttributedString * string = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"支付金额¥%@", price]];
-    [string addAttributes:@{NSForegroundColorAttributeName : [UIColor redColor], NSFontAttributeName : [UIFont systemFontOfSize:24]} range:NSMakeRange(4, string.length - 4)];
-    [string addAttributes:@{NSFontAttributeName : [UIFont systemFontOfSize:20]} range:NSMakeRange(0, 4)];
-    return [string copy];
-}
-
-
-- (void)createDatePickerView
-{
-    self.datePicker = [[UIDatePicker alloc] initWithFrame:CGRectMake(0, 0, 200, 150)];
-    _datePicker.backgroundColor = [UIColor whiteColor];
-    [_datePicker setTimeZone:[NSTimeZone timeZoneWithName:@"GMT+8"]];
-//    [_datePicker setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:8]];
-//    [_datePicker setDate:[NSDate date] animated:YES];
-    [_datePicker setMinimumDate:[NSDate date]];
-    [_datePicker setDatePickerMode:UIDatePickerModeDate];
-    
-    self.pickerView = [[UIView alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-    _pickerView.backgroundColor = [UIColor colorWithWhite:0.7 alpha:0.5];
-    [_pickerView addSubview:_datePicker];
-    _datePicker.center = _pickerView.center;
-
-    UIButton * dateBT = [UIButton buttonWithType:UIButtonTypeCustom];
-    dateBT.frame = CGRectMake(0, 5, 80, 30);
-    dateBT.centerX = _datePicker.centerX;
-    [dateBT setTitle:@"确定" forState:UIControlStateNormal];
-    [dateBT setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-    [dateBT addTarget:self action:@selector(getDate:) forControlEvents:UIControlEventTouchUpInside];
-    dateBT.backgroundColor = MAIN_COLOR;
-    UIView * view = [[UIView alloc] initWithFrame:CGRectMake(0, _datePicker.bottom, _pickerView.width, 40)];
-    view.backgroundColor = [UIColor whiteColor];
-    [view addSubview:dateBT];
-    [_pickerView addSubview:view];
-}
 
 - (void)backLastVC:(id)sender
 {
     [self.navigationController popViewControllerAnimated:YES];
 }
 
-#pragma mark - 提交支付
-- (void)payOrderDetails:(UIButton *)button
+
+- (void)payOrder:(UIButton *)button
 {
-    if (self.ruzhuDate == nil) {
-        [self alertMessage:@"请选择入住时间"];
-    }else if (self.lidianDate == nil)
-    {
-        [self alertMessage:@"请选择离店时间"];
-    }else if (self.personTF.text.length == 0)
-    {
-        [self alertMessage:@"请输入入住人名"];
-    }else if (self.telTF.text.length == 0)
-    {
-        [self alertMessage:@"请输入手机号码"];
+    NSLog(@"%@", self.payType);
+    if ([self.payType isEqualToNumber:@1]) {
+        if ([WXApi isWXAppInstalled] && [WXApi isWXAppSupportApi]) {
+            [SVProgressHUD showWithStatus:@"正在提交支付..." maskType:SVProgressHUDMaskTypeBlack];
+            NSDictionary * dic = @{
+                                   @"Command":@34,
+                                   @"UserId":[UserInfo shareUserInfo].userId,
+                                   @"PayType":self.payType,
+                                   @"OrderId":self.orderID,
+                                   @"Cur_IP":[self getIPAddress]
+                                   };
+            [self playPostWithDictionary:dic];
+        }else
+        {
+            [SVProgressHUD showErrorWithStatus:@"你还没安装微信或者微信版本太低" duration:2];
+        }
+
     }else
     {
-        BOOL isPhoneNum = [NSString isTelPhoneNub:self.telTF.text];
-        if (isPhoneNum) {
-            NSDateFormatter* dateFormatter = [[NSDateFormatter alloc] init];
-            [dateFormatter setDateStyle:NSDateFormatterFullStyle];
-            [dateFormatter setDateFormat:@"yyyy-MM-dd"];
-            NSString * ruzhuDateString = [dateFormatter stringFromDate:self.ruzhuDate];
-            NSString * lidianDateString = [dateFormatter stringFromDate:self.lidianDate];
-            NSLog(@"ip = %@", [self getIPAddress]);
-            
-            NSDictionary * jsonDic = @{
-                                       @"Cur_IP":[self getIPAddress],
-                                       @"Command":@11,
-                                       @"SuiteId":self.roomId,
-                                       @"SuitePrice":[NSNumber numberWithDouble:_allMoney],
-                                       @"CheckInDate":ruzhuDateString,
-                                       @"LeaveDate":lidianDateString,
-                                       @"UserId":[UserInfo shareUserInfo].userId,
-                                       @"PhoneNumber":self.telTF.text,
-                                       @"Demand":self.requireTF.text,
-                                       @"PayType":self.payType,
-                                       @"CheckInName":self.personTF.text
-                                       };
-            [self playPostWithDictionary:jsonDic];
-        }
+        BDWalletSDKMainManager* payMainManager = [BDWalletSDKMainManager getInstance];
+        NSString *orderInfo = [self buildOrderInfoWithOrderID:self.orderID];
+        [payMainManager doPayWithOrderInfo:orderInfo params:nil delegate:self];
     }
 }
+
 
 #pragma mark - 选择支付方式
 - (void)changePayType:(UIButton *)button
@@ -352,90 +275,7 @@
     button.selected = !button.selected;
 }
 
-
-- (void)changeDate:(UIButton *)button
-{
-    self.dateButton = button;
-    if (button.tag == 10002 & self.ruzhuDate != nil) {
-        self.datePicker.minimumDate = self.ruzhuDate;
-        self.datePicker.maximumDate = [NSDate dateWithTimeIntervalSinceNow:1000000000];
-    }else if (button.tag == 10002 & self.ruzhuDate == nil)
-    {
-        self.datePicker.minimumDate = [NSDate date];
-        self.datePicker.maximumDate = [NSDate dateWithTimeIntervalSinceNow:1000000000];
-    }else if (button.tag == 10001 & self.lidianDate != nil)
-    {
-        self.datePicker.minimumDate = [NSDate date];
-        self.datePicker.maximumDate = self.lidianDate;
-    }else if (button.tag == 10001 & self.lidianDate == nil)
-    {
-        self.datePicker.minimumDate = [NSDate date];
-        self.datePicker.maximumDate = [NSDate dateWithTimeIntervalSinceNow:1000000000];
-    }
-    [self.view.window addSubview:_pickerView];
-    NSLog(@"时间");
-}
-
-
-- (void)getDate:(UIButton *)button
-{
-    if (self.dateButton.tag == 10001) {
-        self.ruzhuDate = self.datePicker.date;
-    }else if (self.dateButton.tag == 10002)
-    {
-        self.lidianDate = self.datePicker.date;
-    }
-    if (self.ruzhuDate != nil & self.lidianDate != nil) {
-        NSInteger days = [self calculateAgeFromDate:self.ruzhuDate toDate:self.lidianDate];
-        self.daysLB.text = [NSString stringWithFormat:@"住店时长: 共%ld天", days];
-        double price = self.price.doubleValue * days;
-        _allMoney = price;
-        self.priceLB.attributedText = [self allPriceLBTextWithPrice:[NSNumber numberWithDouble:price]];
-    }
-    [self.pickerView removeFromSuperview];
-    NSDateFormatter* dateFormatter = [[NSDateFormatter alloc] init];
-    [dateFormatter setDateStyle:NSDateFormatterFullStyle];
-    [dateFormatter setDateFormat:@"yyyy-MM-dd"];
-    NSString *dateString = [dateFormatter stringFromDate:_datePicker.date];
-    [self.dateButton setTitle:dateString forState:UIControlStateNormal];
-//    NSLog(@"%@", _dateButton);
-//    _dateButton.backgroundColor = [UIColor redColor];
-    NSLog(@"%@", dateString);
-}
-
-- (BOOL)textFieldShouldEndEditing:(UITextField *)textField
-{
-    [textField resignFirstResponder];
-    return YES;
-}
-
-
-- (BOOL)textFieldShouldReturn:(UITextField *)textField
-{
-    [self.personTF resignFirstResponder];
-    [self.telTF resignFirstResponder];
-    [self.requireTF resignFirstResponder];
-    return YES;
-}
-
-
-- (NSInteger)calculateAgeFromDate:(NSDate *)date1 toDate:(NSDate *)date2{
-    
-    NSCalendar *userCalendar = [NSCalendar currentCalendar];
-    unsigned int unitFlags = NSCalendarUnitHour;
-    NSDateComponents *components = [userCalendar components:unitFlags fromDate:date1 toDate:date2 options:0];
-    NSInteger hours = [components hour];
-    
-    NSInteger day = 1;
-    NSLog(@"////%ld", (long)hours);
-    if (hours > 22) {
-        day = hours / 24 + 2;
-        NSLog(@"---%ld", (long)day);
-    }
-    return day;
-}
-
-#pragma mark - 数据请求
+#pragma mark-  数据请求
 - (void)playPostWithDictionary:(NSDictionary *)dic
 {
     NSString * jsonStr = [dic JSONString];
@@ -454,9 +294,30 @@
     NSLog(@"+++%@", data);
     NSLog(@"%@", [data objectForKey:@"ErrorMsg"]);
     if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
-        self.orderId = [data objectForKey:@"HotelOrder"];
-        NSString * appid = [data objectForKey:@"AppId"];
-        if (![appid isEqual:[NSNull null]]) {
+        if ([[data objectForKey:@"Command"] isEqualToNumber:@10026]) {
+            self.priceLB.text = [NSString stringWithFormat:@"     订单金额:%@", [data objectForKey:@"Price"]];
+            self.price = [[data objectForKey:@"Price"] doubleValue];
+            self.personLB.text = [NSString stringWithFormat:@"预定人:%@", [data objectForKey:@"Name"]];
+            self.telLB.text = [NSString stringWithFormat:@"预定号码:%@", [data objectForKey:@"PhoneNumber"]];
+            NSString * checkInTime = [data objectForKey:@"CheckInTime"];
+            self.checkInDateLB.text = [NSString stringWithFormat:@"入住时间:%@", [checkInTime substringToIndex:10]];
+            NSString * leaveTime = [data objectForKey:@"LeaveTime"];
+            self.leaveLB.text = [NSString stringWithFormat:@"%@", [leaveTime substringToIndex:10]];
+            self.roomLB.text = [NSString stringWithFormat:@"房型:%@", [data objectForKey:@"RoomType"]];
+            self.roomName = [data objectForKey:@"RoomType"];
+            self.countLB.text = [NSString stringWithFormat:@"预定房间:%@间", [data objectForKey:@"RoomCount"]];
+//            self.payType = [data objectForKey:@"PeyType"];
+            if ([[data objectForKey:@"PeyType"] isEqualToNumber:@1]) {
+                self.payLB.text = @"支付方式:微信支付";
+            }else{
+                self.payLB.text = @"支付方式:百度支付";
+            }
+            self.requireLB.text = [NSString stringWithFormat:@"特殊需求:%@", [data objectForKey:@"Demand"]];
+            self.grogshopLB.text = [data objectForKey:@"HotelName"];
+            self.addressLB.text = [data objectForKey:@"HotelAddress"];
+            self.telGSLB.text = [NSString stringWithFormat:@"%@", [data objectForKey:@"HotelTel"]];
+        }else if ([[data objectForKey:@"Command"] isEqualToNumber:@10034])
+        {
             NSMutableDictionary *signParams = [NSMutableDictionary dictionary];
             [signParams setObject: [NSString stringWithFormat:@"%@", [data objectForKey:@"AppId"]]       forKey:@"appid"];
             [signParams setObject: [NSString stringWithFormat:@"%@", [data objectForKey:@"NonceStr"]]    forKey:@"noncestr"];
@@ -464,7 +325,8 @@
             [signParams setObject: [NSString stringWithFormat:@"%@", [data objectForKey:@"PartnerId"]]        forKey:@"partnerid"];
             [signParams setObject: [data objectForKey:@"TimeStamp"]   forKey:@"timestamp"];
             [signParams setObject: [data objectForKey:@"PrepayId"]    forKey:@"prepayid"];
-            
+//            [signParams setObject: @"MD5"       forKey:@"signType"];
+            NSLog(@"signDic = %@", signParams);
             NSString * sign = [self createMd5Sign:signParams];
             NSNumber * stamp = [data objectForKey:@"TimeStamp"];
             //调起微信支付
@@ -477,63 +339,21 @@
             req.package             = [NSString stringWithFormat:@"%@", [data objectForKey:@"Package"]];
 //            req.sign                = [NSString stringWithFormat:@"%@", [data objectForKey:@"Sign"]];
             req.sign = sign;
-            BOOL a = [WXApi sendReq:req];
-            NSLog(@"%d", a);
-        }else
-        {
-            BDWalletSDKMainManager* payMainManager = [BDWalletSDKMainManager getInstance];
-//            NSLog(@"order_no = %@", [data objectForKey:@"HotelOrder"]);
-            NSString *orderInfo = [self buildOrderInfoWithOrderID:[data objectForKey:@"HotelOrder"]];
-            [payMainManager doPayWithOrderInfo:orderInfo params:nil delegate:self];
+            [WXApi sendReq:req];
         }
-    }else
-    {
-        UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:[data objectForKey:@"ErrorMsg"] delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
-        [alert show];
-        [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:1.5];
     }
-    //    [self.detailsTableView headerEndRefreshing];
-    //    [self.detailsTableView footerEndRefreshing];
     [SVProgressHUD dismiss];
 }
 
-#pragma  mark - 跳转到订单详情页面
-- (void)pushOrderDetailsVC
+- (void)failWithError:(NSError *)error
 {
-    DetailsGSOrderViewController * detailsOrderVC = [[DetailsGSOrderViewController alloc] init];
-    detailsOrderVC.isPay = YES;
-    detailsOrderVC.orderID = self.orderId;
-    [self.navigationController pushViewController:detailsOrderVC animated:YES];
+    NSLog(@"%@", error);
 }
-
 
 #pragma mark - 百度支付
-
-/*
--(void)dopay
-{
-    BDWalletSDKMainManager* payMainManager = [BDWalletSDKMainManager getInstance];
-    
-    NSString *orderInfo = [self buildOrderInfoTest];    //创建测试orderInfo
-    
-    // for your info
-    {
-        // 可选
-        //[payMainManager setBdWalletNavTitleColor:Your color];
-        //[[BDWalletSDKMainManager getInstance] setBdWalletNavBgImage:[UIImage imageNamed:Your NavBgImage]];
-        //[[BDWalletSDKMainManager getInstance] setBdWalletNavBackNormalImage:[UIImage imageNamed:Your BackImage]];
-    }
-    
-    [payMainManager doPayWithOrderInfo:orderInfo params:nil delegate:self];
-    
-}
-*/
-/*
- 此处生成的订单OrderInfo为测试专用，请接入的商户兄弟使用自己的订单，并且是按首字母排序的
- */
 -(NSString*)buildOrderInfoWithOrderID:(NSString *)orderId
 {
-    int money = (int)(_allMoney * 100);
+    int money = (int)(_price * 100);
     NSMutableString *str = [[NSMutableString alloc]init];
     
     static NSString *spNo = @"1000011124";
@@ -546,7 +366,7 @@
      如有中文相关，步骤一 GBK ；步骤二 MD5 GBK ； 步骤三 URLEncode GBK
      详见以下注释
      */
-//    NSString *orderId = [NSString stringWithFormat:@"z2015052713275609521156"];
+    //    NSString *orderId = [NSString stringWithFormat:@"z2015052713275609521156"];
     [str appendString:@"currency=1&extra=ios123"];
     [str appendString:@"&goods_desc="];
     [str appendString:[self utf8toGbk:self.roomName]];
@@ -595,7 +415,7 @@
     [str1 appendString:[NSString stringWithFormat:@"%d", money]];//商品单价(以分为单位)
     [str1 appendString:@"&unit_count=1&version=2"];//商品数量
     NSLog(@"%@", str);
-//    NSLog(@"+++%@", [NSString stringWithFormat:@"%@&sign=%@" , str1 , md5CapPwd]);
+    //    NSLog(@"+++%@", [NSString stringWithFormat:@"%@&sign=%@" , str1 , md5CapPwd]);
     return [NSString stringWithFormat:@"%@&sign=%@" , str1, md5CapPwd];
 }
 
@@ -640,12 +460,6 @@
 -(void)BDWalletPayResultWithCode:(int)statusCode payDesc:(NSString*)payDesc;
 {
     NSLog(@"支付结束 接口 code:%d desc:%@",statusCode,payDesc);
-    if (statusCode == 0) {
-        [self pushOrderDetailsVC];
-    }else
-    {
-        [SVProgressHUD showErrorWithStatus:@"支付失败" duration:2];
-    }
 }
 
 - (void)logEventId:(NSString*)eventId eventDesc:(NSString*)eventDesc;
@@ -800,9 +614,8 @@
     [contentString appendFormat:@"key=I57gmdk90nd5bla84nkyqldicn3294Fh"];
     //得到MD5 sign签名
     NSString *md5Sign =[[WXUtil md5:contentString] uppercaseString];
-    
-    //输出Debug Info
-//    [debugInfo appendFormat:@"MD5签名字符串：\n%@\n\n",contentString];
+//    NSString * md5Sign = [contentString md5];
+    NSLog(@"%@", [NSString stringWithFormat:@"MD5签名字符串：\n%@\n\n",contentString]);
     
     return md5Sign;
 }
@@ -849,6 +662,7 @@
     freeifaddrs(interfaces);
     return address;
 }
+
 
 
 - (void)didReceiveMemoryWarning {

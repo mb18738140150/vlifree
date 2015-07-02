@@ -13,6 +13,8 @@
 #import "KeyboardManager.h"
 #import "DetailsGrogshopViewController.h"
 #import "DetailTakeOutViewController.h"
+#import "TakeOutOrderViewController.h"
+#import "GSOrderPayViewController.h"
 
 @interface AppDelegate ()<WXApiDelegate>
 
@@ -112,11 +114,23 @@
                 //服务器端查询支付通知或查询API返回的结果再提示成功
                 NSLog(@"支付成功");
                 UINavigationController * nav = (UINavigationController *)self.myTabBarVC.selectedViewController;
-                [nav popToRootViewControllerAnimated:YES];
+                UIViewController * vc = [nav.viewControllers lastObject];
+                if ([vc isKindOfClass:[TakeOutOrderViewController class]]) {
+                    TakeOutOrderViewController * takeOutOrderVC = (TakeOutOrderViewController *)vc;
+                    [takeOutOrderVC pushFinishOrderVC];
+                }else if ([vc isKindOfClass:[GSOrderPayViewController class]])
+                {
+                    GSOrderPayViewController * gsOrderPayVC = (GSOrderPayViewController *)vc;
+                    [gsOrderPayVC pushOrderDetailsVC];
+                }
             }
                 break;
             default:
+            {
                 NSLog(@"支付失败， retcode=%d",resp.errCode);
+                [SVProgressHUD showErrorWithStatus:@"支付失败" duration:2];
+            }
+                
                 break;
         }
     }
