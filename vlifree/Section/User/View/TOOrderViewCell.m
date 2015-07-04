@@ -34,8 +34,8 @@
 {
     if (!_dateLabel) {
         self.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
-        self.backgroundColor = [UIColor colorWithWhite:0.95 alpha:0.7];
-        UIView * view = [[UIView alloc] initWithFrame:CGRectMake(0, 5, frame.size.width, [TOOrderViewCell cellHeight] - 10)];
+        self.backgroundColor = [UIColor colorWithWhite:0.98 alpha:0.6];
+        UIView * view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, frame.size.width, [TOOrderViewCell cellHeight] - 5)];
         view.backgroundColor = [UIColor whiteColor];
         [self.contentView addSubview:view];
         
@@ -47,6 +47,7 @@
         
         self.dateLabel = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, TOP_SPACE, frame.size.width - BUTTON_WIDTH - 3 * LEFT_SPACE, LABEL_HEIGHT)];
         _dateLabel.text = @"05月13日 14:34";
+        _dateLabel.textColor = TEXT_COLOR;
         [view addSubview:_dateLabel];
         
 //        self.cancelButton = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -71,10 +72,12 @@
         
         self.titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(_iconView.right + 5, _iconView.top, frame.size.width - _iconView.right - 30, LABEL_HEIGHT)];
         _titleLabel.text = @"打牌小当1好套餐";
+        _titleLabel.textColor = TEXT_COLOR;
         [view addSubview:_titleLabel];
         
         self.priceLabel = [[UILabel alloc] initWithFrame:CGRectMake(_titleLabel.left, _titleLabel.bottom + TOP_SPACE, 80, LABEL_HEIGHT)];
         _priceLabel.text = @"¥34";
+        _priceLabel.textColor = TEXT_COLOR;
         [view addSubview:_priceLabel];
         
         UIView * lineView3 = [[UIView alloc] initWithFrame:CGRectMake(0, view.height - 1, view.width, 1)];

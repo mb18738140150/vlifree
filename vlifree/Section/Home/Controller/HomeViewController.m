@@ -75,6 +75,7 @@
     
     UILabel * aLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 10, aView.width - 20, 30)];
     aLabel.text = @"你还没有登录,请跳转到登录页面登录";
+    aLabel.textColor = TEXT_COLOR;
     aLabel.textAlignment = NSTextAlignmentCenter;
     [aView addSubview:aLabel];
     
@@ -437,16 +438,24 @@ updatingLocation:(BOOL)updatingLocation
     return [HomeViewCell cellHeigth];
 }
 
-- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
-{
-    return @"经常光顾";
-}
+//- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
+//{
+//    return @"经常光顾";
+//}
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
 {
     return 40;
 }
 
+- (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
+{
+    UILabel * label = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, tableView.width, 30)];
+    label.textColor = TEXT_COLOR;
+    label.text = @"  经常光顾";
+    label.backgroundColor = [UIColor colorWithWhite:0.97 alpha:1];
+    return label;
+}
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {

@@ -9,7 +9,7 @@
 #import "OrderMenuVIew.h"
 
 
-#define LEFT_SPACE 20
+#define LEFT_SPACE 10
 #define PRICE_LABEL_WIDTH 70
 #define COUNT_LABEL_WIDTH 40
 #define LABEL_HEIGHT 25
@@ -27,19 +27,22 @@
         self.menuNameLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, 0, self.width - COUNT_LABEL_WIDTH - PRICE_LABEL_WIDTH - 4 * LEFT_SPACE, LABEL_HEIGHT)];
         _menuNameLB.backgroundColor = VIEW_COLOR;
         _menuNameLB.text = @"1号套餐猪排饭";
-        _menuNameLB.textColor = [UIColor colorWithWhite:0.1 alpha:1];
+        _menuNameLB.textColor = TEXT_COLOR;
+        _menuNameLB.font = [UIFont systemFontOfSize:14];
         [self addSubview:_menuNameLB];
         
         self.countLabel = [[UILabel alloc] initWithFrame:CGRectMake(_menuNameLB.right, 0, COUNT_LABEL_WIDTH, LABEL_HEIGHT)];
         _countLabel.text = @"1";
-        _countLabel.textColor = [UIColor colorWithWhite:0.1 alpha:1];
+        _countLabel.textColor = TEXT_COLOR;
         _countLabel.backgroundColor = VIEW_COLOR;
+        _countLabel.font = [UIFont systemFontOfSize:14];
         [self addSubview:_countLabel];
         
-        self.priceLabel = [[UILabel alloc] initWithFrame:CGRectMake(_countLabel.right + 2 * LEFT_SPACE, 0, PRICE_LABEL_WIDTH, LABEL_HEIGHT)];
+        self.priceLabel = [[UILabel alloc] initWithFrame:CGRectMake(self.width - PRICE_LABEL_WIDTH, 0, PRICE_LABEL_WIDTH, LABEL_HEIGHT)];
         _priceLabel.text = @"23";
-        _priceLabel.textColor = [UIColor colorWithWhite:0.1 alpha:1];
+        _priceLabel.textColor = [UIColor redColor];
         _priceLabel.backgroundColor = VIEW_COLOR;
+        _priceLabel.font = [UIFont systemFontOfSize:14];
         [self addSubview:_priceLabel];
         
     }

@@ -60,6 +60,7 @@
         self.titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(_icon.right + LEFT_SPACE, _icon.top, CENTRE_LABEL_WIDTH, LABEL_HEIGTH)];
         _titleLabel.backgroundColor = VIEW_COLOR;
 //        _titleLabel.text = @"小肥羊";
+        _titleLabel.textColor = TEXT_COLOR;
         [self.contentView addSubview:_titleLabel];
         
         self.detailLabel = [[UILabel alloc] initWithFrame:CGRectMake(_titleLabel.left, _titleLabel.bottom, CENTRE_LABEL_WIDTH, LABEL_HEIGTH)];

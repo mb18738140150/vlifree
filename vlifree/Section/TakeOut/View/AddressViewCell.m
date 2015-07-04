@@ -37,9 +37,11 @@
         [self.contentView addSubview:_seleteImageView];
         self.addressLB = [[UILabel alloc] initWithFrame:CGRectMake(_seleteImageView.right, 10, frame.size.width - _seleteImageView.right - 10, 25)];
         _addressLB.numberOfLines = 0;
+        _addressLB.textColor = TEXT_COLOR;
         _addressLB.lineBreakMode = NSLineBreakByWordWrapping;
         [self.contentView addSubview:_addressLB];
         self.telLabel = [[UILabel alloc] initWithFrame:CGRectMake(_addressLB.left, _addressLB.bottom, _addressLB.width, _addressLB.height)];
+        _telLabel.textColor = TEXT_COLOR;
         [self.contentView addSubview:_telLabel];
         _seleteImageView.center = CGPointMake(_seleteImageView.centerX, _telLabel.bottom / 2 + 5);
     }

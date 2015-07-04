@@ -54,7 +54,9 @@
     
     self.phoneTF = [[UITextField alloc] initWithFrame:CGRectMake(phoneLB.right + 5, phoneLB.top, phoneView.width - 10 - phoneLB.right, IMAGE_SIZE)];
     _phoneTF.placeholder = @"手机号";
-    _phoneTF.font = [UIFont systemFontOfSize:22];
+//    _phoneTF.font = [UIFont systemFontOfSize:20];
+    _phoneTF.font = [UIFont systemFontOfSize:15];
+    _phoneTF.textColor = TEXT_COLOR;
 //    _phoneTF.keyboardType = UIKeyboardTypePhonePad;
     _phoneTF.clearButtonMode = UITextFieldViewModeWhileEditing;
     [phoneView addSubview:_phoneTF];

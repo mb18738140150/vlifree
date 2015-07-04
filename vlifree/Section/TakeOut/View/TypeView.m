@@ -49,6 +49,7 @@
         UILabel * snacksLB = [[UILabel alloc] initWithFrame:CGRectMake(0, snacksImageV.bottom, IMAGE_SIZE, LABEL_HEIGTH)];
         snacksLB.textAlignment = NSTextAlignmentCenter;
         snacksLB.text = @"零食";
+        snacksLB.textColor = TEXT_COLOR;
         self.snacksBT = [UIButton buttonWithType:UIButtonTypeCustom];
         _snacksBT.frame = CGRectMake(LEFT_SPACE, TOP_SPACE, BUTTON_WIDTH, BUTTON_HEIGTH);
         _snacksBT.backgroundColor = BUTTON_COLOR;
@@ -61,6 +62,7 @@
         UILabel * fastFoodLB = [[UILabel alloc] initWithFrame:CGRectMake(0, snacksImageV.bottom, IMAGE_SIZE, LABEL_HEIGTH)];
         fastFoodLB.textAlignment = NSTextAlignmentCenter;
         fastFoodLB.text = @"快餐";
+        fastFoodLB.textColor = TEXT_COLOR;
         self.fastFoodBT = [UIButton buttonWithType:UIButtonTypeCustom];
         _fastFoodBT.frame = CGRectMake(LEFT_SPACE + _snacksBT.right, TOP_SPACE, BUTTON_WIDTH, BUTTON_HEIGTH);
         _fastFoodBT.backgroundColor = BUTTON_COLOR;
@@ -74,6 +76,7 @@
         UILabel * supermarketLB = [[UILabel alloc] initWithFrame:CGRectMake(0, supermarketImageV.bottom, IMAGE_SIZE, LABEL_HEIGTH)];
         supermarketLB.textAlignment = NSTextAlignmentCenter;
         supermarketLB.text = @"超市";
+        supermarketLB.textColor = TEXT_COLOR;
         self.supermarketBT = [UIButton buttonWithType:UIButtonTypeCustom];
         _supermarketBT.frame = CGRectMake(LEFT_SPACE + _fastFoodBT.right, TOP_SPACE, BUTTON_WIDTH, BUTTON_HEIGTH);
         _supermarketBT.backgroundColor = BUTTON_COLOR;
@@ -87,6 +90,7 @@
         UILabel * cakeLB = [[UILabel alloc] initWithFrame:CGRectMake(0, snacksImageV.bottom, IMAGE_SIZE, LABEL_HEIGTH)];
         cakeLB.textAlignment = NSTextAlignmentCenter;
         cakeLB.text = @"蛋糕";
+        cakeLB.textColor = TEXT_COLOR;
         self.cakeBT = [UIButton buttonWithType:UIButtonTypeCustom];
         _cakeBT.frame = CGRectMake(LEFT_SPACE + _supermarketBT.right, TOP_SPACE, BUTTON_WIDTH, BUTTON_HEIGTH);
         _cakeBT.backgroundColor = BUTTON_COLOR;
@@ -99,6 +103,7 @@
         UILabel * milkTeaLB = [[UILabel alloc] initWithFrame:CGRectMake(0, snacksImageV.bottom, IMAGE_SIZE, LABEL_HEIGTH)];
         milkTeaLB.textAlignment = NSTextAlignmentCenter;
         milkTeaLB.text = @"奶茶";
+        milkTeaLB.textColor = TEXT_COLOR;
         self.milkTeaBT = [UIButton buttonWithType:UIButtonTypeCustom];
         _milkTeaBT.frame = CGRectMake(LEFT_SPACE, TOP_SPACE + _snacksBT.bottom, BUTTON_WIDTH, BUTTON_HEIGTH);
         _milkTeaBT.backgroundColor = BUTTON_COLOR;
@@ -111,6 +116,7 @@
         UILabel * fruitLB = [[UILabel alloc] initWithFrame:CGRectMake(0, snacksImageV.bottom, IMAGE_SIZE, LABEL_HEIGTH)];
         fruitLB.textAlignment = NSTextAlignmentCenter;
         fruitLB.text = @"水果";
+        fruitLB.textColor = TEXT_COLOR;
         self.fruitBT = [UIButton buttonWithType:UIButtonTypeCustom];
         _fruitBT.frame = CGRectMake(LEFT_SPACE + _milkTeaBT.right, TOP_SPACE + _fastFoodBT.bottom, BUTTON_WIDTH, BUTTON_HEIGTH);
         _fruitBT.backgroundColor = BUTTON_COLOR;
@@ -124,6 +130,7 @@
         UILabel * dessertLB = [[UILabel alloc] initWithFrame:CGRectMake(0, snacksImageV.bottom, IMAGE_SIZE, LABEL_HEIGTH)];
         dessertLB.textAlignment = NSTextAlignmentCenter;
         dessertLB.text = @"甜品";
+        dessertLB.textColor = TEXT_COLOR;
         self.dessertBT = [UIButton buttonWithType:UIButtonTypeCustom];
         _dessertBT.frame = CGRectMake(LEFT_SPACE + _fruitBT.right, TOP_SPACE + _supermarketBT.bottom, BUTTON_WIDTH, BUTTON_HEIGTH);
         _dessertBT.backgroundColor = BUTTON_COLOR;
@@ -136,6 +143,7 @@
         UILabel * pastaLB = [[UILabel alloc] initWithFrame:CGRectMake(0, snacksImageV.bottom, IMAGE_SIZE, LABEL_HEIGTH)];
         pastaLB.textAlignment = NSTextAlignmentCenter;
         pastaLB.text = @"面食";
+        pastaLB.textColor = TEXT_COLOR;
         self.pastaBT = [UIButton buttonWithType:UIButtonTypeCustom];
         _pastaBT.frame = CGRectMake(LEFT_SPACE + _dessertBT.right, TOP_SPACE + _cakeBT.bottom, BUTTON_WIDTH, BUTTON_HEIGTH);
         _pastaBT.backgroundColor = BUTTON_COLOR;

@@ -13,8 +13,8 @@
 
 
 #define CYCLESCROLLVIEW_HEIGHT 150
-#define DESCRIBEVIEW_HEIGHT 50
-#define LABEL_HEIGHT 30
+#define DESCRIBEVIEW_HEIGHT 40
+#define LABEL_HEIGHT 20
 
 #define IMAGE_SIZE 10
 
@@ -57,11 +57,12 @@
     
 //    [self addSubview:_cycleScrollView];
     UIView * lineView = [[UIView alloc] initWithFrame:CGRectMake(0, _cycleScrollView.height - 1, self.width, 1)];
-    lineView.backgroundColor = [UIColor colorWithWhite:0.9 alpha:0.4];
+    lineView.backgroundColor = LINE_COLOR;
     [self addSubview:lineView];
     self.addressView = [[DescribeView alloc] initWithFrame:CGRectMake(0, _cycleScrollView.bottom, self.width, DESCRIBEVIEW_HEIGHT)];
     _addressView.iconView.image = [UIImage imageNamed:@"addressIcon.png"];
     _addressView.titleLable.text = @"新环西路56号高新工业园区1号楼";
+    
     _addressView.backgroundColor = [UIColor whiteColor];
 //    _addressView.backgroundColor = [UIColor orangeColor];
     [self addSubview:_addressView];
@@ -72,12 +73,16 @@
 //    _phoneView.backgroundColor = [UIColor magentaColor];
     [self addSubview:_phoneView];
     
+    
+    
     UIView * labelView = [[UIView alloc] initWithFrame:CGRectMake(0, _phoneView.bottom, self.width, DESCRIBEVIEW_HEIGHT)];
     labelView.backgroundColor = [UIColor whiteColor];
     [self addSubview:labelView];
     
     UILabel * aLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 10, 80, LABEL_HEIGHT)];
     aLabel.text = @"查看详情";
+    aLabel.textColor = TEXT_COLOR;
+    aLabel.font = [UIFont systemFontOfSize:14];
     [labelView addSubview:aLabel];
     
     self.wifiView = [[UIImageView alloc] initWithFrame:CGRectMake(aLabel.right + 5, (labelView.height - IMAGE_SIZE) / 2, IMAGE_SIZE, IMAGE_SIZE)];
@@ -93,12 +98,16 @@
     _foodView.image = [UIImage imageNamed:@"food_on.png"];
     [labelView addSubview:_foodView];
     
+    self.detailsBT = [UIButton buttonWithType:UIButtonTypeCustom];
+    _detailsBT.frame = CGRectMake(0, _phoneView.bottom, self.width, DESCRIBEVIEW_HEIGHT);
+//    _detailsBT.backgroundColor = [UIColor whiteColor];
+    [self addSubview:_detailsBT];
     
     UIView * bottomLineView = [[UIView alloc] initWithFrame:CGRectMake(0, labelView.bottom, self.width, 1)];
-    bottomLineView.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.7];
-    [self addSubview:bottomLineView];
+    bottomLineView.backgroundColor = LINE_COLOR;
+//    [self addSubview:bottomLineView];
     
-    self.backgroundColor = [UIColor colorWithWhite:0.9 alpha:0.6];
+    self.backgroundColor = [UIColor colorWithWhite:0.95 alpha:0.4];
     
     
     

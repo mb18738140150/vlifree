@@ -71,10 +71,12 @@
     
     self.stateLabel = [[UILabel alloc] initWithFrame:CGRectMake(_stateImageV.right + 5, _stateImageV.top, 200, _stateImageV.height)];
     _stateLabel.text = @"订单完成";
+    _stateLabel.textColor = TEXT_COLOR;
     [view1 addSubview:_stateLabel];
     
     UILabel * aLabel = [[UILabel alloc] initWithFrame:CGRectMake(_stateImageV.left, _stateImageV.bottom + 10, view1.width - _stateImageV.left * 2, 20)];
     aLabel.text = @"感谢您使用微外卖，欢迎再次订餐。";
+    aLabel.textColor = TEXT_COLOR;
     aLabel.textColor = [UIColor colorWithWhite:0.3 alpha:1];
     aLabel.font = [UIFont systemFontOfSize:15];
     [view1 addSubview:aLabel];
@@ -84,7 +86,7 @@
     _cancelBT.frame = CGRectMake(view1.width - 100, aLabel.bottom + 10, 80, 25);
     [_cancelBT setTitle:@"取消订单" forState:UIControlStateNormal];
     _cancelBT.titleLabel.font = [UIFont systemFontOfSize:15];
-    [_cancelBT setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+    [_cancelBT setTitleColor:TEXT_COLOR forState:UIControlStateNormal];
     _cancelBT.layer.borderColor = [UIColor colorWithWhite:0.8 alpha:0.8].CGColor;
     _cancelBT.layer.borderWidth = 1;
     _cancelBT.layer.cornerRadius = 3;
@@ -104,7 +106,7 @@
     _confirmBT.frame = CGRectMake(view1.width - 100, aLabel.bottom + 10, 80, 25);
     [_confirmBT setTitle:@"确认订单" forState:UIControlStateNormal];
     _confirmBT.titleLabel.font = [UIFont systemFontOfSize:15];
-    [_confirmBT setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    [_confirmBT setTitleColor:TEXT_COLOR forState:UIControlStateNormal];
     _confirmBT.layer.borderColor = [UIColor colorWithWhite:0.8 alpha:0.8].CGColor;
     _confirmBT.layer.backgroundColor = [UIColor orangeColor].CGColor;
     _confirmBT.layer.borderWidth = 1;
@@ -119,7 +121,7 @@
     lineView1.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
     [view1 addSubview:lineView1];
     
-    UIView * view2 = [[UIView alloc] initWithFrame:CGRectMake(0, view1.bottom + 10, _scrollView.width, 100)];
+    UIView * view2 = [[UIView alloc] initWithFrame:CGRectMake(0, view1.bottom + 5, _scrollView.width, 100)];
     view2.tag = 2000;
     view2.backgroundColor = [UIColor whiteColor];
     [_scrollView addSubview:view2];
@@ -132,13 +134,14 @@
 //    int state = self.takeOutOrderMD.orderState.intValue - 1;
     for (int i = 0; i < 4; i++) {
         UIImageView * aImageView = [[UIImageView alloc] initWithFrame:CGRectMake((view2.width - 200) / 5 * (i + 1) + 50 * i, 10, 50, 50)];
-        aImageView.image = [UIImage imageNamed:[NSString stringWithFormat:@"orderState%d.png", i + 1]];
+        aImageView.image = [UIImage imageNamed:[NSString stringWithFormat:@"orderState_off%d.png", i + 1]];
         aImageView.tag = 10001 + i;
         [view2 addSubview:aImageView];
         UILabel * label = [[UILabel alloc] initWithFrame:CGRectMake(aImageView.left, aImageView.bottom, aImageView.width, 20)];
         label.tag = 20001 + i;
         label.text = [array objectAtIndex:i];
         label.textAlignment = NSTextAlignmentCenter;
+        label.textColor = TEXT_COLOR;
         label.font = [UIFont systemFontOfSize:12];
         [view2 addSubview:label];
         if (i != 3) {
@@ -166,7 +169,7 @@
     [view2 addSubview:lineView3];
     
     
-    UIView * view3 = [[UIView alloc] initWithFrame:CGRectMake(0, view2.bottom + 10, _scrollView.width, 100)];
+    UIView * view3 = [[UIView alloc] initWithFrame:CGRectMake(0, view2.bottom + 5, _scrollView.width, 100)];
     view3.backgroundColor = [UIColor whiteColor];
     view3.tag = 3000;
     [_scrollView addSubview:view3];
@@ -181,6 +184,7 @@
     
     self.storeNameLB = [[UILabel alloc] initWithFrame:CGRectMake(storeIcon.right + 5, storeIcon.top, view3.width - 10 - storeIcon.right, storeIcon.height)];
     _storeNameLB.text = self.takeOutOrderMD.storeName;
+    _storeNameLB.textColor = TEXT_COLOR;
     [view3 addSubview:_storeNameLB];
     
     UIView * lineView5 = [[UIView alloc] initWithFrame:CGRectMake(10, _storeNameLB.bottom, view3.width - 20, 1)];
@@ -220,11 +224,13 @@
     if (![self.takeOutOrderMD.firstReduce isEqualToNumber:@0]) {
         UILabel * firstTitleLB = [[UILabel alloc] initWithFrame:CGRectMake(15, top, 100, 25)];
         firstTitleLB.text = @"首单减免";
+        firstTitleLB.textColor = TEXT_COLOR;
         [view4 addSubview:firstTitleLB];
         
         UILabel * firstJLB = [[UILabel alloc] initWithFrame:CGRectMake(view4.width - 70, firstTitleLB.top, 50, 25)];
         firstJLB.text = [NSString stringWithFormat:@"-%@", self.takeOutOrderMD.firstReduce];
         firstJLB.textAlignment = NSTextAlignmentRight;
+        firstJLB.textColor = TEXT_COLOR;
         [view4 addSubview:firstJLB];
         
         UIView * firstlineView = [[UIView alloc] initWithFrame:CGRectMake(10, firstJLB.bottom, view4.width - 20, 1)];
@@ -237,30 +243,35 @@
     {
         UILabel * fullTitleLB = [[UILabel alloc] initWithFrame:CGRectMake(15, top, 100, 25)];
         fullTitleLB.text = @"满减优惠";
+        fullTitleLB.textColor = TEXT_COLOR;
         [view4 addSubview:fullTitleLB];
         
         UILabel * fullJLB = [[UILabel alloc] initWithFrame:CGRectMake(view4.width - 70, fullTitleLB.top, 50, 25)];
         fullJLB.text = [NSString stringWithFormat:@"-%@", self.takeOutOrderMD.fullReduce];
         fullJLB.textAlignment = NSTextAlignmentRight;
+        fullJLB.textColor = TEXT_COLOR;
         [view4 addSubview:fullJLB];
         
         UIView * fullLineView = [[UIView alloc] initWithFrame:CGRectMake(10, fullJLB.bottom, view4.width - 20, 1)];
         fullLineView.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
         [view4 addSubview:fullLineView];
+        top = fullLineView.bottom + 5;
     }
     
     if (![self.takeOutOrderMD.mealBoxMoney isEqualToNumber:@0])
     {
         UILabel * boxTitleLB = [[UILabel alloc] initWithFrame:CGRectMake(15, top, 100, 25)];
         boxTitleLB.text = @"餐具费";
+        boxTitleLB.textColor = TEXT_COLOR;
         [view4 addSubview:boxTitleLB];
         
         UILabel * boxPriceLB = [[UILabel alloc] initWithFrame:CGRectMake(view4.width - 70, boxTitleLB.top, 50, 25)];
         boxPriceLB.text = [NSString stringWithFormat:@"+%@", self.takeOutOrderMD.mealBoxMoney];
         boxPriceLB.textAlignment = NSTextAlignmentRight;
+        boxPriceLB.textColor = TEXT_COLOR;
         [view4 addSubview:boxPriceLB];
         
-        UIView * boxLineView = [[UIView alloc] initWithFrame:CGRectMake(10, _otherPriceLB.bottom, view4.width - 20, 1)];
+        UIView * boxLineView = [[UIView alloc] initWithFrame:CGRectMake(10, boxPriceLB.bottom, view4.width - 20, 1)];
         boxLineView.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
         [view4 addSubview:boxLineView];
         top = boxLineView.bottom + 5;
@@ -271,11 +282,13 @@
     {
         UILabel * otherTitleLB = [[UILabel alloc] initWithFrame:CGRectMake(15, top, 100, 25)];
         otherTitleLB.text = @"配送费";
+        otherTitleLB.textColor = TEXT_COLOR;
         [view4 addSubview:otherTitleLB];
         
         self.otherPriceLB = [[UILabel alloc] initWithFrame:CGRectMake(view4.width - 70, otherTitleLB.top, 50, 25)];
         _otherPriceLB.text = [NSString stringWithFormat:@"+%@", self.takeOutOrderMD.deliveryMoney];
         _otherPriceLB.textAlignment = NSTextAlignmentRight;
+        _otherPriceLB.textColor = TEXT_COLOR;
         [view4 addSubview:_otherPriceLB];
         
         UIView * lineView8 = [[UIView alloc] initWithFrame:CGRectMake(10, _otherPriceLB.bottom, view4.width - 20, 1)];
@@ -284,14 +297,16 @@
         
         top = lineView8.bottom + 5;
     }
-    
+    NSLog(@"top = %g", top);
     
     UILabel * totalLB = [[UILabel alloc] initWithFrame:CGRectMake(15, top, 100, 25)];
     totalLB.text = @"合计";
+    totalLB.textColor = TEXT_COLOR;
     [view4 addSubview:totalLB];
     
-    self.totalPriceLB = [[UILabel alloc] initWithFrame:CGRectMake(view4.width - 70, totalLB.top, 50, 25)];
+    self.totalPriceLB = [[UILabel alloc] initWithFrame:CGRectMake(view4.width - 90, totalLB.top, 70, 25)];
     _totalPriceLB.text = @"¥35";
+    _totalPriceLB.textColor = TEXT_COLOR;
     _totalPriceLB.textAlignment = NSTextAlignmentRight;
     [view4 addSubview:_totalPriceLB];
     
@@ -330,6 +345,7 @@
     
     UILabel * detailsLB = [[UILabel alloc] initWithFrame:CGRectMake(detalsView.right + 5, detalsView.top, 100, detalsView.height)];
     detailsLB.text = @"订单详情";
+    detailsLB.textColor = TEXT_COLOR;
     [view5 addSubview:detailsLB];
     
     UIView * lineView12 = [[UIView alloc] initWithFrame:CGRectMake(10, detailsLB.bottom + 5, view5.width - 20, 1)];
@@ -338,6 +354,7 @@
     
     self.orderNumberLB = [[UILabel alloc] initWithFrame:CGRectMake(15, lineView12.bottom + 5, lineView12.width - 10, 30)];
     _orderNumberLB.text = [NSString stringWithFormat:@"订单号:%@", self.takeOutOrderMD.orderID];
+    _orderNumberLB.textColor = TEXT_COLOR;
     [view5 addSubview:_orderNumberLB];
     
     
@@ -347,15 +364,18 @@
     
     self.orderPayTypeLB = [[UILabel alloc] initWithFrame:CGRectMake(15, _orderDateLB.bottom + 5, lineView12.width - 10, 30)];
     _orderPayTypeLB.text = @"支付方式: 餐到付款";
+    _orderPayTypeLB.textColor = TEXT_COLOR;
     [view5 addSubview:_orderPayTypeLB];
     
     self.orderTelLB = [[UILabel alloc] initWithFrame:CGRectMake(15, _orderPayTypeLB.bottom + 5, lineView12.width - 10, 30)];
     _orderTelLB.text = [NSString stringWithFormat:@"手机号码: %@", self.takeOutOrderMD.nextphone];
+    _orderTelLB.textColor = TEXT_COLOR;
     [view5 addSubview:_orderTelLB];
     
     
     self.orderAddressLB = [[UILabel alloc] initWithFrame:CGRectMake(15, _orderTelLB.bottom + 5, lineView12.width - 10, 30)];
     _orderAddressLB.text = [NSString stringWithFormat:@"收餐地址: %@", self.takeOutOrderMD.address];
+    _orderAddressLB.textColor = TEXT_COLOR;
     _orderAddressLB.numberOfLines = 0;
     [_orderAddressLB sizeToFit];
     [view5 addSubview:_orderAddressLB];

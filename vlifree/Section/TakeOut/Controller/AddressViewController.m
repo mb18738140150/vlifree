@@ -94,12 +94,14 @@
     
     self.addressLB = [[UILabel alloc] initWithFrame:CGRectMake(aImageView.right + 5, 5, addressView.width - aImageView.right - 10, 30)];
     _addressLB.text = @"送餐地址:新西环路1000弄5号903";
+    _addressLB.textColor = TEXT_COLOR;
     _addressLB.numberOfLines = 0;
     _addressLB.lineBreakMode = NSLineBreakByWordWrapping;
     [addressView addSubview:_addressLB];
     
     self.telLabel = [[UILabel alloc] initWithFrame:CGRectMake(_addressLB.left, _addressLB.bottom, _addressLB.width, _addressLB.height)];
     _telLabel.text = @"13564224954";
+    _telLabel.textColor = TEXT_COLOR;
     [addressView addSubview:_telLabel];
     
     aImageView.center = CGPointMake(aImageView.centerX, _telLabel.bottom / 2);
@@ -158,6 +160,8 @@
     _addressTableView.dataSource = self;
     _addressTableView.delegate = self;
     [_addressTableView registerClass:[AddressViewCell class] forCellReuseIdentifier:@"cell"];
+    _addressTableView.tableFooterView = [[UIView alloc] init];
+    _addressTableView.backgroundColor = [UIColor colorWithWhite:0.9 alpha:0.8];
     [self.view addSubview:_addressTableView];
     
     [self downloadData];
@@ -288,13 +292,21 @@
                 addressView.hidden = YES;
             }
             [self.addressTableView reloadData];
-            AddressModel * addressMD = [self.dataArray objectAtIndex:seletNum];
-            self.addressLB.text = [NSString stringWithFormat:@"送餐地址:%@", addressMD.address];
-            CGSize size = [_addressLB sizeThatFits:CGSizeMake(_addressLB.width, MAXFLOAT)];
-            _addressLB.height = size.height;
-            self.telLabel.text = addressMD.phoneNumber;
-            [self reloadViewsFrame];
-            [self.addressTableView selectRowAtIndexPath:[NSIndexPath indexPathForRow:seletNum inSection:0] animated:YES scrollPosition:UITableViewScrollPositionNone];
+            if (self.dataArray.count == 0) {
+                self.addressLB.text = @"送餐地址:";
+                CGSize size = [_addressLB sizeThatFits:CGSizeMake(_addressLB.width, MAXFLOAT)];
+                _addressLB.height = size.height;
+                self.telLabel.text = @"";
+            }else
+            {
+                AddressModel * addressMD = [self.dataArray objectAtIndex:seletNum];
+                self.addressLB.text = [NSString stringWithFormat:@"送餐地址:%@", addressMD.address];
+                CGSize size = [_addressLB sizeThatFits:CGSizeMake(_addressLB.width, MAXFLOAT)];
+                _addressLB.height = size.height;
+                self.telLabel.text = addressMD.phoneNumber;
+                [self reloadViewsFrame];
+                [self.addressTableView selectRowAtIndexPath:[NSIndexPath indexPathForRow:seletNum inSection:0] animated:YES scrollPosition:UITableViewScrollPositionNone];
+            }
         }else if ([[data objectForKey:@"Command"] isEqualToNumber:@10030])
         {
             [self downloadData];

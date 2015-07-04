@@ -50,7 +50,7 @@
 //    self.navigationController.navigationBar.translucent = NO;
     self.navigationController.navigationBar.titleTextAttributes = @{
                                                                     NSForegroundColorAttributeName: [UIColor whiteColor],
-                                                                    NSFontAttributeName : [UIFont boldSystemFontOfSize:18]
+                                                                    NSFontAttributeName : [UIFont boldSystemFontOfSize:17]
                                                                     };
     self.navigationController.navigationBar.tintColor = [UIColor whiteColor];
     self.logInView = [[LogInView alloc] initWithFrame:CGRectMake(0, self.navigationController.navigationBar.bottom, self.view.width, self.view.height - self.navigationController.navigationBar.bottom)];
@@ -90,6 +90,7 @@
 
 - (void)viewWillAppear:(BOOL)animated
 {
+    self.navigationController.navigationBar.barTintColor = MAIN_COLOR;
     if ([UserInfo shareUserInfo].userId) {
 //        [self removeLogInView];
         [self fiexdData];
@@ -334,7 +335,7 @@
         [alert show];
         [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:2];
     }
-
+    [SVProgressHUD dismiss];
 }
 - (void)failWithError:(NSError *)error
 {

@@ -19,6 +19,7 @@
 
 @property (nonatomic, strong)DescribeView * addressView;
 @property (nonatomic, strong)DescribeView * phoneView;
+@property (nonatomic, strong)UIButton * detailsBT;
 @property (nonatomic, strong)UIImageView * hotelImage;
 
 @property (nonatomic, strong)UIImageView * wifiView;

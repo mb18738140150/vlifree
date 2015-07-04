@@ -61,7 +61,7 @@
     self.view.backgroundColor = [UIColor whiteColor];
 //    NSLog(@"%d", self.navigationController.navigationBar.translucent);
     UIScrollView * scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, self.view.height - 75)];
-    scrollView.backgroundColor = [UIColor colorWithWhite:0.9 alpha:0.7];
+    scrollView.backgroundColor = [UIColor colorWithWhite:0.95 alpha:0.5];
     [self.view addSubview:scrollView];
     
     UILabel * aLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, scrollView.width, 30)];
@@ -69,8 +69,8 @@
     aLabel.font = [UIFont systemFontOfSize:11];
     aLabel.textAlignment = NSTextAlignmentCenter;
     aLabel.textColor = [UIColor colorWithRed:227 / 255.0 green:185 / 255.0 blue:16 / 255.0 alpha:1];
-    aLabel.layer.borderColor = [UIColor colorWithWhite:0.8 alpha:1].CGColor;
-    aLabel.layer.borderWidth = 1.5;
+    aLabel.layer.borderColor = LINE_COLOR.CGColor;
+    aLabel.layer.borderWidth = 0.7;
     aLabel.backgroundColor = [UIColor colorWithRed:255 / 255.0 green:254 / 255.0 blue:242 / 255.0 alpha:1];
     [scrollView addSubview:aLabel];
     
@@ -80,21 +80,25 @@
     
     UILabel * roomLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, TOP_SPACE, view1.width - 2 * LEFT_SPACE, LABEL_HEIGHT)];
     roomLB.text = [NSString stringWithFormat:@"房型:%@", self.roomName];
+    roomLB.textColor = TEXT_COLOR;
     [view1 addSubview:roomLB];
     
     UILabel * ruzhuLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, roomLB.bottom + TOP_SPACE, 80, LABEL_HEIGHT)];
 //    dateLB.font = [UIFont systemFontOfSize:14];
     ruzhuLB.text = @"入住时间:";
+    ruzhuLB.textColor = TEXT_COLOR;
     [view1 addSubview:ruzhuLB];
     
     UIButton * ruzhuBT = [UIButton buttonWithType:UIButtonTypeCustom];
-    ruzhuBT.frame = CGRectMake(ruzhuLB.right, ruzhuLB.top, view1.width - 2 * LEFT_SPACE - ruzhuLB.width, ruzhuLB.height);
+    ruzhuBT.frame = CGRectMake(ruzhuLB.right, ruzhuLB.top, 90, ruzhuLB.height);
     ruzhuBT.tag = 10001;
 //    ruzhuBT.layer.borderColor = [UIColor colorWithWhite:0.7 alpha:0.9].CGColor;
 //    ruzhuBT.layer.borderWidth = 0.5;
     [ruzhuBT setTitle:@"选择入住时间" forState:UIControlStateNormal];
-    [ruzhuBT setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+    [ruzhuBT setTitleColor:[UIColor colorWithWhite:0.7 alpha:1] forState:UIControlStateNormal];
+    ruzhuBT.titleLabel.font = [UIFont systemFontOfSize:15];
 //    ruzhuBT.backgroundColor = [UIColor redColor];
+    ruzhuBT.titleLabel.textAlignment = NSTextAlignmentLeft;
     [ruzhuBT addTarget:self action:@selector(changeDate:) forControlEvents:UIControlEventTouchUpInside];
     [view1 addSubview:ruzhuBT];
     
@@ -102,26 +106,29 @@
     UILabel * lidianLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, ruzhuLB.bottom + TOP_SPACE, 80, LABEL_HEIGHT)];
     //    dateLB.font = [UIFont systemFontOfSize:14];
     lidianLB.text = @"离店时间:";
+    lidianLB.textColor = TEXT_COLOR;
     [view1 addSubview:lidianLB];
     
     UIButton * lidianBT = [UIButton buttonWithType:UIButtonTypeCustom];
-    lidianBT.frame = CGRectMake(lidianLB.right, lidianLB.top, view1.width - 2 * LEFT_SPACE - lidianLB.width, lidianLB.height);
+    lidianBT.frame = CGRectMake(lidianLB.right, lidianLB.top, ruzhuBT.width, lidianLB.height);
     lidianBT.tag = 10002;
 //    lidianBT.layer.borderColor = [UIColor colorWithWhite:0.7 alpha:0.9].CGColor;
 //    lidianBT.layer.borderWidth = 0.5;
     [lidianBT setTitle:@"选择离店时间" forState:UIControlStateNormal];
-    [lidianBT setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+    [lidianBT setTitleColor:[UIColor colorWithWhite:0.7 alpha:1] forState:UIControlStateNormal];
+    lidianBT.titleLabel.font = [UIFont systemFontOfSize:15];
     //    ruzhuBT.backgroundColor = [UIColor redColor];
     [lidianBT addTarget:self action:@selector(changeDate:) forControlEvents:UIControlEventTouchUpInside];
     [view1 addSubview:lidianBT];
     
     self.daysLB = [[UILabel alloc] initWithFrame:CGRectMake(lidianLB.left, lidianLB.bottom, lidianLB.width * 2, lidianLB.height)];
     _daysLB.text = @"住店时长: ";
+    _daysLB.textColor = TEXT_COLOR;
     [view1 addSubview:_daysLB];
     view1.height = _daysLB.bottom + TOP_SPACE;
     
     UIView * line1 = [[UIView alloc] initWithFrame:CGRectMake(0, view1.height - 1, view1.width, 1)];
-    line1.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
+    line1.backgroundColor = LINE_COLOR;
     [view1 addSubview:line1];
     
     
@@ -130,7 +137,7 @@
     [scrollView addSubview:view2];
     
     UIView * line2 = [[UIView alloc] initWithFrame:CGRectMake(0, 0, view2.width, 1)];
-    line2.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
+    line2.backgroundColor = LINE_COLOR;
     [view2 addSubview:line2];
     
 //    UILabel * datumLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, 0, view2.width - 2 * LEFT_SPACE, 40)];
@@ -138,32 +145,39 @@
 //    [view2 addSubview:datumLB];
     
     UIView * line3 = [[UIView alloc] initWithFrame:CGRectMake(LEFT_SPACE, 0, view2.width - 2 * LEFT_SPACE, 1)];
-    line3.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
+    line3.backgroundColor = LINE_COLOR;
     [view2 addSubview:line3];
     
     UILabel * personLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, line3.bottom + TOP_SPACE, 80, LABEL_HEIGHT)];
     personLB.text = @"入住人名:";
+    personLB.textColor = TEXT_COLOR;
     [view2 addSubview:personLB];
     
     self.personTF = [[UITextField alloc] initWithFrame:CGRectMake(personLB.right, personLB.top, view2.width - LEFT_SPACE - personLB.right, personLB.height)];
     _personTF.borderStyle = UITextBorderStyleNone;
     _personTF.placeholder = @"请输入入住人";
+    _personTF.font = [UIFont systemFontOfSize:15];
+    _personTF.textColor = TEXT_COLOR;
     _personTF.delegate = self;
     [view2 addSubview:_personTF];
     
     
     UILabel * telLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, personLB.bottom + TOP_SPACE, personLB.width, LABEL_HEIGHT)];
     telLB.text = @"手机号码:";
+    telLB.textColor = TEXT_COLOR;
     [view2 addSubview:telLB];
     
     self.telTF = [[UITextField alloc] initWithFrame:CGRectMake(telLB.right, telLB.top, view2.width - LEFT_SPACE - telLB.right, telLB.height)];
     _telTF.borderStyle = UITextBorderStyleNone;
     _telTF.placeholder = @"请输入手机号";
+    _telTF.font = [UIFont systemFontOfSize:15];
+    _telTF.textColor = TEXT_COLOR;
     _telTF.delegate = self;
     [view2 addSubview:_telTF];
     
     UILabel * requireLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, telLB.bottom + TOP_SPACE, 80, LABEL_HEIGHT)];
     requireLB.text = @"特殊需求:";
+    requireLB.textColor = TEXT_COLOR;
 //    requireLB.numberOfLines = 0;
 //    requireLB.lineBreakMode = NSLineBreakByWordWrapping;
 //    [requireLB sizeToFit];
@@ -174,11 +188,14 @@
     _requireTF.borderStyle = UITextBorderStyleNone;
     _requireTF.placeholder = @"请输入其他要求";
     _requireTF.delegate = self;
+    _requireTF.font = [UIFont systemFontOfSize:15];
+    _requireTF.textColor = TEXT_COLOR;
+
     [view2 addSubview:_requireTF];
     
     view2.height = requireLB.bottom + TOP_SPACE * 2;
     UIView * line4 = [[UIView alloc] initWithFrame:CGRectMake(0, view2.height - 1, view2.width, 1)];
-    line4.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
+    line4.backgroundColor = LINE_COLOR;
     [view2 addSubview:line4];
     
     UIView * view3 = [[UIView alloc] initWithFrame:CGRectMake(0, view2.bottom + 10, scrollView.width, 100)];
@@ -186,16 +203,17 @@
     [scrollView addSubview:view3];
     
     UIView * line5 = [[UIView alloc] initWithFrame:CGRectMake(0, 0, view2.width, 1)];
-    line5.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
+    line5.backgroundColor = LINE_COLOR;
     [view3 addSubview:line5];
     
     UILabel * payLabel = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, 0, view3.width - 2 * LEFT_SPACE, 40)];
     payLabel.text = @"支付方式";
+    payLabel.textColor = TEXT_COLOR;
     [view3 addSubview:payLabel];
     
     
     UIView * line6 = [[UIView alloc] initWithFrame:CGRectMake(LEFT_SPACE, payLabel.bottom, view3.width - 2 * LEFT_SPACE, 1)];
-    line6.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
+    line6.backgroundColor = LINE_COLOR;
     [view3 addSubview:line6];
     
     
@@ -205,24 +223,26 @@
     [_weixinView.changeButton addTarget:self action:@selector(changePayType:) forControlEvents:UIControlEventTouchUpInside];
     _weixinView.iconView.image = [UIImage imageNamed:@"weixinzhifu.png"];
     _weixinView.titleLabel.text = @"微信支付";
+    _weixinView.titleLabel.textColor = TEXT_COLOR;
     [view3 addSubview:_weixinView];
     
     self.baiduView = [[PayTypeView alloc] initWithFrame:CGRectMake(0, _weixinView.bottom + TOP_SPACE, view3.width, 40)];
     _baiduView.iconView.image = [UIImage imageNamed:@"baiduzhifu.png"];
     _baiduView.titleLabel.text = @"百度钱包";
+    _baiduView.titleLabel.textColor = TEXT_COLOR;
     [_baiduView.changeButton addTarget:self action:@selector(changePayType:) forControlEvents:UIControlEventTouchUpInside];
     [view3 addSubview:_baiduView];
     
     view3.height = _baiduView.bottom + TOP_SPACE;
     
     UIView * line7 = [[UIView alloc] initWithFrame:CGRectMake(0, view3.height - 1, view3.width, 1)];
-    line7.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
+    line7.backgroundColor = LINE_COLOR;
     [view3 addSubview:line7];
     
     UIView * view4 = [[UIView alloc] initWithFrame:CGRectMake(0, scrollView.bottom, scrollView.width, 75)];
     [self.view addSubview:view4];
     
-    self.priceLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, 20, scrollView.width - 3 * LEFT_SPACE - 80, 35)];
+    self.priceLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, 20, scrollView.width - 3 * LEFT_SPACE - 80, 28)];
     
     _priceLB.attributedText = [self allPriceLBTextWithPrice:self.price];
     [view4 addSubview:_priceLB];
@@ -251,8 +271,8 @@
 - (id)allPriceLBTextWithPrice:(NSNumber *)price
 {
     NSMutableAttributedString * string = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"支付金额¥%@", price]];
-    [string addAttributes:@{NSForegroundColorAttributeName : [UIColor redColor], NSFontAttributeName : [UIFont systemFontOfSize:24]} range:NSMakeRange(4, string.length - 4)];
-    [string addAttributes:@{NSFontAttributeName : [UIFont systemFontOfSize:20]} range:NSMakeRange(0, 4)];
+    [string addAttributes:@{NSForegroundColorAttributeName : [UIColor redColor], NSFontAttributeName : [UIFont systemFontOfSize:20]} range:NSMakeRange(4, string.length - 4)];
+    [string addAttributes:@{NSForegroundColorAttributeName : TEXT_COLOR, NSFontAttributeName : [UIFont systemFontOfSize:16]} range:NSMakeRange(0, 4)];
     return [string copy];
 }
 
@@ -398,6 +418,7 @@
     [dateFormatter setDateFormat:@"yyyy-MM-dd"];
     NSString *dateString = [dateFormatter stringFromDate:_datePicker.date];
     [self.dateButton setTitle:dateString forState:UIControlStateNormal];
+    [self.dateButton setTitleColor:TEXT_COLOR forState:UIControlStateNormal];
 //    NSLog(@"%@", _dateButton);
 //    _dateButton.backgroundColor = [UIColor redColor];
     NSLog(@"%@", dateString);
@@ -466,6 +487,7 @@
             [signParams setObject: [data objectForKey:@"PrepayId"]    forKey:@"prepayid"];
             
             NSString * sign = [self createMd5Sign:signParams];
+            NSLog(@"%@", sign);
             NSNumber * stamp = [data objectForKey:@"TimeStamp"];
             //调起微信支付
             PayReq* req             = [[PayReq alloc] init];
@@ -475,8 +497,8 @@
             req.nonceStr            = [NSString stringWithFormat:@"%@", [data objectForKey:@"NonceStr"]];
             req.timeStamp           = stamp.intValue;
             req.package             = [NSString stringWithFormat:@"%@", [data objectForKey:@"Package"]];
-//            req.sign                = [NSString stringWithFormat:@"%@", [data objectForKey:@"Sign"]];
-            req.sign = sign;
+            req.sign                = [NSString stringWithFormat:@"%@", [data objectForKey:@"Sign"]];
+//            req.sign = sign;
             BOOL a = [WXApi sendReq:req];
             NSLog(@"%d", a);
         }else

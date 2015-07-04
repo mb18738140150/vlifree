@@ -14,6 +14,7 @@
 @property (nonatomic, strong)NSNumber * takeOutID;
 @property (nonatomic, strong)NSNumber * sendPrice;
 @property (nonatomic, strong)NSNumber * outSentMoney;
+@property (nonatomic, strong)NSNumber * storeState;
 - (void)getAccessToken:(NSString *)code;
 
 

@@ -34,7 +34,7 @@
     self.navigationItem.title = @"修改昵称";
     self.navigationController.navigationBar.titleTextAttributes = @{
                                                                     NSForegroundColorAttributeName: [UIColor whiteColor],
-                                                                    NSFontAttributeName : [UIFont boldSystemFontOfSize:18]};
+                                                                    NSFontAttributeName : [UIFont boldSystemFontOfSize:15]};
     self.navigationController.navigationBar.tintColor = [UIColor whiteColor];
     UIView * aView = [[UIView alloc] initWithFrame:CGRectMake(LEFT_SPACE, TOP_SPACE + self.navigationController.navigationBar.bottom, self.view.width - 2 *  LEFT_SPACE, VIEW_HEIGHT)];
     aView.layer.borderColor = [UIColor colorWithWhite:0.7 alpha:0.7].CGColor;

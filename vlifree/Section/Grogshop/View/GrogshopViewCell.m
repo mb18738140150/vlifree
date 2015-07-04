@@ -12,7 +12,7 @@
 #define LEFT_SPACE 10
 #define TOP_SPACE 15
 #define IMAGE_SIZE 60
-#define WIFI_IMAGE_WIDTH 12
+#define WIFI_IMAGE_WIDTH 10
 #define SOLD_WIDTH 80
 #define RIGTH_WIDTH 60
 #define NAME_LABEL_WIDTH frame.size.width - 3 * LEFT_SPACE - IMAGE_SIZE
@@ -63,7 +63,8 @@
         
         self.nameLabel = [[UILabel alloc] initWithFrame:CGRectMake(_icon.right + LEFT_SPACE, TOP_SPACE, NAME_LABEL_WIDTH, LABEL_HEIGTH)];
         _nameLabel.text = @"北京五棵松体育馆快捷酒店";
-        _nameLabel.font = [UIFont systemFontOfSize:18];
+        _nameLabel.textColor = TEXT_COLOR;
+//        _nameLabel.font = [UIFont systemFontOfSize:18];
         [self.contentView addSubview:_nameLabel];
         
         self.wifiImage = [[UIImageView alloc] initWithFrame:CGRectMake(_nameLabel.left, _nameLabel.bottom + (LABEL_HEIGTH - WIFI_IMAGE_WIDTH) / 2, WIFI_IMAGE_WIDTH, WIFI_IMAGE_WIDTH)];
@@ -86,13 +87,14 @@
         [self.contentView addSubview:_priceLabel];
         self.distanceLabel = [[UILabel alloc] initWithFrame:CGRectMake(_priceLabel.left, _priceLabel.bottom, RIGTH_WIDTH, LABEL_HEIGTH)];
         _distanceLabel.text = @"1.2km";
-        _distanceLabel.font = [UIFont systemFontOfSize:14];
+        _distanceLabel.font = [UIFont systemFontOfSize:12];
         _distanceLabel.textColor = LABEL_TEXTCOLOR;
         [self.contentView addSubview:_distanceLabel];
         self.addressLabel = [[UILabel alloc] initWithFrame:CGRectMake(_icon.right + LEFT_SPACE, _soldLabel.bottom, frame.size.width - _wifiImage.left - LEFT_SPACE - RIGTH_WIDTH, LABEL_HEIGTH)];
         _addressLabel.text = @"万寿路商圈";
 //        _addressLabel.backgroundColor = [UIColor redColor];
         _addressLabel.textColor = LABEL_TEXTCOLOR;
+        _addressLabel.font = [UIFont systemFontOfSize:12];
         [self.contentView addSubview:_addressLabel];
         
     }
@@ -145,7 +147,7 @@
     NSRange yRange = NSMakeRange(0, 1);
     NSRange lastRange = NSMakeRange(str.length - 1, 1);
     [str addAttribute:NSForegroundColorAttributeName value:[UIColor redColor] range:strRange];
-    [str addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:15] range:strRange];
+    [str addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:17] range:strRange];
     [str addAttribute:NSForegroundColorAttributeName value:[UIColor blackColor] range:yRange];
     [str addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:12] range:yRange];
     [str addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithWhite:0.5 alpha:1] range:lastRange];

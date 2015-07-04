@@ -34,6 +34,8 @@
         self.iconView = [[UIImageView alloc] initWithFrame:CGRectMake(LEFT_SPACE, TOP_SPACE, IMAGE_SIZE, IMAGE_SIZE)];
         [self addSubview:_iconView];
         self.titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(_iconView.right + TOP_SPACE, _iconView.top, LABEL_WIDTH, IMAGE_SIZE)];
+        _titleLabel.textColor = TEXT_COLOR;
+        _titleLabel.font = [UIFont systemFontOfSize:14];
 //        _titleLabel.backgroundColor = [UIColor orangeColor];
         [self addSubview:_titleLabel];
         self.changeButton = [UIButton buttonWithType:UIButtonTypeCustom];

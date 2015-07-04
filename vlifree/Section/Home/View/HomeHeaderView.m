@@ -43,6 +43,7 @@
         UILabel * grogshopLB = [[UILabel alloc] initWithFrame:CGRectMake(0, grogshopImageV.bottom, IMAGE_SIZE, LABEL_HEIGTH)];
         grogshopLB.textAlignment = NSTextAlignmentCenter;
         grogshopLB.text = @"微酒店";
+        grogshopLB.textColor = TEXT_COLOR;
         self.grogshopBT = [UIButton buttonWithType:UIButtonTypeCustom];
         _grogshopBT.frame = CGRectMake(LEFT_SPACE, TOP_SPACE, BUTTON_WIDTH, BUTTON_HEIGTH);
         _grogshopBT.backgroundColor = BUTTON_COLOR;
@@ -55,7 +56,7 @@
         UILabel * takeOutLB = [[UILabel alloc] initWithFrame:CGRectMake(0, takeOutImageV.bottom, IMAGE_SIZE, LABEL_HEIGTH)];
         takeOutLB.textAlignment = NSTextAlignmentCenter;
         takeOutLB.text = @"微外卖";
-        
+        takeOutLB.textColor = TEXT_COLOR;
         self.takeOutBT = [UIButton buttonWithType:UIButtonTypeCustom];
         _takeOutBT.frame = CGRectMake(_grogshopBT.right + LEFT_SPACE, TOP_SPACE, BUTTON_WIDTH, BUTTON_HEIGTH);
         _takeOutBT.backgroundColor = BUTTON_COLOR;
@@ -68,7 +69,7 @@
         UILabel * supermarketLB = [[UILabel alloc] initWithFrame:CGRectMake(0, supermarketImageV.bottom, IMAGE_SIZE, LABEL_HEIGTH)];
         supermarketLB.textAlignment = NSTextAlignmentCenter;
         supermarketLB.text = @"微超市";
-        
+        supermarketLB.textColor = TEXT_COLOR;
         self.supermarketBT = [UIButton buttonWithType:UIButtonTypeCustom];
         _supermarketBT.frame = CGRectMake(_takeOutBT.right + LEFT_SPACE, TOP_SPACE, BUTTON_WIDTH, BUTTON_HEIGTH);
         _supermarketBT.backgroundColor = BUTTON_COLOR;

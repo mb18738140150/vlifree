@@ -70,6 +70,8 @@
     
     [self.tableView registerClass:[TakeOutViewCell class] forCellReuseIdentifier:@"cell"];
     
+    self.tableView.tableFooterView = [[UIView alloc] init];
+    
     UIButton * backBT = [UIButton buttonWithType:UIButtonTypeCustom];
     backBT.frame = CGRectMake(0, 0, 15, 20);
     [backBT setBackgroundImage:[UIImage imageNamed:@"back_w.png"] forState:UIControlStateNormal];
@@ -139,7 +141,7 @@
 {
     TakeOutModel * takeOutModel = [self.dataArray objectAtIndex:indexPath.row];
     TakeOutViewCell * cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
-    [cell createSubview:tableView.bounds activityCount:takeOutModel.activityArray.count];
+    [cell createSubview:tableView.bounds activityCount:(int)takeOutModel.activityArray.count];
     cell.takeOutModel = takeOutModel;
     return cell;
 }

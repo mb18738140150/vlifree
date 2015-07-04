@@ -55,7 +55,7 @@
 //    [self addSubview:_allButton];
     
     UIView * lineView = [[UIView alloc] initWithFrame:CGRectMake(0, BUTTON_VIEW_TOP_SPACE - 1, self.width, 1)];
-    lineView.backgroundColor = [UIColor colorWithWhite:0.7 alpha:0.4];
+    lineView.backgroundColor = LINE_COLOR;
     [self addSubview:lineView];
     self.explainView = [[UIView alloc] initWithFrame:CGRectMake(0, BUTTON_VIEW_TOP_SPACE, self.width, 10)];
     _explainView.backgroundColor = [UIColor whiteColor];
@@ -64,7 +64,9 @@
     
     UILabel * titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, 0, 100, LABEL_HEIGHT)];
     titleLabel.text = @"订房说明";
-//    titleLabel.backgroundColor = [UIColor whiteColor];
+    titleLabel.textColor = TEXT_COLOR;
+    titleLabel.font = [UIFont systemFontOfSize:16];
+    titleLabel.backgroundColor = [UIColor whiteColor];
     //    titleLabel.font = [UIFont systemFontOfSize:25];
     [self.explainView addSubview:titleLabel];
     UIView * lineView1 = [[UIView alloc] initWithFrame:CGRectMake(LEFT_SPACE, titleLabel.bottom + TOP_SPACE, _explainView.width - 2 * LEFT_SPACE, 1.5)];
@@ -72,6 +74,9 @@
     [self addSubview:lineView1];
     self.explainLabel = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, lineView1.bottom, lineView1.width, 20)];
     _explainLabel.text = @"无";
+    _explainLabel.textColor = TEXT_COLOR;
+    _explainLabel.numberOfLines = 0;
+    _explainLabel.font = [UIFont systemFontOfSize:14];
 //    _explainLabel.backgroundColor = [UIColor whiteColor];
     [self.explainView addSubview:_explainLabel];
 

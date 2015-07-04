@@ -31,6 +31,7 @@
     self.addressTF = [[UITextField alloc] initWithFrame:CGRectMake(20, 15, addressView.width - 60, 30)];
     _addressTF.delegate = self;
     _addressTF.placeholder = @"地址";
+    _addressTF.textColor = TEXT_COLOR;
     [addressView addSubview:_addressTF];
     
     UIView * lineView = [[UIView alloc] initWithFrame:CGRectMake(0, addressView.bottom, self.view.width, 1)];
@@ -44,6 +45,7 @@
     self.telTF = [[UITextField alloc] initWithFrame:CGRectMake(20, 15, addressView.width - 60, 30)];
     _telTF.delegate = self;
     _telTF.placeholder = @"手机号";
+    _telTF.textColor = TEXT_COLOR;
     [telView addSubview:_telTF];
     
     
@@ -139,7 +141,7 @@
 - (void)downloadDataEditAddress
 {
     NSDictionary * jsonDic = @{
-                               @"Command":@16,
+                               @"Command":@17,
                                @"UserId":[UserInfo shareUserInfo].userId,
                                @"Address":self.addressTF.text,
                                @"PhoneNumber":self.telTF.text,

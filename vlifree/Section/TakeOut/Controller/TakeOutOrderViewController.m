@@ -33,7 +33,7 @@
 #define ADDRESS_IMAGE_SIZE 40
 #define ORDER_MENU_VIEW_HEIGHT 25
 
-#define TEXT_COLOR [UIColor colorWithWhite:0.2 alpha:1]
+//#define TEXT_COLOR [UIColor colorWithWhite:0.2 alpha:1]
 
 @interface TakeOutOrderViewController ()<BDWalletSDKMainManagerDelegate, HTTPPostDelegate, UINavigationControllerDelegate>
 {
@@ -63,7 +63,8 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.view.backgroundColor = [UIColor colorWithWhite:0.9 alpha:0.9];
+//    self.view.backgroundColor = [UIColor colorWithWhite:0.9 alpha:0.9];
+    self.view.backgroundColor = [UIColor whiteColor];
     
     UIScrollView * scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, self.view.height - 40 - 2 * TOP_SPACE)];
     scrollView.backgroundColor = [UIColor colorWithWhite:0.9 alpha:0.9];
@@ -79,6 +80,7 @@
     self.addressLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, TOP_SPACE, _addressBT.width - 2 * LEFT_SPACE - ADDRESS_IMAGE_SIZE, LABEL_HEIGHT)];
     _addressLB.textColor = [UIColor whiteColor];
     _addressLB.numberOfLines = 0;
+    _addressLB.font = [UIFont systemFontOfSize:15];
     _addressLB.lineBreakMode = NSLineBreakByWordWrapping;
     _addressLB.text = @"请选择送餐地址";
     [_addressBT addSubview:_addressLB];
@@ -109,11 +111,13 @@
     UILabel * orderDetailsLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, TOP_SPACE, menusView.width, LABEL_HEIGHT)];
     orderDetailsLB.textColor = TEXT_COLOR;
     orderDetailsLB.text = @"订单详情";
-    orderDetailsLB.font = [UIFont systemFontOfSize:20];
+    orderDetailsLB.font = [UIFont systemFontOfSize:14];
+    orderDetailsLB.textColor = TEXT_COLOR;
+//    orderDetailsLB.font = [UIFont systemFontOfSize:20];
     [menusView addSubview:orderDetailsLB];
     
     UIView * lineView2 = [[UIView alloc] initWithFrame:CGRectMake(LEFT_SPACE, orderDetailsLB.bottom, menusView.width - 2 * LEFT_SPACE, 1)];
-    lineView2.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
+    lineView2.backgroundColor = LINE_COLOR;
     [menusView addSubview:lineView2];
     
     double allMoney = 0;
@@ -131,7 +135,7 @@
     }
     _allMoney = allMoney;
     UIView * lineView3 = [[UIView alloc] initWithFrame:CGRectMake(LEFT_SPACE, lineView2.bottom + self.shopArray.count * ORDER_MENU_VIEW_HEIGHT, menusView.width - 2 * LEFT_SPACE, 1)];
-    lineView3.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
+    lineView3.backgroundColor = LINE_COLOR;
     [menusView addSubview:lineView3];
     
     CGFloat top = lineView3.bottom;
@@ -139,9 +143,13 @@
     if ([[self.orderDic objectForKey:@"IsFirstOrder"] isEqualToNumber:@YES]) {
         UILabel * firstOrderLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, top, 80, LABEL_HEIGHT)];
         firstOrderLB.text = @"首单减免";
+        firstOrderLB.textColor = TEXT_COLOR;
+        firstOrderLB.font = [UIFont systemFontOfSize:14];
         [menusView addSubview:firstOrderLB];
         UILabel * firstPriceLB = [[UILabel alloc] initWithFrame:CGRectMake(menusView.width - 50 - LEFT_SPACE, firstOrderLB.top, 50, LABEL_HEIGHT)];
         firstPriceLB.text = [NSString stringWithFormat:@"-%@", [self.orderDic objectForKey:@"FirstReduce"]];
+        firstPriceLB.font = [UIFont systemFontOfSize:14];
+        firstPriceLB.textColor = [UIColor redColor];
         [menusView addSubview:firstPriceLB];
         NSNumber * firstPrice = [self.orderDic objectForKey:@"FirstReduce"];
         allMoney -= firstPrice.doubleValue;
@@ -152,9 +160,13 @@
     {
         UILabel * fullOrderLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, top, 80, LABEL_HEIGHT)];
         fullOrderLB.text = @"满单减免";
+        fullOrderLB.font = [UIFont systemFontOfSize:14];
+        fullOrderLB.textColor = TEXT_COLOR;
         [menusView addSubview:fullOrderLB];
         UILabel * fullPriceLB = [[UILabel alloc] initWithFrame:CGRectMake(menusView.width - 50 - LEFT_SPACE, fullOrderLB.top, 50, LABEL_HEIGHT)];
         fullPriceLB.text = [NSString stringWithFormat:@"-%@", [self.orderDic objectForKey:@"FullReduce"]];
+        fullPriceLB.textColor = [UIColor redColor];
+        fullOrderLB.font = [UIFont systemFontOfSize:14];
         [menusView addSubview:fullPriceLB];
         top = fullOrderLB.bottom;
         NSNumber * fullPrice = [self.orderDic objectForKey:@"FullReduce"];
@@ -165,22 +177,30 @@
     if (![self.mealBoxMoney isEqualToNumber:@0]) {
         UILabel * mealBoxLabel = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, top, 80, LABEL_HEIGHT)];
         mealBoxLabel.text = @"餐具费";
+        mealBoxLabel.textColor = TEXT_COLOR;
+        mealBoxLabel.font = [UIFont systemFontOfSize:14];
         [menusView addSubview:mealBoxLabel];
         
         UILabel * mealBoxPriceLB = [[UILabel alloc] initWithFrame:CGRectMake(menusView.width - 50 - LEFT_SPACE, mealBoxLabel.top, 50, LABEL_HEIGHT)];
-        mealBoxPriceLB.text = [NSString stringWithFormat:@"+%g", self.mealBoxMoney.doubleValue * allCount];
+        mealBoxPriceLB.text = [NSString stringWithFormat:@"+%g", self.mealBoxMoney.doubleValue];
         [menusView addSubview:mealBoxPriceLB];
+        mealBoxPriceLB.textColor = [UIColor redColor];
+        mealBoxPriceLB.font = [UIFont systemFontOfSize:14];
         top = mealBoxLabel.bottom;
-        allMoney += self.mealBoxMoney.doubleValue * allCount;
+        allMoney += self.mealBoxMoney.doubleValue;
     }
     
     if (![[self.orderDic objectForKey:@"DeliveryFee"] isEqualToNumber:@0]) {
         UILabel * deliveryLabel = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, top, 80, LABEL_HEIGHT)];
         deliveryLabel.text = @"配送费";
+        deliveryLabel.textColor = TEXT_COLOR;
+        deliveryLabel.font = [UIFont systemFontOfSize:14];
         [menusView addSubview:deliveryLabel];
         
         UILabel * deliveryPriceLB = [[UILabel alloc] initWithFrame:CGRectMake(menusView.width - 50 - LEFT_SPACE, deliveryLabel.top, 50, LABEL_HEIGHT)];
         deliveryPriceLB.text = [NSString stringWithFormat:@"+%@", [self.orderDic objectForKey:@"DeliveryFee"]];
+        deliveryPriceLB.textColor = [UIColor redColor];
+        deliveryPriceLB.font = [UIFont systemFontOfSize:14];
         [menusView addSubview:deliveryPriceLB];
         allMoney += [[self.orderDic objectForKey:@"DeliveryFee"] doubleValue];
         top = deliveryLabel.bottom;
@@ -189,9 +209,13 @@
     
     UILabel * totalLabel = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, top, 80, LABEL_HEIGHT)];
     totalLabel.text = @"合计";
+    totalLabel.textColor = TEXT_COLOR;
+    totalLabel.font = [UIFont systemFontOfSize:14];
     [menusView addSubview:totalLabel];
     
-    UILabel * allPriceLB = [[UILabel alloc] initWithFrame:CGRectMake(menusView.width - 50 - LEFT_SPACE, totalLabel.top, 50, LABEL_HEIGHT)];
+    UILabel * allPriceLB = [[UILabel alloc] initWithFrame:CGRectMake(menusView.width - 50 - LEFT_SPACE, totalLabel.top, 70, LABEL_HEIGHT)];
+    allPriceLB.textColor = [UIColor redColor];
+    allPriceLB.font = [UIFont systemFontOfSize:14];
     [menusView addSubview:allPriceLB];
     
     /*
@@ -245,6 +269,7 @@
     UILabel * remarksLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, 0, 80, LABEL_HEIGHT)];
     remarksLB.text = @"备注";
     remarksLB.textColor = TEXT_COLOR;
+    remarksLB.font = [UIFont systemFontOfSize:14];
     [remarksView addSubview:remarksLB];
     UIView * lineView6 = [[UIView alloc] initWithFrame:CGRectMake(LEFT_SPACE, remarksLB.bottom, scrollView.width - LEFT_SPACE * 2, 1)];
     lineView6.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
@@ -256,6 +281,8 @@
 //    [remarksView addSubview:remarksDetailLB];
     
     self.remarksTV = [[UITextView alloc] initWithFrame:CGRectMake(LEFT_SPACE, lineView6.bottom, remarksView.width - 2 * LEFT_SPACE, 60)];
+    _remarksTV.textColor = TEXT_COLOR;
+    _remarksTV.font = [UIFont systemFontOfSize:14];
     [remarksView addSubview:_remarksTV];
     remarksView.height = _remarksTV.bottom + 5;
     
@@ -276,6 +303,7 @@
     UILabel * payLabel = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, 0, payView.width - 2 * LEFT_SPACE, LABEL_HEIGHT)];
     payLabel.text = @"支付方式";
     payLabel.textColor = remarksLB.textColor;
+    payLabel.font = [UIFont systemFontOfSize:14];
     [payView addSubview:payLabel];
     
     
@@ -312,6 +340,7 @@
     [confirmBT setTitle:@"确认支付" forState:UIControlStateNormal];
     [confirmBT setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     [confirmBT addTarget:self action:@selector(confirmOrderAndPayType:) forControlEvents:UIControlEventTouchUpInside];
+    confirmBT.layer.cornerRadius = 10;
     [self.view addSubview:confirmBT];
     
     scrollView.contentSize = CGSizeMake(scrollView.width, lineView10.bottom);
@@ -499,7 +528,7 @@
             req.timeStamp           = stamp.intValue;
             req.package             = [NSString stringWithFormat:@"%@", [data objectForKey:@"Package"]];
             req.sign                = [NSString stringWithFormat:@"%@", [data objectForKey:@"Sign"]];
-            req.sign = sign;
+//            req.sign = sign;
             BOOL a = [WXApi sendReq:req];
             NSLog(@"%d", a);
         }else if ([payType isEqualToNumber:@2])

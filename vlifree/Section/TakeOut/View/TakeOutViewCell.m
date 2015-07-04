@@ -56,7 +56,8 @@
         
         self.nameLabel = [[UILabel alloc] initWithFrame:CGRectMake(_icon.right + LEFT_SPACE, TOP_SPACE, frame.size.width - IMAGE_SIZE - 2 * LEFT_SPACE, LABEL_HEIGTH)];
         _nameLabel.text = @"陕西三民斋餐厅";
-        _nameLabel.font = [UIFont systemFontOfSize:19];
+        _nameLabel.textColor = TEXT_COLOR;
+//        _nameLabel.font = [UIFont systemFontOfSize:19];
         [self.contentView addSubview:_nameLabel];
         
         self.stateImage = [[UIImageView alloc] initWithFrame:CGRectMake(_nameLabel.left, _nameLabel.bottom + (LABEL_HEIGTH - STATE_IMAGE_HEIGTH) / 2, STATE_IMAGE_WIDTH, STATE_IMAGE_HEIGTH)];
@@ -90,7 +91,7 @@
         self.addressLabel = [[UILabel alloc] initWithFrame:CGRectMake(_stateImage.left, _icon.bottom - LABEL_HEIGTH, frame.size.width - IMAGE_SIZE - 3 * LEFT_SPACE, LABEL_HEIGTH)];
         _addressLabel.text = @"南京路东45号";
 //        _addressLabel.textAlignment = NSTextAlignmentCenter;
-        _addressLabel.font = [UIFont systemFontOfSize:14];
+        _addressLabel.font = [UIFont systemFontOfSize:13];
         _addressLabel.textColor = LABEL_TEXTCOLOR;
         _addressLabel.backgroundColor = LABEL_COLOR;
         [self.contentView addSubview:_addressLabel];

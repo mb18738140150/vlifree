@@ -8,7 +8,7 @@
 
 #import "GSMapViewController.h"
 
-@interface GSMapViewController ()
+@interface GSMapViewController ()<MAMapViewDelegate>
 
 
 @property (nonatomic, strong)MAMapView * mapView;
@@ -23,7 +23,8 @@
     
     [MAMapServices sharedServices].apiKey = @"bdb563c4b3d8dae3a9ba228ab0c1f41c";
     self.mapView = [[MAMapView alloc] initWithFrame:self.view.bounds];
-    _mapView.showsUserLocation = NO;
+    _mapView.showsUserLocation = YES;
+    _mapView.delegate = self;
     _mapView.mapType = MAMapTypeStandard;
     [_mapView setZoomLevel:17.f];
     CLLocationCoordinate2D coor;
@@ -51,6 +52,20 @@
 {
     [self.navigationController popViewControllerAnimated:YES];
 }
+
+
+
+-(void)mapView:(MAMapView *)mapView didUpdateUserLocation:(MAUserLocation *)userLocation
+updatingLocation:(BOOL)updatingLocation
+{
+    if (updatingLocation) {
+        MAPointAnnotation * annotation = [[MAPointAnnotation alloc] init];
+        annotation.coordinate = userLocation.location.coordinate;
+        [_mapView addAnnotation:annotation];
+        _mapView.showsUserLocation = NO;
+    }
+}
+
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];

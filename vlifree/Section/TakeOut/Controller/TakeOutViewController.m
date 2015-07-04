@@ -83,6 +83,7 @@
     
     self.addressLB = [[UILabel alloc] initWithFrame:CGRectMake(_addressIM.right, 0, 0, 30)];
     _addressLB.textColor = [UIColor whiteColor];
+    _addressLB.font = [UIFont systemFontOfSize:15];
     [_addressBT addSubview:_addressLB];
     NSLog(@"11%@",     _addressLB.font.fontName);
     self.addressBT.frame = CGRectMake(0, 0, _addressIM.width, 30);
@@ -92,8 +93,8 @@
     typeButton.tag = 2000;
     [typeButton setTitle:@"外卖分类" forState:UIControlStateNormal];
     [typeButton setTitle:@"外卖分类" forState:UIControlStateSelected];
-    [typeButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-    [typeButton setTitleColor:[UIColor blackColor] forState:UIControlStateSelected];
+    [typeButton setTitleColor:TEXT_COLOR forState:UIControlStateNormal];
+    [typeButton setTitleColor:TEXT_COLOR forState:UIControlStateSelected];
     [typeButton setImage:[UIImage imageNamed:@"open.png"] forState:UIControlStateNormal];
     [typeButton setImage:[UIImage imageNamed:@"close.png"] forState:UIControlStateSelected];
     typeButton.imageView.contentMode = UIViewContentModeTopLeft;
@@ -105,7 +106,7 @@
 //    typeButton.backgroundColor = [UIColor grayColor];
     [self.view addSubview:typeButton];
     
-    self.takeOutTabelView = [[UITableView alloc] initWithFrame:CGRectMake(0, typeButton.bottom, self.view.width, self.view.height - typeButton.bottom - self.tabBarController.tabBar.height) style:UITableViewStylePlain];
+    self.takeOutTabelView = [[UITableView alloc] initWithFrame:CGRectMake(0, typeButton.bottom, self.view.width, self.view.height - typeButton.bottom - self.tabBarController.tabBar.height) style:UITableViewStyleGrouped];
     _takeOutTabelView.dataSource = self;
     _takeOutTabelView.delegate = self;
     [self.view addSubview:_takeOutTabelView];
@@ -317,9 +318,13 @@
 
 - (void)footerRereshing
 {
-    if (self.dataArray.count < [_allCount integerValue]) {
+    NSInteger count = 0;
+    for (NSMutableArray * array in self.dataArray) {
+        count += array.count;
+    }
+    if (count < [_allCount integerValue]) {
         self.takeOutTabelView.footerRefreshingText = @"正在加载数据";
-        [self downloadDataWithCommand:@1 page:++_page count:DATA_COUNT type:_type];
+        [self downloadDataWithCommand:@6 page:++_page count:DATA_COUNT type:_type];
     }else
     {
         self.takeOutTabelView.footerRefreshingText = @"数据已经加载完";
@@ -575,6 +580,9 @@ updatingLocation:(BOOL)updatingLocation
     NSMutableArray * array = [self.dataArray objectAtIndex:section];
     TakeOutModel * takeOutMD = [array firstObject];
     UILabel * label = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, self.view.width, 30)];
+    label.backgroundColor = [UIColor whiteColor];
+    label.textAlignment = NSTextAlignmentCenter;
+    label.textColor = TEXT_COLOR;
     if ([takeOutMD.peyType isEqualToNumber:@YES]) {
         label.text = @"在配送范围内";
     }else
@@ -592,12 +600,17 @@ updatingLocation:(BOOL)updatingLocation
     detailTakeOutVC.takeOutID = takeOutMD.storeId;
     detailTakeOutVC.sendPrice = takeOutMD.sendPrice;
     detailTakeOutVC.outSentMoney = takeOutMD.outSentMoney;
+    detailTakeOutVC.storeState = takeOutMD.storeState;
     detailTakeOutVC.storeName = takeOutMD.storeName;
     detailTakeOutVC.navigationItem.title = takeOutMD.storeName;
     detailTakeOutVC.hidesBottomBarWhenPushed = YES;
     [self.navigationController pushViewController:detailTakeOutVC animated:YES];
 }
 
+- (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section
+{
+    return 0.1;
+}
 
 #pragma mark - 点击图片放大
 

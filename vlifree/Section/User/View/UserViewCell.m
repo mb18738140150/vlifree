@@ -10,9 +10,9 @@
 #import "UserViewCell.h"
 #import "UserModel.h"
 
-#define ICON_SIZE 30
+#define ICON_SIZE 20
 #define BUTTON_WIDTH 40
-#define TOP_SPACE 10
+#define TOP_SPACE 3
 #define LEFT_SPACE 10
 #define RIGHT_SPACE 15
 
@@ -36,28 +36,31 @@
 {
     if (!_icon) {
         self.backgroundColor = [UIColor colorWithWhite:0.95 alpha:1];
-        UIView * cellBackgroundView = [[UIView alloc] initWithFrame:CGRectMake(0, TOP_SPACE, frame.size.width, TOP_SPACE * 2 + ICON_SIZE)];
+        UIView * cellBackgroundView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, frame.size.width, TOP_SPACE * 10 + ICON_SIZE)];
         cellBackgroundView.backgroundColor = [UIColor whiteColor];
         [self addSubview:cellBackgroundView];
-        self.icon = [[UIImageView alloc] initWithFrame:CGRectMake(LEFT_SPACE, TOP_SPACE, ICON_SIZE, ICON_SIZE)];
+        self.icon = [[UIImageView alloc] initWithFrame:CGRectMake(LEFT_SPACE, TOP_SPACE * 5, ICON_SIZE, ICON_SIZE)];
         _icon.backgroundColor = VIEW_COLOR;
         [cellBackgroundView addSubview:_icon];
         
         self.modifyBT = [UIButton buttonWithType:UIButtonTypeCustom];
-        _modifyBT.frame = CGRectMake(frame.size.width - RIGHT_SPACE - BUTTON_WIDTH, TOP_SPACE, BUTTON_WIDTH, ICON_SIZE);
+        _modifyBT.frame = CGRectMake(frame.size.width - RIGHT_SPACE - BUTTON_WIDTH, _icon.top, BUTTON_WIDTH, ICON_SIZE);
+        _modifyBT.titleLabel.font = [UIFont systemFontOfSize:14];
 //        [_modifyBT setTitleColor:[UIColor colorWithWhite:0.7 alpha:1] forState:UIControlStateNormal];
         _modifyBT.backgroundColor = VIEW_COLOR;
         [cellBackgroundView addSubview:_modifyBT];
         
-        self.titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE + _icon.right, TOP_SPACE, _modifyBT.left - _icon.right - 2 * LEFT_SPACE, ICON_SIZE)];
+        self.titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE + _icon.right, _icon.top, _modifyBT.left - _icon.right - 2 * LEFT_SPACE, ICON_SIZE)];
         _titleLabel.backgroundColor = VIEW_COLOR;
+        _titleLabel.font = [UIFont systemFontOfSize:16];
+        _titleLabel.textColor = TEXT_COLOR;
         [cellBackgroundView addSubview:_titleLabel];
     }
 }
 
 + (CGFloat)cellHeight
 {
-    return 4 * TOP_SPACE + ICON_SIZE;
+    return 12 * TOP_SPACE + ICON_SIZE;
 }
 
 

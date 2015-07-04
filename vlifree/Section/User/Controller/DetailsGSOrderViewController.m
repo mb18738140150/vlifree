@@ -51,46 +51,62 @@
     _priceLB.backgroundColor = [UIColor orangeColor];
 //    _priceLB.backgroundColor = MAIN_COLOR;
     _priceLB.text = @"    订单金额: ¥298";
-    _priceLB.font = [UIFont systemFontOfSize:22];
+    _priceLB.font = [UIFont systemFontOfSize:20];
     _priceLB.textColor = [UIColor whiteColor];
     [view1 addSubview:_priceLB];
     
     self.personLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, _priceLB.bottom + TOP_SPACE, view1.width  - 2 * LEFT_SPACE, 30)];
     _personLB.text = @"预定人:马哥";
+    _personLB.font = [UIFont systemFontOfSize:15];
+    _personLB.textColor = TEXT_COLOR;
     [view1 addSubview:_personLB];
     
     
-    UILabel * telLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, _personLB.bottom + TOP_SPACE, view1.width - 2 * LEFT_SPACE, 30)];
-    telLB.text = @"预定电话: 13456772457";
-    [view1 addSubview:telLB];
+    self.telLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, _personLB.bottom + TOP_SPACE, view1.width - 2 * LEFT_SPACE, 30)];
+    _telLB.text = @"预定电话: 13456772457";
+    _telLB.font = [UIFont systemFontOfSize:15];
+    _telLB.textColor = TEXT_COLOR;
+    [view1 addSubview:_telLB];
     
     
-    self.checkInDateLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, telLB.bottom + TOP_SPACE, view1.width - 2 * LEFT_SPACE, 30)];
+    self.checkInDateLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, _telLB.bottom + TOP_SPACE, view1.width - 2 * LEFT_SPACE, 30)];
     _checkInDateLB.text = @"入住时间: 2015年5月15日 19:52:15";
+    _checkInDateLB.font = [UIFont systemFontOfSize:15];
+    _checkInDateLB.textColor = TEXT_COLOR;
     [view1 addSubview:_checkInDateLB];
     
     self.leaveLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, _checkInDateLB.bottom + TOP_SPACE, view1.width - 2 * LEFT_SPACE, 30)];
     _leaveLB.text = @"离开时间: 2015年5月17日 19:52:15";
+    _leaveLB.font = [UIFont systemFontOfSize:15];
+    _leaveLB.textColor = TEXT_COLOR;
     [view1 addSubview:_leaveLB];
     
     
     self.roomLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, _leaveLB.bottom + TOP_SPACE, view1.width - 2 * LEFT_SPACE, 30)];
     _roomLB.text = @"总统大套房";
+    _roomLB.font = [UIFont systemFontOfSize:15];
+    _roomLB.textColor = TEXT_COLOR;
     [view1 addSubview:_roomLB];
     
     
     self.countLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, _roomLB.bottom + TOP_SPACE, view1.width - 2 * LEFT_SPACE, 30)];
     _countLB.text = @"预定房间: 1间";
+    _countLB.font = [UIFont systemFontOfSize:15];
+    _countLB.textColor = TEXT_COLOR;
     [view1 addSubview:_countLB];
     
     
     self.payLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, _countLB.bottom + TOP_SPACE, view1.width - 2 * LEFT_SPACE, 30)];
     _payLB.text = @"支付方式: 在线支付";
+    _payLB.font = [UIFont systemFontOfSize:15];
+    _payLB.textColor = TEXT_COLOR;
     [view1 addSubview:_payLB];
     
     
     self.requireLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, _payLB.bottom + TOP_SPACE, view1.width - 2 * LEFT_SPACE, 30)];
     _requireLB.text = @"特殊要求";
+    _requireLB.font = [UIFont systemFontOfSize:15];
+    _requireLB.textColor = TEXT_COLOR;
     [view1 addSubview:_requireLB];
     
     view1.height = _requireLB.bottom + TOP_SPACE;
@@ -100,7 +116,7 @@
     [view1 addSubview:line1];
     
     
-    UIView * view2 = [[UIView alloc] initWithFrame:CGRectMake(0, view1.bottom + 10, scrollView.width, 200)];
+    UIView * view2 = [[UIView alloc] initWithFrame:CGRectMake(0, view1.bottom + 5, scrollView.width, 200)];
     view2.backgroundColor = [UIColor whiteColor];
     [scrollView addSubview:view2];
     
@@ -111,27 +127,31 @@
     
     self.grogshopLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, 0, view2.width - 2 * LEFT_SPACE, 40)];
     _grogshopLB.text = @"柳州新世纪酒店";
-    _grogshopLB.font = [UIFont systemFontOfSize:23];
+    _grogshopLB.font = [UIFont systemFontOfSize:16];
+    _grogshopLB.textColor = TEXT_COLOR;
     [view2 addSubview:_grogshopLB];
     
     UIView * line3 = [[UIView alloc] initWithFrame:CGRectMake(LEFT_SPACE, _grogshopLB.bottom, view2.width - 2 * LEFT_SPACE, 1)];
     line3.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
     [view2 addSubview:line3];
     
-    UIImageView * addressIcon = [[UIImageView alloc] initWithFrame:CGRectMake(LEFT_SPACE, line3.bottom + TOP_SPACE, 30, 30)];
+    UIImageView * addressIcon = [[UIImageView alloc] initWithFrame:CGRectMake(LEFT_SPACE, line3.bottom + TOP_SPACE, 20, 20)];
     addressIcon.image = [UIImage imageNamed:@"addressIcon.png"];
     [view2 addSubview:addressIcon];
     
-    self.addressLB = [[UILabel alloc] initWithFrame:CGRectMake(addressIcon.right + 5, addressIcon.top, view2.width - addressIcon.right - LEFT_SPACE - 5, 30)];
+    self.addressLB = [[UILabel alloc] initWithFrame:CGRectMake(addressIcon.right + 5, addressIcon.top, view2.width - addressIcon.right - LEFT_SPACE - 5, 20)];
     _addressLB.text = @"新环西路1000弄5号903";
+    _addressLB.font = [UIFont systemFontOfSize:15];
+    _addressLB.textColor = TEXT_COLOR;
     [view2 addSubview:_addressLB];
     
-    UIImageView * telIcon = [[UIImageView alloc] initWithFrame:CGRectMake(LEFT_SPACE, addressIcon.bottom + TOP_SPACE, 30, 30)];
+    UIImageView * telIcon = [[UIImageView alloc] initWithFrame:CGRectMake(LEFT_SPACE, addressIcon.bottom + TOP_SPACE, 20, 20)];
     telIcon.image = [UIImage imageNamed:@"phoneIcon.png"];
     [view2 addSubview:telIcon];
     
-    self.telGSLB = [[UILabel alloc] initWithFrame:CGRectMake(telIcon.right + 5, telIcon.top, view2.width - addressIcon.right - LEFT_SPACE - 5, 30)];
+    self.telGSLB = [[UILabel alloc] initWithFrame:CGRectMake(telIcon.right + 5, telIcon.top, view2.width - addressIcon.right - LEFT_SPACE - 5, 20)];
     _telGSLB.text = @"13589645969";
+    _telGSLB.textColor = TEXT_COLOR;
     [view2 addSubview:_telGSLB];
     
     view2.height = _telGSLB.bottom + TOP_SPACE;
@@ -156,7 +176,7 @@
     
     UIButton * backBT = [UIButton buttonWithType:UIButtonTypeCustom];
     backBT.frame = CGRectMake(0, 0, 15, 20);
-    [backBT setBackgroundImage:[UIImage imageNamed:@"back_w.png"] forState:UIControlStateNormal];
+    [backBT setBackgroundImage:[UIImage imageNamed:@"back_r.png"] forState:UIControlStateNormal];
     [backBT addTarget:self action:@selector(backLastVC:) forControlEvents:UIControlEventTouchUpInside];
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:backBT];
 
@@ -193,7 +213,7 @@
     NSLog(@"+++%@", data);
     NSLog(@"%@", [data objectForKey:@"ErrorMsg"]);
     if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
-        self.priceLB.text = [NSString stringWithFormat:@"     订单金额:%@", [data objectForKey:@"Price"]];
+        self.priceLB.text = [NSString stringWithFormat:@"     订单金额:¥%@", [data objectForKey:@"Price"]];
         self.personLB.text = [NSString stringWithFormat:@"预定人:%@", [data objectForKey:@"Name"]];
         self.telLB.text = [NSString stringWithFormat:@"预定号码:%@", [data objectForKey:@"PhoneNumber"]];
         NSString * checkInTime = [data objectForKey:@"CheckInTime"];

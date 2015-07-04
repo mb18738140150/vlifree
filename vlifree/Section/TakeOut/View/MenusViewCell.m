@@ -84,16 +84,20 @@
         
         self.nameLabel = [[UILabel alloc] initWithFrame:CGRectMake(_iconView.right + LEFT_SPACE, TOP_SPACE, frame.size.width - 2 * LEFT_SPACE - _iconView.right, LABEL_HEIGHT)];
         _nameLabel.text = @"双人套餐水煮牛肉套餐";
+        _nameLabel.textColor = TEXT_COLOR;
+        _nameLabel.font = [UIFont systemFontOfSize:14];
         [self.contentView addSubview:_nameLabel];
         
         self.soldCountLB = [[UILabel alloc] initWithFrame:CGRectMake(_nameLabel.left, _nameLabel.bottom, _nameLabel.width, LABEL_HEIGHT)];
         _soldCountLB.text = @"月售453份";
-        _soldCountLB.font = [UIFont systemFontOfSize:13];
+        _soldCountLB.font = [UIFont systemFontOfSize:12];
         _soldCountLB.textColor = [UIColor colorWithWhite:0.7 alpha:1];
         [self.contentView addSubview:_soldCountLB];
         
         self.priceLabel = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, _iconView.bottom, PRICE_LABEL_WIDTH, LABEL_HEIGHT)];
         _priceLabel.text = @"23元/份";
+        _priceLabel.textColor = TEXT_COLOR;
+        _priceLabel.font = [UIFont systemFontOfSize:13];
         _priceLabel.backgroundColor = VIEW_COLOR;
         [self.contentView addSubview:_priceLabel];
         
@@ -107,6 +111,7 @@
         
         self.countLabel = [[UILabel alloc] initWithFrame:CGRectMake(_subtractBT.right, _subtractBT.top, _subtractBT.width, _subtractBT.height)];
         _countLabel.text = @"0";
+        _countLabel.textColor = TEXT_COLOR;
         _countLabel.textAlignment = NSTextAlignmentCenter;
         [self.contentView addSubview:_countLabel];
         

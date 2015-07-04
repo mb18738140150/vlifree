@@ -62,10 +62,12 @@
     
     self.stateLabel = [[UILabel alloc] initWithFrame:CGRectMake(_stateImageV.right + 5, _stateImageV.top, 200, _stateImageV.height)];
     _stateLabel.text = @"订单完成";
+    _stateLabel.textColor = TEXT_COLOR;
     [view1 addSubview:_stateLabel];
     
     UILabel * aLabel = [[UILabel alloc] initWithFrame:CGRectMake(_stateImageV.left, _stateImageV.bottom + 10, view1.width - _stateImageV.left * 2, 20)];
     aLabel.text = @"感谢您使用微外卖，欢迎再次订餐。";
+    aLabel.textColor = TEXT_COLOR;
     aLabel.textColor = [UIColor colorWithWhite:0.3 alpha:1];
     aLabel.font = [UIFont systemFontOfSize:15];
     [view1 addSubview:aLabel];
@@ -101,7 +103,7 @@
     view1.height = _confirmBT.bottom + 10;
     
     UIView * lineView1 = [[UIView alloc] initWithFrame:CGRectMake(0, view1.height - 1, view1.width, 1)];
-    lineView1.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
+    lineView1.backgroundColor = LINE_COLOR;
     [view1 addSubview:lineView1];
     
     UIView * view2 = [[UIView alloc] initWithFrame:CGRectMake(0, view1.bottom + 10, _scrollView.width, 100)];
@@ -110,18 +112,19 @@
     [_scrollView addSubview:view2];
     
     UIView * lineView2 = [[UIView alloc] initWithFrame:CGRectMake(0, 0, view2.width, 1)];
-    lineView2.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
+    lineView2.backgroundColor = LINE_COLOR;
     [view2 addSubview:lineView2];
     
     NSArray * array = @[@"提交订单", @"餐厅接单", @"配送中", @"已收货"];
     for (int i = 0; i < 4; i++) {
         UIImageView * aImageView = [[UIImageView alloc] initWithFrame:CGRectMake((view2.width - 200) / 5 * (i + 1) + 50 * i, 10, 50, 50)];
-        aImageView.image = [UIImage imageNamed:[NSString stringWithFormat:@"orderState%d.png", i + 1]];
+        aImageView.image = [UIImage imageNamed:[NSString stringWithFormat:@"orderState_off%d.png", i + 1]];
         aImageView.tag = 10001 + i;
         [view2 addSubview:aImageView];
         UILabel * label = [[UILabel alloc] initWithFrame:CGRectMake(aImageView.left, aImageView.bottom, aImageView.width, 20)];
         label.tag = 20001 + i;
         label.text = [array objectAtIndex:i];
+        label.textColor = TEXT_COLOR;
         label.textAlignment = NSTextAlignmentCenter;
         label.font = [UIFont systemFontOfSize:12];
         [view2 addSubview:label];
@@ -137,7 +140,7 @@
     }
     
     UIView * lineView3 = [[UIView alloc] initWithFrame:CGRectMake(0, view2.height - 1, view2.width, 1)];
-    lineView3.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
+    lineView3.backgroundColor = LINE_COLOR;
     [view2 addSubview:lineView3];
     
     
@@ -147,7 +150,7 @@
     [_scrollView addSubview:view3];
     
     UIView * lineView4 = [[UIView alloc] initWithFrame:CGRectMake(0, 0, view3.width, 1)];
-    lineView4.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
+    lineView4.backgroundColor = LINE_COLOR;
     [view3 addSubview:lineView4];
     
     UIImageView * storeIcon = [[UIImageView alloc] initWithFrame:CGRectMake(10, 5, 30, 30)];
@@ -159,7 +162,7 @@
     [view3 addSubview:_storeNameLB];
     
     UIView * lineView5 = [[UIView alloc] initWithFrame:CGRectMake(10, _storeNameLB.bottom, view3.width - 20, 1)];
-    lineView5.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
+    lineView5.backgroundColor = LINE_COLOR;
     lineView5.tag = 5005;
     [view3 addSubview:lineView5];
     
@@ -175,7 +178,7 @@
     [_scrollView addSubview:view4];
     
     UIView * lineView7 = [[UIView alloc] initWithFrame:CGRectMake(0, 0, view4.width, 1)];
-    lineView7.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
+    lineView7.backgroundColor = LINE_COLOR;
     [view4 addSubview:lineView7];
    
     /*
@@ -192,7 +195,7 @@
     view4.height = againBT.bottom + 5;
     */
     UIView * lineView10 = [[UIView alloc] initWithFrame:CGRectMake(0, view4.height - 1, view4.width, 1)];
-    lineView10.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
+    lineView10.backgroundColor = LINE_COLOR;
     [view4 addSubview:lineView10];
     
     UIView * view5 = [[UIView alloc] initWithFrame:CGRectMake(0, view4.bottom + 10, _scrollView.width, 270)];
@@ -201,7 +204,7 @@
     [_scrollView addSubview:view5];
     
     UIView * lineView11 = [[UIView alloc] initWithFrame:CGRectMake(0, 0, view5.width, 1)];
-    lineView11.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
+    lineView11.backgroundColor = LINE_COLOR;
     [view5 addSubview:lineView11];
     
     UIImageView * detalsView = [[UIImageView alloc] initWithFrame:CGRectMake(15, 5, 30, 30)];
@@ -210,26 +213,31 @@
     
     UILabel * detailsLB = [[UILabel alloc] initWithFrame:CGRectMake(detalsView.right + 5, detalsView.top, 100, detalsView.height)];
     detailsLB.text = @"订单详情";
+    detailsLB.textColor = TEXT_COLOR;
     [view5 addSubview:detailsLB];
     
     UIView * lineView12 = [[UIView alloc] initWithFrame:CGRectMake(10, detailsLB.bottom + 5, view5.width - 20, 1)];
-    lineView12.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
+    lineView12.backgroundColor = LINE_COLOR;
     [view5 addSubview:lineView12];
     
     self.orderNumberLB = [[UILabel alloc] initWithFrame:CGRectMake(15, lineView12.bottom + 5, lineView12.width - 10, 30)];
+    _orderNumberLB.textColor = TEXT_COLOR;
 //    _orderNumberLB.text = [NSString stringWithFormat:@"订单号:%@", self.takeOutOrderMD.orderID];
     [view5 addSubview:_orderNumberLB];
     
     
     self.orderDateLB = [[UILabel alloc] initWithFrame:CGRectMake(15, _orderNumberLB.bottom + 5, lineView12.width - 10, 30)];
 //    _orderDateLB.text = [NSString stringWithFormat:@"下单时间: %@", self.takeOutOrderMD.time];
+    _orderDateLB.textColor = TEXT_COLOR;
     [view5 addSubview:_orderDateLB];
     
     self.orderPayTypeLB = [[UILabel alloc] initWithFrame:CGRectMake(15, _orderDateLB.bottom + 5, lineView12.width - 10, 30)];
     _orderPayTypeLB.text = @"支付方式: 餐到付款";
+    _orderPayTypeLB.textColor = TEXT_COLOR;
     [view5 addSubview:_orderPayTypeLB];
     
     self.orderTelLB = [[UILabel alloc] initWithFrame:CGRectMake(15, _orderPayTypeLB.bottom + 5, lineView12.width - 10, 30)];
+    _orderTelLB.textColor = TEXT_COLOR;
 //    _orderTelLB.text = [NSString stringWithFormat:@"手机号码: %@", self.takeOutOrderMD.nextphone];
     [view5 addSubview:_orderTelLB];
     
@@ -237,6 +245,7 @@
     self.orderAddressLB = [[UILabel alloc] initWithFrame:CGRectMake(15, _orderTelLB.bottom + 5, lineView12.width - 10, 30)];
 //    _orderAddressLB.text = [NSString stringWithFormat:@"收餐地址: %@", self.takeOutOrderMD.address];
     _orderAddressLB.numberOfLines = 0;
+    _orderAddressLB.textColor= TEXT_COLOR;
     [view5 addSubview:_orderAddressLB];
     view5.height = _orderAddressLB.bottom + 10;
     

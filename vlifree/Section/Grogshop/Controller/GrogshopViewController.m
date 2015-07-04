@@ -95,6 +95,7 @@
     _groshopTabelView.dataSource = self;
     _groshopTabelView.delegate = self;
     [self.view addSubview:_groshopTabelView];
+    self.groshopTabelView.separatorColor = LINE_COLOR;
     [self.groshopTabelView registerClass:[GrogshopViewCell class] forCellReuseIdentifier:CELL_INDENTIFIER];
     [self.groshopTabelView addHeaderWithTarget:self action:@selector(headerRereshing)];
     [self.groshopTabelView addFooterWithTarget:self action:@selector(footerRereshing)];

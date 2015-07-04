@@ -64,6 +64,7 @@
     
     // Configure the cell...
     cell.textLabel.text = [self.dataArray objectAtIndex:indexPath.row];
+    cell.textLabel.textColor = TEXT_COLOR;
     return cell;
 }
 

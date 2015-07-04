@@ -15,8 +15,9 @@
 #import "DetailTakeOutViewController.h"
 #import "TakeOutOrderViewController.h"
 #import "GSOrderPayViewController.h"
+#import "APService.h"
 
-@interface AppDelegate ()<WXApiDelegate>
+@interface AppDelegate ()<WXApiDelegate, HTTPPostDelegate>
 
 
 @property (nonatomic, strong)MyTabBarController * myTabBarVC;
@@ -42,6 +43,14 @@
     manager.shouldResignOnTouchOutside = YES;
     manager.shouldToolbarUsesTextFieldTintColor = YES;
     manager.enableAutoToolbar = NO;
+    
+    
+    [APService registerForRemoteNotificationTypes:(UIUserNotificationTypeAlert |
+                                                   UIUserNotificationTypeBadge |
+                                                   UIUserNotificationTypeSound)
+                                       categories:nil];
+    [APService setupWithOption:launchOptions];
+    
     
     return YES;
 }
@@ -164,6 +173,8 @@
     return [WXApi handleOpenURL:url delegate:self];
 }
 
+
+
 - (void)applicationWillResignActive:(UIApplication *)application {
     // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
     // Use this method to pause ongoing tasks, disable timers, and throttle down OpenGL ES frame rates. Games should use this method to pause the game.
@@ -175,6 +186,7 @@
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application {
+    [application setApplicationIconBadgeNumber:0];
     // Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
 }
 
@@ -185,5 +197,53 @@
 - (void)applicationWillTerminate:(UIApplication *)application {
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
 }
+
+- (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
+    NSLog(@"%@", [NSString stringWithFormat:@"Device Token: %@", deviceToken]);
+    [APService registerDeviceToken:deviceToken];
+    NSString * registrationID = [APService registrationID];
+    NSLog(@"registrID = %@", registrationID);
+    [[NSUserDefaults standardUserDefaults] setObject:registrationID forKey:@"registrationID"];
+    if ([UserInfo shareUserInfo].userId) {
+        NSDictionary * dic = @{
+                               @"Command":@36,
+                               @"UserId":[UserInfo shareUserInfo].userId,
+                               @"Device":@1,
+                               @"CID":registrationID
+                               };
+        [self playPostWithDictionary:dic];
+    }
+}
+
+- (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
+{
+    [APService handleRemoteNotification:userInfo];
+    completionHandler(UIBackgroundFetchResultNewData);
+}
+
+- (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo
+{
+    [APService handleRemoteNotification:userInfo];
+}
+
+#pragma mark - 数据请求--绑定推送registerID
+- (void)playPostWithDictionary:(NSDictionary *)dic
+{
+    NSString * jsonStr = [dic JSONString];
+    //    NSLog(@"%@", jsonStr);
+    NSString * str = [NSString stringWithFormat:@"%@231618", jsonStr];
+    NSString * md5Str = [str md5];
+    NSString * urlString = [NSString stringWithFormat:@"%@%@", POST_URL, md5Str];
+    
+    HTTPPost * httpPost = [HTTPPost shareHTTPPost];
+    [httpPost post:urlString HTTPBody:[jsonStr dataUsingEncoding:NSUTF8StringEncoding]];
+    httpPost.delegate = self;
+}
+
+- (void)refresh:(id)data
+{
+    NSLog(@"+++%@", data);
+}
+
 
 @end

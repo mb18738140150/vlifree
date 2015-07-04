@@ -17,6 +17,7 @@
 #import "RoomModel.h"
 #import "AlertLoginView.h"
 #import "WXLoginViewController.h"
+#import "FacilityViewController.h"
 
 
 #define CELL_INDENTIFIER @"CELL"
@@ -38,6 +39,10 @@
 @property (nonatomic, copy)NSString * phoneNumber;
 
 @property (nonatomic, strong)AlertLoginView * alertLoginV;
+
+@property (nonatomic, strong)NSDictionary * detailsDic;
+
+@property (nonatomic, copy)NSString * describe;
 
 @end
 
@@ -65,14 +70,19 @@
     self.detailsTableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStyleGrouped];
     _detailsTableView.dataSource = self;
     _detailsTableView.delegate = self;
+    _detailsTableView.backgroundColor = [UIColor whiteColor];
     [_detailsTableView registerClass:[DetailsGSViewCell class] forCellReuseIdentifier:CELL_INDENTIFIER];
     [self.view addSubview:_detailsTableView];
     
     
-    self.headerView = [[DetailsGSHearderView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, 310)];
+    self.headerView = [[DetailsGSHearderView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, 280)];
     [_headerView.addressView.button addTarget:self action:@selector(lookOverMapk:) forControlEvents:UIControlEventTouchUpInside];
     [_headerView.phoneView.button addTarget:self action:@selector(callNumberWithPhone:) forControlEvents:UIControlEventTouchUpInside];
-    [_headerView.hotelImage setImageWithURL:[NSURL URLWithString:self.icon]];
+    [_headerView.detailsBT addTarget:self action:@selector(lookFacility:) forControlEvents:UIControlEventTouchUpInside];
+    DetailsGrogshopViewController * detailsVC = self;
+    [_headerView.hotelImage setImageWithURL:[NSURL URLWithString:self.icon] completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType) {
+        detailsVC.headerView.hotelImage.image = [UIImage imageNamed:@"load_fail.png"];
+    }];
 //    _headerView.backgroundColor = [UIColor grayColor];
     self.detailsTableView.tableHeaderView = _headerView;
     
@@ -86,16 +96,16 @@
 //    _headerView.cycleViews = [imageViewAry copy];
     
     self.allButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    _allButton.frame = CGRectMake(0, 0, self.view.width, 50);
+    _allButton.frame = CGRectMake(0, 0, self.view.width, 35);
     [_allButton addTarget:self action:@selector(unfoldAllRoom:) forControlEvents:UIControlEventTouchUpInside];
     [_allButton setTitle:@"展开全部房型" forState:UIControlStateNormal];
-    [_allButton setTitleColor:[UIColor grayColor] forState:UIControlStateNormal];
+    [_allButton setTitleColor:TEXT_COLOR forState:UIControlStateNormal];
     [_allButton setTitle:@"折叠全部房型" forState:UIControlStateSelected];
-    [_allButton setTitleColor:[UIColor grayColor] forState:UIControlStateSelected];
-    _allButton.backgroundColor = [UIColor colorWithWhite:0.9 alpha:0.6];
-    _allButton.layer.borderColor = [UIColor colorWithWhite:0.7 alpha:0.4].CGColor;
-    _allButton.layer.borderWidth = 1;
-    
+    [_allButton setTitleColor:TEXT_COLOR forState:UIControlStateSelected];
+    _allButton.backgroundColor = [UIColor colorWithRed:240 / 255.0 green:240 / 255.0 blue:240 / 255.0 alpha:1];
+    _allButton.layer.borderColor = [UIColor colorWithWhite:0.9 alpha:0.4].CGColor;
+    _allButton.layer.borderWidth = 0.5;
+    _allButton.titleLabel.font = [UIFont systemFontOfSize:16];
     self.footerView = [[DetailsFooterView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, 100)];
     _footerView.explainString = @"无";
 //    [_footerView.allButton addTarget:self action:@selector(unfoldAllRoom:) forControlEvents:UIControlEventTouchUpInside];
@@ -146,6 +156,15 @@
     gsMapVC.lat = self.lat;
     gsMapVC.lon = self.lon;
     [self.navigationController pushViewController:gsMapVC animated:YES];
+}
+
+
+- (void)lookFacility:(UIButton *)button
+{
+    FacilityViewController * factlityVC = [[FacilityViewController alloc] init];
+    factlityVC.detailsDic = self.detailsDic;
+    factlityVC.describe = self.describe;
+    [self.navigationController pushViewController:factlityVC animated:YES];
 }
 
 
@@ -280,22 +299,23 @@
         }else if ([[data objectForKey:@"Command"] isEqualToNumber:@10010])
         {
             NSDictionary * dic = [data objectForKey:@"HotelInfo"];
+            self.describe = [dic objectForKey:@"Describe"];
             self.headerView.addressView.titleLable.text = [dic objectForKey:@"Address"];
             self.headerView.phoneView.titleLable.text = [dic objectForKey:@"PhoneNumber"];
-            NSDictionary * stateDic = [dic objectForKey:@"HotelDetail"];
-            if ([[stateDic objectForKey:@"ParkState"] isEqualToNumber:@1]) {
+            self.detailsDic = [dic objectForKey:@"HotelDetail"];
+            if ([[self.detailsDic objectForKey:@"ParkState"] isEqualToNumber:@1]) {
                 self.headerView.parkView.image = [UIImage imageNamed:@"P_on.png"];
             }else
             {
                 self.headerView.parkView.image = [UIImage imageNamed:@"P_off.png"];
             }
-            if ([[stateDic objectForKey:@"RestaurantState"] isEqualToNumber:@1]) {
+            if ([[self.detailsDic objectForKey:@"RestaurantState"] isEqualToNumber:@1]) {
                 self.headerView.foodView.image = [UIImage imageNamed:@"food_on.png"];
             }else
             {
                 self.headerView.foodView.image = [UIImage imageNamed:@"food_off.png"];
             }
-            if ([[stateDic objectForKey:@"WifiState"] isEqualToNumber:@1]) {
+            if ([[self.detailsDic objectForKey:@"WifiState"] isEqualToNumber:@1]) {
                 self.headerView.wifiView.image = [UIImage imageNamed:@"wifi_on.png"];
             }else
             {
@@ -378,24 +398,26 @@
 //}
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
 {
-    return 50;
+    return 35;
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section
 {
-    return 40;
+    return 35;
 }
 
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
 {
-    UIView * sectionView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, 50)];
+    UIView * sectionView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, 35)];
     sectionView.backgroundColor = [UIColor whiteColor];
-    UILabel * titleLB = [[UILabel alloc] initWithFrame:CGRectMake(15, 10, self.view.width - 30, 30)];
+    UILabel * titleLB = [[UILabel alloc] initWithFrame:CGRectMake(15, 2.5, self.view.width - 30, 30)];
     titleLB.text = @"精品推荐";
+    titleLB.textColor = TEXT_COLOR;
+    titleLB.font = [UIFont systemFontOfSize:15];
     [sectionView addSubview:titleLB];
     UIView * lineView = [[UIView alloc] initWithFrame:CGRectMake(15, sectionView.height - 1, titleLB.width, 1)];
     lineView.backgroundColor = [UIColor colorWithWhite:0.7 alpha:1];
-    [sectionView addSubview:lineView];
+//    [sectionView addSubview:lineView];
     return sectionView;
 }
 

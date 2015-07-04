@@ -77,40 +77,48 @@
     
     self.personLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, _priceLB.bottom + TOP_SPACE, view1.width  - 2 * LEFT_SPACE, 30)];
     _personLB.text = @"预定人:马哥";
+    _personLB.textColor = TEXT_COLOR;
     [view1 addSubview:_personLB];
     
     
-    UILabel * telLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, _personLB.bottom + TOP_SPACE, view1.width - 2 * LEFT_SPACE, 30)];
-    telLB.text = @"预定电话: 13456772457";
-    [view1 addSubview:telLB];
+    self.telLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, _personLB.bottom + TOP_SPACE, view1.width - 2 * LEFT_SPACE, 30)];
+    _telLB.text = @"预定电话: 13456772457";
+    _telLB.textColor = TEXT_COLOR;
+    [view1 addSubview:_telLB];
     
     
-    self.checkInDateLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, telLB.bottom + TOP_SPACE, view1.width - 2 * LEFT_SPACE, 30)];
+    self.checkInDateLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, _telLB.bottom + TOP_SPACE, view1.width - 2 * LEFT_SPACE, 30)];
     _checkInDateLB.text = @"入住时间: 2015年5月15日 19:52:15";
+    _checkInDateLB.textColor = TEXT_COLOR;
     [view1 addSubview:_checkInDateLB];
     
     self.leaveLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, _checkInDateLB.bottom + TOP_SPACE, view1.width - 2 * LEFT_SPACE, 30)];
     _leaveLB.text = @"离开时间: 2015年5月17日 19:52:15";
+    _leaveLB.textColor = TEXT_COLOR;
     [view1 addSubview:_leaveLB];
     
     
     self.roomLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, _leaveLB.bottom + TOP_SPACE, view1.width - 2 * LEFT_SPACE, 30)];
     _roomLB.text = @"总统大套房";
+    _roomLB.textColor = TEXT_COLOR;
     [view1 addSubview:_roomLB];
     
     
     self.countLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, _roomLB.bottom + TOP_SPACE, view1.width - 2 * LEFT_SPACE, 30)];
     _countLB.text = @"预定房间: 1间";
+    _countLB.textColor = TEXT_COLOR;
     [view1 addSubview:_countLB];
     
     
     self.payLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, _countLB.bottom + TOP_SPACE, view1.width - 2 * LEFT_SPACE, 30)];
     _payLB.text = @"支付方式: 在线支付";
+    _payLB.textColor = TEXT_COLOR;
     [view1 addSubview:_payLB];
     
     
     self.requireLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, _payLB.bottom + TOP_SPACE, view1.width - 2 * LEFT_SPACE, 30)];
     _requireLB.text = @"特殊要求";
+    _requireLB.textColor = TEXT_COLOR;
     [view1 addSubview:_requireLB];
     
     view1.height = _requireLB.bottom + TOP_SPACE;
@@ -157,7 +165,7 @@
     view2.height = _telGSLB.bottom + TOP_SPACE;
     */
     
-    UIView * view3 = [[UIView alloc] initWithFrame:CGRectMake(0, view1.bottom + 10, scrollView.width, 100)];
+    UIView * view3 = [[UIView alloc] initWithFrame:CGRectMake(0, view1.bottom + 5, scrollView.width, 100)];
     view3.backgroundColor = [UIColor whiteColor];
     [scrollView addSubview:view3];
     
@@ -167,6 +175,7 @@
     
     UILabel * payLabel = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, 0, view3.width - 2 * LEFT_SPACE, 40)];
     payLabel.text = @"支付方式";
+    payLabel.textColor = TEXT_COLOR;
     [view3 addSubview:payLabel];
     
     
@@ -212,7 +221,7 @@
     
     UIButton * backBT = [UIButton buttonWithType:UIButtonTypeCustom];
     backBT.frame = CGRectMake(0, 0, 15, 20);
-    [backBT setBackgroundImage:[UIImage imageNamed:@"back_w.png"] forState:UIControlStateNormal];
+    [backBT setBackgroundImage:[UIImage imageNamed:@"back_r.png"] forState:UIControlStateNormal];
     [backBT addTarget:self action:@selector(backLastVC:) forControlEvents:UIControlEventTouchUpInside];
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:backBT];
     
@@ -337,8 +346,8 @@
             req.nonceStr            = [NSString stringWithFormat:@"%@", [data objectForKey:@"NonceStr"]];
             req.timeStamp           = stamp.intValue;
             req.package             = [NSString stringWithFormat:@"%@", [data objectForKey:@"Package"]];
-//            req.sign                = [NSString stringWithFormat:@"%@", [data objectForKey:@"Sign"]];
-            req.sign = sign;
+            req.sign                = [NSString stringWithFormat:@"%@", [data objectForKey:@"Sign"]];
+//            req.sign = sign;
             [WXApi sendReq:req];
         }
     }

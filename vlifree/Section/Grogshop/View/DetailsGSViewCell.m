@@ -46,14 +46,17 @@
         
         self.nameLable = [[UILabel alloc] initWithFrame:CGRectMake(_iconView.right + LEFT_SPACE, _iconView.top, LABEL_WIDTH, LABEL_HEIGHT)];
         _nameLable.text = @"总统套房";
+        _nameLable.textColor = TEXT_COLOR;
+        _nameLable.font = [UIFont systemFontOfSize:16];
         [self addSubview:_nameLable];
         self.priceLabel = [[UILabel alloc] initWithFrame:CGRectMake(_iconView.right + LEFT_SPACE, _nameLable.bottom, LABEL_WIDTH, LABEL_HEIGHT)];
         _priceLabel.text = @"¥235";
+        _priceLabel.font = [UIFont systemFontOfSize:14];
         _priceLabel.textColor = [UIColor redColor];
         [self addSubview:_priceLabel];
         
         self.reserveButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        _reserveButton.frame = CGRectMake(frame.size.width - BUTTON_WIDTH - RIGHT_IMAGE_SIZE - LEFT_SPACE, _priceLabel.top, BUTTON_WIDTH, LABEL_HEIGHT + 5);
+        _reserveButton.frame = CGRectMake(frame.size.width - BUTTON_WIDTH - RIGHT_IMAGE_SIZE - LEFT_SPACE, _priceLabel.top, BUTTON_WIDTH, LABEL_HEIGHT);
         _reserveButton.backgroundColor = MAIN_COLOR;
         [_reserveButton setTitle:@"预定" forState:UIControlStateNormal];
         _reserveButton.titleLabel.font = [UIFont systemFontOfSize:14];

@@ -51,7 +51,7 @@
         [phoneView addSubview:phoneImage];
         self.phoneTF = [[UITextField alloc] initWithFrame:CGRectMake(phoneImage.right + 5, phoneImage.top, phoneView.width - 10 - phoneImage.right, IMAGE_SIZE)];
         _phoneTF.placeholder = @"手机号";
-        _phoneTF.font = [UIFont systemFontOfSize:22];
+        _phoneTF.font = [UIFont systemFontOfSize:20];
         _phoneTF.keyboardType = UIKeyboardTypePhonePad;
         _phoneTF.clearButtonMode = UITextFieldViewModeWhileEditing;
         [phoneView addSubview:_phoneTF];
@@ -68,7 +68,7 @@
         [passwordView addSubview:passwordImage];
         self.passwordTF = [[UITextField alloc] initWithFrame:CGRectMake(passwordImage.right + 5, passwordImage.top, passwordView.width - 10 - passwordImage.right, IMAGE_SIZE)];
         _passwordTF.placeholder = @"密码";
-        _passwordTF.font = [UIFont systemFontOfSize:22];
+        _passwordTF.font = [UIFont systemFontOfSize:20];
         _passwordTF.keyboardType = UIKeyboardTypeNumbersAndPunctuation;
         _passwordTF.secureTextEntry = YES;
         _passwordTF.clearButtonMode = UITextFieldViewModeWhileEditing;

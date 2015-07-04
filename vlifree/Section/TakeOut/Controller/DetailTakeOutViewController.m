@@ -87,7 +87,10 @@
     self.view.backgroundColor = [UIColor whiteColor];
 
     self.navigationController.navigationBar.barTintColor = [UIColor whiteColor];
-    
+    self.navigationController.navigationBar.titleTextAttributes = @{
+                                                                    NSForegroundColorAttributeName: TEXT_COLOR
+                                                                    };
+
     [self addObserver:self forKeyPath:@"shopArray" options:NSKeyValueObservingOptionNew context:nil];
     
     UIView * noticeView = [[UIView alloc] initWithFrame:CGRectMake(0, self.navigationController.navigationBar.bottom, self.view.width, 30)];
@@ -101,6 +104,7 @@
     
     UILabel * noticeLB = [[UILabel alloc] initWithFrame:CGRectMake(aImageV.right + 5, 5, noticeView.width - aImageV.right - 40, 20)];
     noticeLB.text = @"欢迎商家测试使用";
+    noticeLB.textColor = TEXT_COLOR;
     [noticeView addSubview:noticeLB];
     
     UIButton * button = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -111,6 +115,7 @@
     
     
     self.sectionTableView = [[UITableView alloc] initWithFrame:CGRectMake(0, noticeView.bottom, 80, self.view.height - SHOPPINGCARVIEW_HEIGHT - noticeView.height - self.navigationController.navigationBar.bottom) style:UITableViewStylePlain];
+    self.sectionTableView.backgroundColor = [UIColor colorWithWhite:0.95 alpha:0.7];
     _sectionTableView.dataSource = self;
     _sectionTableView.delegate = self;
     _sectionTableView.tableFooterView = [[UIView alloc] init];
@@ -123,6 +128,7 @@
     self.menusTableView = [[UITableView alloc] initWithFrame:CGRectMake(_sectionTableView.right, noticeView.bottom, self.view.width - 80, self.view.height - self.navigationController.navigationBar.bottom - SHOPPINGCARVIEW_HEIGHT - noticeView.height) style:UITableViewStylePlain];
     _menusTableView.delegate = self;
     _menusTableView.dataSource = self;
+    _menusTableView.separatorColor = LINE_COLOR;
     _menusTableView.tableFooterView = [[UIView alloc] init];
     [_menusTableView registerClass:[MenusViewCell class] forCellReuseIdentifier:MENUS_TABLEVIEW_CELL];
 //    _menusTableView.backgroundColor = [UIColor orangeColor];
@@ -137,6 +143,19 @@
     [_shoppingCarView.changeButton addTarget:self action:@selector(confirmMenusAction:) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:_shoppingCarView];
 //    _shoppingCarView.backgroundColor = [UIColor greenColor];
+    
+    
+    if ([self.storeState isEqualToNumber:@0]) {
+        UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:@"商家休息中, 暂时不接受新订单." delegate:nil cancelButtonTitle:@"知道了" otherButtonTitles:nil, nil];
+        [alert show];
+        self.shoppingCarView.changeButton.enabled = NO;
+        self.shoppingCarDetailsView.changeBT.enabled = NO;
+        [self.shoppingCarDetailsView.changeBT setBackgroundImage:[UIImage imageNamed:@"storeState_g.png"] forState:UIControlStateDisabled];
+        [self.shoppingCarView.changeButton setBackgroundImage:[UIImage imageNamed:@"storeState_g.png"] forState:UIControlStateDisabled];
+    }
+    
+    
+    
     
     UIButton * backBT = [UIButton buttonWithType:UIButtonTypeCustom];
     backBT.frame = CGRectMake(0, 0, 15, 20);
@@ -208,7 +227,7 @@
 
 - (void)addShoppingCarDetailsViewAction:(UIButton *)button
 {
-    if (self.shopArray.count > 0) {
+    if (self.shopArray.count > 0 && [self.storeState isEqualToNumber:@1]) {
         self.shoppingCarDetailsView = [[ShoppingDetailsCarView alloc] initWithFrame:[[UIScreen mainScreen] bounds] withMneusArray:self.shopArray];
         self.shoppingCarDetailsView.mealBoxMoney = self.mealBoxMoney;//这个赋值许在sendPrice前面
         self.shoppingCarDetailsView.sendPrice = self.sendPrice;
@@ -526,10 +545,23 @@
         }
     }
     if (allPrice < [self.sendPrice doubleValue] || [self getAllCount] == 0) {
-        self.shoppingCarView.changeButton.enabled = NO;
+        if ([self.storeState isEqualToNumber:@0]) {
+            self.shoppingCarView.changeButton.enabled = NO;
+            self.shoppingCarDetailsView.changeBT.enabled = NO;
+            [self.shoppingCarDetailsView.changeBT setBackgroundImage:[UIImage imageNamed:@"storeState_g.png"] forState:UIControlStateDisabled];
+            [self.shoppingCarView.changeButton setBackgroundImage:[UIImage imageNamed:@"storeState_g.png"] forState:UIControlStateDisabled];
+        }
     }else
     {
-        self.shoppingCarView.changeButton.enabled = YES;
+        if ([self.storeState isEqualToNumber:@0]) {
+            self.shoppingCarView.changeButton.enabled = NO;
+            self.shoppingCarDetailsView.changeBT.enabled = NO;
+//            [self.shoppingCarDetailsView.changeBT setBackgroundImage:[UIImage imageNamed:@"storeState_g.png"] forState:UIControlStateDisabled];
+//            [self.shoppingCarView.changeButton setBackgroundImage:[UIImage imageNamed:@"storeState_g.png"] forState:UIControlStateDisabled];
+        }else
+        {
+            self.shoppingCarView.changeButton.enabled = YES;
+        }
     }
 //    allPrice += self.mealBoxMoney.doubleValue * [self getAllCount] + self.outSentMoney.doubleValue;
     self.shoppingCarView.priceLabel.text = [NSString stringWithFormat:@"¥%g(¥%@起送)", allPrice, self.sendPrice];
