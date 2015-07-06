@@ -557,12 +557,16 @@
         UILabel * stateLB = (UILabel *)[view2 viewWithTag:20001 + i];
         if (state == i + 1 && state != 4) {
             stateLB.textColor = [UIColor greenColor];
+            stateIV.image = [UIImage imageNamed:[NSString stringWithFormat:@"orderState%d.png", i + 1]];
         }else if (state == 7)
         {
             stateIV.image = [UIImage imageNamed:[NSString stringWithFormat:@"orderState%d.png", i + 1]];
             if (i == 3) {
                 stateLB.textColor = [UIColor greenColor];
             }
+        }else if (state > i + 1 && state < 4)
+        {
+            stateIV.image = [UIImage imageNamed:[NSString stringWithFormat:@"orderState%d.png", i + 1]];
         }
     }
 }

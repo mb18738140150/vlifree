@@ -61,6 +61,7 @@
         _titleLabel.backgroundColor = VIEW_COLOR;
 //        _titleLabel.text = @"小肥羊";
         _titleLabel.textColor = TEXT_COLOR;
+        _titleLabel.font = [UIFont systemFontOfSize:15];
         [self.contentView addSubview:_titleLabel];
         
         self.detailLabel = [[UILabel alloc] initWithFrame:CGRectMake(_titleLabel.left, _titleLabel.bottom, CENTRE_LABEL_WIDTH, LABEL_HEIGTH)];
@@ -79,7 +80,7 @@
         self.distanceLabel = [[UILabel alloc] initWithFrame:CGRectMake(_titleLabel.right + LEFT_SPACE, _icon.top, RIGHT_LEBEL_WIDTH, LABEL_HEIGTH)];
         _distanceLabel.backgroundColor = VIEW_COLOR;
 //        _distanceLabel.text = @"2.5公里";
-        _distanceLabel.font = [UIFont systemFontOfSize:14];
+        _distanceLabel.font = [UIFont systemFontOfSize:12];
         _distanceLabel.textColor = [UIColor colorWithWhite:0.5 alpha:1];
         [self.contentView addSubview:_distanceLabel];
         self.soldCountLabel = [[UILabel alloc] initWithFrame:CGRectMake(_titleLabel.right + LEFT_SPACE, _priceLabel.top, RIGHT_LEBEL_WIDTH, LABEL_HEIGTH)];

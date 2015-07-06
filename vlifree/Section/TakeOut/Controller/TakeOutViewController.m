@@ -152,7 +152,7 @@
     if ([UserLocation shareUserLocation].placemark) {
         if (!_isSupermark) {
             [self downloadDataWithCommand:@6 page:_page count:DATA_COUNT type:0];
-            [SVProgressHUD showWithStatus:@"加载中..." maskType:SVProgressHUDMaskTypeBlack];
+//            [SVProgressHUD showWithStatus:@"加载中..." maskType:SVProgressHUDMaskTypeBlack];
         }
         _isLoc = YES;
     }else
@@ -303,7 +303,7 @@
     self.typeView.hidden = YES;
     UIButton * typeBT = (UIButton *)[self.view viewWithTag:2000];
     typeBT.selected = NO;
-    [SVProgressHUD showWithStatus:@"正在加载..." maskType:SVProgressHUDMaskTypeBlack];
+//    [SVProgressHUD showWithStatus:@"正在加载..." maskType:SVProgressHUDMaskTypeBlack];
 //    [self.takeOutTabelView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:YES];
 }
 
@@ -582,7 +582,8 @@ updatingLocation:(BOOL)updatingLocation
     UILabel * label = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, self.view.width, 30)];
     label.backgroundColor = [UIColor whiteColor];
     label.textAlignment = NSTextAlignmentCenter;
-    label.textColor = TEXT_COLOR;
+    label.textColor = [UIColor redColor];
+    label.font = [UIFont systemFontOfSize:13];
     if ([takeOutMD.peyType isEqualToNumber:@YES]) {
         label.text = @"在配送范围内";
     }else

@@ -264,7 +264,7 @@
 - (void)playPostWithDictionary:(NSDictionary *)dic
 {
     NSString * jsonStr = [dic JSONString];
-    //    NSLog(@"%@", jsonStr);
+    NSLog(@"%@", jsonStr);
     NSString * str = [NSString stringWithFormat:@"%@231618", jsonStr];
     NSString * md5Str = [str md5];
     NSString * urlString = [NSString stringWithFormat:@"%@%@", POST_URL, md5Str];
@@ -322,7 +322,7 @@
                 self.headerView.wifiView.image = [UIImage imageNamed:@"wifi_off.png"];
             }
             self.footerView = [[DetailsFooterView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, 100)];
-            self.footerView.explainString = [dic objectForKey:@"BookingInstructions"];
+            self.footerView.explainString = [self removeHTMLString:[dic objectForKey:@"BookingInstructions"]] ;
             self.detailsTableView.tableFooterView = _footerView;
             NSArray * array = [dic objectForKey:@"SuiteList"];
             for (NSDictionary * suiteDic in array) {
@@ -331,6 +331,7 @@
             }
             
             [self.detailsTableView reloadData];
+            NSLog(@"解析html = %@", [self removeHTMLString:[dic objectForKey:@"BookingInstructions"]]);
         }
        
     }else
@@ -594,6 +595,21 @@
 {
     UIView * view = [self.view.window viewWithTag:70000];
     [view removeFromSuperview];
+}
+
+
+
+- (NSString *)removeHTMLString:(NSString *)string
+{
+    NSMutableString * str = [string mutableCopy];
+    while ([str rangeOfString:@"<"].location != NSNotFound) {
+        NSRange range1 = [str rangeOfString:@"<"];
+        NSRange range2 = [str rangeOfString:@">"];
+        NSRange strRange = NSMakeRange(range1.location, range2.location - range1.location + 1);
+        [str replaceCharactersInRange:strRange withString:@""];
+//        NSLog(@"%d, %d", strRange.location, strRange.length);
+    }
+    return [str copy];
 }
 
 

@@ -21,7 +21,8 @@
 
 #import "BDWalletSDKMainManager.h"
 #import <CommonCrypto/CommonDigest.h>
-
+#import <ifaddrs.h>
+#import <arpa/inet.h>
 #include <sys/socket.h> // Per msqr
 #include <sys/sysctl.h>
 #include <net/if.h>
@@ -173,7 +174,7 @@
         allMoney -= fullPrice.doubleValue;
     }
     
-    
+    self.mealBoxMoney = [[self orderDic] objectForKey:@"MealBoxMoney"];
     if (![self.mealBoxMoney isEqualToNumber:@0]) {
         UILabel * mealBoxLabel = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, top, 80, LABEL_HEIGHT)];
         mealBoxLabel.text = @"餐具费";
@@ -453,7 +454,11 @@
                                    @"AllMoney":[NSNumber numberWithDouble:_allMoney],
                                    @"Remark":self.remarksTV.text,
                                    @"ReceiverName":[UserInfo shareUserInfo].name,
-                                   @"PayType":[NSNumber numberWithInteger:_payType]
+                                   @"PayType":[NSNumber numberWithInteger:_payType],
+                                   @"Cur_IP":[self getIPAddress],
+                                   @"FirstReduce":[self.orderDic objectForKey:@"FirstReduce"],
+                                   @"FullReduce":[self.orderDic objectForKey:@"FullReduce"],
+                                   @"MealBoxMoney":self.mealBoxMoney
                                    };
         [self playPostWithDictionary:jsonDic];
         [SVProgressHUD showWithStatus:@"正在跳转支付.." maskType:SVProgressHUDMaskTypeBlack];
@@ -937,6 +942,33 @@
     NSLog(@"%@", [NSString stringWithFormat:@"MD5签名字符串：\n%@\n\n",contentString]);
     
     return md5Sign;
+}
+
+// Get IP Address
+- (NSString *)getIPAddress {
+    NSString *address = @"error";
+    struct ifaddrs *interfaces = NULL;
+    struct ifaddrs *temp_addr = NULL;
+    int success = 0;
+    // retrieve the current interfaces - returns 0 on success
+    success = getifaddrs(&interfaces);
+    if (success == 0) {
+        // Loop through linked list of interfaces
+        temp_addr = interfaces;
+        while(temp_addr != NULL) {
+            if(temp_addr->ifa_addr->sa_family == AF_INET) {
+                // Check if interface is en0 which is the wifi connection on the iPhone
+                if([[NSString stringWithUTF8String:temp_addr->ifa_name] isEqualToString:@"en0"]) {
+                    // Get NSString from C String
+                    address = [NSString stringWithUTF8String:inet_ntoa(((struct sockaddr_in *)temp_addr->ifa_addr)->sin_addr)];
+                }
+            }
+            temp_addr = temp_addr->ifa_next;
+        }
+    }
+    // Free memory
+    freeifaddrs(interfaces);
+    return address;
 }
 
 

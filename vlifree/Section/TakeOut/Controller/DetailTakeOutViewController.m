@@ -37,7 +37,7 @@
 
 @property (nonatomic, strong)NSMutableArray * classArray;
 @property (nonatomic, strong)NSMutableArray * menusArray;
-@property (nonatomic, strong)NSNumber * mealBoxMoney;//餐盒费
+//@property (nonatomic, strong)NSNumber * mealBoxMoney;//餐盒费
 
 @property (nonatomic, strong)NSMutableArray * shopArray;
 @property (nonatomic, strong)AlertLoginView * alertLoginV;
@@ -229,7 +229,7 @@
 {
     if (self.shopArray.count > 0 && [self.storeState isEqualToNumber:@1]) {
         self.shoppingCarDetailsView = [[ShoppingDetailsCarView alloc] initWithFrame:[[UIScreen mainScreen] bounds] withMneusArray:self.shopArray];
-        self.shoppingCarDetailsView.mealBoxMoney = self.mealBoxMoney;//这个赋值许在sendPrice前面
+//        self.shoppingCarDetailsView.mealBoxMoney = self.mealBoxMoney;//这个赋值许在sendPrice前面
         self.shoppingCarDetailsView.sendPrice = self.sendPrice;
         [self.shoppingCarDetailsView.shoppingCarBT addTarget:self action:@selector(removeShoppingCarDetailsViewAction:) forControlEvents:UIControlEventTouchUpInside];
         [_shoppingCarDetailsView.changeBT addTarget:self action:@selector(confirmMenusAction:) forControlEvents:UIControlEventTouchUpInside];
@@ -287,8 +287,8 @@
     NSLog(@"+++%@", data);
     if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
         if ([[data objectForKey:@"Command"] intValue] == 10012) {
-            self.mealBoxMoney = [data objectForKey:@"MealBoxMoney"];
-            NSLog(@"餐具费  %@", self.mealBoxMoney);
+//            self.mealBoxMoney = [data objectForKey:@"MealBoxMoney"];
+//            NSLog(@"餐具费  %@", self.mealBoxMoney);
             NSArray * array = [data objectForKey:@"CatalogueList"];
             for (int i = 0; i < array.count; i++) {
                 NSDictionary * dic = [array objectAtIndex:i];
@@ -346,7 +346,7 @@
             orderVC.shopArray = self.shopArray;
             orderVC.takeOutId = self.takeOutID;
             orderVC.storeName = self.storeName;
-            orderVC.mealBoxMoney = self.mealBoxMoney;
+//            orderVC.mealBoxMoney = [data objectForKey:@"MealBoxMoney"];
             [self.navigationController pushViewController:orderVC animated:YES];
         }
     }else

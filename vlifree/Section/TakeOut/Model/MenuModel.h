@@ -16,8 +16,11 @@
 @property (nonatomic, copy)NSString * name;
 @property (nonatomic, strong)NSNumber * price;
 @property (nonatomic, strong)NSNumber * soldCount;
+@property (nonatomic, strong)NSNumber * mealBoxMoney;
+
 
 - (id)initWithDictionary:(NSDictionary *)dic;
+
 
 
 @end

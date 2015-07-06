@@ -101,7 +101,7 @@
     [self.groshopTabelView addFooterWithTarget:self action:@selector(footerRereshing)];
     _page = 1;
     _type = 2;
-    [SVProgressHUD showWithStatus:@"正在加载..." maskType:SVProgressHUDMaskTypeBlack];
+//    [SVProgressHUD showWithStatus:@"正在加载..." maskType:SVProgressHUDMaskTypeBlack];
     self.keyWord = nil;
     if ([UserLocation shareUserLocation].placemark != nil) {
         [self downloadDataWithCommand:@2 page:_page count:DATA_COUNT keyWord:nil];
@@ -181,7 +181,7 @@
         _type = 5;
     }
     self.keyWord = nil;
-    [SVProgressHUD showWithStatus:@"正在加载数据..." maskType:SVProgressHUDMaskTypeBlack];
+//    [SVProgressHUD showWithStatus:@"正在加载数据..." maskType:SVProgressHUDMaskTypeBlack];
 //    [self.groshopTabelView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:YES];
 }
 

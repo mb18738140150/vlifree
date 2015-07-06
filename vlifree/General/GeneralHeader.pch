@@ -24,7 +24,7 @@
 #define APP_SECRET_WX @"055e7e10c698b7b140511d8d1a73cec4"
 #define APP_KEY_WX @"p2j4b57gmdk90nd5bla84nkyqldicn32"
 
-#define POST_URL @"http://test.vlifee.com/User_getdata.ashx?md5="
+#define POST_URL @"http://p.vlifee.com/User_getdata.ashx?md5="
 #define DATA_COUNT 15
 
 #define MAIN_COLOR [UIColor colorWithRed:251 / 250.0 green:51 / 250.0 blue:46 / 250.0 alpha:1]

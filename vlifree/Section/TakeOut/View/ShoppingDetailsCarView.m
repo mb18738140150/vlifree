@@ -110,7 +110,7 @@
         menuView.priceLabel.text = [NSString stringWithFormat:@"¥%g", [menuMD.price doubleValue] * smallAry.count];
 //        allPrice += [menuMD.price doubleValue] * smallAry.count;
 //        allCount += smallAry.count;
-        menuView.countLabel.text = [NSString stringWithFormat:@"%ld", smallAry.count];
+        menuView.countLabel.text = [NSString stringWithFormat:@"%ld", (unsigned long)smallAry.count];
         [self addSubview:menuView];
         if (i == array.count - 1) {
             break;
@@ -126,7 +126,7 @@
     _otherPriceLB.text = @"餐具费¥2";
     _otherPriceLB.textAlignment = NSTextAlignmentCenter;
     _otherPriceLB.textColor = [UIColor colorWithWhite:0.6 alpha:1];
-    [otherView addSubview:_otherPriceLB];
+//    [otherView addSubview:_otherPriceLB];
     
     self.clearCarBT = [UIButton buttonWithType:UIButtonTypeCustom];
     _clearCarBT.frame = CGRectMake(otherView.width - LEFT_SPACE - CLEAR_BUTTON_WIDTH, _otherPriceLB.top, CLEAR_BUTTON_WIDTH, LABEL_HEIGHT);
@@ -217,9 +217,9 @@
     {
         self.changeBT.enabled = YES;
     }
-    if (self.mealBoxMoney) {
-//        allPrice += [self getAllCount] * self.mealBoxMoney.doubleValue;
-    }
+//    if (self.mealBoxMoney) {
+////        allPrice += [self getAllCount] * self.mealBoxMoney.doubleValue;
+//    }
     return allPrice;
 }
 
@@ -231,7 +231,7 @@
         NSMutableArray * ary = [self.menusArray objectAtIndex:i];
         allCount += ary.count;
     }
-    self.otherPriceLB.text = [NSString stringWithFormat:@"餐具费¥%g", self.mealBoxMoney.doubleValue * allCount];
+//    self.otherPriceLB.text = [NSString stringWithFormat:@"餐具费¥%g", self.mealBoxMoney.doubleValue * allCount];
     return allCount;
 }
 
@@ -241,12 +241,12 @@
     self.priceLabel.text = [NSString stringWithFormat:@"¥%g(%@起送)", [self getAllPrice], sendPrice];
 }
 
-- (void)setMealBoxMoney:(NSNumber *)mealBoxMoney
-{
-    _mealBoxMoney = mealBoxMoney;
-    self.otherPriceLB.text = [NSString stringWithFormat:@"餐具费¥%@", mealBoxMoney];
-    [self getAllPrice];
-}
+//- (void)setMealBoxMoney:(NSNumber *)mealBoxMoney
+//{
+//    _mealBoxMoney = mealBoxMoney;
+//    self.otherPriceLB.text = [NSString stringWithFormat:@"餐具费¥%@", mealBoxMoney];
+//    [self getAllPrice];
+//}
 
 - (void)removeDetailsView:(UIButton *)button
 {

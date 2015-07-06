@@ -178,7 +178,7 @@
     lineView4.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
     [view3 addSubview:lineView4];
     
-    UIImageView * storeIcon = [[UIImageView alloc] initWithFrame:CGRectMake(10, 5, 30, 30)];
+    UIImageView * storeIcon = [[UIImageView alloc] initWithFrame:CGRectMake(10, 5, 20, 20)];
     storeIcon.image = [UIImage imageNamed:@"store.png"];
     [view3 addSubview:storeIcon];
     
@@ -230,7 +230,7 @@
         UILabel * firstJLB = [[UILabel alloc] initWithFrame:CGRectMake(view4.width - 70, firstTitleLB.top, 50, 25)];
         firstJLB.text = [NSString stringWithFormat:@"-%@", self.takeOutOrderMD.firstReduce];
         firstJLB.textAlignment = NSTextAlignmentRight;
-        firstJLB.textColor = TEXT_COLOR;
+        firstJLB.textColor = [UIColor redColor];
         [view4 addSubview:firstJLB];
         
         UIView * firstlineView = [[UIView alloc] initWithFrame:CGRectMake(10, firstJLB.bottom, view4.width - 20, 1)];
@@ -249,7 +249,7 @@
         UILabel * fullJLB = [[UILabel alloc] initWithFrame:CGRectMake(view4.width - 70, fullTitleLB.top, 50, 25)];
         fullJLB.text = [NSString stringWithFormat:@"-%@", self.takeOutOrderMD.fullReduce];
         fullJLB.textAlignment = NSTextAlignmentRight;
-        fullJLB.textColor = TEXT_COLOR;
+        fullJLB.textColor = [UIColor redColor];
         [view4 addSubview:fullJLB];
         
         UIView * fullLineView = [[UIView alloc] initWithFrame:CGRectMake(10, fullJLB.bottom, view4.width - 20, 1)];
@@ -268,7 +268,7 @@
         UILabel * boxPriceLB = [[UILabel alloc] initWithFrame:CGRectMake(view4.width - 70, boxTitleLB.top, 50, 25)];
         boxPriceLB.text = [NSString stringWithFormat:@"+%@", self.takeOutOrderMD.mealBoxMoney];
         boxPriceLB.textAlignment = NSTextAlignmentRight;
-        boxPriceLB.textColor = TEXT_COLOR;
+        boxPriceLB.textColor = [UIColor redColor];
         [view4 addSubview:boxPriceLB];
         
         UIView * boxLineView = [[UIView alloc] initWithFrame:CGRectMake(10, boxPriceLB.bottom, view4.width - 20, 1)];
@@ -288,7 +288,7 @@
         self.otherPriceLB = [[UILabel alloc] initWithFrame:CGRectMake(view4.width - 70, otherTitleLB.top, 50, 25)];
         _otherPriceLB.text = [NSString stringWithFormat:@"+%@", self.takeOutOrderMD.deliveryMoney];
         _otherPriceLB.textAlignment = NSTextAlignmentRight;
-        _otherPriceLB.textColor = TEXT_COLOR;
+        _otherPriceLB.textColor = [UIColor redColor];
         [view4 addSubview:_otherPriceLB];
         
         UIView * lineView8 = [[UIView alloc] initWithFrame:CGRectMake(10, _otherPriceLB.bottom, view4.width - 20, 1)];
@@ -306,7 +306,7 @@
     
     self.totalPriceLB = [[UILabel alloc] initWithFrame:CGRectMake(view4.width - 90, totalLB.top, 70, 25)];
     _totalPriceLB.text = @"¥35";
-    _totalPriceLB.textColor = TEXT_COLOR;
+    _totalPriceLB.textColor = [UIColor redColor];
     _totalPriceLB.textAlignment = NSTextAlignmentRight;
     [view4 addSubview:_totalPriceLB];
     
@@ -339,7 +339,7 @@
     lineView11.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
     [view5 addSubview:lineView11];
     
-    UIImageView * detalsView = [[UIImageView alloc] initWithFrame:CGRectMake(15, 5, 30, 30)];
+    UIImageView * detalsView = [[UIImageView alloc] initWithFrame:CGRectMake(15, 5, 20, 20)];
     detalsView.image = [UIImage imageNamed:@"orderDetails.png"];
     [view5 addSubview:detalsView];
     
@@ -360,6 +360,7 @@
     
     self.orderDateLB = [[UILabel alloc] initWithFrame:CGRectMake(15, _orderNumberLB.bottom + 5, lineView12.width - 10, 30)];
     _orderDateLB.text = [NSString stringWithFormat:@"下单时间: %@", self.takeOutOrderMD.time];
+    _orderDateLB.textColor = TEXT_COLOR;
     [view5 addSubview:_orderDateLB];
     
     self.orderPayTypeLB = [[UILabel alloc] initWithFrame:CGRectMake(15, _orderDateLB.bottom + 5, lineView12.width - 10, 30)];
@@ -672,12 +673,16 @@
         UILabel * stateLB = (UILabel *)[view2 viewWithTag:20001 + i];
         if (state == i + 1 && state != 4) {
             stateLB.textColor = [UIColor greenColor];
+            stateIV.image = [UIImage imageNamed:[NSString stringWithFormat:@"orderState%d.png", i + 1]];
         }else if (state == 7)
         {
             stateIV.image = [UIImage imageNamed:[NSString stringWithFormat:@"orderState%d.png", i + 1]];
             if (i == 3) {
                 stateLB.textColor = [UIColor greenColor];
             }
+        }else if (state > i + 1 && state < 4)
+        {
+            stateIV.image = [UIImage imageNamed:[NSString stringWithFormat:@"orderState%d.png", i + 1]];
         }
     }
 }
