@@ -254,6 +254,7 @@
     self.navigationItem.title = @"会员中心";
     NSLog(@"退出登录");
     [UserInfo shareUserInfo].userId = nil;
+    [[NSUserDefaults standardUserDefaults] setValue:@NO forKey:@"haveLogIn"];
     self.title = @"登陆";
 }
 
@@ -327,6 +328,9 @@
         }else
         {
             [self removeLogInView];
+            [[NSUserDefaults standardUserDefaults] setValue:[UserInfo shareUserInfo].phoneNumber forKey:@"account"];
+            [[NSUserDefaults standardUserDefaults] setValue:[UserInfo shareUserInfo].password forKey:@"password"];
+            [[NSUserDefaults standardUserDefaults] setValue:@YES forKey:@"haveLogIn"];
         }
         
     }else

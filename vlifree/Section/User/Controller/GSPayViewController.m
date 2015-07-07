@@ -311,7 +311,7 @@
             NSString * checkInTime = [data objectForKey:@"CheckInTime"];
             self.checkInDateLB.text = [NSString stringWithFormat:@"入住时间:%@", [checkInTime substringToIndex:10]];
             NSString * leaveTime = [data objectForKey:@"LeaveTime"];
-            self.leaveLB.text = [NSString stringWithFormat:@"%@", [leaveTime substringToIndex:10]];
+            self.leaveLB.text = [NSString stringWithFormat:@"离店时间:%@", [leaveTime substringToIndex:10]];
             self.roomLB.text = [NSString stringWithFormat:@"房型:%@", [data objectForKey:@"RoomType"]];
             self.roomName = [data objectForKey:@"RoomType"];
             self.countLB.text = [NSString stringWithFormat:@"预定房间:%@间", [data objectForKey:@"RoomCount"]];
@@ -336,7 +336,7 @@
             [signParams setObject: [data objectForKey:@"PrepayId"]    forKey:@"prepayid"];
 //            [signParams setObject: @"MD5"       forKey:@"signType"];
             NSLog(@"signDic = %@", signParams);
-            NSString * sign = [self createMd5Sign:signParams];
+//            NSString * sign = [self createMd5Sign:signParams];
             NSNumber * stamp = [data objectForKey:@"TimeStamp"];
             //调起微信支付
             PayReq* req             = [[PayReq alloc] init];

@@ -326,6 +326,7 @@
             [[UserInfo shareUserInfo] setValuesForKeysWithDictionary:[data objectForKey:@"UserInfo"]];
             UITabBarItem * item = [self.navigationController.tabBarController.tabBar.items lastObject];
             item.title = @"我的";
+            [self.alertLoginV removeFromSuperview];
             if ([[data objectForKey:@"IsFirst"] isEqualToNumber:@YES]) {
                 //                DetailsGrogshopViewController * detailsGSVC = self;
                 WXLoginViewController * wxLoginVC = [[WXLoginViewController alloc] init];
@@ -336,7 +337,9 @@
                 [self.navigationController presentViewController:nav animated:YES completion:nil];
             }else
             {
-                [self.alertLoginV removeFromSuperview];
+                [[NSUserDefaults standardUserDefaults] setValue:[UserInfo shareUserInfo].phoneNumber forKey:@"account"];
+                [[NSUserDefaults standardUserDefaults] setValue:[UserInfo shareUserInfo].password forKey:@"password"];
+                [[NSUserDefaults standardUserDefaults] setValue:@YES forKey:@"haveLogIn"];
             }
             
         }else if ([[data objectForKey:@"Command"] isEqualToNumber:@10031])

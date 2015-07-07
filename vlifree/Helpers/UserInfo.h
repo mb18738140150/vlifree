@@ -11,6 +11,7 @@
 @interface UserInfo : NSObject
 
 @property (nonatomic, copy)NSString * name;
+@property (nonatomic, copy)NSString * password;
 @property (nonatomic, strong)NSNumber * phoneNumber;
 @property (nonatomic, strong)NSNumber * hotelOrderCount;
 @property (nonatomic, strong)NSNumber * wakeoutOrderCount;

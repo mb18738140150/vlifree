@@ -10,7 +10,8 @@
 
 @interface GSMapViewController : UIViewController
 
-
+@property (nonatomic, copy)NSString * gsName;
+@property (nonatomic, copy)NSString * address;
 @property (nonatomic, copy)NSString * lat;
 @property (nonatomic, copy)NSString * lon;
 

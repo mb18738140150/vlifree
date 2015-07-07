@@ -18,6 +18,7 @@
 #import "SVProgressHUD.h"
 #import "UserInfo.h"
 #import "WXApi.h"
+#import <Availability.h>
 
 #define COUNT 15
 #define APP_ID_WX @"wxaac5e5f7421e84ac"
@@ -48,7 +49,10 @@
 
 #ifndef vlifree_GeneralHeader_pch
 #define vlifree_GeneralHeader_pch
-
+#ifdef __OBJC__
+#import <UIKit/UIKit.h>
+#import <Foundation/Foundation.h>
+#endif
 // Include any system framework and library headers here that should be included in all compilation units.
 // You will also need to set the Prefix Header build setting of one or more of your targets to reference this file.
 

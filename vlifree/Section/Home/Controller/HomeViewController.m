@@ -52,7 +52,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.homeTableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, self.view.height - self.navigationController.navigationBar.bottom) style:UITableViewStylePlain];
+    self.homeTableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, self.view.height) style:UITableViewStylePlain];
     _homeTableView.dataSource = self;
     _homeTableView.delegate = self;
     [self.homeTableView registerClass:[HomeViewCell class] forCellReuseIdentifier:CELL_INDENTIFIER];
@@ -189,8 +189,8 @@
     searchBT.hidden = NO;
     UIView * aView = [self.view viewWithTag:10009];
     if ([UserInfo shareUserInfo].userId) {
-        [self.homeTableView headerBeginRefreshing];
         self.homeTableView.scrollEnabled = YES;
+        [self.homeTableView headerBeginRefreshing];
         aView.hidden = YES;
     }else
     {
@@ -204,6 +204,7 @@
 
 - (void)viewWillDisappear:(BOOL)animated
 {
+    [self.homeTableView headerEndRefreshing];
 //    UIButton * locationBT = (UIButton *)[self.navigationController.navigationBar viewWithTag:1000];
 //    UIButton * searchBT = (UIButton *)[self.navigationController.navigationBar viewWithTag:2000];
 ////    NSLog(@"%@, %@", locationBT, searchBT);
@@ -256,19 +257,27 @@
 #pragma mark - 数据请求
 - (void)downloadDataWithCommand:(NSNumber *)command page:(int)page count:(int)count
 {
-    if (![UserInfo shareUserInfo].userId) {
-        return;
+    UIView * aView = [self.view viewWithTag:10009];
+    if ([UserInfo shareUserInfo].userId) {
+        self.homeTableView.scrollEnabled = YES;
+        aView.hidden = YES;
+        NSDictionary * jsonDic = @{
+                                   @"Command":command,
+                                   //                               @"CurPage":[NSNumber numberWithInt:page],
+                                   //                               @"CurCount":[NSNumber numberWithInt:count],
+                                   @"Lat":[NSNumber numberWithDouble:[UserLocation shareUserLocation].location.coordinate.latitude],
+                                   @"Lon":[NSNumber numberWithDouble:[UserLocation shareUserLocation].location.coordinate.longitude],
+                                   @"UserId":[UserInfo shareUserInfo].userId
+                                   };
+        [self playPostWithDictionary:jsonDic];
+    }else
+    {
+        self.homeTableView.scrollEnabled = NO;
+        self.dataArray = nil;
+        [self.homeTableView reloadData];
+        aView.hidden = NO;
     }
-    
-    NSDictionary * jsonDic = @{
-                               @"Command":command,
-//                               @"CurPage":[NSNumber numberWithInt:page],
-//                               @"CurCount":[NSNumber numberWithInt:count],
-                               @"Lat":[NSNumber numberWithDouble:[UserLocation shareUserLocation].location.coordinate.latitude],
-                               @"Lon":[NSNumber numberWithDouble:[UserLocation shareUserLocation].location.coordinate.longitude],
-                               @"UserId":[UserInfo shareUserInfo].userId
-                               };
-    [self playPostWithDictionary:jsonDic];
+
     /*
      //    NSLog(@"%@, %@", self.classifyId, [UserInfo shareUserInfo].userId);
      NSString * jsonStr = [jsonDic JSONString];

@@ -185,7 +185,10 @@
 }
 
 
-
+- (void)viewWillDisappear:(BOOL)animated
+{
+    [self.takeOutTabelView headerEndRefreshing];
+}
 
 
 - (void)searchTakeOut:(id)sender

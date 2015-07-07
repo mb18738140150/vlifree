@@ -11,6 +11,8 @@
 #import "DetailsGSOrderViewController.h"
 #import "GSPayViewController.h"
 
+
+
 @interface GSOrderViewController ()<HTTPPostDelegate>
 
 {
@@ -34,7 +36,6 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
     
     [self.tableView registerClass:[GSOrderViewCell class] forCellReuseIdentifier:@"cell"];
     _page = 1;
@@ -66,7 +67,10 @@
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
-
+- (void)viewWillDisappear:(BOOL)animated
+{
+    [self.tableView headerEndRefreshing];
+}
 
 #pragma mark - 数据刷新,加载更多
 
@@ -192,12 +196,12 @@
     GrogshopOrderMD * grogshopMD = [self.dataArray objectAtIndex:indexPath.row];
     DetailsGSOrderViewController * detailsGSODVC = [[DetailsGSOrderViewController alloc] init];
     detailsGSODVC.orderID = grogshopMD.orderSn;
-    if ([grogshopMD.payState isEqualToNumber:@1]) {
-        detailsGSODVC.isPay = YES;
-    }else
-    {
-        detailsGSODVC.isPay = NO;
-    }
+//    if ([grogshopMD.payState isEqualToNumber:@1]) {
+//        detailsGSODVC.isPay = YES;
+//    }else
+//    {
+//        detailsGSODVC.isPay = NO;
+//    }
     [self.navigationController pushViewController:detailsGSODVC animated:YES];
 }
 

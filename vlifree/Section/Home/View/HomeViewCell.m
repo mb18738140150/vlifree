@@ -118,7 +118,9 @@
     self.soldCountLabel.text = [NSString stringWithFormat:@"月售%@", collectModel.sold];
     __weak HomeViewCell * cell = self;
     [self.icon setImageWithURL:[NSURL URLWithString:collectModel.icon] placeholderImage:[UIImage imageNamed:@"placeholderIM.png"] completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType) {
-        cell.icon.image = [UIImage imageNamed:@"load_fail.png"];
+        if (error) {
+            cell.icon.image = [UIImage imageNamed:@"load_fail.png"];
+        }
     }];
 }
 

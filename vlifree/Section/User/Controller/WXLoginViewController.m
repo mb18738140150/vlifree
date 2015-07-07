@@ -170,6 +170,9 @@
     NSLog(@"+++%@", data);
     if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
         [[UserInfo shareUserInfo] setValuesForKeysWithDictionary:[data objectForKey:@"UserInfo"]];
+        [[NSUserDefaults standardUserDefaults] setValue:[UserInfo shareUserInfo].phoneNumber forKey:@"account"];
+        [[NSUserDefaults standardUserDefaults] setValue:[UserInfo shareUserInfo].password forKey:@"password"];
+        [[NSUserDefaults standardUserDefaults] setValue:@YES forKey:@"haveLogIn"];
         [self.navigationController dismissViewControllerAnimated:YES completion:nil];
         _refreshBlock();
     }else

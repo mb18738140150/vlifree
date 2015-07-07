@@ -63,6 +63,11 @@
     [self.navigationController popViewControllerAnimated:YES];
 }
 
+- (void)viewWillDisappear:(BOOL)animated
+{
+    [self.tableView headerEndRefreshing];
+}
+
 #pragma mark - 数据刷新,加载更多
 
 - (void)headerRereshing

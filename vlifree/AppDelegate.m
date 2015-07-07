@@ -52,6 +52,18 @@
     [APService setupWithOption:launchOptions];
     
     
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:@"haveLogIn"]) {
+        NSDictionary * dic = @{
+                               @"Command":@38,
+                               @"LoginType":@1,
+                               @"Account":[[NSUserDefaults standardUserDefaults] objectForKey:@"account"],
+                               @"Password":[[NSUserDefaults standardUserDefaults] objectForKey:@"password"]
+                               };
+        [self playPostWithDictionary:dic];
+    }
+    
+    
+    
     return YES;
 }
 
@@ -243,6 +255,11 @@
 - (void)refresh:(id)data
 {
     NSLog(@"+++%@", data);
+    if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
+        if ([[data objectForKey:@"Command"] isEqualToNumber:@10038]) {
+            [[UserInfo shareUserInfo] setValuesForKeysWithDictionary:[data objectForKey:@"UserInfo"]];
+        }
+    }
 }
 
 

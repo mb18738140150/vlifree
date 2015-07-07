@@ -18,6 +18,9 @@
 #import "AlertLoginView.h"
 #import "WXLoginViewController.h"
 #import "FacilityViewController.h"
+#import "HTMLNode.h"
+#import "HTMLParser.h"
+
 
 
 #define CELL_INDENTIFIER @"CELL"
@@ -43,6 +46,8 @@
 @property (nonatomic, strong)NSDictionary * detailsDic;
 
 @property (nonatomic, copy)NSString * describe;
+
+@property (nonatomic, strong)NSMutableString * xmlString;
 
 @end
 
@@ -153,6 +158,8 @@
 {
     NSLog(@"查看地图");
     GSMapViewController * gsMapVC = [[GSMapViewController alloc] init];
+    gsMapVC.gsName = self.hotelName;
+    gsMapVC.address = self.headerView.addressView.titleLable.text;
     gsMapVC.lat = self.lat;
     gsMapVC.lon = self.lon;
     [self.navigationController pushViewController:gsMapVC animated:YES];
@@ -281,6 +288,7 @@
     if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
         if ([[data objectForKey:@"Command"] isEqualToNumber:@10009] || [[data objectForKey:@"Command"] isEqualToNumber:@10007]) {
             [[UserInfo shareUserInfo] setValuesForKeysWithDictionary:[data objectForKey:@"UserInfo"]];
+            [self.alertLoginV removeFromSuperview];
             UITabBarItem * item = [self.navigationController.tabBarController.tabBar.items lastObject];
             item.title = @"我的";
             if ([[data objectForKey:@"IsFirst"] isEqualToNumber:@YES]) {
@@ -293,7 +301,9 @@
                 [self.navigationController presentViewController:nav animated:YES completion:nil];
             }else
             {
-                [self.alertLoginV removeFromSuperview];
+                [[NSUserDefaults standardUserDefaults] setValue:[UserInfo shareUserInfo].phoneNumber forKey:@"account"];
+                [[NSUserDefaults standardUserDefaults] setValue:[UserInfo shareUserInfo].password forKey:@"password"];
+                [[NSUserDefaults standardUserDefaults] setValue:@YES forKey:@"haveLogIn"];
             }
 
         }else if ([[data objectForKey:@"Command"] isEqualToNumber:@10010])
@@ -322,7 +332,7 @@
                 self.headerView.wifiView.image = [UIImage imageNamed:@"wifi_off.png"];
             }
             self.footerView = [[DetailsFooterView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, 100)];
-            self.footerView.explainString = [self removeHTMLString:[dic objectForKey:@"BookingInstructions"]] ;
+            self.footerView.explainString = [self removeHTMLString:[dic objectForKey:@"BookingInstructions"]];
             self.detailsTableView.tableFooterView = _footerView;
             NSArray * array = [dic objectForKey:@"SuiteList"];
             for (NSDictionary * suiteDic in array) {
@@ -601,7 +611,8 @@
 
 - (NSString *)removeHTMLString:(NSString *)string
 {
-    NSMutableString * str = [string mutableCopy];
+    NSMutableString * str = [[NSString stringWithFormat:@"<body>%@<body>", string] mutableCopy];
+    [str stringByReplacingOccurrencesOfString:@"\n" withString:@""];
     while ([str rangeOfString:@"<"].location != NSNotFound) {
         NSRange range1 = [str rangeOfString:@"<"];
         NSRange range2 = [str rangeOfString:@">"];
@@ -609,8 +620,41 @@
         [str replaceCharactersInRange:strRange withString:@""];
 //        NSLog(@"%d, %d", strRange.location, strRange.length);
     }
+    /*
+    NSError *error = nil;
+    HTMLParser *parser = [[HTMLParser alloc] initWithString:string error:&error];
+    
+    if (error) {
+        NSLog(@"Error: %@", error);
+        return nil;
+    }
+    
+    HTMLNode *bodyNode = [parser body];
+    NSLog(@"111 = %@", bodyNode.contents);
+    NSArray *inputNodes = [bodyNode children];
+    for (HTMLNode * node in inputNodes) {
+        NSLog(@"qq = %@", node.allContents);
+        NSArray *childNodes = [node children];
+        if (childNodes.count > 0) {
+            if (childNodes.count == 1) {
+                NSLog(@"2222");
+            }
+            for (HTMLNode * node1 in childNodes) {
+                
+//                if (node1.nodetype == HTMLTextNode) {
+                    NSLog(@"pppp = %@", node1.allContents);
+//                }
+                for (HTMLNode * node2 in [node1 children]) {
+                    
+                }
+            }
+        }
+    }
+     */
     return [str copy];
 }
+
+
 
 
 /*

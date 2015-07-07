@@ -53,7 +53,7 @@
     userNavc.navigationBar.barTintColor = MAIN_COLOR;
     self.viewControllers = @[homeNavc, grogshopNavc, takeOutNavc, userNavc];
     
-   
+
     
     // Do any additional setup after loading the view.
 }

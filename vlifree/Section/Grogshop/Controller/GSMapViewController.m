@@ -33,6 +33,8 @@
     NSLog(@"%f, %f", coor.latitude, coor.longitude);
     MAPointAnnotation * annotation = [[MAPointAnnotation alloc] init];
     annotation.coordinate = coor;
+    annotation.title = self.gsName;
+    annotation.subtitle = self.address;
     [_mapView addAnnotation:annotation];
     [_mapView setCenterCoordinate:coor animated:YES];
     self.view = _mapView;
@@ -61,11 +63,31 @@ updatingLocation:(BOOL)updatingLocation
     if (updatingLocation) {
         MAPointAnnotation * annotation = [[MAPointAnnotation alloc] init];
         annotation.coordinate = userLocation.location.coordinate;
+        NSLog(@"address = %@, %@", annotation.title, annotation.subtitle);
+        NSLog(@"address22 = %@, %@", userLocation.title, userLocation.subtitle);
         [_mapView addAnnotation:annotation];
         _mapView.showsUserLocation = NO;
     }
 }
 
+- (MAAnnotationView *)mapView:(MAMapView *)mapView viewForAnnotation:(id<MAAnnotation>)annotation
+{
+    if ([annotation isKindOfClass:[MAPointAnnotation class]])
+    {
+        static NSString *pointReuseIndetifier = @"pointReuseIndetifier";
+        MAPinAnnotationView*annotationView = (MAPinAnnotationView*)[mapView dequeueReusableAnnotationViewWithIdentifier:pointReuseIndetifier];
+        if (annotationView == nil)
+        {
+            annotationView = [[MAPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:pointReuseIndetifier];
+        }
+        annotationView.canShowCallout= YES;       //设置气泡可以弹出，默认为NO
+        annotationView.animatesDrop = YES;        //设置标注动画显示，默认为NO
+        annotationView.draggable = YES;        //设置标注可以拖动，默认为NO
+        annotationView.pinColor = MAPinAnnotationColorPurple;
+        return annotationView;
+    }
+    return nil;
+}
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];

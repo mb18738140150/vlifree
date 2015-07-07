@@ -123,6 +123,12 @@
 
     }
 }
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+    [self.groshopTabelView headerEndRefreshing];
+}
+
 - (void)isLocationsuccess
 {
     if (![UserLocation shareUserLocation].placemark) {
@@ -399,6 +405,7 @@
     detailsVC.lat = hotelMD.hotelLat;
     detailsVC.lon = hotelMD.hotelLon;
     detailsVC.icon = hotelMD.icon;
+    detailsVC.hotelName = hotelMD.hotelName;
     [self.navigationController pushViewController:detailsVC animated:YES];
 }
 
