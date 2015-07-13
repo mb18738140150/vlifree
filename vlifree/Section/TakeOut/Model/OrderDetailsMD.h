@@ -10,8 +10,10 @@
 
 @interface OrderDetailsMD : NSObject
 
-
+@property (nonatomic, strong)NSNumber * storeState;
+@property (nonatomic, strong)NSNumber * sendPrice;
 @property (nonatomic, strong)NSNumber * orderState;
+@property (nonatomic, strong)NSNumber * storeId;
 @property (nonatomic, strong)NSNumber * isPey;
 @property (nonatomic, strong)NSNumber * PeyType;
 @property (nonatomic, copy)NSString *  storeName;

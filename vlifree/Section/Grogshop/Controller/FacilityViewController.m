@@ -7,39 +7,54 @@
 //
 
 #import "FacilityViewController.h"
-
+#import "HTMLNode.h"
+#import "HTMLParser.h"
 
 #define IMAGE_SIZE 40
 #define LABEL_HEIGHT 20
 
-#define LEFT_SPACE (self.view.width - 4 * IMAGE_SIZE) / 5
+#define LEFT_SPACE (scrollView.width - 4 * IMAGE_SIZE) / 5
 #define TOP_SPACE 20
 #define TEXT_FONT [UIFont systemFontOfSize:10]
 
 #define OFF_TEXT_COLOR [UIColor colorWithWhite:0.7 alpha:1]
 
-@interface FacilityViewController ()
+@interface FacilityViewController ()<NSXMLParserDelegate>
+
+@property (nonatomic, strong)NSMutableString * detailString;
+
 
 @end
 
 @implementation FacilityViewController
 
+- (NSMutableString *)detailString
+{
+    if (!_detailString) {
+        self.detailString = [NSMutableString string];
+    }
+    return _detailString;
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
-    self.view.backgroundColor = [UIColor colorWithRed:237 / 255.0 green:237 / 255.0 blue:237 / 255.0 alpha:1];
-    
-    UILabel * facilityLB = [[UILabel alloc] initWithFrame:CGRectMake(0, self.navigationController.navigationBar.bottom, self.view.width, 40)];
+//    self.navigationController.navigationBar.translucent = YES;
+//    self.view.backgroundColor = [UIColor colorWithRed:237 / 255.0 green:237 / 255.0 blue:237 / 255.0 alpha:1];
+    UIScrollView * scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, -self.navigationController.navigationBar.bottom, self.view.width, self.view.height + self.navigationController.navigationBar.bottom)];
+    scrollView.backgroundColor = [UIColor colorWithRed:237 / 255.0 green:237 / 255.0 blue:237 / 255.0 alpha:1];
+    [self.view addSubview:scrollView];
+//    self.view = scrollView;
+    UILabel * facilityLB = [[UILabel alloc] initWithFrame:CGRectMake(0, self.navigationController.navigationBar.bottom, scrollView.width, 30)];
     facilityLB.text = @"基础设施";
     facilityLB.textAlignment = NSTextAlignmentCenter;
-    facilityLB.font = [UIFont systemFontOfSize:21];
-    [self.view addSubview:facilityLB];
+//    facilityLB.font = [UIFont systemFontOfSize:21];
+    [scrollView addSubview:facilityLB];
     
 
     
-    UIView * view = [[UIView alloc] initWithFrame:CGRectMake(0, facilityLB.bottom, self.view.width, 140)];
+    UIView * view = [[UIView alloc] initWithFrame:CGRectMake(0, facilityLB.bottom, scrollView.width, 140)];
     view.backgroundColor = [UIColor whiteColor];
-    [self.view addSubview:view];
+    [scrollView addSubview:view];
     
 
     UIImageView * broadBandIMV = [[UIImageView alloc] initWithFrame:CGRectMake(LEFT_SPACE, TOP_SPACE, IMAGE_SIZE, IMAGE_SIZE)];
@@ -148,7 +163,7 @@
     meetingLB.text = @"会议室";
     meetingLB.font = TEXT_FONT;
     meetingLB.textAlignment = NSTextAlignmentCenter;
-    [view addSubview:parkLB];
+    [view addSubview:meetingLB];
     if ([[self.detailsDic objectForKey:@"MeetingRoom"] isEqualToNumber:@YES]) {
         meetingIMV.image = [UIImage imageNamed:@"meeting_on.png"];
         meetingLB.textColor = TEXT_COLOR;
@@ -178,33 +193,75 @@
     view.height = businessLB.bottom + 10;
     
     
-    UILabel * describeLB = [[UILabel alloc] initWithFrame:CGRectMake(0, view.bottom, self.view.width, 40)];
+    UILabel * describeLB = [[UILabel alloc] initWithFrame:CGRectMake(0, view.bottom, scrollView.width, 30)];
     describeLB.text = @"商家介绍";
     describeLB.textAlignment = NSTextAlignmentCenter;
-    describeLB.font = [UIFont systemFontOfSize:21];
-    [self.view addSubview:describeLB];
+//    describeLB.font = [UIFont systemFontOfSize:21];
+    [scrollView addSubview:describeLB];
     
     UIView * detailsView = [[UIView alloc] initWithFrame:CGRectMake(0, describeLB.bottom, describeLB.width, 50)];
     detailsView.backgroundColor = [UIColor whiteColor];
-    [self.view addSubview:detailsView];
+    [scrollView addSubview:detailsView];
     
     UILabel * detailsDBLB = [[UILabel alloc] initWithFrame:CGRectMake(10, 10, describeLB.width - 20, 50)];
     detailsDBLB.backgroundColor = [UIColor whiteColor];
     detailsDBLB.text = @"无";
+    detailsDBLB.lineBreakMode = NSLineBreakByCharWrapping | NSLineBreakByClipping;
     detailsDBLB.numberOfLines = 0;
     detailsDBLB.textColor = TEXT_COLOR;
+    detailsDBLB.font = [UIFont systemFontOfSize:14];
     [detailsView addSubview:detailsDBLB];
+    
+    
+    
+    
     if ([self.describe length]) {
-        detailsDBLB.text = self.describe;
+        NSMutableString * str = [[NSString stringWithFormat:@"<body>%@<body>", self.describe] mutableCopy];
+//        NSXMLParser * parser = [[NSXMLParser alloc] initWithData:[[str copy] dataUsingEncoding:NSUTF8StringEncoding]];
+//        parser.delegate = self;
+//        [parser parse];
+        [str stringByReplacingOccurrencesOfString:@"\n" withString:@""];
+        [str stringByReplacingOccurrencesOfString:@" " withString:@""];
+        [str stringByReplacingOccurrencesOfString:@"\t" withString:@""];
+        while ([str rangeOfString:@"<"].location != NSNotFound) {
+            NSRange range1 = [str rangeOfString:@"<"];
+            NSRange range2 = [str rangeOfString:@">"];
+            NSRange strRange = NSMakeRange(range1.location, range2.location - range1.location + 1);
+            [str replaceCharactersInRange:strRange withString:@""];
+            //        NSLog(@"%d, %d", strRange.location, strRange.length);
+        }
+//        [str stringByReplacingOccurrencesOfString:@"\n" withString:@"--"];
+//        [str stringByReplacingOccurrencesOfString:@" " withString:@"=="];
+//        [str stringByReplacingOccurrencesOfString:@"\t" withString:@"**"];
+        detailsDBLB.text = [str copy];
         CGSize size = [detailsDBLB sizeThatFits:CGSizeMake(detailsDBLB.width, CGFLOAT_MAX)];
 //        if (size.height + 20 > detailsView.height) {
             detailsDBLB.height = size.height;
             detailsView.height = detailsDBLB.bottom + 10;
 //        }
     }
-    
+    scrollView.contentSize = CGSizeMake(scrollView.width, detailsView.bottom);
     
     // Do any additional setup after loading the view.
+}
+
+
+
+- (void)parser:(NSXMLParser *)parser foundCharacters:(NSString *)string
+{
+    [self.detailString appendString:string];
+}
+
+
+- (void)parserDidEndDocument:(NSXMLParser *)parser
+{
+    NSLog(@"%@", self.detailString);
+}
+
+
+- (void)parser:(NSXMLParser *)parser parseErrorOccurred:(NSError *)parseError
+{
+    NSLog(@"error = %@", parseError);
 }
 
 - (void)didReceiveMemoryWarning {

@@ -57,13 +57,14 @@
 
 @property (nonatomic, copy)NSString * orderID;
 
+@property (nonatomic, strong)JGProgressHUD * hud;
+
 @end
 
 @implementation TakeOutOrderViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
 //    self.view.backgroundColor = [UIColor colorWithWhite:0.9 alpha:0.9];
     self.view.backgroundColor = [UIColor whiteColor];
     
@@ -461,7 +462,8 @@
                                    @"MealBoxMoney":self.mealBoxMoney
                                    };
         [self playPostWithDictionary:jsonDic];
-        [SVProgressHUD showWithStatus:@"正在跳转支付.." maskType:SVProgressHUDMaskTypeBlack];
+        self.hud = [JGProgressHUD progressHUDWithStyle:JGProgressHUDStyleLight];
+        [self.hud showInView:self.view];
     }else
     {
         UIAlertView * alert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"请选择地址和电话号码" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
@@ -508,7 +510,8 @@
 - (void)refresh:(id)data
 {
     NSLog(@"+++%@", data);
-    [SVProgressHUD dismiss];
+    [self.hud dismiss];
+    self.hud = nil;
     if ([[data objectForKey:@"Result"] isEqualToNumber:@1])
     {
         self.orderID = [data objectForKey:@"WakeOutOrder"];
@@ -522,7 +525,7 @@
             [signParams setObject: [data objectForKey:@"TimeStamp"]   forKey:@"timestamp"];
             [signParams setObject: [data objectForKey:@"PrepayId"]    forKey:@"prepayid"];
             
-            NSString * sign = [self createMd5Sign:signParams];
+//            NSString * sign = [self createMd5Sign:signParams];
             NSNumber * stamp = [data objectForKey:@"TimeStamp"];
             //调起微信支付
             PayReq* req             = [[PayReq alloc] init];
@@ -551,12 +554,12 @@
         [alert show];
         [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:1.5];
     }
-    [SVProgressHUD dismiss];
+//    [SVProgressHUD dismiss];
 }
 
 - (void)failWithError:(NSError *)error
 {
-    [SVProgressHUD dismiss];
+//    [SVProgressHUD dismiss];
     NSLog(@"%@", error);
 }
 
@@ -575,7 +578,7 @@
 -(void)dopay
 {
     BDWalletSDKMainManager* payMainManager = [BDWalletSDKMainManager getInstance];
-    
+    payMainManager.delegate = self;
     NSString *orderInfo = [self buildOrderInfoTest];    //创建测试orderInfo
     
     // for your info
@@ -764,18 +767,22 @@
 }
 
 
--(void)BDWalletPayResultWithCode:(int)statusCode payDesc:(NSString*)payDesc;
+-(void)BDWalletPayResultWithCode:(int)statusCode payDesc:(NSString*)payDesc
 {
     NSLog(@"支付结束 接口 code:%d desc:%@",statusCode,payDesc);
+    [self pushFinishOrderVC];
     if (statusCode == 0) {
-        [self pushFinishOrderVC];
+        
     }else
     {
-        [SVProgressHUD showErrorWithStatus:@"支付失败" duration:2];
+        UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:@"支付失败" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
+        [alert show];
+        [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:1.5];
+//        [SVProgressHUD showErrorWithStatus:@"支付失败" duration:2];
     }
 }
 
-- (void)logEventId:(NSString*)eventId eventDesc:(NSString*)eventDesc;
+- (void)logEventId:(NSString*)eventId eventDesc:(NSString*)eventDesc
 {
     NSLog(@"%@, %@", eventId, eventDesc);
 }

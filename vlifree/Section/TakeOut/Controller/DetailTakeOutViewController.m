@@ -96,7 +96,7 @@
     UIView * noticeView = [[UIView alloc] initWithFrame:CGRectMake(0, self.navigationController.navigationBar.bottom, self.view.width, 30)];
     noticeView.tag = 80000;
     noticeView.backgroundColor = [UIColor colorWithRed:254 / 255.0 green:231 / 255.0 blue:232 / 255.0 alpha:1];
-    [self.view addSubview:noticeView];
+//    [self.view addSubview:noticeView];
     
     UIImageView * aImageV = [[UIImageView alloc] initWithFrame:CGRectMake(5, 5, 20, 20)];
     aImageV.image = [UIImage imageNamed:@"laba.png"];
@@ -114,7 +114,8 @@
     [noticeView addSubview:button];
     
     
-    self.sectionTableView = [[UITableView alloc] initWithFrame:CGRectMake(0, noticeView.bottom, 80, self.view.height - SHOPPINGCARVIEW_HEIGHT - noticeView.height - self.navigationController.navigationBar.bottom) style:UITableViewStylePlain];
+//    self.sectionTableView = [[UITableView alloc] initWithFrame:CGRectMake(0, noticeView.bottom, 80, self.view.height - SHOPPINGCARVIEW_HEIGHT - noticeView.height - self.navigationController.navigationBar.bottom) style:UITableViewStylePlain];
+    self.sectionTableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, 80, self.view.height - SHOPPINGCARVIEW_HEIGHT) style:UITableViewStylePlain];
     self.sectionTableView.backgroundColor = [UIColor colorWithWhite:0.95 alpha:0.7];
     _sectionTableView.dataSource = self;
     _sectionTableView.delegate = self;
@@ -125,7 +126,9 @@
 //    _sectionTableView.backgroundColor = [UIColor redColor];
     [self.view addSubview:_sectionTableView];
     
-    self.menusTableView = [[UITableView alloc] initWithFrame:CGRectMake(_sectionTableView.right, noticeView.bottom, self.view.width - 80, self.view.height - self.navigationController.navigationBar.bottom - SHOPPINGCARVIEW_HEIGHT - noticeView.height) style:UITableViewStylePlain];
+//    self.menusTableView = [[UITableView alloc] initWithFrame:CGRectMake(_sectionTableView.right, noticeView.bottom, self.view.width - 80, self.view.height - self.navigationController.navigationBar.bottom - SHOPPINGCARVIEW_HEIGHT - noticeView.height) style:UITableViewStylePlain];
+    self.menusTableView = [[UITableView alloc] initWithFrame:CGRectMake(_sectionTableView.right, self.navigationController.navigationBar.bottom, self.view.width - 80, self.view.height - self.navigationController.navigationBar.bottom - SHOPPINGCARVIEW_HEIGHT) style:UITableViewStylePlain];
+    
     _menusTableView.delegate = self;
     _menusTableView.dataSource = self;
     _menusTableView.separatorColor = LINE_COLOR;
@@ -156,7 +159,6 @@
     
     
     
-    
     UIButton * backBT = [UIButton buttonWithType:UIButtonTypeCustom];
     backBT.frame = CGRectMake(0, 0, 15, 20);
     [backBT setBackgroundImage:[UIImage imageNamed:@"back_r.png"] forState:UIControlStateNormal];
@@ -182,6 +184,7 @@
     self.menusTableView.top = noticeView.top;
     self.sectionTableView.height += noticeView.height;
     self.menusTableView.height += noticeView.height;
+    [noticeView removeFromSuperview];
 }
 
 - (void)confirmMenusAction:(UIButton *)button
@@ -210,7 +213,7 @@
                                    @"ShoppingList":array
                                    };
         [self playPostWithDictionary:jsonDic];
-        [SVProgressHUD showWithStatus:@"正在提交..." maskType:SVProgressHUDMaskTypeBlack];
+//        [SVProgressHUD showWithStatus:@"正在提交..." maskType:SVProgressHUDMaskTypeClear];
     }else
     {
         self.alertLoginV = [[AlertLoginView alloc] initWithFrame:[UIScreen mainScreen].bounds];
@@ -249,7 +252,7 @@
 #pragma mark - 数据请求
 - (void)downloadData
 {
-    [SVProgressHUD showWithStatus:@"加载中..." maskType:SVProgressHUDMaskTypeBlack];
+//    [SVProgressHUD showWithStatus:@"加载中..." maskType:SVProgressHUDMaskTypeClear];
     NSDictionary * jsonDic = @{
                                @"Command":@12,
                                @"StoreId":self.takeOutID
@@ -359,12 +362,12 @@
         [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:1.5];
     }
 
-    [SVProgressHUD dismiss];
+//    [SVProgressHUD dismiss];
 }
 
 - (void)failWithError:(NSError *)error
 {
-    [SVProgressHUD dismiss];
+//    [SVProgressHUD dismiss];
     NSLog(@"%@", error);
 }
 
@@ -391,10 +394,13 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if ([tableView isEqual:_sectionTableView]) {
-        ClassModel * classMD = [self.classArray objectAtIndex:indexPath.row];
+        
         ClassesViewCell * sectionCell = [tableView dequeueReusableCellWithIdentifier:SECTION_TABLEVIEW_CELL];
         [sectionCell createSubviewWithFrame:tableView.bounds];
-        sectionCell.classModel = classMD;
+        if (self.classArray.count) {
+            ClassModel * classMD = [self.classArray objectAtIndex:indexPath.row];
+            sectionCell.classModel = classMD;
+        }
         return sectionCell;
     }
     MenuModel * menuMD = [self.menusArray objectAtIndex:indexPath.row];
@@ -578,7 +584,7 @@
     for (NSMutableArray * smallAry in self.shopArray) {
         allCount += smallAry.count;
     }
-    self.shoppingCarView.countLabel.text = [NSString stringWithFormat:@"%ld", allCount];
+    self.shoppingCarView.countLabel.text = [NSString stringWithFormat:@"%ld", (long)allCount];
     return allCount;
 }
 
@@ -630,7 +636,7 @@
     NSLog(@"微信登陆");
     if ([[NSUserDefaults standardUserDefaults] objectForKey:@"refresh_token"]) {
         if ([self compareDate]) {
-            [SVProgressHUD showWithStatus:@"登录中..." maskType:SVProgressHUDMaskTypeBlack];
+//            [SVProgressHUD showWithStatus:@"登录中..." maskType:SVProgressHUDMaskTypeClear];
             [self avoidweixinAuthorizeLogIn];
         }else
         {
@@ -719,23 +725,23 @@
                                                    @"LoginType":@2
                                                    };
                         [self playPostWithDictionary:jsonDic];
-                        [SVProgressHUD showWithStatus:@"登录中..." maskType:SVProgressHUDMaskTypeBlack];
+//                        [SVProgressHUD showWithStatus:@"登录中..." maskType:SVProgressHUDMaskTypeClear];
                     }else
                     {
-                        [SVProgressHUD dismiss];
+//                        [SVProgressHUD dismiss];
                     }
                 }else
                 {
-                    [SVProgressHUD dismiss];
+//                    [SVProgressHUD dismiss];
                 }
             }
         }else
         {
-            [SVProgressHUD dismiss];
+//            [SVProgressHUD dismiss];
         }
     }else
     {
-        [SVProgressHUD dismiss];
+//        [SVProgressHUD dismiss];
     }
 }
 

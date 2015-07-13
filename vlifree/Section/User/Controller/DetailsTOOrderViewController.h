@@ -14,4 +14,6 @@
 
 @property (nonatomic, strong)TakeOutOrderMD * takeOutOrderMD;
 
+- (void)downloadData;
+
 @end

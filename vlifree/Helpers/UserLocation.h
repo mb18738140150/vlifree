@@ -7,13 +7,17 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <CoreLocation/CoreLocation.h>
+
 
 @interface UserLocation : NSObject
 
 
 + (UserLocation *)shareUserLocation;
-@property (nonatomic, strong)CLLocation * location;
-@property (nonatomic, strong)CLPlacemark * placemark;
-
+@property (nonatomic, assign)CLLocationCoordinate2D userLocation;
+@property (nonatomic, copy)NSString * city;
+@property (nonatomic, copy)NSString * streetName;
+@property (nonatomic, copy)NSString * streetNumber;
+@property (nonatomic, copy)NSString * district;
 
 @end

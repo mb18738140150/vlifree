@@ -34,13 +34,14 @@
     [super viewDidLoad];
     self.navigationItem.title = @"外卖订单";
     
+    self.navigationController.navigationBar.barTintColor = [UIColor whiteColor];
     
     [self.tableView registerClass:[TOOrderViewCell class] forCellReuseIdentifier:@"cell"];
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     
     UIButton * backBT = [UIButton buttonWithType:UIButtonTypeCustom];
     backBT.frame = CGRectMake(0, 0, 15, 20);
-    [backBT setBackgroundImage:[UIImage imageNamed:@"back_w.png"] forState:UIControlStateNormal];
+    [backBT setBackgroundImage:[UIImage imageNamed:@"back_r.png"] forState:UIControlStateNormal];
     [backBT addTarget:self action:@selector(backLastVC:) forControlEvents:UIControlEventTouchUpInside];
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:backBT];
     
@@ -48,7 +49,7 @@
     [self downloadDataWithCommand:@23 page:_page count:COUNT];
     [self.tableView addHeaderWithTarget:self action:@selector(headerRereshing)];
     [self.tableView addFooterWithTarget:self action:@selector(footerRereshing)];
-    [SVProgressHUD showWithStatus:@"加载中..." maskType:SVProgressHUDMaskTypeBlack];
+//    [SVProgressHUD showWithStatus:@"加载中..." maskType:SVProgressHUDMaskTypeClear];
 
 
     // Uncomment the following line to preserve selection between presentations.
@@ -65,7 +66,8 @@
 
 - (void)viewWillDisappear:(BOOL)animated
 {
-    [self.tableView headerEndRefreshing];
+    [super viewWillDisappear:animated];
+//    [self.tableView headerEndRefreshing];
 }
 
 #pragma mark - 数据刷新,加载更多
@@ -146,14 +148,14 @@
     }
     [self.tableView headerEndRefreshing];
     [self.tableView footerEndRefreshing];
-    [SVProgressHUD dismiss];
+//    [SVProgressHUD dismiss];
 }
 
 - (void)failWithError:(NSError *)error
 {
     [self.tableView headerEndRefreshing];
     [self.tableView footerEndRefreshing];
-    [SVProgressHUD dismiss];
+//    [SVProgressHUD dismiss];
     NSLog(@"%@", error);
 }
 

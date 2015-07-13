@@ -8,11 +8,13 @@
 
 #import "GSMapViewController.h"
 
-@interface GSMapViewController ()<MAMapViewDelegate>
+@interface GSMapViewController ()<BMKMapViewDelegate, BMKLocationServiceDelegate, BMKGeoCodeSearchDelegate>
 
 
-@property (nonatomic, strong)MAMapView * mapView;
-
+@property (nonatomic, strong)BMKMapView * mapView;
+@property (nonatomic, strong)BMKLocationService * locService;
+@property (nonatomic, strong)BMKGeoCodeSearch * geoSearcher;
+@property (nonatomic, assign)id annotation;
 
 @end
 
@@ -21,23 +23,38 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    [MAMapServices sharedServices].apiKey = @"bdb563c4b3d8dae3a9ba228ab0c1f41c";
-    self.mapView = [[MAMapView alloc] initWithFrame:self.view.bounds];
-    _mapView.showsUserLocation = YES;
+    self.mapView = [[BMKMapView alloc] initWithFrame:self.view.bounds];
     _mapView.delegate = self;
-    _mapView.mapType = MAMapTypeStandard;
-    [_mapView setZoomLevel:17.f];
-    CLLocationCoordinate2D coor;
-    coor.latitude = [self.lat doubleValue];
-    coor.longitude = [self.lon doubleValue];
-    NSLog(@"%f, %f", coor.latitude, coor.longitude);
-    MAPointAnnotation * annotation = [[MAPointAnnotation alloc] init];
+    _mapView.zoomLevel = 18.5;
+//    _mapView.userTrackingMode = BMKUserTrackingModeFollow;
+    _mapView.showMapScaleBar = YES;
+    [_mapView setTrafficEnabled:YES];
+    [_mapView setMapType:BMKMapTypeStandard];
+    
+    CLLocationCoordinate2D coor = (CLLocationCoordinate2D){[self.lat doubleValue], [self.lon doubleValue]};
+    BMKPointAnnotation* annotation = [[BMKPointAnnotation alloc]init];
     annotation.coordinate = coor;
     annotation.title = self.gsName;
     annotation.subtitle = self.address;
     [_mapView addAnnotation:annotation];
-    [_mapView setCenterCoordinate:coor animated:YES];
-    self.view = _mapView;
+    [_mapView setCenterCoordinate:annotation.coordinate animated:YES];
+    
+    [self.view addSubview:_mapView];
+    
+    //设置定位精确度，默认：kCLLocationAccuracyBest
+//    [BMKLocationService setLocationDesiredAccuracy:kCLLocationAccuracyBest];
+//    //指定最小距离更新(米)，默认：kCLDistanceFilterNone
+//    [BMKLocationService setLocationDistanceFilter:10.f];
+//    
+    //初始化BMKLocationService
+    self.locService = [[BMKLocationService alloc]init];
+    _locService.delegate = self;
+    //    [BMKLocationService setLocationDesiredAccuracy:kCLLocationAccuracyBest];
+    //启动LocationService
+    [_locService startUserLocationService];
+    
+    self.geoSearcher =[[BMKGeoCodeSearch alloc]init];
+    _geoSearcher.delegate = self;
     
     UIButton * backBT = [UIButton buttonWithType:UIButtonTypeCustom];
     backBT.frame = CGRectMake(0, 0, 15, 20);
@@ -55,38 +72,85 @@
     [self.navigationController popViewControllerAnimated:YES];
 }
 
-
-
--(void)mapView:(MAMapView *)mapView didUpdateUserLocation:(MAUserLocation *)userLocation
-updatingLocation:(BOOL)updatingLocation
+- (void)didUpdateBMKUserLocation:(BMKUserLocation *)userLocation
 {
-    if (updatingLocation) {
-        MAPointAnnotation * annotation = [[MAPointAnnotation alloc] init];
+    if (userLocation.location != nil) {
+        [_mapView removeAnnotation:_annotation];
+//        _mapView.showsUserLocation = YES;//显示定位图层
+        [_mapView updateLocationData:userLocation];
+        // 添加一个PointAnnotation
+        BMKPointAnnotation* annotation = [[BMKPointAnnotation alloc]init];
         annotation.coordinate = userLocation.location.coordinate;
-        NSLog(@"address = %@, %@", annotation.title, annotation.subtitle);
-        NSLog(@"address22 = %@, %@", userLocation.title, userLocation.subtitle);
+        annotation.title = userLocation.title;
+        _annotation = annotation;
         [_mapView addAnnotation:annotation];
-        _mapView.showsUserLocation = NO;
+//        [_mapView setCenterCoordinate:annotation.coordinate];
+        //    NSLog(@"title = %@, subtitle = %@", userLocation.title, userLocation.subtitle);
+        BMKReverseGeoCodeOption *reverseGeoCodeSearchOption = [[BMKReverseGeoCodeOption alloc] init];
+        reverseGeoCodeSearchOption.reverseGeoPoint = userLocation.location.coordinate;
+        BOOL flag = [_geoSearcher reverseGeoCode:reverseGeoCodeSearchOption];
+        if(flag)
+        {
+            NSLog(@"反geo检索发送成功");
+        }
+        else
+        {
+            NSLog(@"反geo检索发送失败");
+        }
+    }
+    
+}
+
+- (void)didFailToLocateUserWithError:(NSError *)error
+{
+    NSLog(@"定位失败 error = %@", error);
+}
+
+- (BMKAnnotationView *)mapView:(BMKMapView *)mapView viewForAnnotation:(id <BMKAnnotation>)annotation
+{
+    if ([annotation isKindOfClass:[BMKPointAnnotation class]]) {
+        BMKPinAnnotationView *newAnnotationView = [[BMKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"Annotation"];
+        newAnnotationView.pinColor = BMKPinAnnotationColorPurple;
+        newAnnotationView.animatesDrop = YES;// 设置该标注点动画显示
+        NSLog(@"标注view");
+        return newAnnotationView;
+    }
+    return nil;
+}
+
+
+
+- (void)onGetGeoCodeResult:(BMKGeoCodeSearch *)searcher result:(BMKGeoCodeResult *)result errorCode:(BMKSearchErrorCode)error
+{
+    if (error == BMK_SEARCH_NO_ERROR) {
+        //在此处理正常结果
+        NSLog(@"处理结果1");
+    }
+    else {
+        NSLog(@"抱歉，未找到结果");
+    }
+}
+- (void)onGetReverseGeoCodeResult:(BMKGeoCodeSearch *)searcher result:(BMKReverseGeoCodeResult *)result errorCode:(BMKSearchErrorCode)error
+{
+    if (error == BMK_SEARCH_NO_ERROR) {
+        //在此处理正常结果
+        //        result.addressDetail.district
+        NSLog(@"处理结果2 %@, %@, %@ %@", result.address, result.addressDetail.streetName, result.addressDetail.streetNumber, result.addressDetail.district);
+    }
+    else {
+        NSLog(@"抱歉，未找到结果");
     }
 }
 
-- (MAAnnotationView *)mapView:(MAMapView *)mapView viewForAnnotation:(id<MAAnnotation>)annotation
+- (void)viewWillAppear:(BOOL)animated
 {
-    if ([annotation isKindOfClass:[MAPointAnnotation class]])
-    {
-        static NSString *pointReuseIndetifier = @"pointReuseIndetifier";
-        MAPinAnnotationView*annotationView = (MAPinAnnotationView*)[mapView dequeueReusableAnnotationViewWithIdentifier:pointReuseIndetifier];
-        if (annotationView == nil)
-        {
-            annotationView = [[MAPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:pointReuseIndetifier];
-        }
-        annotationView.canShowCallout= YES;       //设置气泡可以弹出，默认为NO
-        annotationView.animatesDrop = YES;        //设置标注动画显示，默认为NO
-        annotationView.draggable = YES;        //设置标注可以拖动，默认为NO
-        annotationView.pinColor = MAPinAnnotationColorPurple;
-        return annotationView;
-    }
-    return nil;
+    [_mapView viewWillAppear];
+    _mapView.delegate = self; // 此处记得不用的时候需要置nil，否则影响内存的释放
+}
+- (void)viewWillDisappear:(BOOL)animated
+{
+    [_mapView viewWillDisappear];
+    _mapView.delegate = nil; // 不用时，置nil
 }
 
 - (void)didReceiveMemoryWarning {

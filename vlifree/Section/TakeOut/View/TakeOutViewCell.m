@@ -199,7 +199,7 @@
         UILabel * aLabel = (UILabel *)[self.firstOrderV viewWithTag:2000];
         for (ActivityReduce * activity in takeOutModel.activityArray) {
             if ([activity.activeType isEqualToNumber:@2]) {
-                aLabel.text = [NSString stringWithFormat:@"首单减免%@", activity.sMoney];
+                aLabel.text = [NSString stringWithFormat:@"首单立减%@", activity.sMoney];
             }
         }
     }else

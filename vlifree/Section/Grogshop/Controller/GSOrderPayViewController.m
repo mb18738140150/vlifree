@@ -51,12 +51,15 @@
 
 @property (nonatomic, copy)NSString * orderId;
 
+@property (nonatomic, strong)JGProgressHUD * hud;
+
 @end
 
 @implementation GSOrderPayViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    self.hud = [JGProgressHUD progressHUDWithStyle:JGProgressHUDStyleLight];
     self.payType = @1;
     self.view.backgroundColor = [UIColor whiteColor];
 //    NSLog(@"%d", self.navigationController.navigationBar.translucent);
@@ -349,6 +352,7 @@
                                        @"CheckInName":self.personTF.text
                                        };
             [self playPostWithDictionary:jsonDic];
+            [self.hud showInView:self.view];
         }
     }
 }
@@ -472,6 +476,7 @@
 
 - (void)refresh:(id)data
 {
+    [self.hud dismiss];
     NSLog(@"+++%@", data);
     NSLog(@"%@", [data objectForKey:@"ErrorMsg"]);
     if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
@@ -516,7 +521,7 @@
     }
     //    [self.detailsTableView headerEndRefreshing];
     //    [self.detailsTableView footerEndRefreshing];
-    [SVProgressHUD dismiss];
+//    [SVProgressHUD dismiss];
 }
 
 #pragma  mark - 跳转到订单详情页面
@@ -662,11 +667,15 @@
 -(void)BDWalletPayResultWithCode:(int)statusCode payDesc:(NSString*)payDesc;
 {
     NSLog(@"支付结束 接口 code:%d desc:%@",statusCode,payDesc);
+    [self pushOrderDetailsVC];
     if (statusCode == 0) {
-        [self pushOrderDetailsVC];
+        
     }else
     {
-        [SVProgressHUD showErrorWithStatus:@"支付失败" duration:2];
+        UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:@"支付失败" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
+        [alert show];
+        [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:1.5];
+//        [SVProgressHUD showErrorWithStatus:@"支付失败" duration:2];
     }
 }
 

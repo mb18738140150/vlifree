@@ -13,5 +13,6 @@
 
 @property (nonatomic, copy)NSString * orderID;
 
+- (void)downloadData;
 
 @end

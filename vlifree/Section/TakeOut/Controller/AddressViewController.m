@@ -79,7 +79,7 @@
     [self.view addSubview:lineView];
     
     
-    UIView * addressView = [[UIView alloc] initWithFrame:CGRectMake(0, addAddressBT.bottom + 10, self.view.width, 60)];
+    UIView * addressView = [[UIView alloc] initWithFrame:CGRectMake(0, addAddressBT.bottom + 5, self.view.width, 60)];
     addressView.tag = 1001;
     addressView.backgroundColor = [UIColor whiteColor];
     addressView.hidden= YES;
@@ -151,7 +151,7 @@
     lineView4.backgroundColor = [UIColor colorWithWhite:0.7 alpha:0.8];
     [addressView addSubview:lineView4];
     
-    UIView * lineView5 = [[UIView alloc] initWithFrame:CGRectMake(0, addressView.bottom + 10, self.view.width, 1)];
+    UIView * lineView5 = [[UIView alloc] initWithFrame:CGRectMake(0, addressView.bottom + 5, self.view.width, 1)];
     lineView5.tag = 1004;
     lineView5.backgroundColor = [UIColor colorWithWhite:0.7 alpha:0.8];
     [self.view addSubview:lineView5];
@@ -320,12 +320,12 @@
         [alert show];
         [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:1.5];
     }
-    [SVProgressHUD dismiss];
+//    [SVProgressHUD dismiss];
 }
 
 - (void)failWithError:(NSError *)error
 {
-    [SVProgressHUD dismiss];
+//    [SVProgressHUD dismiss];
     NSLog(@"%@", error);
 }
 
@@ -398,7 +398,7 @@
     line4Frame.origin.y = addressView.height - 1;
     lineView4.frame = line4Frame;
     CGRect line5Frame = lineView5.frame;
-    line5Frame.origin.y = addressView.bottom + 10;
+    line5Frame.origin.y = addressView.bottom + 5;
     lineView5.frame = line5Frame;
     CGRect tableViewFrame = _addressTableView.frame;
     tableViewFrame.origin.y = lineView5.bottom;

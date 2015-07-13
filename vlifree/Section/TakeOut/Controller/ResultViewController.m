@@ -133,7 +133,6 @@
 
 - (void)failWithError:(NSError *)error
 {
-    [SVProgressHUD dismiss];
     NSLog(@"%@", error);
 }
 

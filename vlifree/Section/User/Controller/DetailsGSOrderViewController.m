@@ -233,7 +233,7 @@
         self.addressLB.text = [data objectForKey:@"HotelAddress"];
         self.telGSLB.text = [NSString stringWithFormat:@"%@", [data objectForKey:@"HotelTel"]];
     }
-    [SVProgressHUD dismiss];
+//    [SVProgressHUD dismiss];
 }
 
 - (void)failWithError:(NSError *)error
@@ -252,6 +252,10 @@
                            };
     [self playPostWithDictionary:dic];
 }
+
+
+
+
 
 
 - (void)didReceiveMemoryWarning {

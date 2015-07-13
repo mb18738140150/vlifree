@@ -90,6 +90,7 @@
 
 - (void)viewWillAppear:(BOOL)animated
 {
+    [super viewWillAppear:animated];
     self.navigationController.navigationBar.barTintColor = MAIN_COLOR;
     if ([UserInfo shareUserInfo].userId) {
 //        [self removeLogInView];
@@ -123,7 +124,7 @@
                                    @"Password":self.logInView.passwordTF.text,
                                    };
         [self requestDataWithDictionary:jsonDic];
-        [SVProgressHUD showWithStatus:@"登录中..." maskType:SVProgressHUDMaskTypeBlack];
+//        [SVProgressHUD showWithStatus:@"登录中..." maskType:SVProgressHUDMaskTypeClear];
     }
     /*
     _userTableView.hidden = NO;
@@ -253,9 +254,18 @@
     [UIView commitAnimations];
     self.navigationItem.title = @"会员中心";
     NSLog(@"退出登录");
-    [UserInfo shareUserInfo].userId = nil;
     [[NSUserDefaults standardUserDefaults] setValue:@NO forKey:@"haveLogIn"];
     self.title = @"登陆";
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:@"registrationID"]) {
+        NSDictionary * dic = @{
+                               @"Command":@37,
+                               @"UserId":[UserInfo shareUserInfo].userId,
+                               @"Device":@1,
+                               @"CID":[[NSUserDefaults standardUserDefaults] objectForKey:@"registrationID"]
+                               };
+        [self requestDataWithDictionary:dic];
+    }
+    [UserInfo shareUserInfo].userId = nil;
 }
 
 - (void)fiexdData
@@ -298,7 +308,7 @@
 - (void)requestDataWithDictionary:(NSDictionary *)dic
 {
     NSString * jsonStr = [dic JSONString];
-    //    NSLog(@"%@", jsonStr);
+    NSLog(@"%@", jsonStr);
     NSString * str = [NSString stringWithFormat:@"%@231618", jsonStr];
     NSString * md5Str = [str md5];
     NSString * urlString = [NSString stringWithFormat:@"%@%@", POST_URL, md5Str];
@@ -316,21 +326,26 @@
 //        [self removeLogInView];
 //    }
     if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
-        [[UserInfo shareUserInfo] setValuesForKeysWithDictionary:[data objectForKey:@"UserInfo"]];
-        if ([[data objectForKey:@"IsFirst"] isEqualToNumber:@YES]) {
-            UserViewController * userVC = self;
-            WXLoginViewController * wxLoginVC = [[WXLoginViewController alloc] init];
-            [wxLoginVC refreshUserInfo:^{
-                [userVC removeLogInView];
-            }];
-            UINavigationController * nav = [[UINavigationController alloc] initWithRootViewController:wxLoginVC];
-            [self.navigationController presentViewController:nav animated:YES completion:nil];
-        }else
+        if ([[data objectForKey:@"Command"] isEqualToNumber:@10007] || [[data objectForKey:@"Command"] isEqualToNumber:@10009]) {
+            [[UserInfo shareUserInfo] setValuesForKeysWithDictionary:[data objectForKey:@"UserInfo"]];
+            if ([[data objectForKey:@"IsFirst"] isEqualToNumber:@YES]) {
+                UserViewController * userVC = self;
+                WXLoginViewController * wxLoginVC = [[WXLoginViewController alloc] init];
+                [wxLoginVC refreshUserInfo:^{
+                    [userVC removeLogInView];
+                }];
+                UINavigationController * nav = [[UINavigationController alloc] initWithRootViewController:wxLoginVC];
+                [self.navigationController presentViewController:nav animated:YES completion:nil];
+            }else
+            {
+                [self removeLogInView];
+                [[NSUserDefaults standardUserDefaults] setValue:[UserInfo shareUserInfo].phoneNumber forKey:@"account"];
+                [[NSUserDefaults standardUserDefaults] setValue:[UserInfo shareUserInfo].password forKey:@"password"];
+                [[NSUserDefaults standardUserDefaults] setValue:@YES forKey:@"haveLogIn"];
+            }
+        }else if ([[data objectForKey:@"Command"] isEqualToNumber:@10037])
         {
-            [self removeLogInView];
-            [[NSUserDefaults standardUserDefaults] setValue:[UserInfo shareUserInfo].phoneNumber forKey:@"account"];
-            [[NSUserDefaults standardUserDefaults] setValue:[UserInfo shareUserInfo].password forKey:@"password"];
-            [[NSUserDefaults standardUserDefaults] setValue:@YES forKey:@"haveLogIn"];
+            NSLog(@"解除绑定");
         }
         
     }else
@@ -339,7 +354,7 @@
         [alert show];
         [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:2];
     }
-    [SVProgressHUD dismiss];
+//    [SVProgressHUD dismiss];
 }
 - (void)failWithError:(NSError *)error
 {

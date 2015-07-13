@@ -101,9 +101,9 @@
     [self.groshopTabelView addFooterWithTarget:self action:@selector(footerRereshing)];
     _page = 1;
     _type = 2;
-//    [SVProgressHUD showWithStatus:@"正在加载..." maskType:SVProgressHUDMaskTypeBlack];
+//    [SVProgressHUD showWithStatus:@"正在加载..." maskType:SVProgressHUDMaskTypeClear];
     self.keyWord = nil;
-    if ([UserLocation shareUserLocation].placemark != nil) {
+    if ([UserLocation shareUserLocation].city != nil) {
         [self downloadDataWithCommand:@2 page:_page count:DATA_COUNT keyWord:nil];
     }else
     {
@@ -118,6 +118,8 @@
 
 - (void)viewWillAppear:(BOOL)animated
 {
+    [super viewWillAppear:animated];
+//    [self.groshopTabelView headerEndRefreshing];
     self.navigationController.navigationBar.barTintColor = MAIN_COLOR;
     if ([CLLocationManager locationServicesEnabled] && [CLLocationManager authorizationStatus] != kCLAuthorizationStatusDenied) {
 
@@ -126,13 +128,14 @@
 
 - (void)viewWillDisappear:(BOOL)animated
 {
-    [self.groshopTabelView headerEndRefreshing];
+    [super viewWillDisappear:animated];
+//    [self.groshopTabelView headerEndRefreshing];
 }
 
 - (void)isLocationsuccess
 {
-    if (![UserLocation shareUserLocation].placemark) {
-        [SVProgressHUD dismiss];
+    if (![UserLocation shareUserLocation].city) {
+//        [SVProgressHUD dismiss];
         UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:@"本应用需要打开定位才能请求数据" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
         [alert show];
         [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:1.5];
@@ -142,7 +145,7 @@
 - (void)downloadData
 {
     NSLog(@"2222");
-    if ([UserLocation shareUserLocation].placemark != nil) {
+    if ([UserLocation shareUserLocation].city != nil) {
         [self downloadDataWithCommand:@2 page:_page count:DATA_COUNT keyWord:nil];
 //        [self.groshopTabelView headerBeginRefreshing];
         [self.timer invalidate];
@@ -187,7 +190,7 @@
         _type = 5;
     }
     self.keyWord = nil;
-//    [SVProgressHUD showWithStatus:@"正在加载数据..." maskType:SVProgressHUDMaskTypeBlack];
+//    [SVProgressHUD showWithStatus:@"正在加载数据..." maskType:SVProgressHUDMaskTypeClear];
 //    [self.groshopTabelView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:YES];
 }
 
@@ -221,8 +224,9 @@
                     @"Command":command,
                     @"CurPage":[NSNumber numberWithInt:page],
                     @"CurCount":[NSNumber numberWithInt:count],
-                    @"Lat":[NSNumber numberWithDouble:[UserLocation shareUserLocation].location.coordinate.latitude],
-                    @"Lon":[NSNumber numberWithDouble:[UserLocation shareUserLocation].location.coordinate.longitude]
+                    @"Lat":[NSNumber numberWithDouble:[UserLocation shareUserLocation].userLocation.latitude],
+                    @"Lon":[NSNumber numberWithDouble:[UserLocation shareUserLocation].userLocation.longitude],
+                    @"City":[UserLocation shareUserLocation].city
                     };
     }else
     {
@@ -230,14 +234,15 @@
                     @"Command":command,
                     @"CurPage":[NSNumber numberWithInt:page],
                     @"CurCount":[NSNumber numberWithInt:count],
-                    @"Lat":[NSNumber numberWithDouble:[UserLocation shareUserLocation].location.coordinate.latitude],
-                    @"Lon":[NSNumber numberWithDouble:[UserLocation shareUserLocation].location.coordinate.longitude],
+                    @"Lat":[NSNumber numberWithDouble:[UserLocation shareUserLocation].userLocation.latitude],
+                    @"Lon":[NSNumber numberWithDouble:[UserLocation shareUserLocation].userLocation.longitude],
+                    @"City":[UserLocation shareUserLocation].city,
                     @"KeyWord":keyWord
                     };
         self.keyWord = keyWord;
     }
     [self playPostWithDictionary:jsonDic];
-    NSLog(@"///////%f, %f", [UserLocation shareUserLocation].location.coordinate.latitude, [UserLocation shareUserLocation].location.coordinate.longitude);
+//    NSLog(@"///////%f, %f", [UserLocation shareUserLocation].location.coordinate.latitude, [UserLocation shareUserLocation].location.coordinate.longitude);
     /*
      //    NSLog(@"%@, %@", self.classifyId, [UserInfo shareUserInfo].userId);
      NSString * jsonStr = [jsonDic JSONString];
@@ -297,14 +302,14 @@
     }
     [self.groshopTabelView headerEndRefreshing];
     [self.groshopTabelView footerEndRefreshing];
-    [SVProgressHUD dismiss];
+//    [SVProgressHUD dismiss];
 }
 
 - (void)failWithError:(NSError *)error
 {
     [self.groshopTabelView headerEndRefreshing];
     [self.groshopTabelView footerEndRefreshing];
-    [SVProgressHUD dismiss];
+//    [SVProgressHUD dismiss];
     NSLog(@"%@", error);
 }
 
@@ -406,6 +411,7 @@
     detailsVC.lon = hotelMD.hotelLon;
     detailsVC.icon = hotelMD.icon;
     detailsVC.hotelName = hotelMD.hotelName;
+    detailsVC.navigationItem.title = hotelMD.hotelName;
     [self.navigationController pushViewController:detailsVC animated:YES];
 }
 

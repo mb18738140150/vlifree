@@ -8,6 +8,7 @@
 
 #import "GSPayViewController.h"
 #import "PayTypeView.h"
+#import "DetailsGSOrderViewController.h"
 
 #import "WXApi.h"
 #import "payRequsestHandler.h"
@@ -46,6 +47,7 @@
 
 @property (nonatomic, copy)NSString * roomName;
 @property (nonatomic, assign)double price;
+@property (nonatomic, strong)JGProgressHUD * hud;
 
 
 @end
@@ -242,18 +244,22 @@
     NSLog(@"%@", self.payType);
     if ([self.payType isEqualToNumber:@1]) {
         if ([WXApi isWXAppInstalled] && [WXApi isWXAppSupportApi]) {
-            [SVProgressHUD showWithStatus:@"正在提交支付..." maskType:SVProgressHUDMaskTypeBlack];
             NSDictionary * dic = @{
                                    @"Command":@34,
                                    @"UserId":[UserInfo shareUserInfo].userId,
                                    @"PayType":self.payType,
                                    @"OrderId":self.orderID,
-                                   @"Cur_IP":[self getIPAddress]
+                                   @"Cur_IP":[self getIPAddress],
+                                   @"OrderType":@1
                                    };
             [self playPostWithDictionary:dic];
+            self.hud = [JGProgressHUD progressHUDWithStyle:JGProgressHUDStyleLight];
+            [self.hud showInView:self.view];
         }else
         {
-            [SVProgressHUD showErrorWithStatus:@"你还没安装微信或者微信版本太低" duration:2];
+            UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:@"没安装微信或者微信版本太低" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
+            [alert show];
+            [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:1.5];
         }
 
     }else
@@ -349,14 +355,26 @@
             req.sign                = [NSString stringWithFormat:@"%@", [data objectForKey:@"Sign"]];
 //            req.sign = sign;
             [WXApi sendReq:req];
+            [self.hud dismiss];
+            self.hud = nil;
         }
     }
-    [SVProgressHUD dismiss];
+//    [SVProgressHUD dismiss];
 }
 
 - (void)failWithError:(NSError *)error
 {
     NSLog(@"%@", error);
+}
+
+
+#pragma  mark - 跳转到订单详情页面
+- (void)pushOrderDetailsVC
+{
+    DetailsGSOrderViewController * detailsOrderVC = [[DetailsGSOrderViewController alloc] init];
+    detailsOrderVC.isPay = YES;
+    detailsOrderVC.orderID = self.orderID;
+    [self.navigationController pushViewController:detailsOrderVC animated:YES];
 }
 
 #pragma mark - 百度支付
@@ -469,6 +487,9 @@
 -(void)BDWalletPayResultWithCode:(int)statusCode payDesc:(NSString*)payDesc;
 {
     NSLog(@"支付结束 接口 code:%d desc:%@",statusCode,payDesc);
+    if (statusCode == 0) {
+        [self pushOrderDetailsVC];
+    }
 }
 
 - (void)logEventId:(NSString*)eventId eventDesc:(NSString*)eventDesc;

@@ -40,7 +40,7 @@
     [self.tableView registerClass:[GSOrderViewCell class] forCellReuseIdentifier:@"cell"];
     _page = 1;
     [self downloadDataWithCommand:@25 page:_page count:COUNT];
-    [SVProgressHUD showWithStatus:@"加载中..." maskType:SVProgressHUDMaskTypeBlack];
+//    [SVProgressHUD showWithStatus:@"加载中..." maskType:SVProgressHUDMaskTypeClear];
     [self.tableView addHeaderWithTarget:self action:@selector(headerRereshing)];
     [self.tableView addFooterWithTarget:self action:@selector(footerRereshing)];
     
@@ -67,8 +67,15 @@
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+}
+
 - (void)viewWillDisappear:(BOOL)animated
 {
+    [super viewWillDisappear:animated];
     [self.tableView headerEndRefreshing];
 }
 
@@ -151,14 +158,14 @@
     }
     [self.tableView headerEndRefreshing];
     [self.tableView footerEndRefreshing];
-    [SVProgressHUD dismiss];
+//    [SVProgressHUD dismiss];
 }
 
 - (void)failWithError:(NSError *)error
 {
     [self.tableView headerEndRefreshing];
     [self.tableView footerEndRefreshing];
-    [SVProgressHUD dismiss];
+//    [SVProgressHUD dismiss];
     NSLog(@"%@", error);
 }
 

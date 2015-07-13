@@ -16,8 +16,11 @@
 #import "TakeOutOrderViewController.h"
 #import "GSOrderPayViewController.h"
 #import "APService.h"
+#import "FinishOrderViewController.h"
+#import "GSPayViewController.h"
+#import "DetailsTOOrderViewController.h"
 
-@interface AppDelegate ()<WXApiDelegate, HTTPPostDelegate>
+@interface AppDelegate ()<WXApiDelegate, HTTPPostDelegate, BMKGeneralDelegate>
 
 
 @property (nonatomic, strong)MyTabBarController * myTabBarVC;
@@ -27,6 +30,14 @@
 
 @implementation AppDelegate
 
+- (void)onGetNetworkState:(int)iError
+{
+    NSLog(@"网络错误 = %d", iError);
+}
+- (void)onGetPermissionState:(int)iError
+{
+    NSLog(@"授权验证错误 = %d", iError);
+}
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
@@ -44,6 +55,8 @@
     manager.shouldToolbarUsesTextFieldTintColor = YES;
     manager.enableAutoToolbar = NO;
     
+    BMKMapManager * mapManager = [[BMKMapManager alloc] init];
+    [mapManager start:@"4Fra3gSOChrExioQUdEq54dk" generalDelegate:self];
     
     [APService registerForRemoteNotificationTypes:(UIUserNotificationTypeAlert |
                                                    UIUserNotificationTypeBadge |
@@ -123,7 +136,6 @@
             */
         }else
         {
-            [SVProgressHUD dismiss];
         }
     }else if ([resp isKindOfClass:[PayResp class]])
     {
@@ -143,15 +155,50 @@
                 {
                     GSOrderPayViewController * gsOrderPayVC = (GSOrderPayViewController *)vc;
                     [gsOrderPayVC pushOrderDetailsVC];
+                }else if ([vc isKindOfClass:[FinishOrderViewController class]])
+                {
+                    FinishOrderViewController * finishOrderVC = (FinishOrderViewController *)vc;
+                    [finishOrderVC downloadData];
+                }else if ([vc isKindOfClass:[DetailsTOOrderViewController class]])
+                {
+                    DetailsTOOrderViewController * detailsOrderVC = (DetailsTOOrderViewController *)vc;
+                    [detailsOrderVC downloadData];
+                }else if ([vc isKindOfClass:[GSPayViewController class]])
+                {
+                    GSPayViewController * gsPayVC = (GSPayViewController *)vc;
+                    [gsPayVC pushOrderDetailsVC];
                 }
             }
                 break;
             default:
             {
                 NSLog(@"支付失败， retcode=%d",resp.errCode);
-                [SVProgressHUD showErrorWithStatus:@"支付失败" duration:2];
+                UINavigationController * nav = (UINavigationController *)self.myTabBarVC.selectedViewController;
+                UIViewController * vc = [nav.viewControllers lastObject];
+                if ([vc isKindOfClass:[TakeOutOrderViewController class]]) {
+                    TakeOutOrderViewController * takeOutOrderVC = (TakeOutOrderViewController *)vc;
+                    [takeOutOrderVC pushFinishOrderVC];
+                }else if ([vc isKindOfClass:[GSOrderPayViewController class]])
+                {
+                    GSOrderPayViewController * gsOrderPayVC = (GSOrderPayViewController *)vc;
+                    [gsOrderPayVC pushOrderDetailsVC];
+                }
+                /*
+                else if ([vc isKindOfClass:[FinishOrderViewController class]])
+                {
+                    FinishOrderViewController * finishOrderVC = (FinishOrderViewController *)vc;
+                    [finishOrderVC downloadData];
+                }else if ([vc isKindOfClass:[DetailsTOOrderViewController class]])
+                {
+                    DetailsTOOrderViewController * detailsOrderVC = (DetailsTOOrderViewController *)vc;
+                    [detailsOrderVC downloadData];
+                }else if ([vc isKindOfClass:[GSOrderPayViewController class]])
+                {
+                    GSOrderPayViewController * gsPayVC = (GSOrderPayViewController *)vc;
+                    [gsPayVC pushOrderDetailsVC];
+                }
+                 */
             }
-                
                 break;
         }
     }

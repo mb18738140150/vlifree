@@ -76,7 +76,10 @@
 {
     [self.nameTF resignFirstResponder];
     if (self.nameTF.text.length == 0) {
-        [SVProgressHUD showErrorWithStatus:@"请输入昵称" duration:2];
+//        [SVProgressHUD showErrorWithStatus:@"请输入昵称" duration:2];
+        UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:@"请输入昵称" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
+        [alert show];
+        [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:1.5];
     }else if ([self.nameTF.text isEqualToString:[UserInfo shareUserInfo].name])
     {
         [self.navigationController popViewControllerAnimated:YES];
@@ -135,12 +138,12 @@
         _refreshBlock();
         [self.navigationController popViewControllerAnimated:YES];
     }
-    [SVProgressHUD dismiss];
+//    [SVProgressHUD dismiss];
 }
 
 - (void)failWithError:(NSError *)error
 {
-    [SVProgressHUD dismiss];
+//    [SVProgressHUD dismiss];
     NSLog(@"%@", error);
 }
 

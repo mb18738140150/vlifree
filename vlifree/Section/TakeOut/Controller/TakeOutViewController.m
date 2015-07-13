@@ -21,7 +21,7 @@
 
 #define CYCLESCROLLVIEW_HEIGHT 150
 
-@interface TakeOutViewController ()<UITableViewDataSource, UITableViewDelegate, CLLocationManagerDelegate, MAMapViewDelegate, HTTPPostDelegate>
+@interface TakeOutViewController ()<UITableViewDataSource, UITableViewDelegate, CLLocationManagerDelegate, HTTPPostDelegate, BMKLocationServiceDelegate, BMKGeoCodeSearchDelegate>
 
 {
     int _page;
@@ -31,14 +31,15 @@
 
 @property (nonatomic, strong)UITableView * takeOutTabelView;
 @property (nonatomic, strong)TypeView * typeView;
-@property (nonatomic, strong)CLLocationManager * locationManager;
+//@property (nonatomic, strong)CLLocationManager * locationManager;
+@property (nonatomic, strong)BMKLocationService * locService;
+@property (nonatomic, strong)BMKGeoCodeSearch * geoSearcher;
 
 @property (nonatomic, strong)UIButton * addressBT;
 @property (nonatomic, strong)UILabel * addressLB;
 @property (nonatomic, strong)UIImageView * addressIM;
 
-@property (nonatomic, strong)CycleScrollView * cycleScrollView;//轮播图
-@property (nonatomic, strong)MAMapView * aMapView;
+//@property (nonatomic, strong)CycleScrollView * cycleScrollView;//轮播图
 
 @property (nonatomic, strong)NSMutableArray * dataArray;
 @property (nonatomic, strong)NSNumber * allCount;
@@ -58,7 +59,9 @@
 
 - (void)viewWillAppear:(BOOL)animated
 {
+    [super viewWillAppear:animated];
     self.navigationController.navigationBar.barTintColor = MAIN_COLOR;
+//    [self.takeOutTabelView headerEndRefreshing];
 }
 
 
@@ -87,6 +90,8 @@
     [_addressBT addSubview:_addressLB];
     NSLog(@"11%@",     _addressLB.font.fontName);
     self.addressBT.frame = CGRectMake(0, 0, _addressIM.width, 30);
+    
+    [self showLocationAddress];
     
     UIButton * typeButton = [UIButton buttonWithType:UIButtonTypeCustom];
     typeButton.frame = CGRectMake(0, self.navigationController.navigationBar.bottom, self.view.width, 40);
@@ -139,20 +144,14 @@
     
     [self createTypeView];
     
-    [MAMapServices sharedServices].apiKey = @"bdb563c4b3d8dae3a9ba228ab0c1f41c";
     
-    self.aMapView = [[MAMapView alloc] initWithFrame:self.view.bounds];
-    _aMapView.delegate = self;
-    _aMapView.showsUserLocation = YES;
-    _aMapView.userTrackingMode = MAUserTrackingModeNone;
-    [_aMapView setZoomLevel:16.5 animated:YES];
     _page = 1;
     _isLoc = NO;
     _type = 0;
-    if ([UserLocation shareUserLocation].placemark) {
+    if ([UserLocation shareUserLocation].city) {
         if (!_isSupermark) {
             [self downloadDataWithCommand:@6 page:_page count:DATA_COUNT type:0];
-//            [SVProgressHUD showWithStatus:@"加载中..." maskType:SVProgressHUDMaskTypeBlack];
+//            [SVProgressHUD showWithStatus:@"加载中..." maskType:SVProgressHUDMaskTypeClear];
         }
         _isLoc = YES;
     }else
@@ -161,6 +160,19 @@
         [_timer fire];
     }
     
+    //设置定位精确度，默认：kCLLocationAccuracyBest
+    [BMKLocationService setLocationDesiredAccuracy:kCLLocationAccuracyBest];
+    //指定最小距离更新(米)，默认：kCLDistanceFilterNone
+    [BMKLocationService setLocationDistanceFilter:10.f];
+    
+    //初始化BMKLocationService
+    self.locService = [[BMKLocationService alloc]init];
+    _locService.delegate = self;
+    //    [BMKLocationService setLocationDesiredAccuracy:kCLLocationAccuracyBest];
+    //启动LocationService
+    [_locService startUserLocationService];
+    self.geoSearcher =[[BMKGeoCodeSearch alloc]init];
+    _geoSearcher.delegate = self;
     /*
     self.locationManager = [[CLLocationManager alloc] init];
     self.locationManager.delegate = self;
@@ -174,10 +186,28 @@
 }
 
 
+- (void)showLocationAddress
+{
+    NSMutableString * addressStr = [NSMutableString string];
+    if ([UserLocation shareUserLocation].district.length) {
+        [addressStr appendString:[UserLocation shareUserLocation].district];
+    }
+    if ([UserLocation shareUserLocation].streetName.length) {
+        [addressStr appendString:[UserLocation shareUserLocation].streetName];
+    }
+    if ([UserLocation shareUserLocation].streetNumber.length) {
+        [addressStr appendString:[UserLocation shareUserLocation].streetNumber];
+    }
+    self.addressLB.text = [addressStr copy];
+    CGSize size = [self.addressLB.text sizeWithAttributes:[NSDictionary dictionaryWithObjectsAndKeys:[UIFont systemFontOfSize:17], NSFontAttributeName, nil]];
+    _addressLB.frame = CGRectMake(_addressLB.left, _addressLB.top, size.width, 30);
+    _addressBT.frame = CGRectMake(_addressBT.left, _addressBT.top, _addressIM.width + _addressLB.width, _addressBT.height);
+}
+
 - (void)downloadData
 {
     NSLog(@"2222");
-    if ([UserLocation shareUserLocation].placemark != nil) {
+    if ([UserLocation shareUserLocation].city != nil) {
         [self downloadDataWithCommand:@6 page:_page count:DATA_COUNT type:0];
 //        [self.takeOutTabelView headerBeginRefreshing];
         [self.timer invalidate];
@@ -187,7 +217,8 @@
 
 - (void)viewWillDisappear:(BOOL)animated
 {
-    [self.takeOutTabelView headerEndRefreshing];
+    [super viewWillDisappear:animated];
+//    [self.takeOutTabelView headerEndRefreshing];
 }
 
 
@@ -201,8 +232,9 @@
 
 - (void)startLocation:(UIButton *)button
 {
+    [_locService stopUserLocationService];
     NSLog(@"11");
-    _aMapView.showsUserLocation = YES;
+    [_locService startUserLocationService];
 //    [self.locationManager startUpdatingLocation];
 }
 
@@ -306,7 +338,7 @@
     self.typeView.hidden = YES;
     UIButton * typeBT = (UIButton *)[self.view viewWithTag:2000];
     typeBT.selected = NO;
-//    [SVProgressHUD showWithStatus:@"正在加载..." maskType:SVProgressHUDMaskTypeBlack];
+//    [SVProgressHUD showWithStatus:@"正在加载..." maskType:SVProgressHUDMaskTypeClear];
 //    [self.takeOutTabelView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:YES];
 }
 
@@ -346,8 +378,9 @@
                                @"Command":command,
                                @"CurPage":[NSNumber numberWithInt:page],
                                @"CurCount":[NSNumber numberWithInt:count],
-                               @"Lat":[NSNumber numberWithDouble:[UserLocation shareUserLocation].location.coordinate.latitude],
-                               @"Lon":[NSNumber numberWithDouble:[UserLocation shareUserLocation].location.coordinate.longitude],
+                               @"Lat":[NSNumber numberWithDouble:[UserLocation shareUserLocation].userLocation.latitude],
+                               @"Lon":[NSNumber numberWithDouble:[UserLocation shareUserLocation].userLocation.longitude],
+                               @"City":[UserLocation shareUserLocation].city,
                                @"WakeoutType":[NSNumber numberWithInt:type]
                                };
     [self playPostWithDictionary:jsonDic];
@@ -416,16 +449,20 @@
             [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:1.5];
         }
     }
-    [self.takeOutTabelView headerEndRefreshing];
-    [self.takeOutTabelView footerEndRefreshing];
-    [SVProgressHUD dismiss];
+    if (self.takeOutTabelView.isHeaderRefreshing) {
+        [self.takeOutTabelView headerEndRefreshing];
+    }
+    if (self.takeOutTabelView.isFooterRefreshing) {
+        [self.takeOutTabelView footerEndRefreshing];
+    }
+//    [SVProgressHUD dismiss];
 }
 
 - (void)failWithError:(NSError *)error
 {
     [self.takeOutTabelView headerEndRefreshing];
     [self.takeOutTabelView footerEndRefreshing];
-    [SVProgressHUD dismiss];
+//    [SVProgressHUD dismiss];
     NSLog(@"%@", error);
 }
 
@@ -433,84 +470,50 @@
 
 #pragma mark - 定位
 
-
-
--(void)mapView:(MAMapView *)mapView didUpdateUserLocation:(MAUserLocation *)userLocation
-updatingLocation:(BOOL)updatingLocation
+- (void)didUpdateBMKUserLocation:(BMKUserLocation *)userLocation
 {
-    if(updatingLocation)
-    {
-        [UserLocation shareUserLocation].location = userLocation.location;
-        NSLog(@"%f, %f", userLocation.location.coordinate.latitude, userLocation.location.coordinate.longitude);
-        CLGeocoder * geocoder = [[CLGeocoder alloc] init];
-        [geocoder reverseGeocodeLocation:userLocation.location completionHandler:^(NSArray *placemarks, NSError *error) {
-            if (placemarks.count > 0) {
-                CLPlacemark * placemark = [placemarks firstObject];
-                NSLog(@"%@, %@, %@, %@", placemark.locality, placemark.subLocality, placemark.thoroughfare, placemark.subThoroughfare);
-                [UserLocation shareUserLocation].placemark = placemark;
-                NSMutableString * addressStr = [NSMutableString string];
-                if (placemark.subLocality.length) {
-                    [addressStr appendString:placemark.subLocality];
-                }
-                if (placemark.thoroughfare.length) {
-                    [addressStr appendString:placemark.thoroughfare];
-                }
-                if (placemark.subThoroughfare.length) {
-                    [addressStr appendString:placemark.subThoroughfare];
-                }
-                self.addressLB.text = [addressStr copy];
-                CGSize size = [self.addressLB.text sizeWithAttributes:[NSDictionary dictionaryWithObjectsAndKeys:[UIFont systemFontOfSize:17], NSFontAttributeName, nil]];
-                _addressLB.frame = CGRectMake(_addressLB.left, _addressLB.top, size.width, 30);
-                _addressBT.frame = CGRectMake(_addressBT.left, _addressBT.top, _addressIM.width + _addressLB.width, _addressBT.height);
-                mapView.showsUserLocation = NO;
-            }
-        }];
-    }
-}
-
-
-/*
-- (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
-{
-    CLLocation * location = [locations lastObject];
-    NSLog(@"%@, ----%@", location, location.description);
-    CLGeocoder * geocoder = [[CLGeocoder alloc] init];
-    [geocoder reverseGeocodeLocation:location completionHandler:^(NSArray *placemarks, NSError *error) {
-        //        NSLog(@"%@, error = %@", placemarks, error);
-        if (placemarks.count) {
-            CLPlacemark *placeMark = [placemarks firstObject];
-            NSString *locatioName = [NSString stringWithFormat:@"您现在所处的位置为%@",placeMark.name];
-            NSLog(@"%@, %@, %@, %@, %@", locatioName, placeMark.thoroughfare, placeMark.administrativeArea, placeMark.subLocality, placeMark.subThoroughfare);
-            NSMutableString * addressStr = [NSMutableString string];
-            if (placeMark.subLocality.length) {
-                [addressStr appendString:placeMark.subLocality];
-            }
-            if (placeMark.thoroughfare.length) {
-                [addressStr appendString:placeMark.thoroughfare];
-            }
-            if (placeMark.subThoroughfare.length) {
-                [addressStr appendString:placeMark.subThoroughfare];
-            }
-            self.addressLB.text = [addressStr copy];
-            CGSize size = [self.addressLB.text sizeWithAttributes:[NSDictionary dictionaryWithObjectsAndKeys:[UIFont systemFontOfSize:17], NSFontAttributeName, nil]];
-            _addressLB.frame = CGRectMake(_addressLB.left, _addressLB.top, size.width, 30);
-            _addressBT.frame = CGRectMake(_addressBT.left, _addressBT.top, _addressIM.width + _addressLB.width, _addressBT.height);
+    //    NSLog(@"title = %@, subtitle = %@", userLocation.title, userLocation.subtitle);
+    if (userLocation.location != nil) {
+        [UserLocation shareUserLocation].userLocation = userLocation.location.coordinate;
+        //发起反向地理编码检索
+        BMKReverseGeoCodeOption *reverseGeoCodeSearchOption = [[BMKReverseGeoCodeOption alloc] init];
+        reverseGeoCodeSearchOption.reverseGeoPoint = userLocation.location.coordinate;
+        BOOL flag = [_geoSearcher reverseGeoCode:reverseGeoCodeSearchOption];
+        if(flag)
+        {
+            NSLog(@"反geo检索发送成功");
         }
-    }];
-    [manager stopUpdatingLocation];
+        else
+        {
+            NSLog(@"反geo检索发送失败");
+        }
+    }
+    
+}
+
+- (void)didFailToLocateUserWithError:(NSError *)error
+{
+    NSLog(@"定位失败 error = %@", error);
+    [self.locService startUserLocationService];
 }
 
 
-- (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error{
-    NSLog(@"%@", error);
-    if ([error code] == kCLErrorDenied) {
-        NSLog(@"访问被拒绝");
-    }
-    if ([error code] == kCLErrorLocationUnknown) {
-        NSLog(@"无法获得位置信息");
+- (void)onGetReverseGeoCodeResult:(BMKGeoCodeSearch *)searcher result:(BMKReverseGeoCodeResult *)result errorCode:(BMKSearchErrorCode)error
+{
+    if (error == BMK_SEARCH_NO_ERROR) {
+        //在此处理正常结果
+        //        result.addressDetail.district
+        NSLog(@"处理结果2 %@, %@, %@ %@", result.address, result.addressDetail.streetName, result.addressDetail.streetNumber, result.addressDetail.district);
+        [UserLocation shareUserLocation].city = result.addressDetail.city;
+        [UserLocation shareUserLocation].streetName = result.addressDetail.streetName;
+        [UserLocation shareUserLocation].streetNumber = result.addressDetail.streetNumber;
+        [UserLocation shareUserLocation].district = result.addressDetail.district;
+        [self showLocationAddress];
+    }else {
+        NSLog(@"抱歉，未找到结果");
     }
 }
-*/
+
 
 
 

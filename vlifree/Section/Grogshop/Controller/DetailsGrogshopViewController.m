@@ -65,6 +65,7 @@
 
 - (void)viewWillAppear:(BOOL)animated
 {
+    [super viewWillAppear:animated];
     self.navigationController.navigationBar.barTintColor = [UIColor whiteColor];
 }
 
@@ -86,7 +87,9 @@
     [_headerView.detailsBT addTarget:self action:@selector(lookFacility:) forControlEvents:UIControlEventTouchUpInside];
     DetailsGrogshopViewController * detailsVC = self;
     [_headerView.hotelImage setImageWithURL:[NSURL URLWithString:self.icon] completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType) {
-        detailsVC.headerView.hotelImage.image = [UIImage imageNamed:@"load_fail.png"];
+        if (error) {
+            detailsVC.headerView.hotelImage.image = [UIImage imageNamed:@"load_fail.png"];
+        }
     }];
 //    _headerView.backgroundColor = [UIColor grayColor];
     self.detailsTableView.tableHeaderView = _headerView;
@@ -224,14 +227,14 @@
                                    @"Password":self.alertLoginV.passwordTF.text,
                                    };
         [self playPostWithDictionary:jsonDic];
-        [SVProgressHUD showWithStatus:@"登陆中..." maskType:SVProgressHUDMaskTypeBlack];
+//        [SVProgressHUD showWithStatus:@"登陆中..." maskType:SVProgressHUDMaskTypeClear];
     }
 }
 
 - (void)weixinLogIn:(UIButton *)button//微信登陆
 {
     NSLog(@"微信登陆");
-    [SVProgressHUD showWithStatus:@"登陆中..." maskType:SVProgressHUDMaskTypeBlack];
+//    [SVProgressHUD showWithStatus:@"登陆中..." maskType:SVProgressHUDMaskTypeClear];
     if ([[NSUserDefaults standardUserDefaults] objectForKey:@"refresh_token"]) {
         if ([self compareDate]) {
             [self avoidweixinAuthorizeLogIn];
@@ -248,7 +251,7 @@
 #pragma mark - 数据请求
 - (void)downloadDataWithCommand
 {
-    [SVProgressHUD showWithStatus:@"加载中..." maskType:SVProgressHUDMaskTypeBlack];
+//    [SVProgressHUD showWithStatus:@"加载中..." maskType:SVProgressHUDMaskTypeClear];
     NSDictionary * jsonDic = @{
                                @"Command":@10,
                                @"HotelId":self.hotelID
@@ -352,14 +355,14 @@
     }
 //    [self.detailsTableView headerEndRefreshing];
 //    [self.detailsTableView footerEndRefreshing];
-    [SVProgressHUD dismiss];
+//    [SVProgressHUD dismiss];
 }
 
 - (void)failWithError:(NSError *)error
 {
 //    [self.groshopTabelView headerEndRefreshing];
 //    [self.groshopTabelView footerEndRefreshing];
-    [SVProgressHUD dismiss];
+//    [SVProgressHUD dismiss];
     NSLog(@"%@", error);
 }
 
@@ -453,18 +456,18 @@
         req.state = @"123456789";
         BOOL isSend = [WXApi sendReq:req];
         if (!isSend) {
-            [SVProgressHUD dismiss];
+//            [SVProgressHUD dismiss];
         }
 //        [WXApi sendAuthReq:req viewController:self delegate:self];
     }else if([WXApi isWXAppInstalled] == NO)
     {
-        [SVProgressHUD dismiss];
+//        [SVProgressHUD dismiss];
         UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:@"你的设备还没安装微信,请先安装微信" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
         [alert show];
         [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:2];
     }else if([WXApi isWXAppSupportApi] == NO)
     {
-        [SVProgressHUD dismiss];
+//        [SVProgressHUD dismiss];
         UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:@"你的微信版本不支持,请更新微信" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
         [alert show];
         [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:2];

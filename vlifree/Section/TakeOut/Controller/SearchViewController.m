@@ -97,7 +97,8 @@
                                @"Command":@19,
                                @"KeyWord":keyWords,
                                @"CurPage":@1,
-                               @"CurCount":[NSNumber numberWithInt:COUNT]
+                               @"CurCount":[NSNumber numberWithInt:COUNT],
+                               @"City":[UserLocation shareUserLocation].city
                                };
     [self playPostWithDictionary:jsonDic];
     self.searchVC.active = NO;
@@ -111,11 +112,13 @@
 
 - (void)viewWillAppear:(BOOL)animated
 {
+    [super viewWillAppear:animated];
     self.navigationController.navigationBar.barTintColor = MAIN_COLOR;
 }
 
 - (void)viewWillDisappear:(BOOL)animated
 {
+    [super viewWillDisappear:animated];
 //    self.searchBar.hidden = YES;
 //    [self.searchBar resignFirstResponder];
 //
@@ -177,7 +180,8 @@
                                    @"Command":@19,
                                    @"KeyWord":searchBar.text,
                                    @"CurPage":@1,
-                                   @"CurCount":[NSNumber numberWithInt:COUNT]
+                                   @"CurCount":[NSNumber numberWithInt:COUNT],
+                                   @"City":[UserLocation shareUserLocation].city
                                    };
         [self playPostWithDictionary:jsonDic];
         searchBar.text = nil;
@@ -228,7 +232,6 @@
 
 - (void)failWithError:(NSError *)error
 {
-    [SVProgressHUD dismiss];
     NSLog(@"%@", error);
 }
 

@@ -14,6 +14,7 @@
 @property (nonatomic, copy)NSString * orderID;
 @property (nonatomic, copy)NSString * storeIcon;
 @property (nonatomic, copy)NSString * storeName;
+@property (nonatomic, strong)NSNumber * storeId;
 @property (nonatomic, copy)NSString * time;
 @property (nonatomic, copy)NSString * busiPhone;
 //@property (nonatomic, strong)NSNumber * money;

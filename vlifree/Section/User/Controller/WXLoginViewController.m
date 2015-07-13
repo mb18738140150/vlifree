@@ -181,12 +181,12 @@
         [alert show];
         [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:2];
     }
-    [SVProgressHUD dismiss];
+//    [SVProgressHUD dismiss];
 }
 
 - (void)failWithError:(NSError *)error
 {
-    [SVProgressHUD dismiss];
+//    [SVProgressHUD dismiss];
     NSLog(@"%@", error);
 }
 
