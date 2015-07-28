@@ -61,8 +61,8 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.view.backgroundColor = [UIColor colorWithWhite:0.9 alpha:0.8];
-    
+    self.view.backgroundColor = [UIColor colorWithWhite:0.98 alpha:1];
+    self.navigationItem.title = @"管理地址";
     UIButton * addAddressBT = [UIButton buttonWithType:UIButtonTypeCustom];
     addAddressBT.frame = CGRectMake(0, self.navigationController.navigationBar.bottom, self.view.width, 60);
     [addAddressBT addTarget:self action:@selector(addAddressAndPhoneNumber:) forControlEvents:UIControlEventTouchUpInside];
@@ -75,7 +75,8 @@
     [addAddressBT setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     
     UIView * lineView = [[UIView alloc] initWithFrame:CGRectMake(0, addAddressBT.bottom, self.view.width, 1)];
-    lineView.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
+//    lineView.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
+    lineView.backgroundColor = LINE_COLOR;
     [self.view addSubview:lineView];
     
     
@@ -85,7 +86,7 @@
     addressView.hidden= YES;
     [self.view addSubview:addressView];
     UIView * lineView2 = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, 1)];
-    lineView2.backgroundColor = [UIColor colorWithWhite:0.7 alpha:0.8];
+    lineView2.backgroundColor = LINE_COLOR;
     [addressView addSubview:lineView2];
     
     UIImageView * aImageView = [[UIImageView alloc] initWithFrame:CGRectMake(10, 0, 25, 25)];
@@ -108,7 +109,7 @@
     
     UIView * lineView3 = [[UIView alloc] initWithFrame:CGRectMake(10, _telLabel.bottom, self.view.width - 20, 1)];
     lineView3.tag = 1002;
-    lineView3.backgroundColor = [UIColor colorWithWhite:0.7 alpha:0.8];
+    lineView3.backgroundColor = LINE_COLOR;
     [addressView addSubview:lineView3];
     
     self.editButton = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -148,20 +149,21 @@
     
     UIView * lineView4 = [[UIView alloc] initWithFrame:CGRectMake(0, addressView.height - 1, self.view.width, 1)];
     lineView4.tag = 1003;
-    lineView4.backgroundColor = [UIColor colorWithWhite:0.7 alpha:0.8];
+    lineView4.backgroundColor = LINE_COLOR;
     [addressView addSubview:lineView4];
     
     UIView * lineView5 = [[UIView alloc] initWithFrame:CGRectMake(0, addressView.bottom + 5, self.view.width, 1)];
     lineView5.tag = 1004;
-    lineView5.backgroundColor = [UIColor colorWithWhite:0.7 alpha:0.8];
+    lineView5.backgroundColor = LINE_COLOR;
     [self.view addSubview:lineView5];
     
     self.addressTableView = [[UITableView alloc] initWithFrame:CGRectMake(0, lineView5.bottom , self.view.width, self.view.height - lineView5.bottom - self.navigationController.navigationBar.bottom) style:UITableViewStylePlain];
     _addressTableView.dataSource = self;
     _addressTableView.delegate = self;
     [_addressTableView registerClass:[AddressViewCell class] forCellReuseIdentifier:@"cell"];
+    _addressTableView.separatorColor = LINE_COLOR;
     _addressTableView.tableFooterView = [[UIView alloc] init];
-    _addressTableView.backgroundColor = [UIColor colorWithWhite:0.9 alpha:0.8];
+    _addressTableView.backgroundColor = [UIColor colorWithWhite:0.97 alpha:1];
     [self.view addSubview:_addressTableView];
     
     [self downloadData];

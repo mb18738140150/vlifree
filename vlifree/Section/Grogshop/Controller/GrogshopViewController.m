@@ -97,11 +97,15 @@
     [self.view addSubview:_groshopTabelView];
     self.groshopTabelView.separatorColor = LINE_COLOR;
     [self.groshopTabelView registerClass:[GrogshopViewCell class] forCellReuseIdentifier:CELL_INDENTIFIER];
-    [self.groshopTabelView addHeaderWithTarget:self action:@selector(headerRereshing)];
-    [self.groshopTabelView addFooterWithTarget:self action:@selector(footerRereshing)];
+    self.groshopTabelView.header = [MJRefreshNormalHeader headerWithRefreshingTarget:self refreshingAction:@selector(headerRereshing)];
+//    self.groshopTabelView.footer = [MJRefreshAutoNormalFooter footerWithRefreshingTarget:self refreshingAction:@selector(footerRereshing)];
+    self.groshopTabelView.footer = [MJRefreshAutoNormalFooter footerWithRefreshingBlock:^{
+        [self footerRereshing];
+    }];
+//    [self.groshopTabelView.footer noticeNoMoreData];
+    self.groshopTabelView.tableFooterView = [[UIView alloc] init];
     _page = 1;
     _type = 2;
-//    [SVProgressHUD showWithStatus:@"正在加载..." maskType:SVProgressHUDMaskTypeClear];
     self.keyWord = nil;
     if ([UserLocation shareUserLocation].city != nil) {
         [self downloadDataWithCommand:@2 page:_page count:DATA_COUNT keyWord:nil];
@@ -119,7 +123,6 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-//    [self.groshopTabelView headerEndRefreshing];
     self.navigationController.navigationBar.barTintColor = MAIN_COLOR;
     if ([CLLocationManager locationServicesEnabled] && [CLLocationManager authorizationStatus] != kCLAuthorizationStatusDenied) {
 
@@ -198,63 +201,55 @@
 
 - (void)headerRereshing
 {
+//    [self.groshopTabelView.footer resetNoMoreData];
     [self downloadDataWithCommand:[NSNumber numberWithInt:_type] page:1 count:DATA_COUNT keyWord:self.keyWord];
     _page = 1;
 }
 
 - (void)footerRereshing
 {
-    if (self.dataArray.count < [_allCount integerValue]) {
-        self.groshopTabelView.footerRefreshingText = @"正在加载数据";
+//    if (self.dataArray.count < [_allCount integerValue]) {
+////        self.groshopTabelView.footerRefreshingText = @"正在加载数据";
+//        [self.groshopTabelView.footer resetNoMoreData];
         [self downloadDataWithCommand:[NSNumber numberWithInt:_type] page:++_page count:DATA_COUNT keyWord:self.keyWord];
-    }else
-    {
-        self.groshopTabelView.footerRefreshingText = @"数据已经加载完";
-        [self.groshopTabelView performSelector:@selector(footerEndRefreshing) withObject:nil afterDelay:1.5];
-    }
+//    }else
+//    {
+////        self.groshopTabelView.footerRefreshingText = @"数据已经加载完";
+//        [self.groshopTabelView.footer noticeNoMoreData];
+//        [self.groshopTabelView performSelector:@selector(footerEndRefreshing) withObject:nil afterDelay:1.5];
+//    }
     
 }
 
 #pragma mark - 数据请求
 - (void)downloadDataWithCommand:(NSNumber *)command page:(int)page count:(int)count keyWord:(NSString *)keyWord
 {
-    NSDictionary * jsonDic = nil;
-    if (keyWord == nil) {
-        jsonDic = @{
-                    @"Command":command,
-                    @"CurPage":[NSNumber numberWithInt:page],
-                    @"CurCount":[NSNumber numberWithInt:count],
-                    @"Lat":[NSNumber numberWithDouble:[UserLocation shareUserLocation].userLocation.latitude],
-                    @"Lon":[NSNumber numberWithDouble:[UserLocation shareUserLocation].userLocation.longitude],
-                    @"City":[UserLocation shareUserLocation].city
-                    };
-    }else
-    {
-        jsonDic = @{
-                    @"Command":command,
-                    @"CurPage":[NSNumber numberWithInt:page],
-                    @"CurCount":[NSNumber numberWithInt:count],
-                    @"Lat":[NSNumber numberWithDouble:[UserLocation shareUserLocation].userLocation.latitude],
-                    @"Lon":[NSNumber numberWithDouble:[UserLocation shareUserLocation].userLocation.longitude],
-                    @"City":[UserLocation shareUserLocation].city,
-                    @"KeyWord":keyWord
-                    };
-        self.keyWord = keyWord;
+    if ([UserLocation shareUserLocation].city) {
+        NSDictionary * jsonDic = nil;
+        if (keyWord == nil) {
+            jsonDic = @{
+                        @"Command":command,
+                        @"CurPage":[NSNumber numberWithInt:page],
+                        @"CurCount":[NSNumber numberWithInt:count],
+                        @"Lat":[NSNumber numberWithDouble:[UserLocation shareUserLocation].userLocation.latitude],
+                        @"Lon":[NSNumber numberWithDouble:[UserLocation shareUserLocation].userLocation.longitude],
+                        @"City":[UserLocation shareUserLocation].city
+                        };
+        }else
+        {
+            jsonDic = @{
+                        @"Command":command,
+                        @"CurPage":[NSNumber numberWithInt:page],
+                        @"CurCount":[NSNumber numberWithInt:count],
+                        @"Lat":[NSNumber numberWithDouble:[UserLocation shareUserLocation].userLocation.latitude],
+                        @"Lon":[NSNumber numberWithDouble:[UserLocation shareUserLocation].userLocation.longitude],
+                        @"City":[UserLocation shareUserLocation].city,
+                        @"KeyWord":keyWord
+                        };
+            self.keyWord = keyWord;
+        }
+        [self playPostWithDictionary:jsonDic];
     }
-    [self playPostWithDictionary:jsonDic];
-//    NSLog(@"///////%f, %f", [UserLocation shareUserLocation].location.coordinate.latitude, [UserLocation shareUserLocation].location.coordinate.longitude);
-    /*
-     //    NSLog(@"%@, %@", self.classifyId, [UserInfo shareUserInfo].userId);
-     NSString * jsonStr = [jsonDic JSONString];
-     NSString * str = [NSString stringWithFormat:@"%@231618", jsonStr];
-     NSLog(@"%@", str);
-     NSString * md5Str = [str md5];
-     NSString * urlString = [NSString stringWithFormat:@"http://p.vlifee.com/getdata.ashx?md5=%@",md5Str];
-     
-     HTTPPost * httpPost = [HTTPPost shareHTTPPost];
-     [httpPost post:urlString HTTPBody:[jsonStr dataUsingEncoding:NSUTF8StringEncoding]];
-     httpPost.delegate = self;
-     */
 }
 
 - (void)playPostWithDictionary:(NSDictionary *)dic
@@ -273,6 +268,8 @@
 - (void)refresh:(id)data
 {
     NSLog(@"+++%@", data);
+    [self.groshopTabelView.header endRefreshing];
+    [self.groshopTabelView.footer endRefreshing];
     if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
         if([[data objectForKey:@"Command"] isEqualToNumber:@10028])
         {
@@ -291,8 +288,14 @@
                 HotelModel * hotelMD = [[HotelModel alloc] initWithDictionary:dic];
                 [self.dataArray addObject:hotelMD];
             }
+            
             [self.groshopTabelView reloadData];
+           
+//            if (self.dataArray.count == [_allCount integerValue]) {
+                [self.groshopTabelView.footer noticeNoMoreData];
+//            }
         }
+        
         NSLog(@"%@", [data objectForKey:@"ErrorMsg"]);
     }else
     {
@@ -300,15 +303,12 @@
         [alert show];
         [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:1.5];
     }
-    [self.groshopTabelView headerEndRefreshing];
-    [self.groshopTabelView footerEndRefreshing];
-//    [SVProgressHUD dismiss];
 }
 
 - (void)failWithError:(NSError *)error
 {
-    [self.groshopTabelView headerEndRefreshing];
-    [self.groshopTabelView footerEndRefreshing];
+    [self.groshopTabelView.header endRefreshing];
+    [self.groshopTabelView.footer endRefreshing];
 //    [SVProgressHUD dismiss];
     NSLog(@"%@", error);
 }

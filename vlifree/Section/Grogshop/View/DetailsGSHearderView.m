@@ -21,7 +21,7 @@
 @interface DetailsGSHearderView ()
 
 
-@property (nonatomic, strong)CycleScrollView * cycleScrollView;//轮播图
+//@property (nonatomic, strong)CycleScrollView * cycleScrollView;//轮播图
 
 
 
@@ -48,27 +48,28 @@
 
 - (void)createSubview
 {
+    /*
     self.cycleScrollView = [[CycleScrollView alloc] initWithFrame:CGRectMake(0, 0, self.width, CYCLESCROLLVIEW_HEIGHT) array:nil animationDuration:3];
 //    _cycleScrollView.backgroundColor = [UIColor greenColor];
     _cycleScrollView.backgroundColor = [UIColor whiteColor];
-    
+    */
     self.hotelImage = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, self.width, CYCLESCROLLVIEW_HEIGHT)];
     [self addSubview:_hotelImage];
     
 //    [self addSubview:_cycleScrollView];
-    UIView * lineView = [[UIView alloc] initWithFrame:CGRectMake(0, _cycleScrollView.height - 1, self.width, 1)];
+    UIView * lineView = [[UIView alloc] initWithFrame:CGRectMake(0, _hotelImage.height - 1, self.width, 1)];
     lineView.backgroundColor = LINE_COLOR;
     [self addSubview:lineView];
-    self.addressView = [[DescribeView alloc] initWithFrame:CGRectMake(0, _cycleScrollView.bottom, self.width, DESCRIBEVIEW_HEIGHT)];
+    self.addressView = [[DescribeView alloc] initWithFrame:CGRectMake(0, _hotelImage.bottom, self.width, DESCRIBEVIEW_HEIGHT)];
     _addressView.iconView.image = [UIImage imageNamed:@"addressIcon.png"];
-    _addressView.titleLable.text = @"新环西路56号高新工业园区1号楼";
+//    _addressView.titleLable.text = @"新环西路56号高新工业园区1号楼";
     
     _addressView.backgroundColor = [UIColor whiteColor];
 //    _addressView.backgroundColor = [UIColor orangeColor];
     [self addSubview:_addressView];
     self.phoneView = [[DescribeView alloc] initWithFrame:CGRectMake(0, _addressView.bottom, self.width, DESCRIBEVIEW_HEIGHT)];
     _phoneView.iconView.image = [UIImage imageNamed:@"phoneIcon.png"];
-    _phoneView.titleLable.text = @"18530053345";
+//    _phoneView.titleLable.text = @"18530053345";
     _phoneView.backgroundColor = [UIColor whiteColor];
 //    _phoneView.backgroundColor = [UIColor magentaColor];
     [self addSubview:_phoneView];

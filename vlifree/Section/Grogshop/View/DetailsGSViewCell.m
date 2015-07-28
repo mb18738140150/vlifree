@@ -22,7 +22,7 @@
 @property (nonatomic, strong)UIImageView * iconView;
 @property (nonatomic, strong)UILabel * nameLable;
 @property (nonatomic, strong)UILabel * priceLabel;
-
+@property (nonatomic, strong)UILabel * introLabel;
 
 @end
 
@@ -55,15 +55,21 @@
         _priceLabel.textColor = [UIColor redColor];
         [self addSubview:_priceLabel];
         
+        self.introLabel = [[UILabel alloc] initWithFrame:CGRectMake(_iconView.right + LEFT_SPACE, _priceLabel.bottom, LABEL_WIDTH, LABEL_HEIGHT)];
+        _introLabel.text = @"¥235";
+        _introLabel.font = [UIFont systemFontOfSize:13];
+        _introLabel.textColor = TEXT_COLOR;
+        [self addSubview:_introLabel];
+        
         self.reserveButton = [UIButton buttonWithType:UIButtonTypeCustom];
         _reserveButton.frame = CGRectMake(frame.size.width - BUTTON_WIDTH - RIGHT_IMAGE_SIZE - LEFT_SPACE, _priceLabel.top, BUTTON_WIDTH, LABEL_HEIGHT);
         _reserveButton.backgroundColor = MAIN_COLOR;
-        [_reserveButton setTitle:@"预定" forState:UIControlStateNormal];
+        [_reserveButton setTitle:@"有房" forState:UIControlStateNormal];
+        [_reserveButton setTitle:@"满房" forState:UIControlStateDisabled];
         _reserveButton.titleLabel.font = [UIFont systemFontOfSize:14];
         _reserveButton.layer.cornerRadius = 5;
         [self addSubview:_reserveButton];
-        self.accessoryType = UITableViewCellAccessoryDisclosureIndicator ;
-
+        self.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     }
 }
 
@@ -84,6 +90,15 @@
     }];
     self.nameLable.text = roomModel.suiteName;
     self.priceLabel.text = [NSString stringWithFormat:@"¥%@", roomModel.suitePrice];
+    if ([roomModel.stock isEqualToNumber:@0]) {
+        self.reserveButton.enabled = NO;
+        _reserveButton.backgroundColor = [UIColor grayColor];
+    }else
+    {
+        self.reserveButton.enabled = YES;
+        _reserveButton.backgroundColor = MAIN_COLOR;
+    }
+    self.introLabel.text = roomModel.intro;
 }
 
 

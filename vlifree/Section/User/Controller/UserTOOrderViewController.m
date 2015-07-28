@@ -33,7 +33,10 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.navigationItem.title = @"外卖订单";
-    
+    self.navigationController.navigationBar.titleTextAttributes = @{
+                                                                    NSForegroundColorAttributeName: TEXT_COLOR,
+                                                                    NSFontAttributeName : [UIFont boldSystemFontOfSize:17]
+                                                                    };
     self.navigationController.navigationBar.barTintColor = [UIColor whiteColor];
     
     [self.tableView registerClass:[TOOrderViewCell class] forCellReuseIdentifier:@"cell"];
@@ -47,8 +50,11 @@
     
     _page = 1;
     [self downloadDataWithCommand:@23 page:_page count:COUNT];
-    [self.tableView addHeaderWithTarget:self action:@selector(headerRereshing)];
-    [self.tableView addFooterWithTarget:self action:@selector(footerRereshing)];
+    self.tableView.header = [MJRefreshNormalHeader headerWithRefreshingTarget:self refreshingAction:@selector(headerRereshing)];
+    self.tableView.footer = [MJRefreshAutoNormalFooter footerWithRefreshingTarget:self refreshingAction:@selector(footerRereshing)];
+//    [self.tableView addHeaderWithTarget:self action:@selector(headerRereshing)];
+//    [self.tableView addFooterWithTarget:self action:@selector(footerRereshing)];
+    
 //    [SVProgressHUD showWithStatus:@"加载中..." maskType:SVProgressHUDMaskTypeClear];
 
 
@@ -80,14 +86,16 @@
 
 - (void)footerRereshing
 {
-    if (self.dataArray.count < [_allCount integerValue]) {
-        self.tableView.footerRefreshingText = @"正在加载数据";
+//    if (self.dataArray.count < [_allCount integerValue]) {
+//        self.tableView.footerRefreshingText = @"正在加载数据";
+//        [self.tableView.footer resetNoMoreData];
         [self downloadDataWithCommand:@23 page:++_page count:COUNT];
-    }else
-    {
-        self.tableView.footerRefreshingText = @"数据已经加载完";
-        [self.tableView performSelector:@selector(footerEndRefreshing) withObject:nil afterDelay:1.5];
-    }
+//    }else
+//    {
+////        self.tableView.footerRefreshingText = @"数据已经加载完";
+//        [self.tableView.footer noticeNoMoreData];
+//        [self.tableView performSelector:@selector(footerEndRefreshing) withObject:nil afterDelay:1.5];
+//    }
     
 }
 
@@ -132,6 +140,8 @@
 - (void)refresh:(id)data
 {
     NSLog(@"+++%@", data);
+    [self.tableView.header endRefreshing];
+    [self.tableView.footer endRefreshing];
     if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
         NSLog(@"%@", [data objectForKey:@"ErrorMsg"]);
         NSArray * array = [data objectForKey:@"WakeOutOrderList"];
@@ -145,16 +155,20 @@
             [self.dataArray addObject:takeOutOrderMD];
         }
         [self.tableView reloadData];
+        if (self.dataArray.count < [_allCount integerValue])
+        {
+            [self.tableView.footer resetNoMoreData];
+        }else
+        {
+            [self.tableView.footer noticeNoMoreData];
+        }
     }
-    [self.tableView headerEndRefreshing];
-    [self.tableView footerEndRefreshing];
-//    [SVProgressHUD dismiss];
 }
 
 - (void)failWithError:(NSError *)error
 {
-    [self.tableView headerEndRefreshing];
-    [self.tableView footerEndRefreshing];
+    [self.tableView.header endRefreshing];
+    [self.tableView.footer endRefreshing];
 //    [SVProgressHUD dismiss];
     NSLog(@"%@", error);
 }
@@ -209,7 +223,7 @@
 - (void)lookBigImage:(UIButton *)button
 {
     int section = 0;
-    int row = button.tag - 10000;
+    NSInteger row = button.tag - 10000;
     TakeOutOrderMD * takeOutOrderMd = [self.dataArray objectAtIndex:row];
     CGPoint point = self.tableView.contentOffset;
     CGRect cellRect = [self.tableView rectForRowAtIndexPath:[NSIndexPath indexPathForRow:row inSection:section]];

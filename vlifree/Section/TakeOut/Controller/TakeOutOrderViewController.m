@@ -67,7 +67,7 @@
     [super viewDidLoad];
 //    self.view.backgroundColor = [UIColor colorWithWhite:0.9 alpha:0.9];
     self.view.backgroundColor = [UIColor whiteColor];
-    
+    self.navigationItem.title = @"外卖订单";
     UIScrollView * scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, self.view.height - 40 - 2 * TOP_SPACE)];
     scrollView.backgroundColor = [UIColor colorWithWhite:0.9 alpha:0.9];
     scrollView.tag = 10001;
@@ -131,7 +131,7 @@
         allCount += array.count;
         OrderMenuVIew * orderMenuV = [[OrderMenuVIew alloc] initWithFrame:CGRectMake(0, lineView2.bottom + i * ORDER_MENU_VIEW_HEIGHT, menusView.width, ORDER_MENU_VIEW_HEIGHT)];
         orderMenuV.menuNameLB.text = menuMD.name;
-        orderMenuV.countLabel.text = [NSString stringWithFormat:@"%d份", menuMD.count];
+        orderMenuV.countLabel.text = [NSString stringWithFormat:@"%ld份", (long)menuMD.count];
         orderMenuV.priceLabel.text = [NSString stringWithFormat:@"+%g", menuMD.price.doubleValue * array.count];
         [menusView addSubview:orderMenuV];
     }
@@ -319,18 +319,24 @@
     _weixinView.iconView.image = [UIImage imageNamed:@"weixinzhifu.png"];
     _weixinView.titleLabel.text = @"微信支付";
     [payView addSubview:_weixinView];
-    
+    _payType = 1;
     self.baiduView = [[PayTypeView alloc] initWithFrame:CGRectMake(0, _weixinView.bottom, payView.width, 40)];
     _baiduView.iconView.image = [UIImage imageNamed:@"baiduzhifu.png"];
     _baiduView.titleLabel.text = @"百度钱包";
     [_baiduView.changeButton addTarget:self action:@selector(changePayType:) forControlEvents:UIControlEventTouchUpInside];
     [payView addSubview:_baiduView];
-    
+    if (![WXApi isWXAppInstalled]) {
+        _weixinView.hidden = YES;
+        _baiduView.top = _weixinView.top;
+        _baiduView.changeButton.selected = YES;
+        _payType = 2;
+    }
     self.candaoView = [[PayTypeView alloc] initWithFrame:CGRectMake(0, _baiduView.bottom, payView.width, _baiduView.height)];
     _candaoView.iconView.image = [UIImage imageNamed:@"delivery.png"];
     _candaoView.titleLabel.text = @"餐到付款";
     [_candaoView.changeButton addTarget:self action:@selector(changePayType:) forControlEvents:UIControlEventTouchUpInside];
     [payView addSubview:_candaoView];
+    
     payView.height = _candaoView.bottom;
     
     UIView * lineView10 = [[UIView alloc] initWithFrame:CGRectMake(0, payView.bottom, payView.width, 1)];
@@ -347,7 +353,7 @@
     
     scrollView.contentSize = CGSizeMake(scrollView.width, lineView10.bottom);
     
-    _payType = 1;
+    
     
     UIButton * backBT = [UIButton buttonWithType:UIButtonTypeCustom];
     backBT.frame = CGRectMake(0, 0, 15, 20);

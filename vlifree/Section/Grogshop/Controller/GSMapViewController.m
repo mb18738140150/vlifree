@@ -22,7 +22,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
+    self.navigationItem.title = @"地图";
     self.mapView = [[BMKMapView alloc] initWithFrame:self.view.bounds];
     _mapView.delegate = self;
     _mapView.zoomLevel = 18.5;

@@ -61,6 +61,7 @@
     [super viewDidLoad];
     self.hud = [JGProgressHUD progressHUDWithStyle:JGProgressHUDStyleLight];
     self.payType = @1;
+    self.navigationItem.title = @"订单填写";
     self.view.backgroundColor = [UIColor whiteColor];
 //    NSLog(@"%d", self.navigationController.navigationBar.translucent);
     UIScrollView * scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, self.view.height - 75)];
@@ -71,10 +72,12 @@
     aLabel.text = @"订单确认后不可取消，该订单不可变更。如未入住扣除全部房费";
     aLabel.font = [UIFont systemFontOfSize:11];
     aLabel.textAlignment = NSTextAlignmentCenter;
-    aLabel.textColor = [UIColor colorWithRed:227 / 255.0 green:185 / 255.0 blue:16 / 255.0 alpha:1];
+//    aLabel.textColor = [UIColor colorWithRed:227 / 255.0 green:185 / 255.0 blue:16 / 255.0 alpha:1];
+    aLabel.textColor = [UIColor whiteColor];
     aLabel.layer.borderColor = LINE_COLOR.CGColor;
     aLabel.layer.borderWidth = 0.7;
-    aLabel.backgroundColor = [UIColor colorWithRed:255 / 255.0 green:254 / 255.0 blue:242 / 255.0 alpha:1];
+//    aLabel.backgroundColor = [UIColor colorWithRed:255 / 255.0 green:254 / 255.0 blue:242 / 255.0 alpha:1];
+    aLabel.backgroundColor = [UIColor blueColor];
     [scrollView addSubview:aLabel];
     
     UIView * view1 = [[UIView alloc] initWithFrame:CGRectMake(0, aLabel.bottom, scrollView.width, 100)];
@@ -235,6 +238,13 @@
     _baiduView.titleLabel.textColor = TEXT_COLOR;
     [_baiduView.changeButton addTarget:self action:@selector(changePayType:) forControlEvents:UIControlEventTouchUpInside];
     [view3 addSubview:_baiduView];
+    
+    if (![WXApi isWXAppInstalled]) {
+        _weixinView.hidden = YES;
+        _baiduView.top = _weixinView.top;
+        _baiduView.changeButton.selected = YES;
+        _payType = @2;
+    }
     
     view3.height = _baiduView.bottom + TOP_SPACE;
     
@@ -411,7 +421,7 @@
     }
     if (self.ruzhuDate != nil & self.lidianDate != nil) {
         NSInteger days = [self calculateAgeFromDate:self.ruzhuDate toDate:self.lidianDate];
-        self.daysLB.text = [NSString stringWithFormat:@"住店时长: 共%ld天", days];
+        self.daysLB.text = [NSString stringWithFormat:@"住店时长: 共%ld天", (long)days];
         double price = self.price.doubleValue * days;
         _allMoney = price;
         self.priceLB.attributedText = [self allPriceLBTextWithPrice:[NSNumber numberWithDouble:price]];

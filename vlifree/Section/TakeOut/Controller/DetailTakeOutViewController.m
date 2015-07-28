@@ -15,6 +15,7 @@
 #import "TakeOutOrderViewController.h"
 #import "AlertLoginView.h"
 #import "WXLoginViewController.h"
+#import "CommentViewController.h"
 
 #define SECTION_TABLEVIEW_CELL @"SECTIONCELL"
 #define MENUS_TABLEVIEW_CELL @"MENUSCELL"
@@ -78,7 +79,7 @@
 
 - (void)dealloc
 {
-    [self removeObserver:self forKeyPath:@"shopArray"];
+//    [self removeObserver:self forKeyPath:@"shopArray"];
 }
 
 - (void)viewDidLoad {
@@ -86,13 +87,13 @@
     
     self.view.backgroundColor = [UIColor whiteColor];
 
-    self.navigationController.navigationBar.barTintColor = [UIColor whiteColor];
+    
     self.navigationController.navigationBar.titleTextAttributes = @{
                                                                     NSForegroundColorAttributeName: TEXT_COLOR
                                                                     };
-
-    [self addObserver:self forKeyPath:@"shopArray" options:NSKeyValueObservingOptionNew context:nil];
-    
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"查看评论" style:UIBarButtonItemStylePlain target:self action:@selector(lookComment:)];
+//    [self addObserver:self forKeyPath:@"shopArray" options:NSKeyValueObservingOptionNew context:nil];
+    /*
     UIView * noticeView = [[UIView alloc] initWithFrame:CGRectMake(0, self.navigationController.navigationBar.bottom, self.view.width, 30)];
     noticeView.tag = 80000;
     noticeView.backgroundColor = [UIColor colorWithRed:254 / 255.0 green:231 / 255.0 blue:232 / 255.0 alpha:1];
@@ -112,7 +113,7 @@
     [button setBackgroundImage:[UIImage imageNamed:@"xx.png"] forState:UIControlStateNormal];
     [button addTarget:self action:@selector(removeNoticeView:) forControlEvents:UIControlEventTouchUpInside];
     [noticeView addSubview:button];
-    
+    */
     
 //    self.sectionTableView = [[UITableView alloc] initWithFrame:CGRectMake(0, noticeView.bottom, 80, self.view.height - SHOPPINGCARVIEW_HEIGHT - noticeView.height - self.navigationController.navigationBar.bottom) style:UITableViewStylePlain];
     self.sectionTableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, 80, self.view.height - SHOPPINGCARVIEW_HEIGHT) style:UITableViewStylePlain];
@@ -140,7 +141,13 @@
     
     self.shoppingCarView = [[ShoppingCartView alloc] initWithFrame:CGRectMake(0, _menusTableView.bottom, self.view.width, SHOPPINGCARVIEW_HEIGHT)];
     _shoppingCarView.backgroundColor = [UIColor whiteColor];
-    _shoppingCarView.priceLabel.text = [NSString stringWithFormat:@"¥0(%@起送)", self.sendPrice];
+    
+    if (self.sendPrice != nil) {
+        _shoppingCarView.priceLabel.text = [NSString stringWithFormat:@"¥0(%@起送)", self.sendPrice];
+    }else
+    {
+        self.shoppingCarView.priceLabel.text = @"¥0";
+    }
     NSLog(@"=====%@", self.sendPrice);
     [_shoppingCarView.shoppingCarBT addTarget:self action:@selector(addShoppingCarDetailsViewAction:) forControlEvents:UIControlEventTouchUpInside];
     [_shoppingCarView.changeButton addTarget:self action:@selector(confirmMenusAction:) forControlEvents:UIControlEventTouchUpInside];
@@ -175,6 +182,21 @@
 - (void)backLastVC:(id)sender
 {
     [self.navigationController popViewControllerAnimated:YES];
+}
+
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    self.navigationController.navigationBar.tintColor = MAIN_COLOR;
+    self.navigationController.navigationBar.barTintColor = [UIColor whiteColor];
+}
+
+- (void)lookComment:(id)sender
+{
+    CommentViewController * commentVC = [[CommentViewController alloc] init];
+    commentVC.storeId = self.takeOutID;
+    [self.navigationController pushViewController:commentVC animated:YES];
 }
 
 - (void)removeNoticeView:(UIButton *)button
@@ -220,6 +242,9 @@
         [_alertLoginV.logInButton addTarget:self action:@selector(userLogInAction:) forControlEvents:UIControlEventTouchUpInside];
         [_alertLoginV.weixinButton addTarget:self action:@selector(weixinLogIn:) forControlEvents:UIControlEventTouchUpInside];
         [self.view.window addSubview:_alertLoginV];
+        if (![WXApi isWXAppInstalled]) {
+            _alertLoginV.weixinButton.hidden = YES;
+        }
 //        UIAlertView * alert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"请先登录" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil];
 //        alert.alertViewStyle = UIAlertViewStyleLoginAndPasswordInput;
 //        [alert show];
@@ -573,7 +598,13 @@
         }
     }
 //    allPrice += self.mealBoxMoney.doubleValue * [self getAllCount] + self.outSentMoney.doubleValue;
-    self.shoppingCarView.priceLabel.text = [NSString stringWithFormat:@"¥%g(¥%@起送)", allPrice, self.sendPrice];
+    if (self.sendPrice != nil) {
+       self.shoppingCarView.priceLabel.text = [NSString stringWithFormat:@"¥%g(¥%@起送)", allPrice, self.sendPrice];
+    }else
+    {
+        self.shoppingCarView.priceLabel.text = [NSString stringWithFormat:@"¥%g", allPrice];
+    }
+    
     return allPrice;
 }
 
@@ -777,7 +808,7 @@
 - (void)lookBigImage:(UIButton *)button
 {
     int section = 0;
-    int row = button.tag - 10000;
+    NSInteger row = button.tag - 10000;
     MenuModel * menuMd = [self.menusArray objectAtIndex:row];
     CGPoint point = self.menusTableView.contentOffset;
     CGRect cellRect = [self.menusTableView rectForRowAtIndexPath:[NSIndexPath indexPathForRow:row inSection:section]];

@@ -60,6 +60,7 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
+    self.navigationController.navigationBar.tintColor = [UIColor whiteColor];
     self.navigationController.navigationBar.barTintColor = MAIN_COLOR;
 //    [self.takeOutTabelView headerEndRefreshing];
 }
@@ -71,7 +72,6 @@
     [self.view setBackgroundColor:[UIColor whiteColor]];
     
     self.navigationController.navigationBar.translucent = YES;
-    self.navigationController.navigationBar.tintColor = [UIColor whiteColor];
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSearch target:self action:@selector(searchTakeOut:)];
 
     self.addressBT = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -115,9 +115,11 @@
     _takeOutTabelView.dataSource = self;
     _takeOutTabelView.delegate = self;
     [self.view addSubview:_takeOutTabelView];
-    
-    [self.takeOutTabelView addHeaderWithTarget:self action:@selector(headerRereshing)];
-    [self.takeOutTabelView addFooterWithTarget:self action:@selector(footerRereshing)];
+    self.takeOutTabelView.tableFooterView = [[UIView alloc] init];
+    self.takeOutTabelView.header = [MJRefreshNormalHeader headerWithRefreshingTarget:self refreshingAction:@selector(headerRereshing)];
+    self.takeOutTabelView.footer = [MJRefreshAutoNormalFooter footerWithRefreshingTarget:self refreshingAction:@selector(footerRereshing)];
+//    [self.takeOutTabelView addHeaderWithTarget:self action:@selector(headerRereshing)];
+//    [self.takeOutTabelView addFooterWithTarget:self action:@selector(footerRereshing)];
     
 //    [self.takeOutTabelView registerClass:[TakeOutViewCell class] forCellReuseIdentifier:CELL_INDENTIFIER];
     
@@ -347,24 +349,27 @@
 
 - (void)headerRereshing
 {
+    [self.takeOutTabelView.footer resetNoMoreData];
     [self downloadDataWithCommand:@6 page:1 count:DATA_COUNT type:_type];
     _page = 1;
 }
 
 - (void)footerRereshing
 {
-    NSInteger count = 0;
-    for (NSMutableArray * array in self.dataArray) {
-        count += array.count;
-    }
-    if (count < [_allCount integerValue]) {
-        self.takeOutTabelView.footerRefreshingText = @"正在加载数据";
+//    NSInteger count = 0;
+//    for (NSMutableArray * array in self.dataArray) {
+//        count += array.count;
+//    }
+//    if (count < [_allCount integerValue]) {
+////        self.takeOutTabelView.footerRefreshingText = @"正在加载数据";
+//        [self.takeOutTabelView.footer resetNoMoreData];
         [self downloadDataWithCommand:@6 page:++_page count:DATA_COUNT type:_type];
-    }else
-    {
-        self.takeOutTabelView.footerRefreshingText = @"数据已经加载完";
-        [self.takeOutTabelView performSelector:@selector(footerEndRefreshing) withObject:nil afterDelay:1.5];
-    }
+//    }else
+//    {
+////        self.takeOutTabelView.footerRefreshingText = @"数据已经加载完";
+//        [self.takeOutTabelView.footer noticeNoMoreData];
+//        [self.takeOutTabelView performSelector:@selector(footerEndRefreshing) withObject:nil afterDelay:1.5];
+//    }
     
 }
 
@@ -373,17 +378,20 @@
 #pragma mark - 数据请求
 - (void)downloadDataWithCommand:(NSNumber *)command page:(int)page count:(int)count type:(int)type
 {
-    _type = type;
-    NSDictionary * jsonDic = @{
-                               @"Command":command,
-                               @"CurPage":[NSNumber numberWithInt:page],
-                               @"CurCount":[NSNumber numberWithInt:count],
-                               @"Lat":[NSNumber numberWithDouble:[UserLocation shareUserLocation].userLocation.latitude],
-                               @"Lon":[NSNumber numberWithDouble:[UserLocation shareUserLocation].userLocation.longitude],
-                               @"City":[UserLocation shareUserLocation].city,
-                               @"WakeoutType":[NSNumber numberWithInt:type]
-                               };
-    [self playPostWithDictionary:jsonDic];
+    if ([UserLocation shareUserLocation].city) {
+        _type = type;
+        NSDictionary * jsonDic = @{
+                                   @"Command":command,
+                                   @"CurPage":[NSNumber numberWithInt:page],
+                                   @"CurCount":[NSNumber numberWithInt:count],
+                                   @"Lat":[NSNumber numberWithDouble:[UserLocation shareUserLocation].userLocation.latitude],
+                                   @"Lon":[NSNumber numberWithDouble:[UserLocation shareUserLocation].userLocation.longitude],
+                                   @"City":[UserLocation shareUserLocation].city,
+                                   @"WakeoutType":[NSNumber numberWithInt:type]
+                                   };
+        [self playPostWithDictionary:jsonDic];
+    }
+    
     /*
      //    NSLog(@"%@, %@", self.classifyId, [UserInfo shareUserInfo].userId);
      NSString * jsonStr = [jsonDic JSONString];
@@ -413,6 +421,8 @@
 
 - (void)refresh:(id)data
 {
+    [self.takeOutTabelView.header endRefreshing];
+    [self.takeOutTabelView.footer endRefreshing];
     NSLog(@"+++%@", data);
     if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
         NSLog(@"%@", [data objectForKey:@"ErrorMsg"]);
@@ -425,6 +435,7 @@
             }
             NSMutableArray * sendArray = [NSMutableArray array];
             NSMutableArray * noSendAry = [NSMutableArray array];
+            NSInteger count = 0;
             for (NSDictionary * dic in array) {
                 TakeOutModel * takeOutMD = [[TakeOutModel alloc] initWithDictionary:dic];
                 if ([takeOutMD.peyType isEqualToNumber:@YES]) {
@@ -433,6 +444,7 @@
                 {
                     [noSendAry addObject:takeOutMD];
                 }
+                count++;
 //                [self.dataArray addObject:takeOutMD];
             }
             if (sendArray.count > 0) {
@@ -442,26 +454,32 @@
                 [self.dataArray addObject:noSendAry];
             }
             [self.takeOutTabelView reloadData];
+            if (count < self.dataArray.count) {
+                [self.takeOutTabelView.footer resetNoMoreData];
+            }else
+            {
+                [self.takeOutTabelView.footer noticeNoMoreData];
+            }
+            
+            
         }else if([[data objectForKey:@"Command"] isEqualToNumber:@10028])
         {
             UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:@"收藏成功" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
             [alert show];
             [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:1.5];
         }
+    }else
+    {
+        UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:[data objectForKey:@"ErrorMsg"] delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
+        [alert show];
+        [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:1.5];
     }
-    if (self.takeOutTabelView.isHeaderRefreshing) {
-        [self.takeOutTabelView headerEndRefreshing];
-    }
-    if (self.takeOutTabelView.isFooterRefreshing) {
-        [self.takeOutTabelView footerEndRefreshing];
-    }
-//    [SVProgressHUD dismiss];
 }
 
 - (void)failWithError:(NSError *)error
 {
-    [self.takeOutTabelView headerEndRefreshing];
-    [self.takeOutTabelView footerEndRefreshing];
+    [self.takeOutTabelView.header endRefreshing];
+    [self.takeOutTabelView.footer endRefreshing];
 //    [SVProgressHUD dismiss];
     NSLog(@"%@", error);
 }
@@ -487,6 +505,7 @@
         {
             NSLog(@"反geo检索发送失败");
         }
+        [self.locService stopUserLocationService];
     }
     
 }
@@ -494,6 +513,7 @@
 - (void)didFailToLocateUserWithError:(NSError *)error
 {
     NSLog(@"定位失败 error = %@", error);
+    [self.locService stopUserLocationService];
     [self.locService startUserLocationService];
 }
 
@@ -545,7 +565,7 @@
     if (!cell) {
         cell = [[TakeOutViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIndetifiel];
     }
-    [cell createSubview:tableView.bounds activityCount:takeOutMD.activityArray.count];
+    [cell createSubview:tableView.bounds activityCount:(int)takeOutMD.activityArray.count];
     __weak TakeOutViewController * takeOutVC = self;
     cell.rightButtons = @[[MGSwipeButton buttonWithTitle:@"关注商店" backgroundColor:[UIColor redColor] callback:^BOOL(MGSwipeTableCell *sender) {
         if ([UserInfo shareUserInfo].userId) {
@@ -623,8 +643,8 @@
 
 - (void)lookBigImage:(UIButton *)button
 {
-    int section = (button.tag - 5000000) / 1000;
-    int row = (button.tag - 5000000) % 1000;
+    NSInteger section = (button.tag - 5000000) / 1000;
+    NSInteger row = (button.tag - 5000000) % 1000;
     TakeOutModel * takeOutMd = [[self.dataArray objectAtIndex:section] objectAtIndex:row];
     CGPoint point = self.takeOutTabelView.contentOffset;
     CGRect cellRect = [self.takeOutTabelView rectForRowAtIndexPath:[NSIndexPath indexPathForRow:row inSection:section]];

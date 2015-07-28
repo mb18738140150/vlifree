@@ -18,8 +18,7 @@
 #import "AlertLoginView.h"
 #import "WXLoginViewController.h"
 #import "FacilityViewController.h"
-#import "HTMLNode.h"
-#import "HTMLParser.h"
+
 
 
 
@@ -151,7 +150,7 @@
     NSLog(@"打电话");
     UIWebView *callWebView = [[UIWebView alloc] init];
     
-    NSURL *telURL = [NSURL URLWithString:@"tel:13788052976"];
+    NSURL *telURL = [NSURL URLWithString:[NSString stringWithFormat:@"tel:%@", self.phoneNumber]];
     //    [[UIApplication sharedApplication] openURL:telURL];
     [callWebView loadRequest:[NSURLRequest requestWithURL:telURL]];
     [self.view addSubview:callWebView];
@@ -203,6 +202,9 @@
         [_alertLoginV.logInButton addTarget:self action:@selector(userLogInAction:) forControlEvents:UIControlEventTouchUpInside];
         [_alertLoginV.weixinButton addTarget:self action:@selector(weixinLogIn:) forControlEvents:UIControlEventTouchUpInside];
         [self.detailsTableView.window addSubview:_alertLoginV];
+        if (![WXApi isWXAppInstalled]) {
+            _alertLoginV.weixinButton.hidden = YES;
+        }
     }
     
 }
@@ -227,7 +229,6 @@
                                    @"Password":self.alertLoginV.passwordTF.text,
                                    };
         [self playPostWithDictionary:jsonDic];
-//        [SVProgressHUD showWithStatus:@"登陆中..." maskType:SVProgressHUDMaskTypeClear];
     }
 }
 
@@ -315,6 +316,7 @@
             self.describe = [dic objectForKey:@"Describe"];
             self.headerView.addressView.titleLable.text = [dic objectForKey:@"Address"];
             self.headerView.phoneView.titleLable.text = [dic objectForKey:@"PhoneNumber"];
+            self.phoneNumber = [dic objectForKey:@"PhoneNumber"];
             self.detailsDic = [dic objectForKey:@"HotelDetail"];
             if ([[self.detailsDic objectForKey:@"ParkState"] isEqualToNumber:@1]) {
                 self.headerView.parkView.image = [UIImage imageNamed:@"P_on.png"];
@@ -569,7 +571,7 @@
 - (void)lookBigImage:(UIButton *)button
 {
     int section = 0;
-    int row = button.tag - 10000;
+    NSInteger row = button.tag - 10000;
     RoomModel * roomMd = [self.dataArray objectAtIndex:row];
     CGPoint point = self.detailsTableView.contentOffset;
     CGRect cellRect = [self.detailsTableView rectForRowAtIndexPath:[NSIndexPath indexPathForRow:row inSection:section]];

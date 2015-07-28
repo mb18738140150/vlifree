@@ -86,13 +86,17 @@ static HTTPPost * httpPost = nil;
 //    NSLog(@"++%@", [[NSString alloc] initWithData:self.data encoding:0]);
     NSDictionary * dic = [NSJSONSerialization JSONObjectWithData:self.data options:0 error:nil];
 //    NSLog(@"%@",dic);
-    [self.delegate refresh:dic];
+    if ([self.delegate respondsToSelector:@selector(refresh:)]) {
+        [self.delegate refresh:dic];
+    }
 }
 
 //请求失败
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
 {
-    [self.delegate failWithError:error];
+    if ([self.delegate respondsToSelector:@selector(failWithError:)]) {
+        [self.delegate failWithError:error];
+    }
 }
 
 

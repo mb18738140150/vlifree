@@ -28,6 +28,10 @@
 @property (nonatomic, strong)NSNumber * mealBoxMoney;
 @property (nonatomic, strong)NSMutableArray * menusArray;
 
+@property (nonatomic, copy)NSString * storeDecribe;
+@property (nonatomic, copy)NSString * storeIcon;
+@property (nonatomic, strong)NSNumber * isComment;
+
 - (id)initWithDictionary:(NSDictionary *)dic;
 
 

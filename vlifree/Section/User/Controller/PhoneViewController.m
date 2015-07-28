@@ -34,7 +34,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
+    self.navigationItem.title = @"修改号码";
     self.view.backgroundColor = [UIColor whiteColor];
     UIView * phoneView = [[UIView alloc] initWithFrame:CGRectMake(LEFT_SPACE, TOP_SPACE + self.navigationController.navigationBar.bottom, self.view.width - 2 * LEFT_SPACE, VIEW_HEIGHT)];
     phoneView.layer.borderColor = [UIColor colorWithWhite:0.8 alpha:1].CGColor;

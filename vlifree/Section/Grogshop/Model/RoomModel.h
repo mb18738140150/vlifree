@@ -15,6 +15,8 @@
 @property (nonatomic, strong)NSNumber * suitePrice;
 @property (nonatomic, copy)NSString * suiteName;
 @property (nonatomic, strong)NSNumber * suiteId;
+@property (nonatomic, strong)NSNumber * stock;
+@property (nonatomic, copy)NSString * intro;
 
 - (id)initWithDictionary:(NSDictionary *)dic;
 

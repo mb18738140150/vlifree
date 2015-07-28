@@ -37,8 +37,8 @@
 @property (nonatomic, strong)UILabel * orderTelLB;
 @property (nonatomic, strong)UILabel * orderAddressLB;
 
-@property (nonatomic, strong)UIButton * confirmBT;
-@property (nonatomic, strong)UIButton * cancelBT;
+//@property (nonatomic, strong)UIButton * confirmBT;
+//@property (nonatomic, strong)UIButton * cancelBT;
 @property (nonatomic, strong)UIButton * paymentBT;
 @property (nonatomic, strong)NSNumber * payType;
 
@@ -53,7 +53,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    
+    self.navigationItem.title = @"订单详情";
 //    UIButton * telButton = [UIButton buttonWithType:UIButtonTypeCustom];
 //    telButton.frame = CGRectMake(0, 0, 30, 30);
 //    [telButton setBackgroundImage:[UIImage imageNamed:@"tel_order_detail_icon.png"] forState:UIControlStateNormal];
@@ -85,7 +85,7 @@
     aLabel.textColor = [UIColor colorWithWhite:0.3 alpha:1];
     aLabel.font = FONT;
     [view1 addSubview:aLabel];
-    
+    /*
     self.cancelBT = [UIButton buttonWithType:UIButtonTypeCustom];
     //    _cancelBT.frame = CGRectMake(view1.width - 200, aLabel.bottom + 10, 80, 25);
     _cancelBT.frame = CGRectMake(view1.width - 100, aLabel.bottom + 10, 80, 25);
@@ -113,6 +113,7 @@
     [_confirmBT addTarget:self action:@selector(confirmOrder:) forControlEvents:UIControlEventTouchUpInside];
     _confirmBT.hidden = YES;
 //    [view1 addSubview:_confirmBT];
+     */
     self.paymentBT = [UIButton buttonWithType:UIButtonTypeCustom];
     _paymentBT.frame = CGRectMake(view1.width - 100, aLabel.bottom + 10, 80, 25);
     [_paymentBT setTitle:@"立即支付" forState:UIControlStateNormal];
@@ -127,7 +128,7 @@
     [view1 addSubview:_paymentBT];
     
     
-    view1.height = _confirmBT.bottom + 10;
+    view1.height = _paymentBT.bottom + 10;
     
     UIView * lineView1 = [[UIView alloc] initWithFrame:CGRectMake(0, view1.height - 1, view1.width, 1)];
     lineView1.backgroundColor = LINE_COLOR;
@@ -418,20 +419,20 @@
             }
             NSNumber * orderState = [data objectForKey:@"OrderState"];
             [self orderState:orderState.intValue];
-            _cancelBT.hidden = YES;
-            _confirmBT.hidden = YES;
+//            _cancelBT.hidden = YES;
+//            _confirmBT.hidden = YES;
             _paymentBT.hidden = YES;
             switch (orderState.intValue) {
                 case 1:
                 {
                     if ([[data objectForKey:@"IsPey"] isEqualToNumber:@YES]) {
                         self.stateLabel.text = @"已支付";
-                        _cancelBT.hidden = NO;
+//                        _cancelBT.hidden = NO;
                     }else
                     {
                         if (_payType.intValue == 3) {
                             self.stateLabel.text = @"餐到付款";
-                            _cancelBT.hidden = NO;
+//                            _cancelBT.hidden = NO;
                         }else
                         {
                             self.stateLabel.text = @"未支付";
@@ -443,13 +444,13 @@
                 case 2:
                 {
                     self.stateLabel.text = @"餐厅已经接单";
-                    _cancelBT.hidden = YES;
+//                    _cancelBT.hidden = YES;
                 }
                     break;
                 case 3:
                 {
                     self.stateLabel.text = @"订单已经在配送";
-                    self.confirmBT.hidden = NO;
+//                    self.confirmBT.hidden = NO;
                 }
                     break;
                 case 4:

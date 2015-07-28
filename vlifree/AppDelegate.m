@@ -32,11 +32,11 @@
 
 - (void)onGetNetworkState:(int)iError
 {
-    NSLog(@"网络错误 = %d", iError);
+//    NSLog(@"网络错误 = %d", iError);
 }
 - (void)onGetPermissionState:(int)iError
 {
-    NSLog(@"授权验证错误 = %d", iError);
+//    NSLog(@"授权验证错误 = %d", iError);
 }
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
@@ -65,7 +65,7 @@
     [APService setupWithOption:launchOptions];
     
     
-    if ([[NSUserDefaults standardUserDefaults] objectForKey:@"haveLogIn"]) {
+    if ([[[NSUserDefaults standardUserDefaults] objectForKey:@"haveLogIn"] isEqualToNumber:@YES]) {
         NSDictionary * dic = @{
                                @"Command":@38,
                                @"LoginType":@1,
@@ -74,20 +74,17 @@
                                };
         [self playPostWithDictionary:dic];
     }
-    
-    
-    
     return YES;
 }
 
 - (void)onReq:(BaseReq *)req
 {
-    NSLog(@"%@", req);
+//    NSLog(@"%@", req);
 }
 
 - (void)onResp:(BaseResp *)resp
 {
-    NSLog(@"---%@", resp);
+//    NSLog(@"---%@", resp);
     if ([resp isKindOfClass:[SendAuthResp class]]) {
         SendAuthResp * sendAR = (SendAuthResp *)resp;
         if (sendAR.errCode == 0) {//0代表已授权登陆
@@ -100,7 +97,7 @@
                 [(DetailsGrogshopViewController *)logInVC getAccessToken:sendAR.code];
             }else if([logInVC isKindOfClass:[DetailTakeOutViewController class]])
             {
-                NSLog(@"外卖登陆");
+//                NSLog(@"外卖登陆");
                 [(DetailTakeOutViewController *)logInVC getAccessToken:sendAR.code];
             }
             /*
@@ -139,13 +136,13 @@
         }
     }else if ([resp isKindOfClass:[PayResp class]])
     {
-        NSLog(@"支付");
+//        NSLog(@"支付");
         PayResp *response = (PayResp *)resp;
         switch (response.errCode) {
             case WXSuccess:
             {
                 //服务器端查询支付通知或查询API返回的结果再提示成功
-                NSLog(@"支付成功");
+//                NSLog(@"支付成功");
                 UINavigationController * nav = (UINavigationController *)self.myTabBarVC.selectedViewController;
                 UIViewController * vc = [nav.viewControllers lastObject];
                 if ([vc isKindOfClass:[TakeOutOrderViewController class]]) {
@@ -172,7 +169,7 @@
                 break;
             default:
             {
-                NSLog(@"支付失败， retcode=%d",resp.errCode);
+//                NSLog(@"支付失败， retcode=%d",resp.errCode);
                 UINavigationController * nav = (UINavigationController *)self.myTabBarVC.selectedViewController;
                 UIViewController * vc = [nav.viewControllers lastObject];
                 if ([vc isKindOfClass:[TakeOutOrderViewController class]]) {
@@ -258,10 +255,10 @@
 }
 
 - (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
-    NSLog(@"%@", [NSString stringWithFormat:@"Device Token: %@", deviceToken]);
+//    NSLog(@"%@", [NSString stringWithFormat:@"Device Token: %@", deviceToken]);
     [APService registerDeviceToken:deviceToken];
     NSString * registrationID = [APService registrationID];
-    NSLog(@"registrID = %@", registrationID);
+//    NSLog(@"registrID = %@", registrationID);
     [[NSUserDefaults standardUserDefaults] setObject:registrationID forKey:@"registrationID"];
     if ([UserInfo shareUserInfo].userId) {
         NSDictionary * dic = @{
@@ -301,7 +298,7 @@
 
 - (void)refresh:(id)data
 {
-    NSLog(@"+++%@", data);
+//    NSLog(@"+++%@", data);
     if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
         if ([[data objectForKey:@"Command"] isEqualToNumber:@10038]) {
             [[UserInfo shareUserInfo] setValuesForKeysWithDictionary:[data objectForKey:@"UserInfo"]];

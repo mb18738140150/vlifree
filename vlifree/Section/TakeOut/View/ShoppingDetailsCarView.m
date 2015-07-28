@@ -37,7 +37,7 @@
 
 @interface ShoppingDetailsCarView ()
 
-@property (nonatomic, strong)UILabel * otherPriceLB;
+//@property (nonatomic, strong)UILabel * otherPriceLB;
 @property (nonatomic, strong)UILabel * priceLabel;
 @property (nonatomic, strong)UILabel * countLabel;
 
@@ -121,15 +121,16 @@
     }
     UIView * otherView = [[UIView alloc] initWithFrame:CGRectMake(0, _priceLabel.top - BOTTOM_SPACE - array.count * MENU_VIEW_HEIGHT - LABEL_HEIGHT - 2 * TOP_SPACE, self.width, LABEL_HEIGHT + TOP_SPACE)];
     otherView.tag = 2000;
+    /*
     self.otherPriceLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, TOP_SPACE, OTHER_LABEL_WIDTH, LABEL_HEIGHT)];
 //    _otherPriceLB.backgroundColor = [UIColor greenColor];
     _otherPriceLB.text = @"餐具费¥2";
     _otherPriceLB.textAlignment = NSTextAlignmentCenter;
     _otherPriceLB.textColor = [UIColor colorWithWhite:0.6 alpha:1];
 //    [otherView addSubview:_otherPriceLB];
-    
+    */
     self.clearCarBT = [UIButton buttonWithType:UIButtonTypeCustom];
-    _clearCarBT.frame = CGRectMake(otherView.width - LEFT_SPACE - CLEAR_BUTTON_WIDTH, _otherPriceLB.top, CLEAR_BUTTON_WIDTH, LABEL_HEIGHT);
+    _clearCarBT.frame = CGRectMake(otherView.width - LEFT_SPACE - CLEAR_BUTTON_WIDTH, TOP_SPACE, CLEAR_BUTTON_WIDTH, LABEL_HEIGHT);
     [_clearCarBT setTitle:@"清空购物车" forState:UIControlStateNormal];
     [_clearCarBT setTitleColor:[UIColor colorWithWhite:0.6 alpha:1] forState:UIControlStateNormal];
 //    [_clearCarBT addTarget:self action:@selector(clearShoppingCar:) forControlEvents:UIControlEventTouchUpInside];
@@ -138,7 +139,8 @@
     
     self.shoppingCarBT = [UIButton buttonWithType:UIButtonTypeCustom];
     _shoppingCarBT.frame = CGRectMake(0, otherView.top - CAR_BUTTON_SIZE, CAR_BUTTON_SIZE, CAR_BUTTON_SIZE);
-    _shoppingCarBT.center = CGPointMake(_otherPriceLB.centerX, _shoppingCarBT.centerY);
+//    _shoppingCarBT.center = CGPointMake(_otherPriceLB.centerX, _shoppingCarBT.centerY);
+    _shoppingCarBT.center = CGPointMake(LEFT_SPACE + OTHER_LABEL_WIDTH / 2, _shoppingCarBT.centerY);
     [_shoppingCarBT setBackgroundImage:[UIImage imageNamed:@"shoppingCar.png"] forState:UIControlStateNormal];
 //    [_shoppingCarBT addTarget:self action:@selector(removeDetailsView:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:_shoppingCarBT];
@@ -147,7 +149,7 @@
     _countLabel.center = CGPointMake(_shoppingCarBT.right, _countLabel.centerY);
     _countLabel.textColor = [UIColor whiteColor];
     _countLabel.layer.backgroundColor = [UIColor redColor].CGColor;
-    _countLabel.text = [NSString stringWithFormat:@"%ld", [self getAllCount]];
+    _countLabel.text = [NSString stringWithFormat:@"%ld", (long)[self getAllCount]];
     _countLabel.font = [UIFont systemFontOfSize:14];
     _countLabel.textAlignment = NSTextAlignmentCenter;
     _countLabel.layer.cornerRadius = COUNT_LABEL_SIZE / 2;
@@ -164,9 +166,15 @@
     menu.count += 1;
     [smallAry addObject:menu];
     ShoppingMenuView * menuView = (ShoppingMenuView *)button.superview;
-    menuView.countLabel.text = [NSString stringWithFormat:@"%ld", smallAry.count];
-    self.priceLabel.text = [NSString stringWithFormat:@"¥%g(%@起送)", [self getAllPrice], self.sendPrice];
-    self.countLabel.text = [NSString stringWithFormat:@"¥%ld", [self getAllCount]];
+    menuView.countLabel.text = [NSString stringWithFormat:@"%lu", (unsigned long)smallAry.count];
+    if (self.sendPrice != nil) {
+       self.priceLabel.text = [NSString stringWithFormat:@"¥%g(%@起送)", [self getAllPrice], self.sendPrice];
+    }else
+    {
+        self.priceLabel.text = [NSString stringWithFormat:@"¥%g", [self getAllPrice]];
+    }
+    
+    self.countLabel.text = [NSString stringWithFormat:@"¥%ld", (long)[self getAllCount]];
 }
 
 - (void)subtractMenu:(UIButton *)button
@@ -176,9 +184,14 @@
     menuMD.count -= 1;
     [smallAry removeLastObject];
     ShoppingMenuView * menuView = (ShoppingMenuView *)button.superview;
-    menuView.countLabel.text = [NSString stringWithFormat:@"%ld", smallAry.count];
-    self.priceLabel.text = [NSString stringWithFormat:@"¥%g(%@起送)", [self getAllPrice], self.sendPrice];
-    self.countLabel.text = [NSString stringWithFormat:@"¥%ld", [self getAllCount]];
+    menuView.countLabel.text = [NSString stringWithFormat:@"%lu", (unsigned long)smallAry.count];
+    if (self.sendPrice != nil) {
+        self.priceLabel.text = [NSString stringWithFormat:@"¥%g(%@起送)", [self getAllPrice], self.sendPrice];
+    }else
+    {
+        self.priceLabel.text = [NSString stringWithFormat:@"¥%g", [self getAllPrice]];
+    }
+    self.countLabel.text = [NSString stringWithFormat:@"¥%ld", (long)[self getAllCount]];
     if (smallAry.count == 0) {
         UIView * view = [self viewWithTag:1000];
         view.height = view.height - MENU_VIEW_HEIGHT;
@@ -238,7 +251,12 @@
 - (void)setSendPrice:(NSNumber *)sendPrice
 {
     _sendPrice = sendPrice;
-    self.priceLabel.text = [NSString stringWithFormat:@"¥%g(%@起送)", [self getAllPrice], sendPrice];
+    if (sendPrice != nil) {
+        self.priceLabel.text = [NSString stringWithFormat:@"¥%g(%@起送)", [self getAllPrice], self.sendPrice];
+    }else
+    {
+        self.priceLabel.text = [NSString stringWithFormat:@"¥%g", [self getAllPrice]];
+    }
 }
 
 //- (void)setMealBoxMoney:(NSNumber *)mealBoxMoney

@@ -57,7 +57,8 @@
     _homeTableView.delegate = self;
     [self.homeTableView registerClass:[HomeViewCell class] forCellReuseIdentifier:CELL_INDENTIFIER];
     
-    [self.homeTableView addHeaderWithTarget:self action:@selector(headerRereshing)];
+    self.homeTableView.header = [MJRefreshNormalHeader headerWithRefreshingTarget:self refreshingAction:@selector(headerRereshing)];
+
     [self.view addSubview:_homeTableView];
     
     HomeHeaderView * homeHeaderView = [[HomeHeaderView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, 120)];
@@ -122,6 +123,7 @@
     [_locService startUserLocationService];
     self.geoSearcher =[[BMKGeoCodeSearch alloc]init];
     _geoSearcher.delegate = self;
+    [self performSelector:@selector(isLocationsuccess) withObject:nil afterDelay:2];
     /*
     self.locationManager = [[CLLocationManager alloc] init];
     self.locationManager.delegate = self;
@@ -150,12 +152,17 @@
 
 - (void)isLocationsuccess
 {
-    if (![UserLocation shareUserLocation].city) {
-//        [SVProgressHUD dismiss];
+    if ([CLLocationManager authorizationStatus] == kCLAuthorizationStatusDenied || [CLLocationManager authorizationStatus] == kCLAuthorizationStatusRestricted) {
         UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:@"本应用需要打开定位才能请求数据" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
         [alert show];
         [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:1.5];
     }
+//    if (![UserLocation shareUserLocation].city) {
+////        [SVProgressHUD dismiss];
+//        UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:@"本应用需要打开定位才能请求数据" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
+//        [alert show];
+//        [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:1.5];
+//    }
 }
 
 - (void)headerRereshing
@@ -165,6 +172,7 @@
         [self downloadDataWithCommand:@1 page:_page count:DATA_COUNT];
     }else
     {
+        [self.locService stopUserLocationService];
         [self.locService startUserLocationService];
     }
 }
@@ -181,8 +189,8 @@
     UIView * aView = [self.view viewWithTag:10009];
     if ([UserInfo shareUserInfo].userId) {
         self.homeTableView.scrollEnabled = YES;
-//        [self.homeTableView headerEndRefreshing];
-        [self.homeTableView headerBeginRefreshing];
+//        [self.homeTableView.header beginRefreshing];
+        [self downloadDataWithCommand:@1 page:_page count:DATA_COUNT];
         aView.hidden = YES;
     }else
     {
@@ -256,15 +264,17 @@
     if ([UserInfo shareUserInfo].userId) {
         self.homeTableView.scrollEnabled = YES;
         aView.hidden = YES;
-        NSDictionary * jsonDic = @{
-                                   @"Command":command,
-                                   //                               @"CurPage":[NSNumber numberWithInt:page],
-                                   //                               @"CurCount":[NSNumber numberWithInt:count],
-                                   @"Lat":[NSNumber numberWithDouble:[UserLocation shareUserLocation].userLocation.latitude],
-                                   @"Lon":[NSNumber numberWithDouble:[UserLocation shareUserLocation].userLocation.longitude],
-                                   @"UserId":[UserInfo shareUserInfo].userId
-                                   };
-        [self playPostWithDictionary:jsonDic];
+        if ([UserLocation shareUserLocation].city) {
+            NSDictionary * jsonDic = @{
+                                       @"Command":command,
+                                       //                               @"CurPage":[NSNumber numberWithInt:page],
+                                       //                               @"CurCount":[NSNumber numberWithInt:count],
+                                       @"Lat":[NSNumber numberWithDouble:[UserLocation shareUserLocation].userLocation.latitude],
+                                       @"Lon":[NSNumber numberWithDouble:[UserLocation shareUserLocation].userLocation.longitude],
+                                       @"UserId":[UserInfo shareUserInfo].userId
+                                       };
+            [self playPostWithDictionary:jsonDic];
+        }
     }else
     {
         self.homeTableView.scrollEnabled = NO;
@@ -330,13 +340,13 @@
         [alert show];
         [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:1.5];
     }
-    [self.homeTableView headerEndRefreshing];
+    [self.homeTableView.header endRefreshing];
 //    [SVProgressHUD dismiss];
 }
 
 - (void)failWithError:(NSError *)error
 {
-    [self.homeTableView headerEndRefreshing];
+    [self.homeTableView.header endRefreshing];
     NSLog(@"%@", error);
 }
 
@@ -365,13 +375,14 @@
         {
             NSLog(@"反geo检索发送失败");
         }
+        [self.locService stopUserLocationService];
     }
-    
 }
 
 - (void)didFailToLocateUserWithError:(NSError *)error
 {
     NSLog(@"定位失败 error = %@", error);
+    [self.locService stopUserLocationService];
     [self.locService startUserLocationService];
 }
 
@@ -467,7 +478,10 @@
     if ([collectMD.businessType isEqualToNumber:@2]) {
         DetailTakeOutViewController * detaiTOVC = [[DetailTakeOutViewController alloc] init];
         detaiTOVC.takeOutID = collectMD.businessId;
+        detaiTOVC.sendPrice = collectMD.sendPrice;
+        detaiTOVC.storeState = collectMD.storeState;
         detaiTOVC.hidesBottomBarWhenPushed = YES;
+        detaiTOVC.navigationItem.title = collectMD.businessName;
         [self.navigationController pushViewController:detaiTOVC animated:YES];
     }else
     {
@@ -477,6 +491,7 @@
         detailsGSVC.lat = collectMD.businessLat;
         detailsGSVC.lon = collectMD.businessLon;
         detailsGSVC.icon = collectMD.icon;
+        detailsGSVC.navigationItem.title = collectMD.businessName;
         [self.navigationController pushViewController:detailsGSVC animated:YES];
     }
     

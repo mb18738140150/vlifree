@@ -96,7 +96,7 @@
         weixinLB.text = @"微信登陆";
         weixinLB.font = [UIFont systemFontOfSize:14];
         self.weixinButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        _weixinButton.frame = CGRectMake(LEFT_SPACE, TOP_SPACE + _registerButton.bottom, WEIXIN_BUTTON_WIDTH, WEIXIN_BUTTON_HEIGHT);
+        _weixinButton.frame = CGRectMake(LEFT_SPACE, 10 + _registerButton.bottom, WEIXIN_BUTTON_WIDTH, WEIXIN_BUTTON_HEIGHT);
         _weixinButton.center = CGPointMake(self.centerX, _weixinButton.centerY);
 //        _weixinButton.backgroundColor = MAIN_COLOR;
         [_weixinButton addSubview:weixinLB];

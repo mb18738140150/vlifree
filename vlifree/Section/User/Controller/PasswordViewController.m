@@ -30,13 +30,14 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
     self.view.backgroundColor = [UIColor whiteColor];
 //    self.navigationController.navigationBar.translucent = NO;
     self.navigationController.navigationBar.titleTextAttributes = @{
                                                                     NSForegroundColorAttributeName: [UIColor whiteColor],
                                                                     NSFontAttributeName : [UIFont boldSystemFontOfSize:18]
                                                                     };
-    self.title = @"修改密码";
+    self.navigationItem.title = @"修改密码";
     UIView * oldView = [[UIView alloc] initWithFrame:CGRectMake(LEFT_SPACE, TOP_SPACE + self.navigationController.navigationBar.bottom, self.view.width - 2 * LEFT_SPACE, VIEW_HEIGHT)];
     oldView.layer.borderColor = [UIColor colorWithWhite:0.7 alpha:0.7].CGColor;
     oldView.layer.borderWidth = 1;

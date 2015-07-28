@@ -22,6 +22,8 @@
 #include <net/if.h>
 #include <net/if_dl.h>
 
+#import "CreateCommentViewController.h"
+
 @interface DetailsTOOrderViewController ()<HTTPPostDelegate, BDWalletSDKMainManagerDelegate>
 
 {
@@ -43,6 +45,8 @@
 @property (nonatomic, strong)UIButton * confirmBT;
 @property (nonatomic, strong)UIButton * cancelBT;
 @property (nonatomic, strong)UIButton * paymentBT;
+@property (nonatomic, strong)UIButton * commentBT;
+
 @property (nonatomic, strong)NSNumber * payType;
 @property (nonatomic, strong)OrderDetailsMD * orderDetailsMD;
 
@@ -67,7 +71,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    
+    self.navigationItem.title = @"订单详情";
     UIButton * telButton = [UIButton buttonWithType:UIButtonTypeCustom];
     telButton.frame = CGRectMake(0, 0, 30, 30);
     [telButton setBackgroundImage:[UIImage imageNamed:@"tel_order_detail_icon.png"] forState:UIControlStateNormal];
@@ -328,7 +332,7 @@
         
         top = lineView8.bottom + 5;
     }
-    NSLog(@"top = %g", top);
+//    NSLog(@"top = %g", top);
     
     UILabel * totalLB = [[UILabel alloc] initWithFrame:CGRectMake(15, top, 100, 25)];
     totalLB.text = @"合计";
@@ -344,6 +348,18 @@
     UIView * lineView9 = [[UIView alloc] initWithFrame:CGRectMake(10, totalLB.bottom, view4.width - 20, 1)];
     lineView9.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
     [view4 addSubview:lineView9];
+    
+    self.commentBT = [UIButton buttonWithType:UIButtonTypeCustom];
+    _commentBT.frame = CGRectMake(20, lineView9.bottom + 5, 60, 25);
+    [_commentBT setTitle:@"评论" forState:UIControlStateNormal];
+    [_commentBT setTitleColor:MAIN_COLOR forState:UIControlStateNormal];
+    _commentBT.titleLabel.font = [UIFont systemFontOfSize:14];
+    _commentBT.layer.borderColor = [UIColor orangeColor].CGColor;
+    _commentBT.layer.borderWidth = 1;
+    _commentBT.layer.cornerRadius = 5;
+    _commentBT.hidden = YES;
+    [_commentBT addTarget:self action:@selector(commentAction:) forControlEvents:UIControlEventTouchUpInside];
+    [view4 addSubview:_commentBT];
     
     UIButton * againBT = [UIButton buttonWithType:UIButtonTypeCustom];
     againBT.frame = CGRectMake(view4.width - 100, lineView9.bottom + 5, 80, 25);
@@ -464,7 +480,7 @@
      */
     self.orderTelLB.text = [NSString stringWithFormat:@"手机号码:%@", _takeOutOrderMD.nextphone];
     self.orderAddressLB.text = [NSString stringWithFormat:@"收餐地址:%@", _takeOutOrderMD.address];
-    [self downloadData];
+    
     
     
     UIButton * backBT = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -479,6 +495,14 @@
 - (void)backLastVC:(id)sender
 {
     [self.navigationController popViewControllerAnimated:YES];
+}
+
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    self.navigationController.navigationBar.barTintColor = [UIColor whiteColor];
+    [self downloadData];
 }
 
 - (void)againOrdor:(UIButton *)button
@@ -505,6 +529,19 @@
 //    [[UIApplication sharedApplication] openURL:telURL];
     [callWebView loadRequest:[NSURLRequest requestWithURL:telURL]];
     [self.view addSubview:callWebView];
+}
+
+
+- (void)commentAction:(UIButton *)button
+{
+    self.commentBT.hidden = YES;
+    CreateCommentViewController * commentVC = [[CreateCommentViewController alloc] init];
+    commentVC.icon = self.takeOutOrderMD.storeIcon;
+    commentVC.storeName = self.orderDetailsMD.storeName;
+//    commentVC.decribe = self.orderDetailsMD.sto
+    commentVC.storeId = self.orderDetailsMD.storeId;
+    commentVC.orderId = self.takeOutOrderMD.orderID;
+    [self.navigationController pushViewController:commentVC animated:YES];
 }
 
 /*
@@ -592,6 +629,7 @@
 - (void)refresh:(id)data
 {
     NSLog(@"+++%@", data);
+    [self.hud dismiss];
     if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
         if ([[data objectForKey:@"Command"] isEqualToNumber:@10024]) {
             self.orderDetailsMD = [[OrderDetailsMD alloc] initWithDictionary:data];
@@ -646,6 +684,7 @@
             _cancelBT.hidden = YES;
             _confirmBT.hidden = YES;
             _paymentBT.hidden = YES;
+            _commentBT.hidden = YES;
             switch (orderState.intValue) {
                 case 1:
                 {
@@ -695,6 +734,9 @@
                 case 7:
                 {
                     self.stateLabel.text = @"订单已完成";
+                    if ([self.orderDetailsMD.isComment isEqualToNumber:@2]) {
+                        _commentBT.hidden = NO;
+                    }
                 }
                     break;
                     
@@ -725,7 +767,6 @@
             [self.hud dismiss];
             self.hud = nil;
         }
-        
     }
 }
 - (void)failWithError:(NSError *)error

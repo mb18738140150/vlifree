@@ -39,6 +39,10 @@
 
 #define LINE_COLOR [UIColor colorWithWhite:0.9 alpha:0.7]
 
+#define WINDOW_WIDHT [UIScreen mainScreen].bounds.size.width
+
+
+
 #pragma mark -- 系统和设备区分
 #define ios7 ([[UIDevice currentDevice].systemVersion doubleValue] >= 7.0)
 #define ios8 ([[UIDevice currentDevice].systemVersion doubleValue] >= 8.0)

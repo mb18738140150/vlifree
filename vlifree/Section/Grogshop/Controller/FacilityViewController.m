@@ -7,8 +7,7 @@
 //
 
 #import "FacilityViewController.h"
-#import "HTMLNode.h"
-#import "HTMLParser.h"
+
 
 #define IMAGE_SIZE 40
 #define LABEL_HEIGHT 20
@@ -38,6 +37,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    self.navigationItem.title = @"设施详情";
 //    self.navigationController.navigationBar.translucent = YES;
 //    self.view.backgroundColor = [UIColor colorWithRed:237 / 255.0 green:237 / 255.0 blue:237 / 255.0 alpha:1];
     UIScrollView * scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, -self.navigationController.navigationBar.bottom, self.view.width, self.view.height + self.navigationController.navigationBar.bottom)];

@@ -21,7 +21,8 @@
 @property (nonatomic, strong)NSNumber * sold;
 @property (nonatomic, copy)NSString * businessLat;
 @property (nonatomic, copy)NSString * businessLon;
-
+@property (nonatomic, strong)NSNumber * storeState;
+@property (nonatomic, strong)NSNumber * sendPrice;
 
 
 - (id)initWithDictionary:(NSDictionary *)dic;

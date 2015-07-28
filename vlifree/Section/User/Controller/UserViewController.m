@@ -48,10 +48,7 @@
     [super viewDidLoad];
     self.title = @"登陆";
 //    self.navigationController.navigationBar.translucent = NO;
-    self.navigationController.navigationBar.titleTextAttributes = @{
-                                                                    NSForegroundColorAttributeName: [UIColor whiteColor],
-                                                                    NSFontAttributeName : [UIFont boldSystemFontOfSize:17]
-                                                                    };
+    
     self.navigationController.navigationBar.tintColor = [UIColor whiteColor];
     self.logInView = [[LogInView alloc] initWithFrame:CGRectMake(0, self.navigationController.navigationBar.bottom, self.view.width, self.view.height - self.navigationController.navigationBar.bottom)];
 //    _logInView.backgroundColor = [UIColor grayColor];
@@ -91,6 +88,10 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
+    self.navigationController.navigationBar.titleTextAttributes = @{
+                                                                    NSForegroundColorAttributeName: [UIColor whiteColor],
+                                                                    NSFontAttributeName : [UIFont boldSystemFontOfSize:17]
+                                                                    };
     self.navigationController.navigationBar.barTintColor = MAIN_COLOR;
     if ([UserInfo shareUserInfo].userId) {
 //        [self removeLogInView];
@@ -101,7 +102,9 @@
         self.navigationController.tabBarItem.title = @"我的";
         [_logInView textFiledResignFirstResponder];
     }
-
+    if (![WXApi isWXAppInstalled]) {
+        _logInView.weixinButton.hidden = YES;
+    }
 }
 
 - (void)userLogInAction:(UIButton *)button
@@ -161,7 +164,7 @@
             if (yzData) {
                 NSDictionary * yzDic = [NSJSONSerialization JSONObjectWithData:yzData options:0 error:nil];
                 if ([[yzDic objectForKey:@"errcode"] isEqual:@0]) {
-                    NSString * infoURLSTR = [NSString stringWithFormat:@"https://api.weixin.qq.com/sns/userinfo?access_token=%@&openid=%@", [dic objectForKey:@"access_token"], [dic objectForKey:@"openid"]];
+                    NSString * infoURLSTR = [NSString stringWithFormat:@"https://api.weixin.qq.com/sns/userinfo?access_token=%@&openid=%@&lang=zh_CN", [dic objectForKey:@"access_token"], [dic objectForKey:@"openid"]];
                     NSURLRequest * infoRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:infoURLSTR]];
                     NSData * infoData = [NSURLConnection sendSynchronousRequest:infoRequest returningResponse:nil error:nil];
                     if (infoData) {
@@ -213,7 +216,7 @@
 
 - (void)registerUser:(UIButton *)button
 {
-    UIAlertView * alert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"请使用微信登陆注册" delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
+    UIAlertView * alert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"请使用微信注册" delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
     [alert show];
     /*
     RegisterViewController * registerVC = [[RegisterViewController alloc] init];
@@ -230,23 +233,26 @@
 
 - (void)weixinLogIn:(UIButton *)button//微信登陆
 {
-    NSLog(@"微信登陆");
-    if ([[NSUserDefaults standardUserDefaults] objectForKey:@"refresh_token"]) {
-        if ([self compareDate]) {
-            [self avoidweixinAuthorizeLogIn];
-        }else
-        {
+//    NSLog(@"微信登陆");
+//    if ([[NSUserDefaults standardUserDefaults] objectForKey:@"refresh_token"]) {
+//        if ([self compareDate]) {
+//            [self avoidweixinAuthorizeLogIn];
+//        }else
+//        {
             [self weixinAuthorizeLogIn];
-        }
-    }else
-    {
-        [self weixinAuthorizeLogIn];
-    }
+//        }
+//    }else
+//    {
+//        [self weixinAuthorizeLogIn];
+//    }
 }
 
 - (void)exitLogInAciton:(UIButton *)button
 {
     _logInView.hidden = NO;
+    if (![WXApi isWXAppInstalled]) {
+        _logInView.weixinButton.hidden = YES;
+    }
     _userTableView.hidden = YES;
     [UIView beginAnimations:nil context:nil];
     [UIView setAnimationDuration:1];
@@ -387,10 +393,27 @@
     return [UserViewCell cellHeight];
 }
 
-
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (indexPath.row == 3) {
+        NSLog(@"外卖订单");
+        UserTOOrderViewController * TOOrderVC = [[UserTOOrderViewController alloc] init];
+        TOOrderVC.hidesBottomBarWhenPushed = YES;
+        [self.navigationController pushViewController:TOOrderVC animated:YES];
+    }else if (indexPath.row == 4)
+    {
+        NSLog(@"酒店订单");
+        GSOrderViewController * gsOrderVC = [[GSOrderViewController alloc] init];
+        gsOrderVC.hidesBottomBarWhenPushed = YES;
+        [self.navigationController pushViewController:gsOrderVC animated:YES];
+    }
+}
 
 - (BOOL)tableView:(UITableView *)tableView shouldHighlightRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    if (indexPath.row == 3 | indexPath.row == 4) {
+        return YES;
+    }
     return NO;
 }
 
@@ -431,18 +454,18 @@
             break;
         case MODIFY_BUTTON_TAG + 3:
         {
-             NSLog(@"外卖订单");
-            UserTOOrderViewController * TOOrderVC = [[UserTOOrderViewController alloc] init];
-            TOOrderVC.hidesBottomBarWhenPushed = YES;
-            [self.navigationController pushViewController:TOOrderVC animated:YES];
+//             NSLog(@"外卖订单");
+//            UserTOOrderViewController * TOOrderVC = [[UserTOOrderViewController alloc] init];
+//            TOOrderVC.hidesBottomBarWhenPushed = YES;
+//            [self.navigationController pushViewController:TOOrderVC animated:YES];
         }
             break;
         case MODIFY_BUTTON_TAG + 4:
         {
-             NSLog(@"酒店订单");
-            GSOrderViewController * gsOrderVC = [[GSOrderViewController alloc] init];
-            gsOrderVC.hidesBottomBarWhenPushed = YES;
-            [self.navigationController pushViewController:gsOrderVC animated:YES];
+//             NSLog(@"酒店订单");
+//            GSOrderViewController * gsOrderVC = [[GSOrderViewController alloc] init];
+//            gsOrderVC.hidesBottomBarWhenPushed = YES;
+//            [self.navigationController pushViewController:gsOrderVC animated:YES];
         }
             break;
         default:

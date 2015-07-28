@@ -8,12 +8,11 @@
 
 #import "SearchViewController.h"
 #import "ResultViewController.h"
-#import "ZWYPopKeyWordsView.h"
 #import "TakeOutViewCell.h"
 #import "TakeOutModel.h"
 #import "DetailTakeOutViewController.h"
 
-@interface SearchViewController ()<UISearchBarDelegate, UISearchResultsUpdating, ZWYSearchShowViewDelegate, HTTPPostDelegate>
+@interface SearchViewController ()<UISearchBarDelegate, UISearchResultsUpdating, HTTPPostDelegate>
 
 {
     int _page;
@@ -79,11 +78,6 @@
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:backBT];
     
     
-//    ZWYPopKeyWordsView * zwyPopKWV = [[ZWYPopKeyWordsView alloc] initWithFrame:CGRectMake(0, 150, self.view.width, 300)];
-//    zwyPopKWV.keyWordArray = [NSMutableArray arrayWithArray:@[@"445", @"yyy"]];
-//    zwyPopKWV.delegate = self;
-//    [self.view addSubview:zwyPopKWV];
-//    [zwyPopKWV changeSearchKeyWord];
     // Do any additional setup after loading the view.
 }
 
@@ -175,16 +169,19 @@
 - (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar
 {
     if (searchBar.text.length) {
-        _page = 1;
-        NSDictionary * jsonDic = @{
-                                   @"Command":@19,
-                                   @"KeyWord":searchBar.text,
-                                   @"CurPage":@1,
-                                   @"CurCount":[NSNumber numberWithInt:COUNT],
-                                   @"City":[UserLocation shareUserLocation].city
-                                   };
-        [self playPostWithDictionary:jsonDic];
-        searchBar.text = nil;
+        if ([UserLocation shareUserLocation].city) {
+            _page = 1;
+            NSDictionary * jsonDic = @{
+                                       @"Command":@19,
+                                       @"KeyWord":searchBar.text,
+                                       @"CurPage":@1,
+                                       @"CurCount":[NSNumber numberWithInt:COUNT],
+                                       @"City":[UserLocation shareUserLocation].city
+                                       };
+            [self playPostWithDictionary:jsonDic];
+            searchBar.text = nil;
+
+        }
     }
     self.searchVC.active = NO;
 }

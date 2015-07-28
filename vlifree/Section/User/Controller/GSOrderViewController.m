@@ -36,14 +36,19 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
+    self.navigationItem.title = @"酒店订单";
+    self.navigationController.navigationBar.titleTextAttributes = @{
+                                                                    NSForegroundColorAttributeName: TEXT_COLOR,
+                                                                    NSFontAttributeName : [UIFont boldSystemFontOfSize:17]
+                                                                    };
     [self.tableView registerClass:[GSOrderViewCell class] forCellReuseIdentifier:@"cell"];
     _page = 1;
     [self downloadDataWithCommand:@25 page:_page count:COUNT];
 //    [SVProgressHUD showWithStatus:@"加载中..." maskType:SVProgressHUDMaskTypeClear];
-    [self.tableView addHeaderWithTarget:self action:@selector(headerRereshing)];
-    [self.tableView addFooterWithTarget:self action:@selector(footerRereshing)];
-    
+//    [self.tableView addHeaderWithTarget:self action:@selector(headerRereshing)];
+//    [self.tableView addFooterWithTarget:self action:@selector(footerRereshing)];
+    self.tableView.header = [MJRefreshNormalHeader headerWithRefreshingTarget:self refreshingAction:@selector(headerRereshing)];
+    self.tableView.footer = [MJRefreshAutoNormalFooter footerWithRefreshingTarget:self refreshingAction:@selector(footerRereshing)];
     UIButton * backBT = [UIButton buttonWithType:UIButtonTypeCustom];
     backBT.frame = CGRectMake(0, 0, 15, 20);
     [backBT setBackgroundImage:[UIImage imageNamed:@"back_r.png"] forState:UIControlStateNormal];
@@ -76,7 +81,7 @@
 - (void)viewWillDisappear:(BOOL)animated
 {
     [super viewWillDisappear:animated];
-    [self.tableView headerEndRefreshing];
+    [self.tableView.header endRefreshing];
 }
 
 #pragma mark - 数据刷新,加载更多
@@ -84,20 +89,13 @@
 - (void)headerRereshing
 {
     _page = 1;
+    [self.tableView.footer resetNoMoreData];
     [self downloadDataWithCommand:@25 page:_page count:COUNT];
 }
 
 - (void)footerRereshing
 {
-    if (self.dataArray.count < [_allCount integerValue]) {
-        self.tableView.footerRefreshingText = @"正在加载数据";
-        [self downloadDataWithCommand:@25 page:++_page count:COUNT];
-    }else
-    {
-        self.tableView.footerRefreshingText = @"数据已经加载完";
-        [self.tableView performSelector:@selector(footerEndRefreshing) withObject:nil afterDelay:1.5];
-    }
-    
+    [self downloadDataWithCommand:@25 page:++_page count:COUNT];
 }
 
 #pragma mark - 数据请求
@@ -140,6 +138,8 @@
 - (void)refresh:(id)data
 {
     NSLog(@"+++%@", data);
+    [self.tableView.header endRefreshing];
+    [self.tableView.footer endRefreshing];
     if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
         NSLog(@"%@", [data objectForKey:@"ErrorMsg"]);
         self.allCount = [data objectForKey:@"AllCount"];
@@ -154,17 +154,21 @@
             [self.dataArray addObject:grogshopMD];
         }
         [self.tableView reloadData];
-        NSLog(@"%d", _dataArray.count);
+        if (self.dataArray.count < [_allCount integerValue])
+        {
+            [self.tableView.footer resetNoMoreData];
+        }else
+        {
+            [self.tableView.footer noticeNoMoreData];
+        }
+//        NSLog(@"%lu", (unsigned long)_dataArray.count);
     }
-    [self.tableView headerEndRefreshing];
-    [self.tableView footerEndRefreshing];
-//    [SVProgressHUD dismiss];
 }
 
 - (void)failWithError:(NSError *)error
 {
-    [self.tableView headerEndRefreshing];
-    [self.tableView footerEndRefreshing];
+    [self.tableView.header endRefreshing];
+    [self.tableView.footer endRefreshing];
 //    [SVProgressHUD dismiss];
     NSLog(@"%@", error);
 }
