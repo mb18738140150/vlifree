@@ -84,7 +84,7 @@
     [_headerView.addressView.button addTarget:self action:@selector(lookOverMapk:) forControlEvents:UIControlEventTouchUpInside];
     [_headerView.phoneView.button addTarget:self action:@selector(callNumberWithPhone:) forControlEvents:UIControlEventTouchUpInside];
     [_headerView.detailsBT addTarget:self action:@selector(lookFacility:) forControlEvents:UIControlEventTouchUpInside];
-    DetailsGrogshopViewController * detailsVC = self;
+    __weak DetailsGrogshopViewController * detailsVC = self;
     [_headerView.hotelImage setImageWithURL:[NSURL URLWithString:self.icon] completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType) {
         if (error) {
             detailsVC.headerView.hotelImage.image = [UIImage imageNamed:@"load_fail.png"];
@@ -185,7 +185,7 @@
 
 - (void)reserveGSRoom:(UIButton *)button
 {
-    NSLog(@"预定%ld", button.tag - BUTTON_TAG);
+//    NSLog(@"预定%ld", button.tag - BUTTON_TAG);
     if ([UserInfo shareUserInfo].userId) {
         RoomModel * roomMD = [self.dataArray objectAtIndex:button.tag - BUTTON_TAG];
         GSOrderPayViewController * gsOrderPayVC = [[GSOrderPayViewController alloc] init];
