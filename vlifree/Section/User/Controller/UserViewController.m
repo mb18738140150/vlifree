@@ -420,7 +420,7 @@
 
 - (void)modifyAction:(UIButton *)button
 {
-    UserViewController * userVC = self;
+    __weak UserViewController * userVC = self;
     switch (button.tag) {
         case MODIFY_BUTTON_TAG:
         {

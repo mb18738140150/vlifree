@@ -25,9 +25,22 @@
 @interface PhoneViewController ()<HTTPPostDelegate>
 
 @property (nonatomic, copy)RefreshUserInfo refreshBlock;
+/**
+ *  手机号输入框
+ */
 @property (nonatomic, strong)UITextField * phoneTF;
+/**
+ *  验证码输入框
+ */
+@property (nonatomic, strong)UITextField * verifyTF;
+/**
+ *  获取验证码按钮
+ */
+@property (nonatomic, strong)UIButton * getCodeBT;
 
-@property (nonatomic, copy)NSString * phone;
+@property (nonatomic, strong)NSTimer * timer;
+
+//@property (nonatomic, copy)NSString * phone;
 @end
 
 @implementation PhoneViewController
@@ -63,6 +76,21 @@
     
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"确定" style:UIBarButtonItemStylePlain target:self action:@selector(determineModifyPhoneNum:)];
     
+    self.verifyTF = [[UITextField alloc] initWithFrame:CGRectMake(phoneLB.left + phoneView.left, phoneView.bottom + 20, 140, 30)];
+    _verifyTF.placeholder = @"请输入验证码";
+    _verifyTF.textColor = TEXT_COLOR;
+    _verifyTF.borderStyle = UITextBorderStyleRoundedRect;
+    _verifyTF.enabled = NO;
+    [self.view addSubview:_verifyTF];
+    
+    self.getCodeBT = [UIButton buttonWithType:UIButtonTypeCustom];
+    _getCodeBT.frame = CGRectMake(_verifyTF.right + 10, _verifyTF.top, 100, _verifyTF.height);
+    [_getCodeBT setTitle:@"获取验证码" forState:UIControlStateNormal];
+    _getCodeBT.backgroundColor = MAIN_COLOR;
+    _getCodeBT.layer.cornerRadius = 3;
+    [_getCodeBT addTarget:self action:@selector(getVerificationCode:) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:_getCodeBT];
+    
     
     UIButton * backBT = [UIButton buttonWithType:UIButtonTypeCustom];
     backBT.frame = CGRectMake(0, 0, 15, 20);
@@ -78,7 +106,48 @@
     [self.navigationController popViewControllerAnimated:YES];
 }
 
+static int t = 60;
+/**
+ *  点击获取验证码后, 每秒走一次的方法
+ */
+- (void)getVerificattionCodeTime
+{
+    NSLog(@"timer");
+    t--;
+    [self.getCodeBT setTitle:[NSString stringWithFormat:@"%d", t] forState:UIControlStateDisabled];
+}
 
+/**
+ *  获取验证码
+ *
+ *  @param button 获取验证码按钮
+ */
+- (void)getVerificationCode:(UIButton *)button
+{
+    NSLog(@"1111");
+    self.verifyTF.enabled = YES;
+    button.enabled = NO;
+    button.backgroundColor = [UIColor colorWithWhite:0.8 alpha:1];
+    t = 60;
+    self.timer = nil;
+    self.timer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(getVerificattionCodeTime) userInfo:nil repeats:YES];
+    [self performSelector:@selector(passSixtySeconds) withObject:nil afterDelay:60];
+}
+
+- (void)passSixtySeconds
+{
+    [_timer invalidate];
+    self.timer = nil;
+    self.getCodeBT.enabled = YES;
+    self.getCodeBT.backgroundColor = MAIN_COLOR;
+    [_getCodeBT setTitle:@"重新获取" forState:UIControlStateNormal];
+}
+
+/**
+ *  确定修改手机号方法
+ *
+ *  @param barBT 确定按钮
+ */
 - (void)determineModifyPhoneNum:(UIBarButtonItem *)barBT
 {
     [self.phoneTF resignFirstResponder];
@@ -94,7 +163,7 @@
     }else{
         BOOL isPhoneNum = [NSString isTelPhoneNub:_phoneTF.text];
         if (isPhoneNum) {
-            _phone = self.phoneTF.text;
+//            _phone = self.phoneTF.text;
             [self downloadData];
         }
     }
@@ -168,6 +237,12 @@
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+
+- (void)dealloc
+{
+    NSLog(@"销毁手机修改页面");
 }
 
 /*
