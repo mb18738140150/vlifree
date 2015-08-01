@@ -1,17 +1,16 @@
 //
-//  CycleScrollView.h
-//  PagedScrollView
+//  AutoSlideScrollView.h
+//  AutoSlideScrollViewDemo
 //
-//  Created by 陈政 on 14-1-23.
-//  Copyright (c) 2014年 Apple Inc. All rights reserved.
+//  Created by Mike Chen on 14-1-23.
+//  Copyright (c) 2014年 __MyCompanyName__. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
-@class HomeScrollView;
-@interface CycleScrollView : UIView
+
+@interface AutoSlideScrollView : UIView
 
 @property (nonatomic , readonly) UIScrollView *scrollView;
-@property (nonatomic, retain)   UIPageControl * page;
 /**
  *  初始化
  *
@@ -20,19 +19,21 @@
  *
  *  @return instance
  */
+- (id)initWithFrame:(CGRect)frame animationDuration:(NSTimeInterval)animationDuration;
 
-- (id)initWithFrame:(CGRect)frame array:(NSMutableArray *)array animationDuration:(NSTimeInterval)animationDuration;
 /**
- 数据源：获取总的page个数
+ 数据源：获取总的page个数，如果少于2个，不自动滚动
  **/
 @property (nonatomic , copy) NSInteger (^totalPagesCount)(void);
+
 /**
  数据源：获取第pageIndex个位置的contentView
  **/
 @property (nonatomic , copy) UIView *(^fetchContentViewAtIndex)(NSInteger pageIndex);
+
 /**
  当点击的时候，执行的block
  **/
 @property (nonatomic , copy) void (^TapActionBlock)(NSInteger pageIndex);
-@property (nonatomic, retain)HomeScrollView * labelView;
+
 @end

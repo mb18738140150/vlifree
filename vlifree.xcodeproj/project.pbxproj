@@ -64,8 +64,6 @@
 		73461EA81B0D6E290089352E /* ModifyNameViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 73461EA71B0D6E290089352E /* ModifyNameViewController.m */; };
 		73461EAB1B0DAB0A0089352E /* PasswordViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 73461EAA1B0DAB0A0089352E /* PasswordViewController.m */; };
 		73461EAE1B0DBFB90089352E /* DetailsGrogshopViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 73461EAD1B0DBFB90089352E /* DetailsGrogshopViewController.m */; };
-		73461EF31B0DDCAE0089352E /* CycleScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = 73461EF01B0DDCAE0089352E /* CycleScrollView.m */; };
-		73461EF41B0DDCAE0089352E /* NSTimer+Addition.m in Sources */ = {isa = PBXBuildFile; fileRef = 73461EF21B0DDCAE0089352E /* NSTimer+Addition.m */; };
 		73461F011B0DE3130089352E /* 1-1.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 73461EFD1B0DE3130089352E /* 1-1.jpg */; };
 		73461F021B0DE3130089352E /* 1-2.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 73461EFE1B0DE3130089352E /* 1-2.jpg */; };
 		73461F031B0DE3130089352E /* 1-3.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 73461EFF1B0DE3130089352E /* 1-3.jpg */; };
@@ -312,6 +310,9 @@
 		7397FAFB1B4678F00014E54C /* orderState_off3.png in Resources */ = {isa = PBXBuildFile; fileRef = 7397FAF71B4678F00014E54C /* orderState_off3.png */; };
 		7397FAFC1B4678F00014E54C /* orderState_off4.png in Resources */ = {isa = PBXBuildFile; fileRef = 7397FAF81B4678F00014E54C /* orderState_off4.png */; };
 		7397FAFF1B4688780014E54C /* JSONKit.m in Sources */ = {isa = PBXBuildFile; fileRef = 7397FAFE1B4688780014E54C /* JSONKit.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		7399919B1B6B197700D7E757 /* AutoSlideScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = 739991961B6B197700D7E757 /* AutoSlideScrollView.m */; };
+		7399919C1B6B197700D7E757 /* MyPageControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 739991981B6B197700D7E757 /* MyPageControl.m */; };
+		7399919D1B6B197700D7E757 /* NSTimer+Addition.m in Sources */ = {isa = PBXBuildFile; fileRef = 7399919A1B6B197700D7E757 /* NSTimer+Addition.m */; };
 		73A7CA8C1B65BDD4003933B7 /* back@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 73A7CA8B1B65BDD4003933B7 /* back@2x.png */; };
 		73A7CA8F1B65C78E003933B7 /* CreateCommentViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 73A7CA8E1B65C78E003933B7 /* CreateCommentViewController.m */; };
 		73A7CA921B65D375003933B7 /* CommentModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 73A7CA911B65D375003933B7 /* CommentModel.m */; };
@@ -433,10 +434,6 @@
 		73461EAA1B0DAB0A0089352E /* PasswordViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PasswordViewController.m; sourceTree = "<group>"; };
 		73461EAC1B0DBFB90089352E /* DetailsGrogshopViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DetailsGrogshopViewController.h; sourceTree = "<group>"; };
 		73461EAD1B0DBFB90089352E /* DetailsGrogshopViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DetailsGrogshopViewController.m; sourceTree = "<group>"; };
-		73461EEF1B0DDCAE0089352E /* CycleScrollView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CycleScrollView.h; sourceTree = "<group>"; };
-		73461EF01B0DDCAE0089352E /* CycleScrollView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CycleScrollView.m; sourceTree = "<group>"; };
-		73461EF11B0DDCAE0089352E /* NSTimer+Addition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSTimer+Addition.h"; sourceTree = "<group>"; };
-		73461EF21B0DDCAE0089352E /* NSTimer+Addition.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSTimer+Addition.m"; sourceTree = "<group>"; };
 		73461EFD1B0DE3130089352E /* 1-1.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "1-1.jpg"; sourceTree = "<group>"; };
 		73461EFE1B0DE3130089352E /* 1-2.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "1-2.jpg"; sourceTree = "<group>"; };
 		73461EFF1B0DE3130089352E /* 1-3.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "1-3.jpg"; sourceTree = "<group>"; };
@@ -818,6 +815,12 @@
 		7397FAF81B4678F00014E54C /* orderState_off4.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = orderState_off4.png; sourceTree = "<group>"; };
 		7397FAFD1B4688780014E54C /* JSONKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JSONKit.h; sourceTree = "<group>"; };
 		7397FAFE1B4688780014E54C /* JSONKit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JSONKit.m; sourceTree = "<group>"; };
+		739991951B6B197700D7E757 /* AutoSlideScrollView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AutoSlideScrollView.h; sourceTree = "<group>"; };
+		739991961B6B197700D7E757 /* AutoSlideScrollView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AutoSlideScrollView.m; sourceTree = "<group>"; };
+		739991971B6B197700D7E757 /* MyPageControl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyPageControl.h; sourceTree = "<group>"; };
+		739991981B6B197700D7E757 /* MyPageControl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyPageControl.m; sourceTree = "<group>"; };
+		739991991B6B197700D7E757 /* NSTimer+Addition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSTimer+Addition.h"; sourceTree = "<group>"; };
+		7399919A1B6B197700D7E757 /* NSTimer+Addition.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSTimer+Addition.m"; sourceTree = "<group>"; };
 		73A7CA8B1B65BDD4003933B7 /* back@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "back@2x.png"; sourceTree = "<group>"; };
 		73A7CA8D1B65C78E003933B7 /* CreateCommentViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CreateCommentViewController.h; sourceTree = "<group>"; };
 		73A7CA8E1B65C78E003933B7 /* CreateCommentViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CreateCommentViewController.m; sourceTree = "<group>"; };
@@ -1371,6 +1374,7 @@
 		733819641B0ACE0200E9F8AD /* Vendors */ = {
 			isa = PBXGroup;
 			children = (
+				739991941B6B197000D7E757 /* AutoSlideScrollView */,
 				7376412F1B54A1C6000E9BBC /* MJRefresh */,
 				7353265E1B535A5E004EEBAF /* JGProgressHUD */,
 				7397FAED1B4620EE0014E54C /* lib */,
@@ -1378,10 +1382,6 @@
 				734B719F1B214CA10056B58D /* weixinzhifu */,
 				734656F91B1D4585000C3E9D /* Baiduzhifu */,
 				736360051B12C71900EE8F56 /* MGSwipeTableCell */,
-				73461EEF1B0DDCAE0089352E /* CycleScrollView.h */,
-				73461EF01B0DDCAE0089352E /* CycleScrollView.m */,
-				73461EF11B0DDCAE0089352E /* NSTimer+Addition.h */,
-				73461EF21B0DDCAE0089352E /* NSTimer+Addition.m */,
 				733819871B0ADF7F00E9F8AD /* UIViewAdditions */,
 			);
 			path = Vendors;
@@ -1799,6 +1799,19 @@
 			path = lib;
 			sourceTree = "<group>";
 		};
+		739991941B6B197000D7E757 /* AutoSlideScrollView */ = {
+			isa = PBXGroup;
+			children = (
+				739991951B6B197700D7E757 /* AutoSlideScrollView.h */,
+				739991961B6B197700D7E757 /* AutoSlideScrollView.m */,
+				739991971B6B197700D7E757 /* MyPageControl.h */,
+				739991981B6B197700D7E757 /* MyPageControl.m */,
+				739991991B6B197700D7E757 /* NSTimer+Addition.h */,
+				7399919A1B6B197700D7E757 /* NSTimer+Addition.m */,
+			);
+			path = AutoSlideScrollView;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -2059,11 +2072,13 @@
 				7389DB8C1B0C730300F76582 /* UserViewCell.m in Sources */,
 				734657CC1B1D4585000C3E9D /* CDataScanner_Extensions.m in Sources */,
 				734657C71B1D4585000C3E9D /* CJSONSerializedData.m in Sources */,
+				7399919C1B6B197700D7E757 /* MyPageControl.m in Sources */,
 				736360041B12BCA200EE8F56 /* DetailTakeOutViewController.m in Sources */,
 				734657B61B1D4585000C3E9D /* ASIFormDataRequest.m in Sources */,
 				734657DD1B1D4585000C3E9D /* Reachability.m in Sources */,
 				7376415E1B54A1C6000E9BBC /* MJRefreshComponent.m in Sources */,
 				7389DB591B0C223C00F76582 /* GrogshopHeaderView.m in Sources */,
+				7399919D1B6B197700D7E757 /* NSTimer+Addition.m in Sources */,
 				7355A2131B2FB62300095764 /* RoomModel.m in Sources */,
 				734BE0121B0F0A6D003E2A22 /* DetailsGSViewCell.m in Sources */,
 				733819731B0AD19500E9F8AD /* UserViewController.m in Sources */,
@@ -2096,7 +2111,6 @@
 				737641641B54A1C6000E9BBC /* MJRefreshBackGifFooter.m in Sources */,
 				734657EC1B1D4585000C3E9D /* MKAnnotationView+WebCache.m in Sources */,
 				735908671B33F69E005143E4 /* IQKeyboardManager.m in Sources */,
-				73461EF31B0DDCAE0089352E /* CycleScrollView.m in Sources */,
 				734657B91B1D4585000C3E9D /* ASINetworkQueue.m in Sources */,
 				7355A2191B2FD0EE00095764 /* MenuModel.m in Sources */,
 				7349C2D51B44D13100A5A10A /* FinishOrderViewController.m in Sources */,
@@ -2122,6 +2136,7 @@
 				734657F21B1D4586000C3E9D /* SDWebImageDownloaderOperation.m in Sources */,
 				734657D91B1D4585000C3E9D /* CSerializedJSONData.m in Sources */,
 				734657B41B1D4585000C3E9D /* ASIDataDecompressor.m in Sources */,
+				7399919B1B6B197700D7E757 /* AutoSlideScrollView.m in Sources */,
 				73A7CA8F1B65C78E003933B7 /* CreateCommentViewController.m in Sources */,
 				737641691B54A1C6000E9BBC /* MJRefreshStateHeader.m in Sources */,
 				735B75131B2137AD0021D2F9 /* GSMapViewController.m in Sources */,
@@ -2173,7 +2188,6 @@
 				733819671B0ACE4100E9F8AD /* MyTabBarController.m in Sources */,
 				7351C27D1B329E4C0086711B /* WXLoginViewController.m in Sources */,
 				734657B21B1D4585000C3E9D /* ASIAuthenticationDialog.m in Sources */,
-				73461EF41B0DDCAE0089352E /* NSTimer+Addition.m in Sources */,
 				732319621B3E3B7E00206A95 /* OrderMenuMD.m in Sources */,
 				732492401B1844EF00CC5B6C /* AddressModel.m in Sources */,
 				7376416D1B54A1C6000E9BBC /* UIScrollView+MJRefresh.m in Sources */,

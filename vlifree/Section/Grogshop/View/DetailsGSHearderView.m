@@ -7,7 +7,7 @@
 //
 
 #import "DetailsGSHearderView.h"
-#import "CycleScrollView.h"
+#import "AutoSlideScrollView.h"
 #import "DescribeView.h"
 
 
@@ -21,7 +21,7 @@
 @interface DetailsGSHearderView ()
 
 
-//@property (nonatomic, strong)CycleScrollView * cycleScrollView;//轮播图
+@property (nonatomic, strong)AutoSlideScrollView * cycleScrollView;//轮播图
 
 
 
@@ -48,19 +48,19 @@
 
 - (void)createSubview
 {
-    /*
-    self.cycleScrollView = [[CycleScrollView alloc] initWithFrame:CGRectMake(0, 0, self.width, CYCLESCROLLVIEW_HEIGHT) array:nil animationDuration:3];
-//    _cycleScrollView.backgroundColor = [UIColor greenColor];
-    _cycleScrollView.backgroundColor = [UIColor whiteColor];
-    */
-    self.hotelImage = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, self.width, CYCLESCROLLVIEW_HEIGHT)];
-    [self addSubview:_hotelImage];
     
-//    [self addSubview:_cycleScrollView];
-    UIView * lineView = [[UIView alloc] initWithFrame:CGRectMake(0, _hotelImage.height - 1, self.width, 1)];
+    self.cycleScrollView = [[AutoSlideScrollView alloc] initWithFrame:CGRectMake(0, 0, self.width, CYCLESCROLLVIEW_HEIGHT) animationDuration:3];
+    _cycleScrollView.backgroundColor = [UIColor redColor];
+    [self addSubview:_cycleScrollView];
+    
+//    self.hotelImage = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, self.width, CYCLESCROLLVIEW_HEIGHT)];
+//    [self addSubview:_hotelImage];
+    
+    
+    UIView * lineView = [[UIView alloc] initWithFrame:CGRectMake(0, _cycleScrollView.height - 1, self.width, 1)];
     lineView.backgroundColor = LINE_COLOR;
     [self addSubview:lineView];
-    self.addressView = [[DescribeView alloc] initWithFrame:CGRectMake(0, _hotelImage.bottom, self.width, DESCRIBEVIEW_HEIGHT)];
+    self.addressView = [[DescribeView alloc] initWithFrame:CGRectMake(0, _cycleScrollView.bottom, self.width, DESCRIBEVIEW_HEIGHT)];
     _addressView.iconView.image = [UIImage imageNamed:@"addressIcon.png"];
 //    _addressView.titleLable.text = @"新环西路56号高新工业园区1号楼";
     
@@ -115,18 +115,29 @@
 }
 
 
-//- (void)setCycleViews:(NSArray *)cycleViews
-//{
-//    _cycleViews = cycleViews;
-//    _cycleScrollView.page.numberOfPages = cycleViews.count;
-//    _cycleScrollView.fetchContentViewAtIndex = ^UIView *(NSInteger pageIndex){
-//        return cycleViews[pageIndex];
-//    };
-//    _cycleScrollView.totalPagesCount = ^NSInteger(void){
-//        return cycleViews.count;
-//    };
-//
-//}
+- (void)setIconUrlStingAry:(NSArray *)iconUrlStingAry
+{
+    _iconUrlStingAry = iconUrlStingAry;
+    NSMutableArray * viewsAry = [NSMutableArray arrayWithCapacity:1];
+    for (int i = 0; i < iconUrlStingAry.count; i++) {
+        UIImageView * imageV = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, WINDOW_WIDHT, CYCLESCROLLVIEW_HEIGHT)];
+        imageV.backgroundColor = [UIColor greenColor];
+        __weak UIImageView * iconV = imageV;
+        [imageV setImageWithURL:[NSURL URLWithString:[iconUrlStingAry objectAtIndex:i]] placeholderImage:[UIImage imageNamed:@"placeholderIM.png"] completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType) {
+            if (error) {
+                iconV.image = [UIImage imageNamed:@"load_fail.png"];
+            }
+        }];
+        [viewsAry addObject:imageV];
+    }
+    self.cycleScrollView.fetchContentViewAtIndex = ^UIView *(NSInteger pageIndex){
+        return [viewsAry objectAtIndex:pageIndex];
+    };
+    self.cycleScrollView.totalPagesCount = ^NSInteger(void){
+        return viewsAry.count;
+    };
+
+}
 
 
 /*

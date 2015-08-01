@@ -11,7 +11,6 @@
 #import "TypeView.h"
 #import <CoreLocation/CoreLocation.h>
 #import "DetailTakeOutViewController.h"
-#import "CycleScrollView.h"
 #import "MGSwipeButton.h"
 #import "MGSwipeTableCell.h"
 #import "TakeOutModel.h"

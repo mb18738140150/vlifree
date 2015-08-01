@@ -30,28 +30,76 @@
 {
     double _allMoney;
 }
+/**
+ *  微信支付自定义页面
+ */
 @property (nonatomic, strong)PayTypeView * weixinView;
+/**
+ *  百度支付自定义页面
+ */
 @property (nonatomic, strong)PayTypeView * baiduView;
+/**
+ *  时间控件
+ */
 @property (nonatomic, strong)UIDatePicker * datePicker;
+/**
+ *  加载时间控件的页面
+ */
 @property (nonatomic, strong)UIView * pickerView;
+/**
+ *  支付方式 1 微信支付. 2 百度支付
+ */
 @property (nonatomic, strong)NSNumber * payType;
-
+/**
+ *  选择日期的button, 用来记载是入住时间button还是离店时间button
+ */
 @property (nonatomic, strong)UIButton * dateButton;
-
+/**
+ *  入住人输入框
+ */
 @property (nonatomic, strong)UITextField * personTF;
+/**
+ *  电话输入框
+ */
 @property (nonatomic, strong)UITextField * telTF;
+/**
+ *  特殊需求输入框
+ */
 @property (nonatomic, strong)UITextField * requireTF;
+/**
+ *  入住时间
+ */
 @property (nonatomic, strong)NSDate * ruzhuDate;
+/**
+ *  离店时间
+ */
 @property (nonatomic, strong)NSDate * lidianDate;
-
+/**
+ *  显示总天数label
+ */
 @property (nonatomic, strong)UILabel * daysLB;
 //@property (nonatomic, strong)UILabel 
-
+/**
+ *  显示价格的label
+ */
 @property (nonatomic, strong)UILabel * priceLB;
-
+/**
+ *  订单号
+ */
 @property (nonatomic, copy)NSString * orderId;
-
+/**
+ *  提示框
+ */
 @property (nonatomic, strong)JGProgressHUD * hud;
+/**
+ *  首单立减金额
+ */
+@property (nonatomic, strong)NSNumber * firstCut;
+
+///**
+// *  首单立减价格label
+// */
+//@property (nonatomic, strong)UILabel * firstCutPriceLB;
 
 @end
 
@@ -136,6 +184,18 @@
     UIView * line1 = [[UIView alloc] initWithFrame:CGRectMake(0, view1.height - 1, view1.width, 1)];
     line1.backgroundColor = LINE_COLOR;
     [view1 addSubview:line1];
+    
+//    UIView * cutView = [[UIView alloc] initWithFrame:CGRectMake(0, view1.bottom + 10, scrollView.width, 40)];
+//    cutView.backgroundColor = [UIColor whiteColor];
+//    [scrollView addSubview:cutView];
+//    
+//    UILabel * firstCutLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, TOP_SPACE, 180, LABEL_HEIGHT)];
+//    firstCutLB.text = @"首单立减: -¥20";
+//    firstCutLB.textColor = [UIColor redColor];
+////    firstCutLB.font = 
+//    [cutView addSubview:firstCutLB];
+//    cutView.height = firstCutLB.bottom + 5;
+    
     
     
     UIView * view2 = [[UIView alloc] initWithFrame:CGRectMake(0, view1.bottom + 10, scrollView.width, 140)];
@@ -255,16 +315,18 @@
     UIView * view4 = [[UIView alloc] initWithFrame:CGRectMake(0, scrollView.bottom, scrollView.width, 75)];
     [self.view addSubview:view4];
     
-    self.priceLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, 20, scrollView.width - 3 * LEFT_SPACE - 80, 28)];
-    
-    _priceLB.attributedText = [self allPriceLBTextWithPrice:self.price];
+    self.priceLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, 12.5, scrollView.width - 3 * LEFT_SPACE - 80, 50)];
+//    _priceLB.backgroundColor = [UIColor magentaColor];
+    _priceLB.numberOfLines = 0;
+    _priceLB.attributedText = [self allPriceLBTextWithPrice:self.price firstCut:self.firstCut];
     [view4 addSubview:_priceLB];
     
     UIButton * payButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    payButton.frame = CGRectMake(_priceLB.right + LEFT_SPACE, _priceLB.top, 80, _priceLB.height);
+    payButton.frame = CGRectMake(_priceLB.right + LEFT_SPACE, _priceLB.top, 80, 28);
 //    [payButton setTitle:@"马上支付" forState:UIControlStateNormal];
 //    [payButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
 //    payButton.backgroundColor = MAIN_COLOR;
+    payButton.centerY = _priceLB.centerY;
     [payButton setBackgroundImage:[UIImage imageNamed:@"change_n.png"] forState:UIControlStateNormal];
     [payButton addTarget:self action:@selector(payOrderDetails:) forControlEvents:UIControlEventTouchUpInside];
     [view4 addSubview:payButton];
@@ -278,14 +340,35 @@
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:backBT];
     
     [self createDatePickerView];
+    
+    
+    NSDictionary * jsonDic = @{
+                               @"UserId":[UserInfo shareUserInfo].userId,
+                               @"HotelId":self.hotelId,
+                               @"Command":@41
+                               };
+    [self playPostWithDictionary:jsonDic];
+    
     // Do any additional setup after loading the view.
 }
 
-- (id)allPriceLBTextWithPrice:(NSNumber *)price
+- (id)allPriceLBTextWithPrice:(NSNumber *)price firstCut:(NSNumber *)firstCut
 {
-    NSMutableAttributedString * string = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"支付金额¥%@", price]];
-    [string addAttributes:@{NSForegroundColorAttributeName : [UIColor redColor], NSFontAttributeName : [UIFont systemFontOfSize:20]} range:NSMakeRange(4, string.length - 4)];
+    double money = price.doubleValue - firstCut.doubleValue;
+    NSString * payString = [NSString stringWithFormat:@"支付金额¥%g", money];
+    NSMutableAttributedString * string = nil;
+    if (firstCut != nil) {
+        string = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@\n首单立减: -¥%@", payString, firstCut]];
+    }else
+    {
+        string = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@\n", payString]];
+    }
+    [string addAttributes:@{NSForegroundColorAttributeName : [UIColor redColor], NSFontAttributeName : [UIFont systemFontOfSize:20]} range:NSMakeRange(4, payString.length - 4)];
     [string addAttributes:@{NSForegroundColorAttributeName : TEXT_COLOR, NSFontAttributeName : [UIFont systemFontOfSize:16]} range:NSMakeRange(0, 4)];
+    if (firstCut != nil)
+    {
+        [string addAttributes:@{NSForegroundColorAttributeName : [UIColor redColor], NSFontAttributeName : [UIFont systemFontOfSize:14]} range:NSMakeRange(payString.length, string.length - payString.length)];
+    }
     return [string copy];
 }
 
@@ -424,7 +507,7 @@
         self.daysLB.text = [NSString stringWithFormat:@"住店时长: 共%ld天", (long)days];
         double price = self.price.doubleValue * days;
         _allMoney = price;
-        self.priceLB.attributedText = [self allPriceLBTextWithPrice:[NSNumber numberWithDouble:price]];
+        self.priceLB.attributedText = [self allPriceLBTextWithPrice:[NSNumber numberWithDouble:price] firstCut:self.firstCut];
     }
     [self.pickerView removeFromSuperview];
     NSDateFormatter* dateFormatter = [[NSDateFormatter alloc] init];
@@ -490,38 +573,46 @@
     NSLog(@"+++%@", data);
     NSLog(@"%@", [data objectForKey:@"ErrorMsg"]);
     if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
-        self.orderId = [data objectForKey:@"HotelOrder"];
-        NSString * appid = [data objectForKey:@"AppId"];
-        if (![appid isEqual:[NSNull null]]) {
-            NSMutableDictionary *signParams = [NSMutableDictionary dictionary];
-            [signParams setObject: [NSString stringWithFormat:@"%@", [data objectForKey:@"AppId"]]       forKey:@"appid"];
-            [signParams setObject: [NSString stringWithFormat:@"%@", [data objectForKey:@"NonceStr"]]    forKey:@"noncestr"];
-            [signParams setObject: [NSString stringWithFormat:@"%@", [data objectForKey:@"Package"]]      forKey:@"package"];
-            [signParams setObject: [NSString stringWithFormat:@"%@", [data objectForKey:@"PartnerId"]]        forKey:@"partnerid"];
-            [signParams setObject: [data objectForKey:@"TimeStamp"]   forKey:@"timestamp"];
-            [signParams setObject: [data objectForKey:@"PrepayId"]    forKey:@"prepayid"];
-            
-            NSString * sign = [self createMd5Sign:signParams];
-            NSLog(@"%@", sign);
-            NSNumber * stamp = [data objectForKey:@"TimeStamp"];
-            //调起微信支付
-            PayReq* req             = [[PayReq alloc] init];
-            req.openID              =  [NSString stringWithFormat:@"%@", [data objectForKey:@"AppId"]];
-            req.partnerId           = [NSString stringWithFormat:@"%@", [data objectForKey:@"PartnerId"]];
-            req.prepayId            = [NSString stringWithFormat:@"%@", [data objectForKey:@"PrepayId"]];
-            req.nonceStr            = [NSString stringWithFormat:@"%@", [data objectForKey:@"NonceStr"]];
-            req.timeStamp           = stamp.intValue;
-            req.package             = [NSString stringWithFormat:@"%@", [data objectForKey:@"Package"]];
-            req.sign                = [NSString stringWithFormat:@"%@", [data objectForKey:@"Sign"]];
-//            req.sign = sign;
-            BOOL a = [WXApi sendReq:req];
-            NSLog(@"%d", a);
-        }else
+        if ([[data objectForKey:@"Command"] isEqualToNumber:@10041]) {
+            if ([[data objectForKey:@"IsFirstReduce"] isEqualToNumber:@1]) {
+                self.firstCut = [data objectForKey:@"FirstReduce"];
+                _priceLB.attributedText = [self allPriceLBTextWithPrice:self.price firstCut:self.firstCut];
+            }
+        }else if ([[data objectForKey:@"Command"] isEqualToNumber:@10011])
         {
-            BDWalletSDKMainManager* payMainManager = [BDWalletSDKMainManager getInstance];
-//            NSLog(@"order_no = %@", [data objectForKey:@"HotelOrder"]);
-            NSString *orderInfo = [self buildOrderInfoWithOrderID:[data objectForKey:@"HotelOrder"]];
-            [payMainManager doPayWithOrderInfo:orderInfo params:nil delegate:self];
+            self.orderId = [data objectForKey:@"HotelOrder"];
+            NSString * appid = [data objectForKey:@"AppId"];
+            if (![appid isEqual:[NSNull null]]) {
+                NSMutableDictionary *signParams = [NSMutableDictionary dictionary];
+                [signParams setObject: [NSString stringWithFormat:@"%@", [data objectForKey:@"AppId"]]       forKey:@"appid"];
+                [signParams setObject: [NSString stringWithFormat:@"%@", [data objectForKey:@"NonceStr"]]    forKey:@"noncestr"];
+                [signParams setObject: [NSString stringWithFormat:@"%@", [data objectForKey:@"Package"]]      forKey:@"package"];
+                [signParams setObject: [NSString stringWithFormat:@"%@", [data objectForKey:@"PartnerId"]]        forKey:@"partnerid"];
+                [signParams setObject: [data objectForKey:@"TimeStamp"]   forKey:@"timestamp"];
+                [signParams setObject: [data objectForKey:@"PrepayId"]    forKey:@"prepayid"];
+                
+                NSString * sign = [self createMd5Sign:signParams];
+                NSLog(@"%@", sign);
+                NSNumber * stamp = [data objectForKey:@"TimeStamp"];
+                //调起微信支付
+                PayReq* req             = [[PayReq alloc] init];
+                req.openID              =  [NSString stringWithFormat:@"%@", [data objectForKey:@"AppId"]];
+                req.partnerId           = [NSString stringWithFormat:@"%@", [data objectForKey:@"PartnerId"]];
+                req.prepayId            = [NSString stringWithFormat:@"%@", [data objectForKey:@"PrepayId"]];
+                req.nonceStr            = [NSString stringWithFormat:@"%@", [data objectForKey:@"NonceStr"]];
+                req.timeStamp           = stamp.intValue;
+                req.package             = [NSString stringWithFormat:@"%@", [data objectForKey:@"Package"]];
+                req.sign                = [NSString stringWithFormat:@"%@", [data objectForKey:@"Sign"]];
+                //            req.sign = sign;
+                BOOL a = [WXApi sendReq:req];
+                NSLog(@"%d", a);
+            }else
+            {
+                BDWalletSDKMainManager* payMainManager = [BDWalletSDKMainManager getInstance];
+                //            NSLog(@"order_no = %@", [data objectForKey:@"HotelOrder"]);
+                NSString *orderInfo = [self buildOrderInfoWithOrderID:[data objectForKey:@"HotelOrder"]];
+                [payMainManager doPayWithOrderInfo:orderInfo params:nil delegate:self];
+            }
         }
     }else
     {
@@ -532,6 +623,12 @@
     //    [self.detailsTableView headerEndRefreshing];
     //    [self.detailsTableView footerEndRefreshing];
 //    [SVProgressHUD dismiss];
+}
+
+- (void)failWithError:(NSError *)error
+{
+    [self.hud dismiss];
+    NSLog(@"%@", error);
 }
 
 #pragma  mark - 跳转到订单详情页面

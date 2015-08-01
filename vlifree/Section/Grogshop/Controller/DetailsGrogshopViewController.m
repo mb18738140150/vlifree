@@ -7,7 +7,7 @@
 //
 
 #import "DetailsGrogshopViewController.h"
-#import "CycleScrollView.h"
+#import "AutoSlideScrollView.h"
 #import "DetailsGSHearderView.h"
 #import "DetailsFooterView.h"
 #import "DetailsGSViewCell.h"
@@ -29,30 +29,52 @@
 @interface DetailsGrogshopViewController ()<UITableViewDataSource, UITableViewDelegate, HTTPPostDelegate>
 
 @property (nonatomic, strong)UITableView * detailsTableView;
-
+/**
+ *  自定义头部试图
+ */
 @property (nonatomic, strong)DetailsGSHearderView * headerView;
+/**
+ *  自定义尾部试图
+ */
 @property (nonatomic, strong)DetailsFooterView * footerView;
+/**
+ *  全部房型button
+ */
 @property (nonatomic, strong)UIButton * allButton;
 
 //@property (nonatomic, strong)CycleScrollView * cycleScrollView;//轮播图
-
+/**
+ *  数据数组
+ */
 @property (nonatomic, strong)NSMutableArray * dataArray;
-
+/**
+ *  酒店电话
+ */
 @property (nonatomic, copy)NSString * phoneNumber;
-
+/**
+ *  自定义登陆弹出页面
+ */
 @property (nonatomic, strong)AlertLoginView * alertLoginV;
-
+/**
+ *  酒店设施详情字典
+ */
 @property (nonatomic, strong)NSDictionary * detailsDic;
-
+/**
+ *  酒店的商家介绍(描述)
+ */
 @property (nonatomic, copy)NSString * describe;
 
-@property (nonatomic, strong)NSMutableString * xmlString;
+//@property (nonatomic, strong)NSMutableString * xmlString;
 
 @end
 
 
 @implementation DetailsGrogshopViewController
-
+/**
+ *  懒加载
+ *
+ *  @return 返回数据数组
+ */
 - (NSMutableArray *)dataArray
 {
     if (!_dataArray) {
@@ -84,13 +106,14 @@
     [_headerView.addressView.button addTarget:self action:@selector(lookOverMapk:) forControlEvents:UIControlEventTouchUpInside];
     [_headerView.phoneView.button addTarget:self action:@selector(callNumberWithPhone:) forControlEvents:UIControlEventTouchUpInside];
     [_headerView.detailsBT addTarget:self action:@selector(lookFacility:) forControlEvents:UIControlEventTouchUpInside];
-    __weak DetailsGrogshopViewController * detailsVC = self;
-    [_headerView.hotelImage setImageWithURL:[NSURL URLWithString:self.icon] completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType) {
-        if (error) {
-            detailsVC.headerView.hotelImage.image = [UIImage imageNamed:@"load_fail.png"];
-        }
-    }];
+//    __weak DetailsGrogshopViewController * detailsVC = self;
+//    [_headerView.hotelImage setImageWithURL:[NSURL URLWithString:self.icon] completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType) {
+//        if (error) {
+//            detailsVC.headerView.hotelImage.image = [UIImage imageNamed:@"load_fail.png"];
+//        }
+//    }];
 //    _headerView.backgroundColor = [UIColor grayColor];
+    _headerView.iconUrlStingAry = @[self.icon];
     self.detailsTableView.tableHeaderView = _headerView;
     
 //    NSMutableArray * iary = [@[@"1-1.jpg", @"1-2.jpg", @"1-3.jpg", @"1-4.jpg"] mutableCopy];
@@ -136,7 +159,11 @@
 }
 
 
-
+/**
+ *  展开或者折叠全部房型
+ *
+ *  @param button 全部房型按钮
+ */
 - (void)unfoldAllRoom:(UIButton *)button
 {
     button.selected = !button.selected;
@@ -144,7 +171,11 @@
     [self.detailsTableView reloadData];
 }
 
-
+/**
+ *  拨打酒店电话
+ *
+ *  @param button 自定义头部视图的电话按钮
+ */
 - (void)callNumberWithPhone:(UIButton *)button
 {
     NSLog(@"打电话");
@@ -155,7 +186,11 @@
     [callWebView loadRequest:[NSURLRequest requestWithURL:telURL]];
     [self.view addSubview:callWebView];
 }
-
+/**
+ *  查看酒店位置
+ *
+ *  @param button 自定义头部视图的地址按钮
+ */
 - (void)lookOverMapk:(UIButton *)button
 {
     NSLog(@"查看地图");
@@ -167,7 +202,11 @@
     [self.navigationController pushViewController:gsMapVC animated:YES];
 }
 
-
+/**
+ *  查看就点设施详情
+ *
+ *  @param button 自定义头部视图查看详情上的透明按钮
+ */
 - (void)lookFacility:(UIButton *)button
 {
     FacilityViewController * factlityVC = [[FacilityViewController alloc] init];
@@ -182,7 +221,11 @@
     // Dispose of any resources that can be recreated.
 }
 
-
+/**
+ *  跳转到到房间预订页面(如果还没登陆则弹出登陆页面)
+ *
+ *  @param button cell上的有房按钮
+ */
 - (void)reserveGSRoom:(UIButton *)button
 {
 //    NSLog(@"预定%ld", button.tag - BUTTON_TAG);
@@ -192,12 +235,10 @@
         gsOrderPayVC.roomName = roomMD.suiteName;
         gsOrderPayVC.price = roomMD.suitePrice;
         gsOrderPayVC.roomId = roomMD.suiteId;
+        gsOrderPayVC.hotelId = self.hotelID;
         [self.navigationController pushViewController:gsOrderPayVC animated:YES];
     }else
     {
-//        UIView * view = [[UIView alloc] initWithFrame:[UIScreen mainScreen].bounds];
-//        view.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.2];
-//        [self.view.window addSubview:view];
         self.alertLoginV = [[AlertLoginView alloc] initWithFrame:[UIScreen mainScreen].bounds];
         [_alertLoginV.logInButton addTarget:self action:@selector(userLogInAction:) forControlEvents:UIControlEventTouchUpInside];
         [_alertLoginV.weixinButton addTarget:self action:@selector(weixinLogIn:) forControlEvents:UIControlEventTouchUpInside];
@@ -208,7 +249,11 @@
     }
     
 }
-
+/**
+ *  自定义登陆页面登陆按钮关联的登陆方法
+ *
+ *  @param button 自定义登陆弹出页面的登陆按钮
+ */
 - (void)userLogInAction:(UIButton *)button
 {
     if (self.alertLoginV.phoneTF.text.length == 0) {
@@ -232,6 +277,11 @@
     }
 }
 
+/**
+ *  自定义登陆页面微信按钮关联的登陆方法
+ *
+ *  @param button 自定义登陆弹出页面的微信按钮
+ */
 - (void)weixinLogIn:(UIButton *)button//微信登陆
 {
     NSLog(@"微信登陆");
@@ -258,18 +308,6 @@
                                @"HotelId":self.hotelID
                                };
     [self playPostWithDictionary:jsonDic];
-    /*
-     //    NSLog(@"%@, %@", self.classifyId, [UserInfo shareUserInfo].userId);
-     NSString * jsonStr = [jsonDic JSONString];
-     NSString * str = [NSString stringWithFormat:@"%@231618", jsonStr];
-     NSLog(@"%@", str);
-     NSString * md5Str = [str md5];
-     NSString * urlString = [NSString stringWithFormat:@"http://p.vlifee.com/getdata.ashx?md5=%@",md5Str];
-     
-     HTTPPost * httpPost = [HTTPPost shareHTTPPost];
-     [httpPost post:urlString HTTPBody:[jsonStr dataUsingEncoding:NSUTF8StringEncoding]];
-     httpPost.delegate = self;
-     */
 }
 
 - (void)playPostWithDictionary:(NSDictionary *)dic
@@ -313,6 +351,11 @@
         }else if ([[data objectForKey:@"Command"] isEqualToNumber:@10010])
         {
             NSDictionary * dic = [data objectForKey:@"HotelInfo"];
+            NSArray * photosAry = [dic objectForKey:@"Photos"];
+            if (photosAry.count != 0) {
+                NSLog(@"%@", photosAry);
+                self.headerView.iconUrlStingAry = photosAry;
+            }
             self.describe = [dic objectForKey:@"Describe"];
             self.headerView.addressView.titleLable.text = [dic objectForKey:@"Address"];
             self.headerView.phoneView.titleLable.text = [dic objectForKey:@"PhoneNumber"];

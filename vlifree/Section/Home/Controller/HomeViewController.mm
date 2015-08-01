@@ -186,6 +186,9 @@
     UIButton * searchBT = (UIButton *)[self.navigationController.navigationBar viewWithTag:2000];
     locationBT.hidden = NO;
     searchBT.hidden = NO;
+    if ([UserLocation shareUserLocation].city) {
+        self.locationLB.text = [UserLocation shareUserLocation].city;
+    }
     UIView * aView = [self.view viewWithTag:10009];
     if ([UserInfo shareUserInfo].userId) {
         self.homeTableView.scrollEnabled = YES;
