@@ -7,6 +7,7 @@
 //
 
 #import "PhoneViewController.h"
+#import "UCSVerifyService.h"
 
 #define TOP_SPACE 30
 #define LEFT_SPACE 10
@@ -22,7 +23,7 @@
 //#define VIEW_COLOR [UIColor redColor]
 #define VIEW_COLOR [UIColor clearColor]
 
-@interface PhoneViewController ()<HTTPPostDelegate>
+@interface PhoneViewController ()<HTTPPostDelegate, UCSVerifyEventDelegate>
 
 @property (nonatomic, copy)RefreshUserInfo refreshBlock;
 /**
@@ -40,7 +41,17 @@
 
 @property (nonatomic, strong)NSTimer * timer;
 
-//@property (nonatomic, copy)NSString * phone;
+
+//@property (nonatomic, strong)UCSVerifyService * ucsVerifySV;
+/**
+ *  验证码的MD5值
+ */
+@property (nonatomic, copy)NSString * verifyCode;
+
+/**
+ *  获取验证码的时间
+ */
+@property (nonatomic, strong)NSDate * codeDate;
 @end
 
 @implementation PhoneViewController
@@ -90,7 +101,8 @@
     _getCodeBT.layer.cornerRadius = 3;
     [_getCodeBT addTarget:self action:@selector(getVerificationCode:) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:_getCodeBT];
-    
+
+//    self.ucsVerifySV = [[UCSVerifyService alloc] initWithDelegate:self];
     
     UIButton * backBT = [UIButton buttonWithType:UIButtonTypeCustom];
     backBT.frame = CGRectMake(0, 0, 15, 20);
@@ -100,6 +112,14 @@
     
     // Do any additional setup after loading the view.
 }
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+    [super viewWillDisappear:animated];
+    [self.timer invalidate];
+    self.timer = nil;
+}
+
 
 - (void)backLastVC:(id)sender
 {
@@ -125,13 +145,33 @@ static int t = 60;
 - (void)getVerificationCode:(UIButton *)button
 {
     NSLog(@"1111");
-    self.verifyTF.enabled = YES;
-    button.enabled = NO;
-    button.backgroundColor = [UIColor colorWithWhite:0.8 alpha:1];
-    t = 60;
-    self.timer = nil;
-    self.timer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(getVerificattionCodeTime) userInfo:nil repeats:YES];
-    [self performSelector:@selector(passSixtySeconds) withObject:nil afterDelay:60];
+    [self.phoneTF resignFirstResponder];
+    if (self.phoneTF.text.length == 0) {
+        UIAlertView * alert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"请输入手机号" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
+        [alert show];
+        [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:2];
+    }else if ([self.phoneTF.text isEqualToString:[NSString stringWithFormat:@"%@", [UserInfo shareUserInfo].phoneNumber]])
+    {
+        UIAlertView * alert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"这号码和原号码一样" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
+        [alert show];
+        [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:2];
+    }else{
+        BOOL isPhoneNum = [NSString isTelPhoneNub:_phoneTF.text];
+        if (isPhoneNum) {
+            NSDictionary * jsonDic = @{
+                                       @"Command":@42,
+                                       @"PhoneNumber":self.phoneTF.text
+                                       };
+            [self playPostWithDictionary:jsonDic];
+            self.verifyTF.enabled = YES;
+            button.enabled = NO;
+            button.backgroundColor = [UIColor colorWithWhite:0.8 alpha:1];
+            t = 60;
+            self.timer = nil;
+            self.timer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(getVerificattionCodeTime) userInfo:nil repeats:YES];
+            [self performSelector:@selector(passSixtySeconds) withObject:nil afterDelay:60];
+        }
+    }
 }
 
 - (void)passSixtySeconds
@@ -155,6 +195,11 @@ static int t = 60;
         UIAlertView * alert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"请输入手机号" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
         [alert show];
         [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:2];
+    }else if (self.verifyTF.text.length == 0)
+    {
+        UIAlertView * alert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"请输入验证码" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
+        [alert show];
+        [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:2];
     }else if ([self.phoneTF.text isEqualToString:[NSString stringWithFormat:@"%@", [UserInfo shareUserInfo].phoneNumber]])
     {
         UIAlertView * alert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"这号码和原号码一样" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
@@ -163,8 +208,22 @@ static int t = 60;
     }else{
         BOOL isPhoneNum = [NSString isTelPhoneNub:_phoneTF.text];
         if (isPhoneNum) {
-//            _phone = self.phoneTF.text;
-            [self downloadData];
+            if ([self.verifyCode isEqualToString:[[[NSString stringWithFormat:@"%@231618", self.verifyTF.text] md5] uppercaseString]]) {
+                NSTimeInterval seconds = [[NSDate date] timeIntervalSinceDate:self.codeDate];
+                if (seconds > 120) {
+                    UIAlertView * alert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"验证码超时" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
+                    [alert show];
+                    [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:2];
+                }else
+                {
+                    [self downloadData];
+                }
+            }else
+            {
+                UIAlertView * alert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"验证码输入错误" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
+                [alert show];
+                [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:2];
+            }
         }
     }
 }
@@ -179,24 +238,13 @@ static int t = 60;
                                @"PhoneNumber":self.phoneTF.text
                                };
     [self playPostWithDictionary:jsonDic];
-    /*
-     //    NSLog(@"%@, %@", self.classifyId, [UserInfo shareUserInfo].userId);
-     NSString * jsonStr = [jsonDic JSONString];
-     NSString * str = [NSString stringWithFormat:@"%@231618", jsonStr];
-     NSLog(@"%@", str);
-     NSString * md5Str = [str md5];
-     NSString * urlString = [NSString stringWithFormat:@"http://p.vlifee.com/getdata.ashx?md5=%@",md5Str];
-     
-     HTTPPost * httpPost = [HTTPPost shareHTTPPost];
-     [httpPost post:urlString HTTPBody:[jsonStr dataUsingEncoding:NSUTF8StringEncoding]];
-     httpPost.delegate = self;
-     */
+    
 }
 
 - (void)playPostWithDictionary:(NSDictionary *)dic
 {
     NSString * jsonStr = [dic JSONString];
-    //    NSLog(@"%@", jsonStr);
+    NSLog(@"%@", jsonStr);
     NSString * str = [NSString stringWithFormat:@"%@231618", jsonStr];
     NSString * md5Str = [str md5];
     NSString * urlString = [NSString stringWithFormat:@"%@%@", POST_URL, md5Str];
@@ -210,9 +258,16 @@ static int t = 60;
 {
     NSLog(@"+++%@", data);
     if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
-        [UserInfo shareUserInfo].phoneNumber = [NSNumber numberWithLongLong:self.phoneTF.text.longLongValue];
-        [self.navigationController popViewControllerAnimated:YES];
-        _refreshBlock();
+        if ([[data objectForKey:@"Command"] isEqualToNumber:@10022])
+        {
+            [UserInfo shareUserInfo].phoneNumber = [NSNumber numberWithLongLong:self.phoneTF.text.longLongValue];
+            [self.navigationController popViewControllerAnimated:YES];
+            _refreshBlock();
+        }else if ([[data objectForKey:@"Command"] isEqualToNumber:@10042])
+        {
+            self.verifyCode = [data objectForKey:@"Verifynode"];
+            self.codeDate = [NSDate date];
+        }
     }else
     {
         UIAlertView * alert = [[UIAlertView alloc] initWithTitle:@"失败" message:[data objectForKey:@"ErrorMsg"] delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
@@ -244,6 +299,30 @@ static int t = 60;
 {
     NSLog(@"销毁手机修改页面");
 }
+
+
+// 云获取验证码成功  0：已经验证成功，1:已下发验证码到用户
+- (void) onGetValiateCodeSuccessful:(NSInteger)nResult
+{
+    
+}
+// 云获取验证码失败
+- (void) onGetValiateCodeFailed:(NSInteger)reason
+{
+    
+}
+
+// 云验证成功
+- (void) onDoValiateCodeSuccessful:(NSInteger)nResult
+{
+    NSLog(@"验证成功 %d", nResult);
+}
+// 云验证失败
+- (void) onDoValiateCodeFailed:(NSInteger)reason
+{
+    NSLog(@"验证失败 %d", reason);
+}
+
 
 /*
 #pragma mark - Navigation

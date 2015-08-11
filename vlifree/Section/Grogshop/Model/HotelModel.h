@@ -22,6 +22,9 @@
 @property (nonatomic, copy)NSString * hotelLat;
 @property (nonatomic, copy)NSString * hotelLon;
 @property (nonatomic, strong)NSNumber * distance;
+@property (nonatomic, strong)NSNumber * firstReduce;
+
+@property (nonatomic, strong)NSNumber * isFirstReduce;
 
 - (id)initWithDictionary:(NSDictionary *)dic;
 

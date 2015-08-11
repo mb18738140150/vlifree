@@ -70,7 +70,7 @@
     
     [self.view setBackgroundColor:[UIColor whiteColor]];
     
-    self.navigationController.navigationBar.translucent = YES;
+    self.navigationController.navigationBar.translucent = NO;
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSearch target:self action:@selector(searchTakeOut:)];
 
     self.addressBT = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -93,7 +93,8 @@
     [self showLocationAddress];
     
     UIButton * typeButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    typeButton.frame = CGRectMake(0, self.navigationController.navigationBar.bottom, self.view.width, 40);
+    typeButton.frame = CGRectMake(0, 0, self.view.width, 40);
+//    typeButton.frame = CGRectMake(0, self.navigationController.navigationBar.bottom, self.view.width, 40);
     typeButton.tag = 2000;
     [typeButton setTitle:@"外卖分类" forState:UIControlStateNormal];
     [typeButton setTitle:@"外卖分类" forState:UIControlStateSelected];
@@ -110,7 +111,8 @@
 //    typeButton.backgroundColor = [UIColor grayColor];
     [self.view addSubview:typeButton];
     
-    self.takeOutTabelView = [[UITableView alloc] initWithFrame:CGRectMake(0, typeButton.bottom, self.view.width, self.view.height - typeButton.bottom - self.tabBarController.tabBar.height) style:UITableViewStyleGrouped];
+    self.takeOutTabelView = [[UITableView alloc] initWithFrame:CGRectMake(0, typeButton.bottom, self.view.width, self.view.height - self.tabBarController.tabBar.height - typeButton.bottom - self.navigationController.navigationBar.bottom) style:UITableViewStyleGrouped];
+//    self.takeOutTabelView = [[UITableView alloc] initWithFrame:CGRectMake(0, typeButton.bottom, self.view.width, self.view.height - typeButton.bottom - self.tabBarController.tabBar.height) style:UITableViewStyleGrouped];
     _takeOutTabelView.dataSource = self;
     _takeOutTabelView.delegate = self;
     [self.view addSubview:_takeOutTabelView];

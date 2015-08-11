@@ -68,7 +68,8 @@
 //    self.view.backgroundColor = [UIColor colorWithWhite:0.9 alpha:0.9];
     self.view.backgroundColor = [UIColor whiteColor];
     self.navigationItem.title = @"外卖订单";
-    UIScrollView * scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, self.view.height - 40 - 2 * TOP_SPACE)];
+    UIScrollView * scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, self.view.height - 40 - 2 * TOP_SPACE - self.navigationController.navigationBar.bottom)];
+//    UIScrollView * scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, self.view.height - 40 - 2 * TOP_SPACE)];
     scrollView.backgroundColor = [UIColor colorWithWhite:0.9 alpha:0.9];
     scrollView.tag = 10001;
     [self.view addSubview:scrollView];
@@ -342,8 +343,9 @@
     UIView * lineView10 = [[UIView alloc] initWithFrame:CGRectMake(0, payView.bottom, payView.width, 1)];
     lineView10.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
     [scrollView addSubview:lineView10];
+    
     UIButton * confirmBT = [UIButton buttonWithType:UIButtonTypeCustom];
-    confirmBT.frame = CGRectMake(LEFT_SPACE, self.view.height - TOP_SPACE - 40, self.view.width - 2 * LEFT_SPACE, 40);
+    confirmBT.frame = CGRectMake(LEFT_SPACE, self.view.height - TOP_SPACE - 40 - self.navigationController.navigationBar.bottom, self.view.width - 2 * LEFT_SPACE, 40);
     confirmBT.backgroundColor = MAIN_COLOR;
     [confirmBT setTitle:@"确认支付" forState:UIControlStateNormal];
     [confirmBT setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];

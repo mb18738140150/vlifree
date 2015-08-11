@@ -29,6 +29,7 @@
 @property (nonatomic, strong)UILabel * addressLabel;
 @property (nonatomic, strong)UILabel * priceLabel;
 @property (nonatomic, strong)UILabel * distanceLabel;
+@property (nonatomic, strong)UIView * firstOrderV;
 
 @end
 
@@ -97,6 +98,19 @@
         _addressLabel.font = [UIFont systemFontOfSize:12];
         [self.contentView addSubview:_addressLabel];
         
+        self.firstOrderV = [[UIView alloc] initWithFrame:CGRectMake(_addressLabel.left, _addressLabel.bottom, _addressLabel.width, _addressLabel.height)];
+        UIImageView * firstIM = [[UIImageView alloc] initWithFrame:CGRectMake(0, 3, _firstOrderV.height - 6, _firstOrderV.height - 6)];
+        firstIM.image = [UIImage imageNamed:@"shou.png"];
+        [_firstOrderV addSubview:firstIM];
+        UILabel * firstLB = [[UILabel alloc] initWithFrame:CGRectMake(firstIM.right + 3, firstIM.top, _firstOrderV.width - 6 - firstIM.right, firstIM.height)];
+        firstLB.text = @"首单减免";
+        firstLB.tag = 2000;
+        firstLB.textColor = [UIColor colorWithWhite:0.7 alpha:1];
+        firstLB.font = [UIFont systemFontOfSize:13];
+        [_firstOrderV addSubview:firstLB];
+        [self.contentView addSubview:_firstOrderV];
+        
+        
     }
 }
 
@@ -137,6 +151,16 @@
             cell.icon.image = [UIImage imageNamed:@"load_fail.png"];
         }
     }];
+    
+    if ([hotelModel.isFirstReduce isEqualToNumber:@YES]) {
+        self.firstOrderV.hidden = NO;
+        UILabel * aLabel = (UILabel *)[self.firstOrderV viewWithTag:2000];
+        aLabel.text = [NSString stringWithFormat:@"首单立减%@", hotelModel.firstReduce];
+    }else
+    {
+        self.firstOrderV.hidden = YES;
+    }
+    
 }
 
 
@@ -157,8 +181,11 @@
 
 
 
-+ (CGFloat)cellHeigth
++ (CGFloat)cellHeigthWithIsFirstReduce:(NSNumber *)isFirstReduce
 {
+    if ([isFirstReduce isEqualToNumber:@1]) {
+        return TOP_SPACE * 2 + IMAGE_SIZE * 4 / 3;
+    }
     return TOP_SPACE * 2 + IMAGE_SIZE;
 }
 

@@ -28,9 +28,25 @@
 @property (nonatomic, strong)UITextField * passwordTF;
 @property (nonatomic, strong)UIButton * logInButton;
 @property (nonatomic, copy)RefreshUserInfo refreshBlock;
+/**
+ *  验证码输入框
+ */
+@property (nonatomic, strong)UITextField * verifyTF;
+/**
+ *  获取验证码按钮
+ */
+@property (nonatomic, strong)UIButton * getCodeBT;
 
+/**
+ *  验证码MD5值
+ */
+@property (nonatomic, copy)NSString * verifyCode;
 
-
+@property (nonatomic, strong)NSTimer * timer;
+/**
+ *  获取验证码的时间
+ */
+@property (nonatomic, strong)NSDate * codeDate;
 @end
 
 @implementation WXLoginViewController
@@ -79,8 +95,25 @@
     [passwordView addSubview:_passwordTF];
     
     
+    
+    self.verifyTF = [[UITextField alloc] initWithFrame:CGRectMake(phoneImage.left + phoneView.left, passwordView.bottom + 20, 140, 30)];
+    _verifyTF.placeholder = @"请输入验证码";
+    _verifyTF.textColor = TEXT_COLOR;
+    _verifyTF.borderStyle = UITextBorderStyleRoundedRect;
+    _verifyTF.enabled = NO;
+    [self.view addSubview:_verifyTF];
+    
+    self.getCodeBT = [UIButton buttonWithType:UIButtonTypeCustom];
+    _getCodeBT.frame = CGRectMake(_verifyTF.right + 10, _verifyTF.top, 100, _verifyTF.height);
+    [_getCodeBT setTitle:@"获取验证码" forState:UIControlStateNormal];
+    _getCodeBT.backgroundColor = MAIN_COLOR;
+    _getCodeBT.layer.cornerRadius = 3;
+    [_getCodeBT addTarget:self action:@selector(getVerificationCode:) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:_getCodeBT];
+    
+    
     self.logInButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    _logInButton.frame = CGRectMake(LEFT_SPACE, passwordView.bottom + TOP_SPACE, passwordView.width, VIEW_HEIGHT);
+    _logInButton.frame = CGRectMake(LEFT_SPACE, _verifyTF.bottom + TOP_SPACE, passwordView.width, VIEW_HEIGHT);
     _logInButton.backgroundColor = MAIN_COLOR;
     [_logInButton setTitle:@"确认" forState:UIControlStateNormal];
     [_logInButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
@@ -97,13 +130,81 @@
     // Do any additional setup after loading the view.
 }
 
+- (void)viewWillDisappear:(BOOL)animated
+{
+    [super viewWillDisappear:animated];
+    [self.timer invalidate];
+    self.timer = nil;
+}
+
+- (void)dealloc
+{
+    NSLog(@"销毁微信绑定页面");
+    self.verifyCode = nil;
+    self.verifyTF = nil;
+    self.getCodeBT = nil;
+    self.logInButton = nil;
+    self.phoneTF = nil;
+    self.timer = nil;
+    self.passwordTF = nil;
+}
 
 - (void)backLoginVC:(id)sender
 {
     [self.navigationController dismissViewControllerAnimated:YES completion:nil];
 }
 
+static int t = 60;
+/**
+ *  点击获取验证码后, 每秒走一次的方法
+ */
+- (void)getVerificattionCodeTime
+{
+    NSLog(@"timer");
+    t--;
+    [self.getCodeBT setTitle:[NSString stringWithFormat:@"%d", t] forState:UIControlStateDisabled];
+}
 
+/**
+ *  获取验证码
+ *
+ *  @param button 获取验证码按钮
+ */
+- (void)getVerificationCode:(UIButton *)button
+{
+    NSLog(@"1111");
+    [self.phoneTF resignFirstResponder];
+    if (self.phoneTF.text.length == 0) {
+        UIAlertView * alert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"请输入手机号" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
+        [alert show];
+        [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:2];
+    }else{
+        BOOL isPhoneNum = [NSString isTelPhoneNub:_phoneTF.text];
+        if (isPhoneNum) {
+            NSDictionary * jsonDic = @{
+                                       @"Command":@42,
+                                       @"PhoneNumber":self.phoneTF.text
+                                       };
+            [self playPostWithDictionary:jsonDic];
+            self.verifyTF.enabled = YES;
+            button.enabled = NO;
+            button.backgroundColor = [UIColor colorWithWhite:0.8 alpha:1];
+            t = 60;
+            self.timer = nil;
+            self.timer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(getVerificattionCodeTime) userInfo:nil repeats:YES];
+            [self performSelector:@selector(passSixtySeconds) withObject:nil afterDelay:60];
+        }
+    }
+}
+
+- (void)passSixtySeconds
+{
+    [_timer invalidate];
+    self.timer = nil;
+    self.getCodeBT.enabled = YES;
+    self.getCodeBT.backgroundColor = MAIN_COLOR;
+    [_getCodeBT setTitle:@"重新获取" forState:UIControlStateNormal];
+}
 
 - (void)bindingPhonePassword:(UIButton *)button
 {
@@ -117,11 +218,31 @@
         UIAlertView * alert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"请输入密码" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
         [alert show];
         [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:2];
+    }else if (_verifyTF.text.length == 0)
+    {
+        UIAlertView * alert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"请输入验证码" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
+        [alert show];
+        [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:2];
     }else
     {
         BOOL isPhoneNum = [NSString isTelPhoneNub:_phoneTF.text];
         if (isPhoneNum) {
-            [self downloadData];
+            if ([self.verifyCode isEqualToString:[[[NSString stringWithFormat:@"%@231618", _verifyTF.text] md5] uppercaseString]]) {
+                NSTimeInterval seconds = [[NSDate date] timeIntervalSinceDate:self.codeDate];
+                if (seconds > 120) {
+                    UIAlertView * alert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"验证码超时" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
+                    [alert show];
+                    [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:2];
+                }else
+                {
+                    [self downloadData];
+                }
+            }else
+            {
+                UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:@"验证码错误" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
+                [alert show];
+                [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:2];
+            }
         }
     }
 }
@@ -169,12 +290,18 @@
 {
     NSLog(@"+++%@", data);
     if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
-        [[UserInfo shareUserInfo] setValuesForKeysWithDictionary:[data objectForKey:@"UserInfo"]];
-        [[NSUserDefaults standardUserDefaults] setValue:[UserInfo shareUserInfo].phoneNumber forKey:@"account"];
-        [[NSUserDefaults standardUserDefaults] setValue:[UserInfo shareUserInfo].password forKey:@"password"];
-        [[NSUserDefaults standardUserDefaults] setValue:@YES forKey:@"haveLogIn"];
-        [self.navigationController dismissViewControllerAnimated:YES completion:nil];
-        _refreshBlock();
+        if ([[data objectForKey:@"Command"] isEqualToNumber:@10008]) {
+            [[UserInfo shareUserInfo] setValuesForKeysWithDictionary:[data objectForKey:@"UserInfo"]];
+            [[NSUserDefaults standardUserDefaults] setValue:[UserInfo shareUserInfo].phoneNumber forKey:@"account"];
+            [[NSUserDefaults standardUserDefaults] setValue:[UserInfo shareUserInfo].password forKey:@"password"];
+            [[NSUserDefaults standardUserDefaults] setValue:@YES forKey:@"haveLogIn"];
+            [self.navigationController dismissViewControllerAnimated:YES completion:nil];
+            _refreshBlock();
+        }else if ([[data objectForKey:@"Command"] isEqualToNumber:@10042])
+        {
+            self.verifyCode = [data objectForKey:@"Verifynode"];
+            self.codeDate = [NSDate date];
+        }
     }else
     {
         UIAlertView * alert = [[UIAlertView alloc] initWithTitle:@"失败" message:[data objectForKey:@"ErrorMsg"] delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];

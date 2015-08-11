@@ -64,7 +64,8 @@
     self.view.backgroundColor = [UIColor colorWithWhite:0.98 alpha:1];
     self.navigationItem.title = @"管理地址";
     UIButton * addAddressBT = [UIButton buttonWithType:UIButtonTypeCustom];
-    addAddressBT.frame = CGRectMake(0, self.navigationController.navigationBar.bottom, self.view.width, 60);
+    addAddressBT.frame = CGRectMake(0, 0, self.view.width, 60);
+//    addAddressBT.frame = CGRectMake(0, self.navigationController.navigationBar.bottom, self.view.width, 60);
     [addAddressBT addTarget:self action:@selector(addAddressAndPhoneNumber:) forControlEvents:UIControlEventTouchUpInside];
     addAddressBT.backgroundColor = [UIColor whiteColor];
     [self.view addSubview:addAddressBT];

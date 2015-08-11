@@ -61,7 +61,8 @@
 //    UIBarButtonItem * barBT = [[UIBarButtonItem alloc] initWithCustomView:telButton];
 //    self.navigationItem.rightBarButtonItem = barBT;
     
-    self.scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, self.view.height)];
+    self.scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, self.view.height - self.navigationController.navigationBar.bottom)];
+//    self.scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, self.view.height)];
     _scrollView.backgroundColor = [UIColor colorWithWhite:0.9 alpha:0.8];
     [self.view addSubview:_scrollView];
     

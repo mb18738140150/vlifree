@@ -19,7 +19,7 @@
 @property (nonatomic, strong)UIButton * IconButton;
 
 - (void)createSubiew:(CGRect)frame;
-+ (CGFloat)cellHeigth;
++ (CGFloat)cellHeigthWithIsFirstReduce:(NSNumber *)isFirstReduce;
 
 
 @end

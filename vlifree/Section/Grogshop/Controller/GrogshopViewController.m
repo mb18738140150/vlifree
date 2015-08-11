@@ -396,7 +396,8 @@
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    return [GrogshopViewCell cellHeigth];
+    HotelModel * hotelMD = [self.dataArray objectAtIndex:indexPath.row];
+    return [GrogshopViewCell cellHeigthWithIsFirstReduce:hotelMD.isFirstReduce];
 }
 
 
@@ -451,7 +452,7 @@
         imageView.frame = imageFrame;
     }];
     
-    NSLog(@",  %g, %g", cellRect.origin.x, cellRect.origin.y);
+//    NSLog(@",  %g, %g", cellRect.origin.x, cellRect.origin.y);
 }
 
 - (void)removeBigImage
@@ -459,6 +460,9 @@
     UIView * view = [self.view.window viewWithTag:70000];
     [view removeFromSuperview];
 }
+
+
+
 
 
 /*

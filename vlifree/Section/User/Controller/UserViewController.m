@@ -335,7 +335,7 @@
         if ([[data objectForKey:@"Command"] isEqualToNumber:@10007] || [[data objectForKey:@"Command"] isEqualToNumber:@10009]) {
             [[UserInfo shareUserInfo] setValuesForKeysWithDictionary:[data objectForKey:@"UserInfo"]];
             if ([[data objectForKey:@"IsFirst"] isEqualToNumber:@YES]) {
-                UserViewController * userVC = self;
+                __weak UserViewController * userVC = self;
                 WXLoginViewController * wxLoginVC = [[WXLoginViewController alloc] init];
                 [wxLoginVC refreshUserInfo:^{
                     [userVC removeLogInView];

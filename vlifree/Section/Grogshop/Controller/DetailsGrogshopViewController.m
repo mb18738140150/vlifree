@@ -702,7 +702,10 @@
     return [str copy];
 }
 
-
+- (void)dealloc
+{
+    NSLog(@"酒店首页销毁");
+}
 
 
 /*

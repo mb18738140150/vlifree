@@ -24,7 +24,9 @@
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor colorWithWhite:0.9 alpha:1];
     self.navigationItem.title = @"添加地址";
-    UIView * addressView = [[UIView alloc] initWithFrame:CGRectMake(0, self.navigationController.navigationBar.bottom, self.view.width, 60)];
+    
+    UIView * addressView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, 60)];
+//    UIView * addressView = [[UIView alloc] initWithFrame:CGRectMake(0, self.navigationController.navigationBar.bottom, self.view.width, 60)];
     addressView.backgroundColor = [UIColor whiteColor];
     [self.view addSubview:addressView];
     

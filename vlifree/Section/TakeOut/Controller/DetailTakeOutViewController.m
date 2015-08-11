@@ -16,9 +16,13 @@
 #import "AlertLoginView.h"
 #import "WXLoginViewController.h"
 #import "CommentViewController.h"
+#import "HYSegmentedControl.h"
+#import "CommentViewCell.h"
+#import "CommentModel.h"
 
 #define SECTION_TABLEVIEW_CELL @"SECTIONCELL"
 #define MENUS_TABLEVIEW_CELL @"MENUSCELL"
+#define COMMENT_TABLEVIEW_CELL @"COMMENTCELL"
 
 #define SUBTRACT_BUTTON_TAG 1000
 #define ADD_BUTTON_TAG 2000
@@ -26,9 +30,11 @@
 #define SHOPPINGCARVIEW_HEIGHT 55
 
 
-@interface DetailTakeOutViewController ()<UITableViewDataSource, UITableViewDelegate, HTTPPostDelegate>
+@interface DetailTakeOutViewController ()<UITableViewDataSource, UITableViewDelegate, HTTPPostDelegate, HYSegmentedControlDelegate, UIScrollViewDelegate>
 
-
+{
+    int _page;
+}
 @property (nonatomic, strong)UITableView * sectionTableView;
 @property (nonatomic, strong)UITableView * menusTableView;
 
@@ -42,6 +48,20 @@
 
 @property (nonatomic, strong)NSMutableArray * shopArray;
 @property (nonatomic, strong)AlertLoginView * alertLoginV;
+
+
+@property (nonatomic, strong)UIScrollView * noticeScrollV;
+
+@property (nonatomic, strong)UILabel * noticeLB;
+
+@property (nonatomic, strong)NSTimer * noticeTimer;
+
+@property (nonatomic, strong)UIScrollView * aScrollView;
+@property (nonatomic, strong)HYSegmentedControl * segmentC;
+
+@property (nonatomic, strong)UITableView * commentTableView;
+
+@property (nonatomic, strong)NSMutableArray * commentArray;
 
 @end
 
@@ -63,6 +83,13 @@
     return _menusArray;
 }
 
+- (NSMutableArray *)commentArray
+{
+    if (!_commentArray) {
+        self.commentArray = [NSMutableArray array];
+    }
+    return _commentArray;
+}
 
 - (NSMutableArray *)shopArray
 {
@@ -79,6 +106,7 @@
 
 - (void)dealloc
 {
+    NSLog(@"销毁店面页面");
 //    [self removeObserver:self forKeyPath:@"shopArray"];
 }
 
@@ -91,44 +119,70 @@
     self.navigationController.navigationBar.titleTextAttributes = @{
                                                                     NSForegroundColorAttributeName: TEXT_COLOR
                                                                     };
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"查看评论" style:UIBarButtonItemStylePlain target:self action:@selector(lookComment:)];
+//    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"评论" style:UIBarButtonItemStylePlain target:self action:@selector(lookComment:)];
 //    [self addObserver:self forKeyPath:@"shopArray" options:NSKeyValueObservingOptionNew context:nil];
-    /*
-    UIView * noticeView = [[UIView alloc] initWithFrame:CGRectMake(0, self.navigationController.navigationBar.bottom, self.view.width, 30)];
+    
+    self.segmentC = [[HYSegmentedControl alloc] initWithOriginY:0 Titles:@[@"点菜", @"评论"] delegate:self];
+    [self.view addSubview:_segmentC];
+    
+    self.aScrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, _segmentC.bottom, self.view.width, self.view.height - self.navigationController.navigationBar.bottom - _segmentC.height)];
+//    _aScrollView.backgroundColor = [UIColor redColor];
+    _aScrollView.delegate = self;
+    _aScrollView.pagingEnabled = YES;
+    _aScrollView.showsHorizontalScrollIndicator = NO;
+    _aScrollView.contentSize = CGSizeMake(_aScrollView.width * 2, _aScrollView.height);
+    [self.view addSubview:_aScrollView];
+    
+    
+    
+    UIView * noticeView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.aScrollView.width, 30)];
+//    UIView * noticeView = [[UIView alloc] initWithFrame:CGRectMake(0, self.navigationController.navigationBar.bottom, self.aScrollView.width, 30)];
     noticeView.tag = 80000;
     noticeView.backgroundColor = [UIColor colorWithRed:254 / 255.0 green:231 / 255.0 blue:232 / 255.0 alpha:1];
-//    [self.view addSubview:noticeView];
+    [self.aScrollView addSubview:noticeView];
     
     UIImageView * aImageV = [[UIImageView alloc] initWithFrame:CGRectMake(5, 5, 20, 20)];
     aImageV.image = [UIImage imageNamed:@"laba.png"];
     [noticeView addSubview:aImageV];
     
-    UILabel * noticeLB = [[UILabel alloc] initWithFrame:CGRectMake(aImageV.right + 5, 5, noticeView.width - aImageV.right - 40, 20)];
-    noticeLB.text = @"欢迎商家测试使用";
-    noticeLB.textColor = TEXT_COLOR;
-    [noticeView addSubview:noticeLB];
+    self.noticeScrollV = [[UIScrollView alloc] initWithFrame:CGRectMake(aImageV.right + 5, 0, noticeView.width - aImageV.right - 40, noticeView.height)];
+    _noticeScrollV.showsVerticalScrollIndicator   = NO;
+    _noticeScrollV.showsHorizontalScrollIndicator = NO;
+    _noticeScrollV.tag = 9001;
+    [noticeView addSubview:_noticeScrollV];
+    
+    self.noticeLB = [[UILabel alloc] initWithFrame:CGRectMake(0, 5, _noticeScrollV.width, _noticeScrollV.height - 10)];
+//    _noticeLB.text = @"欢迎商家测试使用就饿哦JoeNGO弄欧冠哦哦哦个菲菲";
+    _noticeLB.textColor = TEXT_COLOR;
+//    [_noticeLB sizeToFit];
+    [_noticeScrollV addSubview:_noticeLB];
+//    _noticeScrollV.contentSize = CGSizeMake(_noticeLB.width + 3, _noticeScrollV.height);
+    
     
     UIButton * button = [UIButton buttonWithType:UIButtonTypeCustom];
-    button.frame = CGRectMake(noticeLB.right + 10, 5, 20, 20);
+    button.frame = CGRectMake(_noticeScrollV.right + 10, 5, 20, 20);
     [button setBackgroundImage:[UIImage imageNamed:@"xx.png"] forState:UIControlStateNormal];
     [button addTarget:self action:@selector(removeNoticeView:) forControlEvents:UIControlEventTouchUpInside];
     [noticeView addSubview:button];
-    */
+//    NSLog(@"point =  %g, %g", noticeScrollV.contentOffset.x, _noticeScrollV.contentOffset.y);
     
-//    self.sectionTableView = [[UITableView alloc] initWithFrame:CGRectMake(0, noticeView.bottom, 80, self.view.height - SHOPPINGCARVIEW_HEIGHT - noticeView.height - self.navigationController.navigationBar.bottom) style:UITableViewStylePlain];
-    self.sectionTableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, 80, self.view.height - SHOPPINGCARVIEW_HEIGHT) style:UITableViewStylePlain];
+    
+    
+    self.sectionTableView = [[UITableView alloc] initWithFrame:CGRectMake(0, noticeView.bottom, 80, self.aScrollView.height - SHOPPINGCARVIEW_HEIGHT - noticeView.height) style:UITableViewStylePlain];
+//    self.sectionTableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, 80, self.aScrollView.height - SHOPPINGCARVIEW_HEIGHT) style:UITableViewStylePlain];
     self.sectionTableView.backgroundColor = [UIColor colorWithWhite:0.95 alpha:0.7];
     _sectionTableView.dataSource = self;
     _sectionTableView.delegate = self;
+    _sectionTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     _sectionTableView.tableFooterView = [[UIView alloc] init];
 //    [_sectionTableView set]
     [_sectionTableView registerClass:[ClassesViewCell class] forCellReuseIdentifier:SECTION_TABLEVIEW_CELL];
     [_sectionTableView selectRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] animated:YES scrollPosition:UITableViewScrollPositionNone];
 //    _sectionTableView.backgroundColor = [UIColor redColor];
-    [self.view addSubview:_sectionTableView];
+    [self.aScrollView addSubview:_sectionTableView];
     
-//    self.menusTableView = [[UITableView alloc] initWithFrame:CGRectMake(_sectionTableView.right, noticeView.bottom, self.view.width - 80, self.view.height - self.navigationController.navigationBar.bottom - SHOPPINGCARVIEW_HEIGHT - noticeView.height) style:UITableViewStylePlain];
-    self.menusTableView = [[UITableView alloc] initWithFrame:CGRectMake(_sectionTableView.right, self.navigationController.navigationBar.bottom, self.view.width - 80, self.view.height - self.navigationController.navigationBar.bottom - SHOPPINGCARVIEW_HEIGHT) style:UITableViewStylePlain];
+    self.menusTableView = [[UITableView alloc] initWithFrame:CGRectMake(_sectionTableView.right, noticeView.bottom, self.aScrollView.width - 80, self.aScrollView.height - SHOPPINGCARVIEW_HEIGHT - noticeView.height) style:UITableViewStylePlain];
+//    self.menusTableView = [[UITableView alloc] initWithFrame:CGRectMake(_sectionTableView.right, self.navigationController.navigationBar.bottom, self.aScrollView.width - 80, self.aScrollView.height - self.navigationController.navigationBar.bottom - SHOPPINGCARVIEW_HEIGHT) style:UITableViewStylePlain];
     
     _menusTableView.delegate = self;
     _menusTableView.dataSource = self;
@@ -136,10 +190,10 @@
     _menusTableView.tableFooterView = [[UIView alloc] init];
     [_menusTableView registerClass:[MenusViewCell class] forCellReuseIdentifier:MENUS_TABLEVIEW_CELL];
 //    _menusTableView.backgroundColor = [UIColor orangeColor];
-    [self.view addSubview:_menusTableView];
+    [self.aScrollView addSubview:_menusTableView];
     
     
-    self.shoppingCarView = [[ShoppingCartView alloc] initWithFrame:CGRectMake(0, _menusTableView.bottom, self.view.width, SHOPPINGCARVIEW_HEIGHT)];
+    self.shoppingCarView = [[ShoppingCartView alloc] initWithFrame:CGRectMake(0, _menusTableView.bottom, self.aScrollView.width, SHOPPINGCARVIEW_HEIGHT)];
     _shoppingCarView.backgroundColor = [UIColor whiteColor];
     
     if (self.sendPrice != nil) {
@@ -148,10 +202,10 @@
     {
         self.shoppingCarView.priceLabel.text = @"¥0";
     }
-    NSLog(@"=====%@", self.sendPrice);
+//    NSLog(@"=====%@", self.sendPrice);
     [_shoppingCarView.shoppingCarBT addTarget:self action:@selector(addShoppingCarDetailsViewAction:) forControlEvents:UIControlEventTouchUpInside];
     [_shoppingCarView.changeButton addTarget:self action:@selector(confirmMenusAction:) forControlEvents:UIControlEventTouchUpInside];
-    [self.view addSubview:_shoppingCarView];
+    [self.aScrollView addSubview:_shoppingCarView];
 //    _shoppingCarView.backgroundColor = [UIColor greenColor];
     
     
@@ -164,6 +218,21 @@
         [self.shoppingCarView.changeButton setBackgroundImage:[UIImage imageNamed:@"storeState_g.png"] forState:UIControlStateDisabled];
     }
     
+//    CommentViewController * commentVC = [[CommentViewController alloc] init];
+//    commentVC.storeId = self.takeOutID;
+//    commentVC.view.frame = CGRectMake(_aScrollView.width, 0, _aScrollView.width, _aScrollView.height);
+//    [_aScrollView addSubview:commentVC.view];
+    
+    self.commentTableView = [[UITableView alloc] initWithFrame:CGRectMake(_aScrollView.width, 0, _aScrollView.width, _aScrollView.height)];
+    _commentTableView.delegate = self;
+    _commentTableView.dataSource = self;
+    [_aScrollView addSubview:_commentTableView];
+    _page = 1;
+    self.commentTableView.header = [MJRefreshNormalHeader headerWithRefreshingTarget:self refreshingAction:@selector(headerRereshing)];
+    [_commentTableView registerClass:[CommentViewCell class] forCellReuseIdentifier:COMMENT_TABLEVIEW_CELL];
+    self.commentTableView.footer = [MJRefreshAutoNormalFooter footerWithRefreshingTarget:self refreshingAction:@selector(footerRereshing)];
+    [self downloadDataWithCommand:@39 page:_page count:COUNT];
+    self.commentTableView.tableFooterView = [[UIView alloc] init];
     
     
     UIButton * backBT = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -175,9 +244,50 @@
     
     [self downloadData];
     
+//    [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(scrollNotice) userInfo:nil repeats:YES];
 //    self.navigationController.navigationBar.tintColor = [UIColor clearColor];
     // Do any additional setup after loading the view.
 }
+
+- (void)hySegmentedControlSelectAtIndex:(NSInteger)index
+{
+//    self.aScrollView.contentOffset = CGPointMake(index * _aScrollView.width, 0);
+    [self.aScrollView setContentOffset:CGPointMake(index * _aScrollView.width, 0) animated:YES];
+}
+
+
+
+- (void)scrollNotice
+{
+    if (self.noticeScrollV.contentSize.width - self.noticeScrollV.contentOffset.x > self.noticeScrollV.width) {
+        self.noticeScrollV.contentOffset = CGPointMake(self.noticeScrollV.contentOffset.x + 1, 0);
+    }else
+    {
+        self.noticeScrollV.contentOffset = CGPointMake(0, 0);
+    }
+}
+
+- (void)noticeLBText:(NSString *)notice
+{
+    if (notice.length > 0) {
+        self.noticeLB.text = notice;
+        CGSize size = [self.noticeLB sizeThatFits:CGSizeMake(CGFLOAT_MAX, self.noticeLB.height)];
+        self.noticeLB.width = size.width;
+        self.noticeScrollV.contentSize = CGSizeMake(size.width + 5, _noticeScrollV.height);
+        if (self.noticeTimer != nil) {
+            [self.noticeTimer invalidate];
+        }
+        self.noticeTimer = nil;
+        if (size.width > _noticeScrollV.width) {
+            self.noticeTimer = [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(scrollNotice) userInfo:nil repeats:YES];
+        }
+    }else
+    {
+        [self deleteNOticeView];
+    }
+    
+}
+
 
 - (void)backLastVC:(id)sender
 {
@@ -201,12 +311,26 @@
 
 - (void)removeNoticeView:(UIButton *)button
 {
-    UIView * noticeView = button.superview;
+    [self deleteNOticeView];
+}
+
+- (void)deleteNOticeView
+{
+    UIView * noticeView = [self.aScrollView viewWithTag:80000];
     self.sectionTableView.top = noticeView.top;
     self.menusTableView.top = noticeView.top;
+//    self.menusTableView.top -= noticeView.height;
+//    self.sectionTableView.top -= noticeView.height;
     self.sectionTableView.height += noticeView.height;
     self.menusTableView.height += noticeView.height;
+    self.noticeLB = nil;
+    self.noticeScrollV = nil;
+//    self.sectionTableView.frame = CGRectMake(0, 0, 80, self.aScrollView.height - SHOPPINGCARVIEW_HEIGHT);
     [noticeView removeFromSuperview];
+    if (self.noticeTimer != nil) {
+        [self.noticeTimer invalidate];
+        self.noticeTimer = nil;
+    }
 }
 
 - (void)confirmMenusAction:(UIButton *)button
@@ -274,7 +398,36 @@
     [self getAllCount];
 }
 
+#pragma mark - 评论数据刷新
+
+- (void)headerRereshing
+{
+    _page = 1;
+    [self.commentTableView.footer resetNoMoreData];
+    [self downloadDataWithCommand:@39 page:_page count:COUNT];
+}
+
+- (void)footerRereshing
+{
+    [self downloadDataWithCommand:@39 page:++_page count:COUNT];
+}
+
+
 #pragma mark - 数据请求
+
+- (void)downloadDataWithCommand:(NSNumber *)command page:(int)page count:(int)count
+{
+    NSDictionary * jsonDic = @{
+                               @"Command":command,
+                               @"CurPage":[NSNumber numberWithInt:page],
+                               @"CurCount":[NSNumber numberWithInt:count],
+                               @"StoreId":self.takeOutID,
+                               @"BusType":@2
+                               };
+    [self playPostWithDictionary:jsonDic];
+}
+
+
 - (void)downloadData
 {
 //    [SVProgressHUD showWithStatus:@"加载中..." maskType:SVProgressHUDMaskTypeClear];
@@ -283,18 +436,6 @@
                                @"StoreId":self.takeOutID
                                };
     [self playPostWithDictionary:jsonDic];
-    /*
-     //    NSLog(@"%@, %@", self.classifyId, [UserInfo shareUserInfo].userId);
-     NSString * jsonStr = [jsonDic JSONString];
-     NSString * str = [NSString stringWithFormat:@"%@231618", jsonStr];
-     NSLog(@"%@", str);
-     NSString * md5Str = [str md5];
-     NSString * urlString = [NSString stringWithFormat:@"http://p.vlifee.com/getdata.ashx?md5=%@",md5Str];
-     
-     HTTPPost * httpPost = [HTTPPost shareHTTPPost];
-     [httpPost post:urlString HTTPBody:[jsonStr dataUsingEncoding:NSUTF8StringEncoding]];
-     httpPost.delegate = self;
-     */
 }
 
 - (void)playPostWithDictionary:(NSDictionary *)dic
@@ -313,10 +454,13 @@
 - (void)refresh:(id)data
 {
     NSLog(@"+++%@", data);
+    [self.commentTableView.header endRefreshing];
+    [self.commentTableView.footer endRefreshing];
     if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
         if ([[data objectForKey:@"Command"] intValue] == 10012) {
 //            self.mealBoxMoney = [data objectForKey:@"MealBoxMoney"];
 //            NSLog(@"餐具费  %@", self.mealBoxMoney);
+            [self noticeLBText:[data objectForKey:@"BusinessNotice"]];
             NSArray * array = [data objectForKey:@"CatalogueList"];
             for (int i = 0; i < array.count; i++) {
                 NSDictionary * dic = [array objectAtIndex:i];
@@ -379,19 +523,44 @@
             orderVC.storeName = self.storeName;
 //            orderVC.mealBoxMoney = [data objectForKey:@"MealBoxMoney"];
             [self.navigationController pushViewController:orderVC animated:YES];
+        }else if ([[data objectForKey:@"Command"] isEqualToNumber:@10039])
+        {
+            NSArray * array = [data objectForKey:@"CommentList"];
+            if (_page == 1) {
+                self.commentArray = nil;
+            }
+            for (NSDictionary * dic in array) {
+                CommentModel * commentMD  = [[CommentModel alloc] initWithDictionary:dic];
+                [self.commentArray addObject:commentMD];
+            }
+            if ([[data objectForKey:@"AllCur"] intValue] == _page || self.commentArray.count == 0 || self.commentArray.count == [[data objectForKey:@"AllCount"] integerValue]) {
+                [self.commentTableView.footer noticeNoMoreData];
+            }
+            [self.commentTableView reloadData];
         }
     }else
     {
         UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:[data objectForKey:@"ErrorMsg"] delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
         [alert show];
         [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:1.5];
+        if ([[data objectForKey:@"Command"] isEqualToNumber:@10013])
+        {
+            [self.menusTableView reloadData];
+        }
+//        if ([[data objectForKey:@"Command"] isEqualToNumber:@10039])
+//        {
+//            [self.commentTableView.header endRefreshing];
+//            [self.commentTableView.footer endRefreshing];
+//        }
     }
-
+    
 //    [SVProgressHUD dismiss];
 }
 
 - (void)failWithError:(NSError *)error
 {
+    [self.commentTableView.header endRefreshing];
+    [self.commentTableView.footer endRefreshing];
 //    [SVProgressHUD dismiss];
     NSLog(@"%@", error);
 }
@@ -411,6 +580,9 @@
     if ([tableView isEqual:_sectionTableView]) {
         return self.classArray.count;
 //        return 15;
+    }else if ([tableView isEqual:_commentTableView])
+    {
+        return self.commentArray.count;
     }
     return self.menusArray.count;
 //    return 15;
@@ -427,6 +599,12 @@
             sectionCell.classModel = classMD;
         }
         return sectionCell;
+    }else if ([tableView isEqual:_commentTableView])
+    {
+        CommentViewCell * commentCell = [tableView dequeueReusableCellWithIdentifier:COMMENT_TABLEVIEW_CELL forIndexPath:indexPath];
+        CommentModel * commentMD = [self.commentArray objectAtIndex:indexPath.row];
+        commentCell.commentMD = commentMD;
+        return commentCell;
     }
     MenuModel * menuMD = [self.menusArray objectAtIndex:indexPath.row];
     MenusViewCell * cell = [tableView dequeueReusableCellWithIdentifier:MENUS_TABLEVIEW_CELL];
@@ -449,6 +627,10 @@
         ClassModel * classMD = [self.classArray objectAtIndex:indexPath.row];
         return [ClassesViewCell cellHeightWithString:classMD.title frame:tableView.bounds];
 //        return [ClassesViewCell cellHeightWithString:@"和覅和合格后二极管" frame:tableView.bounds];
+    }else if ([tableView isEqual:_commentTableView])
+    {
+        CommentModel * commentMD = [self.commentArray objectAtIndex:indexPath.row];
+        return [CommentViewCell cellHeightWithCommentMD:commentMD];
     }
     return [MenusViewCell cellHeight];
 }
@@ -467,10 +649,10 @@
 
 - (BOOL)tableView:(UITableView *)tableView shouldHighlightRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    if ([tableView isEqual:_menusTableView]) {
-        return NO;
+    if ([tableView isEqual:_sectionTableView]) {
+        return YES;
     }
-    return YES;
+    return NO;
 }
 
 
@@ -628,7 +810,7 @@
     redView.textColor = [UIColor whiteColor];
     redView.layer.backgroundColor = [UIColor redColor].CGColor;
     redView.layer.cornerRadius = 10;
-    [self.view addSubview:redView];
+    [self.aScrollView addSubview:redView];
     CGRect rect = CGRectMake(65, _shoppingCarView.top - 10, 20, 20);
     [UIView animateWithDuration:0.8 animations:^{
         redView.frame = rect;
@@ -849,6 +1031,20 @@
     [view removeFromSuperview];
 }
 
+
+#pragma mark - scrollView Deletage 
+
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView
+{
+//    [self.segmentC changeSegmentedControlWithIndex:(scrollView.contentOffset.x + scrollView.width / 2) / scrollView.width];
+}
+
+- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
+{
+    if ([scrollView isEqual:_aScrollView]) {
+        [self.segmentC changeSegmentedControlWithIndex:scrollView.contentOffset.x / scrollView.width];
+    }
+}
 
 /*
 #pragma mark - Navigation
