@@ -7,7 +7,6 @@
 //
 
 #import "AddressViewController.h"
-#import "TWButton.h"
 #import "AddressModel.h"
 #import "AddressViewCell.h"
 #import "AddAddressViewController.h"
@@ -16,16 +15,37 @@
 
 
 @interface AddressViewController ()<UITableViewDataSource, UITableViewDelegate, HTTPPostDelegate>
-
+/**
+ *  数据数组
+ */
 @property (nonatomic, strong)NSMutableArray * dataArray;
-
+/**
+ *  选中地址
+ */
 @property (nonatomic, strong)UILabel * addressLB;
+/**
+ *  选中电话
+ */
 @property (nonatomic, strong)UILabel * telLabel;
+/**
+ *  选中编辑按钮
+ */
 @property (nonatomic, strong)UIButton * editButton;
+/**
+ *  选为送餐地址按钮
+ */
 @property (nonatomic, strong)UIButton * sentButton;
+/**
+ *  删除地址按钮
+ */
 @property (nonatomic, strong)UIButton * deleteButton;
+/**
+ *  地址列表
+ */
 @property (nonatomic, strong)UITableView * addressTableView;
-
+/**
+ *  回调block
+ */
 @property (nonatomic, copy)ReturnAddresssModelBlock returnModelBlock;
 
 @end

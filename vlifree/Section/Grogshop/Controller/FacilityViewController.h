@@ -7,12 +7,18 @@
 //
 
 #import <UIKit/UIKit.h>
-
+/**
+ *  设备详情页面
+ */
 @interface FacilityViewController : UIViewController
 
-
+/**
+ *  设备字典
+ */
 @property (nonatomic, strong)NSDictionary * detailsDic;
-
+/**
+ *  商家描述
+ */
 @property (nonatomic, copy)NSString * describe;
 
 

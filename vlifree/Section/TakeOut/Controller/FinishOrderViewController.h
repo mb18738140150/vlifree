@@ -10,9 +10,13 @@
 
 @interface FinishOrderViewController : UIViewController
 
-
+/**
+ *  订单号
+ */
 @property (nonatomic, copy)NSString * orderID;
-
+/**
+ *  数据请求
+ */
 - (void)downloadData;
 
 @end

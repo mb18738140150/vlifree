@@ -24,6 +24,9 @@
 @property (nonatomic, strong)UITextField * modifyPasswordTF;//新密码
 @property (nonatomic, strong)UITextField * confirmPasswordTF;//确认密码
 
+@property (nonatomic, strong)JGProgressHUD * hud;
+
+
 @end
 
 @implementation PasswordViewController
@@ -88,6 +91,8 @@
     [self.view addSubview:confirmButton];
     
     
+    self.hud = [[JGProgressHUD alloc] initWithStyle:JGProgressHUDStyleLight];
+    
     UIButton * backBT = [UIButton buttonWithType:UIButtonTypeCustom];
     backBT.frame = CGRectMake(0, 0, 15, 20);
     [backBT setBackgroundImage:[UIImage imageNamed:@"back_w.png"] forState:UIControlStateNormal];
@@ -139,6 +144,7 @@
 
 - (void)downloadData
 {
+    [self.hud showInView:self.view];
     NSDictionary * jsonDic = @{
                                @"Command":@21,
                                @"UserId":[UserInfo shareUserInfo].userId,
@@ -176,6 +182,7 @@
 - (void)refresh:(id)data
 {
     NSLog(@"+++%@", data);
+    [self.hud dismiss];
     if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
         [self.navigationController popViewControllerAnimated:YES];
     }else

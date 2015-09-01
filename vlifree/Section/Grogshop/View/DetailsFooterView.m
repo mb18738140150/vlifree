@@ -15,9 +15,13 @@
 #define BUTTON_VIEW_TOP_SPACE 10
 
 @interface DetailsFooterView ()
-
+/**
+ *  房间说明文本框
+ */
 @property (nonatomic, strong)UILabel * explainLabel;
-
+/**
+ *  房间说明试图
+ */
 @property (nonatomic, strong)UIView * explainView;
 
 @end
@@ -43,6 +47,7 @@
 - (void)createSubview
 {
     self.backgroundColor = [UIColor colorWithWhite:0.95 alpha:0.7];
+    /*
     self.allButton = [UIButton buttonWithType:UIButtonTypeCustom];
     _allButton.frame = CGRectMake(0, 0, self.width, BUTTON_HEIGHT);
     [_allButton setTitle:@"展开全部房型" forState:UIControlStateNormal];
@@ -53,7 +58,7 @@
     _allButton.layer.borderColor = [UIColor colorWithWhite:0.7 alpha:0.4].CGColor;
     _allButton.layer.borderWidth = 1;
 //    [self addSubview:_allButton];
-    
+    */
     UIView * lineView = [[UIView alloc] initWithFrame:CGRectMake(0, BUTTON_VIEW_TOP_SPACE - 1, self.width, 1)];
     lineView.backgroundColor = LINE_COLOR;
     [self addSubview:lineView];

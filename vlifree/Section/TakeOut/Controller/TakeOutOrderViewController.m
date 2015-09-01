@@ -38,25 +38,59 @@
 
 @interface TakeOutOrderViewController ()<BDWalletSDKMainManagerDelegate, HTTPPostDelegate, UINavigationControllerDelegate>
 {
+    /**
+     *  支付钱
+     */
     double _totalMoney;
+    /**
+     *  未减免前的总价格
+     */
     double _allMoney;
 }
-
+/**
+ *  微信支付视图
+ */
 @property (nonatomic, strong)PayTypeView * weixinView;
+/**
+ *  百度支付视图
+ */
 @property (nonatomic, strong)PayTypeView * baiduView;
+/**
+ *  餐到付款视图
+ */
 @property (nonatomic, strong)PayTypeView * candaoView;
-
+/**
+ *  送餐地址文本框
+ */
 @property (nonatomic, strong)UILabel * addressLB;
-@property (nonatomic, strong)UILabel * phoneLable;
+//@property (nonatomic, strong)UILabel * phoneLable;
+/**
+ *  选中送餐地址按钮
+ */
 @property (nonatomic, strong)UIButton * addressBT;
+/**
+ *  备注输入框
+ */
 @property (nonatomic, strong)UITextView * remarksTV;
+/**
+ *  送餐地址
+ */
 @property (nonatomic, copy)NSString * address;
+/**
+ *  送餐电话
+ */
 @property (nonatomic, copy)NSString * phone;
-
+/**
+ *  支付方式 1,微信  2,百度(默认1)
+ */
 @property (nonatomic, assign)NSInteger payType; //支付方式 1,微信  2,百度(默认1)
-
+/**
+ *  订单id
+ */
 @property (nonatomic, copy)NSString * orderID;
-
+/**
+ *  提示视图
+ */
 @property (nonatomic, strong)JGProgressHUD * hud;
 
 @end
@@ -169,7 +203,7 @@
         UILabel * fullPriceLB = [[UILabel alloc] initWithFrame:CGRectMake(menusView.width - 50 - LEFT_SPACE, fullOrderLB.top, 50, LABEL_HEIGHT)];
         fullPriceLB.text = [NSString stringWithFormat:@"-%@", [self.orderDic objectForKey:@"FullReduce"]];
         fullPriceLB.textColor = [UIColor redColor];
-        fullOrderLB.font = [UIFont systemFontOfSize:14];
+        fullPriceLB.font = [UIFont systemFontOfSize:14];
         [menusView addSubview:fullPriceLB];
         top = fullOrderLB.bottom;
         NSNumber * fullPrice = [self.orderDic objectForKey:@"FullReduce"];
@@ -412,7 +446,7 @@
         CGFloat addY = size.height - _addressLB.height;
         _addressLB.height = size.height;
         _addressBT.height = _addressLB.height + 2 * TOP_SPACE;
-        takeOutOrderVC.phoneLable.text = addressModel.phoneNumber;
+//        takeOutOrderVC.phoneLable.text = addressModel.phoneNumber;
         [takeOutOrderVC reloadViewFrameWithAddY:addY];
     }];
     [self.navigationController pushViewController:addressVC animated:YES];

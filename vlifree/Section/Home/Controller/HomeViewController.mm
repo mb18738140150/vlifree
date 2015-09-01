@@ -26,14 +26,36 @@
 
 @interface HomeViewController ()<CLLocationManagerDelegate, HTTPPostDelegate, UITableViewDataSource, UITableViewDelegate, BMKLocationServiceDelegate, BMKGeoCodeSearchDelegate>
 {
+    /**
+     *  请求数据的页数
+     */
     int _page;
+    /**
+     *  是否已经定位了
+     */
     BOOL _isLOC;
 }
-@property (nonatomic, strong)CLLocationManager * locationManager;
+
+//@property (nonatomic, strong)CLLocationManager * locationManager;
+/**
+ *  位置文本框
+ */
 @property (nonatomic, strong)UILabel * locationLB;
+/**
+ *  数据数组
+ */
 @property (nonatomic, strong)NSMutableArray * dataArray;
+/**
+ *  首页列表
+ */
 @property (nonatomic, strong)UITableView * homeTableView;
+/**
+ *  百度地图SDK定位对象
+ */
 @property (nonatomic, strong)BMKLocationService * locService;
+/**
+ *  百度地图SDK地理编码对象
+ */
 @property (nonatomic, strong)BMKGeoCodeSearch * geoSearcher;
 
 @end
@@ -48,6 +70,35 @@
     return _dataArray;
 }
 
+
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didLoginNOtification) name:@"login" object:nil];
+    }
+    return self;
+}
+
+- (void)didLoginNOtification
+{
+    UIView * aView = [self.view viewWithTag:10009];
+    if ([UserInfo shareUserInfo].userId) {
+        self.homeTableView.scrollEnabled = YES;
+        //        [self.homeTableView.header beginRefreshing];
+        [self downloadDataWithCommand:@1 page:_page count:DATA_COUNT];
+        aView.hidden = YES;
+    }
+    self.homeTableView.scrollEnabled = YES;
+//    self.dataArray = nil;
+    [self.homeTableView reloadData];
+    aView.hidden = NO;
+}
+
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"login" object:nil];
+}
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -153,9 +204,9 @@
 - (void)isLocationsuccess
 {
     if ([CLLocationManager authorizationStatus] == kCLAuthorizationStatusDenied || [CLLocationManager authorizationStatus] == kCLAuthorizationStatusRestricted) {
-        UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:@"本应用需要打开定位才能请求数据" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
-        [alert show];
-        [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:1.5];
+//        UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:@"本应用需要打开定位才能请求数据" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
+//        [alert show];
+//        [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:1.5];
     }
 //    if (![UserLocation shareUserLocation].city) {
 ////        [SVProgressHUD dismiss];
@@ -277,6 +328,9 @@
                                        @"UserId":[UserInfo shareUserInfo].userId
                                        };
             [self playPostWithDictionary:jsonDic];
+        }else
+        {
+            [self.homeTableView.header performSelector:@selector(endRefreshing) withObject:nil afterDelay:2];
         }
     }else
     {
@@ -401,6 +455,7 @@
         [UserLocation shareUserLocation].streetNumber = result.addressDetail.streetNumber;
         [UserLocation shareUserLocation].district = result.addressDetail.district;
         self.locationLB.text = result.addressDetail.city;
+        [self downloadDataWithCommand:@1 page:_page count:DATA_COUNT];
     }
     else {
         NSLog(@"抱歉，未找到结果");

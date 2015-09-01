@@ -10,9 +10,17 @@
 #import "AddressModel.h"
 
 @interface AddAddressViewController ()<UITextFieldDelegate, HTTPPostDelegate>
-
+/**
+ *  地址输入框
+ */
 @property (nonatomic, strong)UITextField * addressTF;
+/**
+ *  电话输入框
+ */
 @property (nonatomic, strong)UITextField * telTF;
+/**
+ *  回调block
+ */
 @property (nonatomic, copy)RefreshDataBlock refreshBlock;
 
 @end

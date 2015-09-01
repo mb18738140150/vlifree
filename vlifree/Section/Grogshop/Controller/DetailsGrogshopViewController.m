@@ -613,20 +613,69 @@
 
 - (void)lookBigImage:(UIButton *)button
 {
-    int section = 0;
+//    int section = 0;
     NSInteger row = button.tag - 10000;
     RoomModel * roomMd = [self.dataArray objectAtIndex:row];
-    CGPoint point = self.detailsTableView.contentOffset;
-    CGRect cellRect = [self.detailsTableView rectForRowAtIndexPath:[NSIndexPath indexPathForRow:row inSection:section]];
-    CGRect btFrame = button.frame;
-    btFrame.origin.y = cellRect.origin.y - point.y + button.frame.origin.y + self.detailsTableView.top;
-    btFrame.origin.x = self.detailsTableView.left + button.left;
+//    CGPoint point = self.detailsTableView.contentOffset;
+//    CGRect cellRect = [self.detailsTableView rectForRowAtIndexPath:[NSIndexPath indexPathForRow:row inSection:section]];
+//    CGRect btFrame = button.frame;
+//    btFrame.origin.y = cellRect.origin.y - point.y + button.frame.origin.y + self.detailsTableView.top;
+//    btFrame.origin.x = self.detailsTableView.left + button.left;
     UITapGestureRecognizer * tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(removeBigImage)];
     
     UIView * view = [[UIView alloc] initWithFrame:[UIScreen mainScreen].bounds];
     view.tag = 70000;
     [view addGestureRecognizer:tapGesture];
-    view.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.3];
+    view.backgroundColor = [UIColor colorWithWhite:0.7 alpha:0.8];
+    
+    NSMutableArray * imageViewAry = [NSMutableArray array];
+    if (roomMd.photos.count > 0) {
+        for (int i = 0; i < roomMd.photos.count; i++) {
+            UIImageView * imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 200, 200)];
+//            imageView.center = view.center;
+            imageView.layer.cornerRadius = 30;
+            imageView.layer.masksToBounds = YES;
+//            CGRect imageFrame = imageView.frame;
+//            imageView.frame = btFrame;
+            imageView.image = [UIImage imageNamed:@"superMarket.png"];
+            [view addSubview:imageView];
+            [self.view.window addSubview:view];
+            __weak UIImageView * imageV = imageView;
+            [imageView setImageWithURL:[NSURL URLWithString:[roomMd.photos objectAtIndex:i]] placeholderImage:[UIImage imageNamed:@"placeholderIM.png"] completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType) {
+                if (error) {
+                    imageV.image = [UIImage imageNamed:@"load_fail.png"];
+                }
+            }];
+            [imageViewAry addObject:imageView];
+        }
+    }else
+    {
+        UIImageView * imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 200, 200)];
+//        imageView.center = view.center;
+        imageView.layer.cornerRadius = 30;
+        imageView.layer.masksToBounds = YES;
+        imageView.image = [UIImage imageNamed:@"superMarket.png"];
+        [view addSubview:imageView];
+        [self.view.window addSubview:view];
+        __weak UIImageView * imageV = imageView;
+        [imageView setImageWithURL:[NSURL URLWithString:roomMd.icon] placeholderImage:[UIImage imageNamed:@"placeholderIM.png"] completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType) {
+            if (error) {
+                imageV.image = [UIImage imageNamed:@"load_fail.png"];
+            }
+        }];
+        [imageViewAry addObject:imageView];
+    }
+    AutoSlideScrollView * cycleScrollView = [[AutoSlideScrollView alloc] initWithFrame:CGRectMake(0, 0, 200, 200) animationDuration:0];
+    cycleScrollView.center = view.center;
+    cycleScrollView.fetchContentViewAtIndex = ^UIView *(NSInteger pageIndex){
+        return [imageViewAry objectAtIndex:pageIndex];
+    };
+    cycleScrollView.totalPagesCount = ^NSInteger(void){
+        return imageViewAry.count;
+    };
+    [view addSubview:cycleScrollView];
+    /*
+    
     UIImageView * imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 200, 200)];
     imageView.center = view.center;
     imageView.layer.cornerRadius = 30;
@@ -645,8 +694,8 @@
     [UIView animateWithDuration:1 animations:^{
         imageView.frame = imageFrame;
     }];
-    
-    NSLog(@",  %g, %g", cellRect.origin.x, cellRect.origin.y);
+    */
+//    NSLog(@",  %g, %g", cellRect.origin.x, cellRect.origin.y);
 }
 
 - (void)removeBigImage

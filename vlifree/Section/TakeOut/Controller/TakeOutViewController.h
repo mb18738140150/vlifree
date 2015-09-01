@@ -9,8 +9,18 @@
 #import <UIKit/UIKit.h>
 
 @interface TakeOutViewController : UIViewController
-
+/**
+ *  是否是微超市按钮跳转过来的
+ */
 @property(nonatomic, assign)BOOL isSupermark;
+/**
+ *  数据请求方法
+ *
+ *  @param command 命令数字
+ *  @param page    数据页数
+ *  @param count   每页数据的个数
+ *  @param type    数据请求类型
+ */
 - (void)downloadDataWithCommand:(NSNumber *)command page:(int)page count:(int)count type:(int)type;
 
 @end

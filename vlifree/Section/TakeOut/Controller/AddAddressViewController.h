@@ -12,9 +12,15 @@
 typedef void(^RefreshDataBlock)();
 @interface AddAddressViewController : UIViewController
 
-
+/**
+ *  地址Model
+ */
 @property(nonatomic, strong)AddressModel * addressModel;
-
+/**
+ *  添加地址成功后回调方法
+ *
+ *  @param refreshBlock 回调block
+ */
 - (void)successBack:(RefreshDataBlock)refreshBlock;
 
 @end

@@ -23,25 +23,59 @@
 @interface TakeOutViewController ()<UITableViewDataSource, UITableViewDelegate, CLLocationManagerDelegate, HTTPPostDelegate, BMKLocationServiceDelegate, BMKGeoCodeSearchDelegate>
 
 {
+    /**
+     *  数据请求页数
+     */
     int _page;
+    /**
+     *  是否已经定位
+     */
     BOOL _isLoc;
+    /**
+     *  请求类型
+     */
     int _type;
 }
 
 @property (nonatomic, strong)UITableView * takeOutTabelView;
+/**
+ *  类型页面
+ */
 @property (nonatomic, strong)TypeView * typeView;
 //@property (nonatomic, strong)CLLocationManager * locationManager;
+/**
+ *  百度地图SDK定位对象
+ */
 @property (nonatomic, strong)BMKLocationService * locService;
+/**
+ *  百度地图SDK地理编码对象
+ */
 @property (nonatomic, strong)BMKGeoCodeSearch * geoSearcher;
-
+/**
+ *  定位按钮
+ */
 @property (nonatomic, strong)UIButton * addressBT;
+/**
+ *  位置信息文本框
+ */
 @property (nonatomic, strong)UILabel * addressLB;
+/**
+ *  定位图标
+ */
 @property (nonatomic, strong)UIImageView * addressIM;
 
 //@property (nonatomic, strong)CycleScrollView * cycleScrollView;//轮播图
-
+/**
+ *  数据数组
+ */
 @property (nonatomic, strong)NSMutableArray * dataArray;
+/**
+ *  数据总个数
+ */
 @property (nonatomic, strong)NSNumber * allCount;
+/**
+ *  监控是否定位的timer
+ */
 @property (nonatomic, strong)NSTimer * timer;
 
 @end

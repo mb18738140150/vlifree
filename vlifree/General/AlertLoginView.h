@@ -10,11 +10,21 @@
 
 @interface AlertLoginView : UIView
 
-
-
+/**
+ *  手机号码输入框
+ */
 @property (nonatomic, strong)UITextField * phoneTF;
+/**
+ *  密码输入框
+ */
 @property (nonatomic, strong)UITextField * passwordTF;
+/**
+ *  登陆按钮
+ */
 @property (nonatomic, strong)UIButton * logInButton;
+/**
+ *  微信登陆按钮
+ */
 @property (nonatomic, strong)UIButton * weixinButton;
 
 

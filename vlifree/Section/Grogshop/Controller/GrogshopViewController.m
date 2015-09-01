@@ -15,19 +15,45 @@
 #define CELL_INDENTIFIER @"CELL"
 @interface GrogshopViewController ()<UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate, HTTPPostDelegate>
 {
+    /**
+     *  请求数据页数
+     */
     int _page;
+    /**
+     *  请求类型
+     */
     int _type;
 }
+/**
+ *  酒店列表
+ */
 @property (nonatomic, strong)UITableView * groshopTabelView;
+/**
+ *  搜索取消按钮
+ */
 @property (nonatomic, strong)UIButton * cancelBT;
+/**
+ *  搜索框
+ */
 @property (nonatomic, strong)UISearchBar * searchB;
-
+/**
+ *  数据数组
+ */
 @property (nonatomic, strong)NSMutableArray * dataArray;
-
+/**
+ *  定位时间监控
+ */
 @property (nonatomic, strong)NSTimer * timer;
+/**
+ *  数据总个数
+ */
 @property (nonatomic, strong)NSNumber * allCount;
-
+/**
+ *  搜索关键词
+ */
 @property (nonatomic, copy)NSString * keyWord;
+
+
 
 @end
 
@@ -134,7 +160,9 @@
     [super viewWillDisappear:animated];
 //    [self.groshopTabelView headerEndRefreshing];
 }
-
+/**
+ *  检测是否已经定位成功了
+ */
 - (void)isLocationsuccess
 {
     if (![UserLocation shareUserLocation].city) {
@@ -144,7 +172,9 @@
         [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:1.5];
     }
 }
-
+/**
+ *  数据请求
+ */
 - (void)downloadData
 {
     NSLog(@"2222");
@@ -249,7 +279,16 @@
             self.keyWord = keyWord;
         }
         [self playPostWithDictionary:jsonDic];
+    }else
+    {
+        [self performSelector:@selector(tableViewEndRefresh) withObject:nil afterDelay:2];
     }
+}
+
+- (void)tableViewEndRefresh
+{
+    [self.groshopTabelView.header endRefreshing];
+    [self.groshopTabelView.footer endRefreshing];
 }
 
 - (void)playPostWithDictionary:(NSDictionary *)dic
@@ -365,6 +404,7 @@
     GrogshopViewCell * cell = [tableView dequeueReusableCellWithIdentifier:CELL_INDENTIFIER];
     [cell createSubiew:tableView.bounds];
     __weak GrogshopViewController * grogshopVC = self;
+    
     cell.rightButtons = @[[MGSwipeButton buttonWithTitle:@"关注酒店" backgroundColor:[UIColor redColor] callback:^BOOL(MGSwipeTableCell *sender) {
         NSLog(@"111");
         if ([UserInfo shareUserInfo].userId) {

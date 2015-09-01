@@ -18,10 +18,21 @@
 #define LABEL_WIDTH (self.width - 2 * LEFT_SPACE - _iconView.right)
 
 @interface DetailsGSViewCell ()
-
+/**
+ *  房间图片
+ */
 @property (nonatomic, strong)UIImageView * iconView;
+/**
+ *  房间名
+ */
 @property (nonatomic, strong)UILabel * nameLable;
+/**
+ *  房间价格
+ */
 @property (nonatomic, strong)UILabel * priceLabel;
+/**
+ *  房间说明
+ */
 @property (nonatomic, strong)UILabel * introLabel;
 
 @end

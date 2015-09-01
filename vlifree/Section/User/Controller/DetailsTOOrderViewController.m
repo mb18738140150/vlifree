@@ -630,6 +630,7 @@
 {
     NSLog(@"+++%@", data);
     [self.hud dismiss];
+    self.hud = nil;
     if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
         if ([[data objectForKey:@"Command"] isEqualToNumber:@10024]) {
             self.orderDetailsMD = [[OrderDetailsMD alloc] initWithDictionary:data];
@@ -764,9 +765,12 @@
             req.package             = [NSString stringWithFormat:@"%@", [data objectForKey:@"Package"]];
             req.sign                = [NSString stringWithFormat:@"%@", [data objectForKey:@"Sign"]];
             [WXApi sendReq:req];
-            [self.hud dismiss];
-            self.hud = nil;
         }
+    }else
+    {
+        UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:[data objectForKey:@"ErrorMsg"] delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
+        [alert show];
+        [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:1.5];
     }
 }
 - (void)failWithError:(NSError *)error

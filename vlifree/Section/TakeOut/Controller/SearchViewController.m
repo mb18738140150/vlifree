@@ -15,13 +15,26 @@
 @interface SearchViewController ()<UISearchBarDelegate, UISearchResultsUpdating, HTTPPostDelegate>
 
 {
+    /**
+     *  数据请求页数
+     */
     int _page;
 }
-@property (nonatomic, strong)UISearchBar * searchBar;
-
+/**
+ *  搜索框
+ */
+//@property (nonatomic, strong)UISearchBar * searchBar;
+/**
+ *  搜索VC
+ */
 @property (nonatomic, strong)UISearchController * searchVC;
+/**
+ *  模糊搜索词展示列表
+ */
 @property (nonatomic, strong)ResultViewController * resultVC;
-
+/**
+ *  数据数组
+ */
 @property (nonatomic, strong)NSMutableArray * dataArray;
 
 

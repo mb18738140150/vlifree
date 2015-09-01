@@ -9,10 +9,21 @@
 #import <UIKit/UIKit.h>
 
 @interface GSMapViewController : UIViewController
-
+/**
+ *  酒店名
+ */
 @property (nonatomic, copy)NSString * gsName;
+/**
+ *  酒店地址
+ */
 @property (nonatomic, copy)NSString * address;
+/**
+ *  酒店纬度
+ */
 @property (nonatomic, copy)NSString * lat;
+/**
+ *  酒店经度
+ */
 @property (nonatomic, copy)NSString * lon;
 
 @end

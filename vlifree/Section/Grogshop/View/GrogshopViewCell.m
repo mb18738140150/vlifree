@@ -20,15 +20,41 @@
 #define LABEL_TEXTCOLOR [UIColor colorWithWhite:0.5 alpha:1];
 
 @interface GrogshopViewCell ()
-
+/**
+ *  酒店图片试图
+ */
 @property (nonatomic, strong)UIImageView * icon;
+/**
+ *  酒店名字文字框
+ */
 @property (nonatomic, strong)UILabel * nameLabel;
+/**
+ *  WiFi
+ */
 @property (nonatomic, strong)UIImageView * wifiImage;
+/**
+ *  停车场
+ */
 @property (nonatomic, strong)UIImageView * parkImage;
+/**
+ *  售量
+ */
 @property (nonatomic, strong)UILabel * soldLabel;
+/**
+ *  地址
+ */
 @property (nonatomic, strong)UILabel * addressLabel;
+/**
+ *  价格
+ */
 @property (nonatomic, strong)UILabel * priceLabel;
+/**
+ *  距离
+ */
 @property (nonatomic, strong)UILabel * distanceLabel;
+/**
+ *  首单减免
+ */
 @property (nonatomic, strong)UIView * firstOrderV;
 
 @end

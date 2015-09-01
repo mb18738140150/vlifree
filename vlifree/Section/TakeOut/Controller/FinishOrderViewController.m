@@ -26,23 +26,64 @@
 @interface FinishOrderViewController ()<HTTPPostDelegate, BDWalletSDKMainManagerDelegate>
 
 @property (nonatomic, strong)UIScrollView * scrollView;
+/**
+ *  订单状态图
+ */
 @property (nonatomic, strong)UIImageView * stateImageV;
+/**
+ *  订单状态文本框
+ */
 @property (nonatomic, strong)UILabel * stateLabel;
+/**
+ *  其他价格
+ */
 @property (nonatomic, strong)UILabel * otherPriceLB;
+/**
+ *  支付价格
+ */
 @property (nonatomic, strong)UILabel * totalPriceLB;
+/**
+ *  商店名
+ */
 @property (nonatomic, strong)UILabel * storeNameLB;
+/**
+ *  订单号
+ */
 @property (nonatomic, strong)UILabel * orderNumberLB;
+/**
+ *  订单处理状态
+ */
 @property (nonatomic, strong)UILabel * orderDateLB;
+/**
+ *  支付方式
+ */
 @property (nonatomic, strong)UILabel * orderPayTypeLB;
+/**
+ *  订单电话
+ */
 @property (nonatomic, strong)UILabel * orderTelLB;
+/**
+ *  订单地址
+ */
 @property (nonatomic, strong)UILabel * orderAddressLB;
 
 //@property (nonatomic, strong)UIButton * confirmBT;
 //@property (nonatomic, strong)UIButton * cancelBT;
+/**
+ *  立即支付按钮
+ */
 @property (nonatomic, strong)UIButton * paymentBT;
+/**
+ *  支付方式
+ */
 @property (nonatomic, strong)NSNumber * payType;
-
+/**
+ *  订单菜数组
+ */
 @property (nonatomic, strong)NSMutableArray * orderArray;
+/**
+ *  订单详情模型
+ */
 @property (nonatomic, strong)OrderDetailsMD * orderDetailsMD;
 @property (nonatomic, strong)JGProgressHUD * hud;
 
@@ -365,6 +406,8 @@
 - (void)refresh:(id)data
 {
     NSLog(@"+++%@", data);
+    [self.hud dismiss];
+    self.hud = nil;
     if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
         if ([[data objectForKey:@"Command"] isEqualToNumber:@10024]) {
             UIView * view3 = [self.scrollView viewWithTag:3000];
@@ -499,10 +542,13 @@
             req.sign                = [NSString stringWithFormat:@"%@", [data objectForKey:@"Sign"]];
             //            req.sign = sign;
             [WXApi sendReq:req];
-            [self.hud dismiss];
-            self.hud = nil;
         }
         
+    }else
+    {
+        UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:[data objectForKey:@"ErrorMsg"] delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
+        [alert show];
+        [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:1.5];
     }
 }
 - (void)failWithError:(NSError *)error
@@ -572,7 +618,7 @@
         boxTitleLB.font = FONT;
         [view4 addSubview:boxPriceLB];
         
-        UIView * boxLineView = [[UIView alloc] initWithFrame:CGRectMake(10, _otherPriceLB.bottom, view4.width - 20, 1)];
+        UIView * boxLineView = [[UIView alloc] initWithFrame:CGRectMake(10, boxTitleLB.bottom, view4.width - 20, 1)];
         boxLineView.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
         [view4 addSubview:boxLineView];
         top = boxLineView.bottom + 5;
@@ -605,7 +651,7 @@
     [view4 addSubview:totalLB];
     
     self.totalPriceLB = [[UILabel alloc] initWithFrame:CGRectMake(view4.width - 70, totalLB.top, 50, 25)];
-    _totalPriceLB.text = @"¥35";
+//    _totalPriceLB.text = @"¥35";
     _totalPriceLB.textAlignment = NSTextAlignmentRight;
     _totalPriceLB.textColor = [UIColor redColor];
     _totalPriceLB.font = FONT;

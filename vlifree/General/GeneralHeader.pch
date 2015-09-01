@@ -28,17 +28,54 @@
 #define APP_ID_WX @"wxaac5e5f7421e84ac"
 #define APP_SECRET_WX @"055e7e10c698b7b140511d8d1a73cec4"
 #define APP_KEY_WX @"p2j4b57gmdk90nd5bla84nkyqldicn32"
-
+/**
+ *  正式库URL
+ *
+ *  @param >.0
+ *
+ *  @return
+ */
 #define POST_URL @"http://p.vlifee.com/User_getdata.ashx?md5="
+/**
+ *  测试库URL
+ *
+ *  @param >.0
+ *
+ *  @return
+ */
 //#define POST_URL @"http://test.vlifee.com/User_getdata.ashx?md5="
 #define DATA_COUNT 15
-
+/**
+ *  app主色调
+ *
+ *  @param >.0 251 51 46
+ *
+ *  @return 颜色
+ */
 #define MAIN_COLOR [UIColor colorWithRed:251 / 250.0 green:51 / 250.0 blue:46 / 250.0 alpha:1]
-
+/**
+ *  app字体主颜色
+ *
+ *  @param >.0 0.3
+ *
+ *  @return 字体颜色
+ */
 #define TEXT_COLOR [UIColor colorWithWhite:0.3 alpha:1]
-
+/**
+ *  app线条主颜色
+ *
+ *  @param >.0 0.9
+ *
+ *  @return 线条颜色
+ */
 #define LINE_COLOR [UIColor colorWithWhite:0.9 alpha:0.7]
-
+/**
+ *  手机屏幕宽度
+ *
+ *  @param >.0 width
+ *
+ *  @return 屏幕宽度
+ */
 #define WINDOW_WIDHT [UIScreen mainScreen].bounds.size.width
 
 

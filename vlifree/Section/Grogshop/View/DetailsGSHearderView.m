@@ -20,7 +20,9 @@
 
 @interface DetailsGSHearderView ()
 
-
+/**
+ *  轮播图
+ */
 @property (nonatomic, strong)AutoSlideScrollView * cycleScrollView;//轮播图
 
 
@@ -50,7 +52,7 @@
 {
     
     self.cycleScrollView = [[AutoSlideScrollView alloc] initWithFrame:CGRectMake(0, 0, self.width, CYCLESCROLLVIEW_HEIGHT) animationDuration:3];
-    _cycleScrollView.backgroundColor = [UIColor redColor];
+//    _cycleScrollView.backgroundColor = [UIColor redColor];
     [self addSubview:_cycleScrollView];
     
 //    self.hotelImage = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, self.width, CYCLESCROLLVIEW_HEIGHT)];

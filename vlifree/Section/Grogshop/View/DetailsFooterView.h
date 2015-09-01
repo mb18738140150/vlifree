@@ -11,8 +11,10 @@
 @interface DetailsFooterView : UIView
 
 
-@property (nonatomic, strong)UIButton * allButton;
-
+//@property (nonatomic, strong)UIButton * allButton;
+/**
+ *  订房说明
+ */
 @property (nonatomic, copy)NSString * explainString;
 
 @end

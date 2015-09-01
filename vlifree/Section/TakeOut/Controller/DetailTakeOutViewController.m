@@ -19,6 +19,9 @@
 #import "HYSegmentedControl.h"
 #import "CommentViewCell.h"
 #import "CommentModel.h"
+#import "StoreIntroView.h"
+
+
 
 #define SECTION_TABLEVIEW_CELL @"SECTIONCELL"
 #define MENUS_TABLEVIEW_CELL @"MENUSCELL"
@@ -33,35 +36,78 @@
 @interface DetailTakeOutViewController ()<UITableViewDataSource, UITableViewDelegate, HTTPPostDelegate, HYSegmentedControlDelegate, UIScrollViewDelegate>
 
 {
+    /**
+     *  数据请求的页数
+     */
     int _page;
 }
+/**
+ *  菜品类型列表
+ */
 @property (nonatomic, strong)UITableView * sectionTableView;
+/**
+ *  菜品列表
+ */
 @property (nonatomic, strong)UITableView * menusTableView;
-
+/**
+ *  购物车
+ */
 @property (nonatomic, strong)ShoppingCartView * shoppingCarView;
+/**
+ *  购物车详情
+ */
 @property (nonatomic, strong)ShoppingDetailsCarView * shoppingCarDetailsView;
 
-
+/**
+ *  分类数据数组
+ */
 @property (nonatomic, strong)NSMutableArray * classArray;
+/**
+ *  菜品数据数组
+ */
 @property (nonatomic, strong)NSMutableArray * menusArray;
 //@property (nonatomic, strong)NSNumber * mealBoxMoney;//餐盒费
 
+/**
+ *  购物车数组
+ */
 @property (nonatomic, strong)NSMutableArray * shopArray;
+/**
+ *  登陆提示页面
+ */
 @property (nonatomic, strong)AlertLoginView * alertLoginV;
-
-
+/**
+ *  商店公告滚动图
+ */
 @property (nonatomic, strong)UIScrollView * noticeScrollV;
-
+/**
+ *  商店公告文本框
+ */
 @property (nonatomic, strong)UILabel * noticeLB;
-
+/**
+ *  商店公告滚动timer
+ */
 @property (nonatomic, strong)NSTimer * noticeTimer;
-
+/**
+ *  点餐页面和评论页面切换的滚动试图
+ */
 @property (nonatomic, strong)UIScrollView * aScrollView;
+/**
+ *  点餐和评论页面切换segment
+ */
 @property (nonatomic, strong)HYSegmentedControl * segmentC;
-
+/**
+ *  评论列表
+ */
 @property (nonatomic, strong)UITableView * commentTableView;
-
+/**
+ *  评论数据数组
+ */
 @property (nonatomic, strong)NSMutableArray * commentArray;
+
+
+@property (nonatomic, strong)StoreIntroView * introView;
+
 
 @end
 
@@ -115,7 +161,7 @@
     
     self.view.backgroundColor = [UIColor whiteColor];
 
-    
+
     self.navigationController.navigationBar.titleTextAttributes = @{
                                                                     NSForegroundColorAttributeName: TEXT_COLOR
                                                                     };
@@ -123,6 +169,7 @@
 //    [self addObserver:self forKeyPath:@"shopArray" options:NSKeyValueObservingOptionNew context:nil];
     
     self.segmentC = [[HYSegmentedControl alloc] initWithOriginY:0 Titles:@[@"点菜", @"评论"] delegate:self];
+//    self.segmentC = [[HYSegmentedControl alloc] initWithOriginY:0 Titles:@[@"点菜", @"评论", @"简介"] delegate:self];
     [self.view addSubview:_segmentC];
     
     self.aScrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, _segmentC.bottom, self.view.width, self.view.height - self.navigationController.navigationBar.bottom - _segmentC.height)];
@@ -130,6 +177,7 @@
     _aScrollView.delegate = self;
     _aScrollView.pagingEnabled = YES;
     _aScrollView.showsHorizontalScrollIndicator = NO;
+//    _aScrollView.contentSize = CGSizeMake(_aScrollView.width * 3, _aScrollView.height);
     _aScrollView.contentSize = CGSizeMake(_aScrollView.width * 2, _aScrollView.height);
     [self.view addSubview:_aScrollView];
     
@@ -209,6 +257,11 @@
 //    _shoppingCarView.backgroundColor = [UIColor greenColor];
     
     
+    
+    
+    
+    
+    
     if ([self.storeState isEqualToNumber:@0]) {
         UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:@"商家休息中, 暂时不接受新订单." delegate:nil cancelButtonTitle:@"知道了" otherButtonTitles:nil, nil];
         [alert show];
@@ -233,6 +286,10 @@
     self.commentTableView.footer = [MJRefreshAutoNormalFooter footerWithRefreshingTarget:self refreshingAction:@selector(footerRereshing)];
     [self downloadDataWithCommand:@39 page:_page count:COUNT];
     self.commentTableView.tableFooterView = [[UIView alloc] init];
+    
+    
+//    self.introView = [[StoreIntroView alloc] initWithFrame:CGRectMake(_commentTableView.right, 0, _aScrollView.width, _aScrollView.height)];
+//    [_aScrollView addSubview:_introView];
     
     
     UIButton * backBT = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -301,7 +358,11 @@
     self.navigationController.navigationBar.tintColor = MAIN_COLOR;
     self.navigationController.navigationBar.barTintColor = [UIColor whiteColor];
 }
-
+/**
+ *  跳转到评论查看页面
+ *
+ *  @param sender 评论barButton
+ */
 - (void)lookComment:(id)sender
 {
     CommentViewController * commentVC = [[CommentViewController alloc] init];
@@ -309,6 +370,11 @@
     [self.navigationController pushViewController:commentVC animated:YES];
 }
 
+/**
+ *  移除商家公告
+ *
+ *  @param button 商家公告上面的x button
+ */
 - (void)removeNoticeView:(UIButton *)button
 {
     [self deleteNOticeView];
@@ -348,7 +414,8 @@
                                    @"Id":menuMD.Id,
                                    @"Count":[NSNumber numberWithInteger:menuMD.count],
                                    @"Name":menuMD.name,
-                                   @"Price":menuMD.price
+                                   @"Price":menuMD.price,
+                                   @"Money":[NSNumber numberWithDouble:menuMD.price.doubleValue * menuMD.count],
                                    };
             [array addObject:dic];
         }

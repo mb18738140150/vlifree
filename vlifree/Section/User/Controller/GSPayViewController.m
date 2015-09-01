@@ -307,6 +307,8 @@
 - (void)refresh:(id)data
 {
     NSLog(@"+++%@", data);
+    [self.hud dismiss];
+    self.hud = nil;
     NSLog(@"%@", [data objectForKey:@"ErrorMsg"]);
     if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
         if ([[data objectForKey:@"Command"] isEqualToNumber:@10026]) {
@@ -355,11 +357,13 @@
             req.sign                = [NSString stringWithFormat:@"%@", [data objectForKey:@"Sign"]];
 //            req.sign = sign;
             [WXApi sendReq:req];
-            [self.hud dismiss];
-            self.hud = nil;
         }
+    }else
+    {
+        UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:[data objectForKey:@"ErrorMsg"] delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
+        [alert show];
+        [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:1.5];
     }
-//    [SVProgressHUD dismiss];
 }
 
 - (void)failWithError:(NSError *)error

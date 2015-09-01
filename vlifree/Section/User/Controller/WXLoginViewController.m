@@ -47,6 +47,10 @@
  *  获取验证码的时间
  */
 @property (nonatomic, strong)NSDate * codeDate;
+
+
+@property (nonatomic, strong)JGProgressHUD * hud;
+
 @end
 
 @implementation WXLoginViewController
@@ -120,6 +124,7 @@
     [_logInButton addTarget:self action:@selector(bindingPhonePassword:) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:_logInButton];
     
+    self.hud = [[JGProgressHUD alloc] initWithStyle:JGProgressHUDStyleLight];
     
     UIButton * backBT = [UIButton buttonWithType:UIButtonTypeCustom];
     backBT.frame = CGRectMake(0, 0, 15, 20);
@@ -183,7 +188,8 @@ static int t = 60;
         if (isPhoneNum) {
             NSDictionary * jsonDic = @{
                                        @"Command":@42,
-                                       @"PhoneNumber":self.phoneTF.text
+                                       @"PhoneNumber":self.phoneTF.text,
+                                       @"Type":@2
                                        };
             [self playPostWithDictionary:jsonDic];
             self.verifyTF.enabled = YES;
@@ -251,6 +257,7 @@ static int t = 60;
 #pragma mark - 数据请求
 - (void)downloadData
 {
+    [self.hud showInView:self.view animated:YES];
     NSDictionary * jsonDic = @{
                                @"Command":@8,
                                @"UserId":[UserInfo shareUserInfo].userId,
@@ -288,6 +295,7 @@ static int t = 60;
 
 - (void)refresh:(id)data
 {
+    [self.hud dismiss];
     NSLog(@"+++%@", data);
     if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
         if ([[data objectForKey:@"Command"] isEqualToNumber:@10008]) {

@@ -149,7 +149,7 @@
         starButton.selected = YES;
         self.evaluateLB.text = [NSString stringWithFormat:@"%d分", i + 1];
     }
-    _starCount = button.tag - 999;
+    _starCount = (int)(button.tag - 999);
     NSLog(@"%d", _starCount);
 }
 

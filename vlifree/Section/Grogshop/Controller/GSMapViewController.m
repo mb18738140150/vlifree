@@ -16,6 +16,8 @@
 @property (nonatomic, strong)BMKGeoCodeSearch * geoSearcher;
 @property (nonatomic, assign)id annotation;
 
+
+
 @end
 
 @implementation GSMapViewController
@@ -23,15 +25,17 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.navigationItem.title = @"地图";
+
     self.mapView = [[BMKMapView alloc] initWithFrame:self.view.bounds];
     _mapView.delegate = self;
     _mapView.zoomLevel = 18.5;
-//    _mapView.userTrackingMode = BMKUserTrackingModeFollow;
+    _mapView.userTrackingMode = BMKUserTrackingModeFollow;
     _mapView.showMapScaleBar = YES;
-    [_mapView setTrafficEnabled:YES];
+//    [_mapView setTrafficEnabled:YES];
     [_mapView setMapType:BMKMapTypeStandard];
     
     CLLocationCoordinate2D coor = (CLLocationCoordinate2D){[self.lat doubleValue], [self.lon doubleValue]};
+//    NSLog(@"lat = %@, lon = %@", self.lat, self.lon);
     BMKPointAnnotation* annotation = [[BMKPointAnnotation alloc]init];
     annotation.coordinate = coor;
     annotation.title = self.gsName;
@@ -56,6 +60,29 @@
     self.geoSearcher =[[BMKGeoCodeSearch alloc]init];
     _geoSearcher.delegate = self;
     
+    
+    UIButton * button = [UIButton buttonWithType:UIButtonTypeCustom];
+    button.frame = CGRectMake(0, self.view.height - 60, 80, 30);
+    button.centerX = self.view.width / 2;
+    [button setTitle:@"百度地图" forState:UIControlStateNormal];
+    button.layer.cornerRadius = 3;
+    button.backgroundColor = [UIColor colorWithWhite:0.7 alpha:1];
+    button.hidden = YES;
+    [button addTarget:self action:@selector(skipBaiduMap:) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:button];
+    
+    //    NSString * mapUrlStr = [NSString stringWithFormat:@"baidumap://map/marker?location=%@,%@&title=%@&content=%@&zoom=19&coord_type=bd09ll&src=微生活", self.lat, self.lon, self.gsName, self.address];
+    //    NSString * mapUrlStr = @"baidumap://map/marker?location=40.047669,116.313082&title=我的位置&content=百度奎科大厦&src=yourCompanyName|yourAppName";
+    BOOL isHaveBDMap = [[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"baidumap://"]];
+    if (isHaveBDMap) {
+        button.hidden = NO;
+        //        NSLog(@"url = %@", mapUrlStr);
+        //        NSString * newUrlStr = [mapUrlStr stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+        //        BOOL a = [[UIApplication sharedApplication] openURL:[NSURL URLWithString:newUrlStr]];
+        //        NSLog(@"a = %d", a);
+    }
+    
+    
     UIButton * backBT = [UIButton buttonWithType:UIButtonTypeCustom];
     backBT.frame = CGRectMake(0, 0, 15, 20);
     [backBT setBackgroundImage:[UIImage imageNamed:@"back_r.png"] forState:UIControlStateNormal];
@@ -70,6 +97,15 @@
 - (void)backLastVC:(id)sender
 {
     [self.navigationController popViewControllerAnimated:YES];
+}
+
+
+- (void)skipBaiduMap:(UIButton *)button
+{
+     NSString * mapUrlStr = [NSString stringWithFormat:@"baidumap://map/marker?location=%@,%@&title=%@&content=%@&zoom=19&coord_type=bd09ll&src=微生活", self.lat, self.lon, self.gsName, self.address];
+    NSString * newUrlStr = [mapUrlStr stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    BOOL a = [[UIApplication sharedApplication] openURL:[NSURL URLWithString:newUrlStr]];
+    NSLog(@"a = %d", a);
 }
 
 - (void)didUpdateBMKUserLocation:(BMKUserLocation *)userLocation
@@ -110,7 +146,12 @@
 {
     if ([annotation isKindOfClass:[BMKPointAnnotation class]]) {
         BMKPinAnnotationView *newAnnotationView = [[BMKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"Annotation"];
-        newAnnotationView.pinColor = BMKPinAnnotationColorPurple;
+        if ([annotation isEqual:_annotation]) {
+            newAnnotationView.pinColor = BMKPinAnnotationColorRed;
+        }else
+        {
+            newAnnotationView.pinColor = BMKPinAnnotationColorPurple;
+        }
         newAnnotationView.animatesDrop = YES;// 设置该标注点动画显示
         NSLog(@"标注view");
         return newAnnotationView;
@@ -157,6 +198,11 @@
     [super didReceiveMemoryWarning];
     
     // Dispose of any resources that can be recreated.
+}
+
+- (void)dealloc
+{
+    NSLog(@"地图销毁");
 }
 
 /*

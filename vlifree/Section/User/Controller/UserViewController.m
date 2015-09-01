@@ -216,8 +216,17 @@
 
 - (void)registerUser:(UIButton *)button
 {
-    UIAlertView * alert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"请使用微信注册" delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
-    [alert show];
+    
+    if ([WXApi isWXAppInstalled]) {
+        UIAlertView * alert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"请使用微信登陆注册" delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
+        [alert show];
+    }else
+    {
+        UIAlertView * alert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"请到官网(www.vlifee.com)进行注册" delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
+        [alert show];
+    }
+    
+
     /*
     RegisterViewController * registerVC = [[RegisterViewController alloc] init];
     UserViewController * userVC = self;

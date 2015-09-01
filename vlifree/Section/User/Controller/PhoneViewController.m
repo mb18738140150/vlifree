@@ -7,7 +7,6 @@
 //
 
 #import "PhoneViewController.h"
-#import "UCSVerifyService.h"
 
 #define TOP_SPACE 30
 #define LEFT_SPACE 10
@@ -23,7 +22,7 @@
 //#define VIEW_COLOR [UIColor redColor]
 #define VIEW_COLOR [UIColor clearColor]
 
-@interface PhoneViewController ()<HTTPPostDelegate, UCSVerifyEventDelegate>
+@interface PhoneViewController ()<HTTPPostDelegate>
 
 @property (nonatomic, copy)RefreshUserInfo refreshBlock;
 /**
@@ -52,6 +51,11 @@
  *  获取验证码的时间
  */
 @property (nonatomic, strong)NSDate * codeDate;
+
+
+@property (nonatomic, strong)JGProgressHUD * hud;
+
+
 @end
 
 @implementation PhoneViewController
@@ -103,6 +107,9 @@
     [self.view addSubview:_getCodeBT];
 
 //    self.ucsVerifySV = [[UCSVerifyService alloc] initWithDelegate:self];
+    
+    self.hud = [[JGProgressHUD alloc] initWithStyle:JGProgressHUDStyleLight];
+    
     
     UIButton * backBT = [UIButton buttonWithType:UIButtonTypeCustom];
     backBT.frame = CGRectMake(0, 0, 15, 20);
@@ -160,7 +167,8 @@ static int t = 60;
         if (isPhoneNum) {
             NSDictionary * jsonDic = @{
                                        @"Command":@42,
-                                       @"PhoneNumber":self.phoneTF.text
+                                       @"PhoneNumber":self.phoneTF.text,
+                                       @"Type":@1
                                        };
             [self playPostWithDictionary:jsonDic];
             self.verifyTF.enabled = YES;
@@ -232,6 +240,7 @@ static int t = 60;
 #pragma mark - 数据请求
 - (void)downloadData
 {
+    [self.hud showInView:self.view animated:YES];
     NSDictionary * jsonDic = @{
                                @"Command":@22,
                                @"UserId":[UserInfo shareUserInfo].userId,
@@ -256,6 +265,7 @@ static int t = 60;
 
 - (void)refresh:(id)data
 {
+    [self.hud dismiss];
     NSLog(@"+++%@", data);
     if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
         if ([[data objectForKey:@"Command"] isEqualToNumber:@10022])
@@ -301,27 +311,6 @@ static int t = 60;
 }
 
 
-// 云获取验证码成功  0：已经验证成功，1:已下发验证码到用户
-- (void) onGetValiateCodeSuccessful:(NSInteger)nResult
-{
-    
-}
-// 云获取验证码失败
-- (void) onGetValiateCodeFailed:(NSInteger)reason
-{
-    
-}
-
-// 云验证成功
-- (void) onDoValiateCodeSuccessful:(NSInteger)nResult
-{
-    NSLog(@"验证成功 %d", nResult);
-}
-// 云验证失败
-- (void) onDoValiateCodeFailed:(NSInteger)reason
-{
-    NSLog(@"验证失败 %d", reason);
-}
 
 
 /*

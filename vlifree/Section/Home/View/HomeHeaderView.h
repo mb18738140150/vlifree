@@ -10,9 +10,17 @@
 
 @interface HomeHeaderView : UIView
 
-
+/**
+ *  微酒店按钮
+ */
 @property (nonatomic, strong)UIButton * grogshopBT;
+/**
+ *  微外卖按钮
+ */
 @property (nonatomic, strong)UIButton * takeOutBT;
+/**
+ *  微超市按钮
+ */
 @property (nonatomic, strong)UIButton * supermarketBT;
 
 

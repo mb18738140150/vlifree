@@ -10,9 +10,17 @@
 
 @interface PayTypeView : UIView
 
-
+/**
+ *  支付logo
+ */
 @property (nonatomic, strong)UIImageView * iconView;
+/**
+ *  支付方式名
+ */
 @property (nonatomic, strong)UILabel * titleLabel;
+/**
+ *  选中支付的按钮
+ */
 @property (nonatomic, strong)UIButton * changeButton;
 
 

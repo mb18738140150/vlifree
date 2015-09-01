@@ -13,7 +13,11 @@ typedef void(^ReturnAddresssModelBlock)(AddressModel * addressModel);
 
 @interface AddressViewController : UIViewController
 
-
+/**
+ *  选择地址成功后回调方法
+ *
+ *  @param addressBlock 地址回调block
+ */
 - (void)returnAddressModel:(ReturnAddresssModelBlock)addressBlock;
 
 

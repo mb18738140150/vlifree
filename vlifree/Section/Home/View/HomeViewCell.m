@@ -24,12 +24,29 @@
 #define VIEW_COLOR [UIColor clearColor]
 
 @interface HomeViewCell ()
-
+/**
+ *  图片
+ */
 @property (nonatomic, strong)UIImageView * icon;
+/**
+ *  商店名
+ */
 @property (nonatomic, strong)UILabel * titleLabel;
+/**
+ *  描述
+ */
 @property (nonatomic, strong)UILabel * detailLabel;
+/**
+ *  价格
+ */
 @property (nonatomic, strong)UILabel * priceLabel;
+/**
+ *  距离
+ */
 @property (nonatomic, strong)UILabel * distanceLabel;
+/**
+ *  月售
+ */
 @property (nonatomic, strong)UILabel * soldCountLabel;
 
 
