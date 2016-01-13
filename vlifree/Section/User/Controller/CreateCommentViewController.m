@@ -72,7 +72,7 @@
     UILabel * decribeLB = [[UILabel alloc] initWithFrame:CGRectMake(nameLabel.left, nameLabel.bottom, nameLabel.width, icon.height - nameLabel.height)];
     decribeLB.font = [UIFont systemFontOfSize:13];
     decribeLB.numberOfLines = 0;
-    decribeLB.text = @"哦能够鄂农攻击哦";
+    decribeLB.text = self.decribe;
     decribeLB.textColor = TEXT_COLOR;
     [self.view addSubview:decribeLB];
     

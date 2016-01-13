@@ -427,7 +427,7 @@
                 OrderMenuVIew * menuView = [[OrderMenuVIew alloc] initWithFrame:CGRectMake(15, self.storeNameLB.bottom + 5 + i * 25, view3.width - 30, 25)];
                 menuView.menuNameLB.text = orderMneuMD.name;
                 menuView.countLabel.text = [NSString stringWithFormat:@"%@", orderMneuMD.count];
-                menuView.priceLabel.text = [NSString stringWithFormat:@"¥%@", orderMneuMD.money];
+                menuView.priceLabel.text = [NSString stringWithFormat:@"¥%g", orderMneuMD.money.doubleValue * orderMneuMD.count.intValue];
                 [view3 addSubview:menuView];
             }
             view3.height += 25 * self.orderDetailsMD.menusArray.count + 5;
@@ -456,6 +456,21 @@
                 case 3:
                 {
                     self.orderPayTypeLB.text = @"支付方式:餐到付款";
+                }
+                    break;
+                case 4:
+                {
+                    self.orderPayTypeLB.text = @"支付方式:优惠券";
+                }
+                    break;
+                case 5:
+                {
+                    self.orderPayTypeLB.text = @"支付方式:积分";
+                }
+                    break;
+                case 6:
+                {
+                    self.orderPayTypeLB.text = @"支付方式:优惠券，积分";
                 }
                     break;
                 default:
@@ -650,7 +665,7 @@
     totalLB.font = FONT;
     [view4 addSubview:totalLB];
     
-    self.totalPriceLB = [[UILabel alloc] initWithFrame:CGRectMake(view4.width - 70, totalLB.top, 50, 25)];
+    self.totalPriceLB = [[UILabel alloc] initWithFrame:CGRectMake(totalLB.right, totalLB.top, view4.width - totalLB.width - 30, 25)];
 //    _totalPriceLB.text = @"¥35";
     _totalPriceLB.textAlignment = NSTextAlignmentRight;
     _totalPriceLB.textColor = [UIColor redColor];

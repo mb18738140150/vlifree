@@ -9,8 +9,8 @@
 #import "DescribeView.h"
 
 #define LEFT_SPACE 20
-#define TOP_SPACE 10
 #define IMAGE_SIZE 20
+#define TOP_SPACE  (self.frame.size.height - IMAGE_SIZE) / 2
 
 //#define VIEW_COLOR [UIColor orangeColor]
 #define VIEW_COLOR [UIColor clearColor]
@@ -32,7 +32,7 @@
     self.iconView = [[UIImageView alloc] initWithFrame:CGRectMake(LEFT_SPACE, TOP_SPACE, IMAGE_SIZE, IMAGE_SIZE)];
     _iconView.backgroundColor = VIEW_COLOR;
     [self addSubview:_iconView];
-    
+   
     self.titleLable = [[UILabel alloc] initWithFrame:CGRectMake(_iconView.right + 5, TOP_SPACE, self.width - _iconView.right - IMAGE_SIZE, IMAGE_SIZE)];
     _titleLable.font = [UIFont systemFontOfSize:15];
     _titleLable.textColor = TEXT_COLOR;

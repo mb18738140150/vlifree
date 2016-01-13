@@ -18,7 +18,7 @@
 #import "AlertLoginView.h"
 #import "WXLoginViewController.h"
 #import "FacilityViewController.h"
-
+#import "GSCommentController.h"
 
 
 
@@ -66,6 +66,8 @@
 
 //@property (nonatomic, strong)NSMutableString * xmlString;
 
+@property (nonatomic, assign) int page;
+
 @end
 
 
@@ -93,7 +95,6 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    
     self.detailsTableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStyleGrouped];
     _detailsTableView.dataSource = self;
     _detailsTableView.delegate = self;
@@ -102,8 +103,9 @@
     [self.view addSubview:_detailsTableView];
     
     
-    self.headerView = [[DetailsGSHearderView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, 280)];
+    self.headerView = [[DetailsGSHearderView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, [UIScreen mainScreen].bounds.size.height / 2)];
     [_headerView.addressView.button addTarget:self action:@selector(lookOverMapk:) forControlEvents:UIControlEventTouchUpInside];
+    [_headerView.commentView.button addTarget:self action:@selector(lookComments:) forControlEvents:UIControlEventTouchUpInside];
     [_headerView.phoneView.button addTarget:self action:@selector(callNumberWithPhone:) forControlEvents:UIControlEventTouchUpInside];
     [_headerView.detailsBT addTarget:self action:@selector(lookFacility:) forControlEvents:UIControlEventTouchUpInside];
 //    __weak DetailsGrogshopViewController * detailsVC = self;
@@ -202,6 +204,21 @@
     [self.navigationController pushViewController:gsMapVC animated:YES];
 }
 
+/**
+ *  查看酒店评论
+ *
+ *  @param button 自定义头部视图的评论按钮
+ */
+- (void)lookComments:(UIButton *)button
+{
+    NSLog(@"查看评论");
+    _page = 1;
+    GSCommentController *gsCommentVC = [[GSCommentController alloc]init];
+    gsCommentVC.StoreId = [self.hotelID integerValue];
+    gsCommentVC.CurPage = _page;
+    gsCommentVC.CurCount = COUNT;
+    [self.navigationController pushViewController:gsCommentVC animated:YES];
+}
 /**
  *  查看就点设施详情
  *

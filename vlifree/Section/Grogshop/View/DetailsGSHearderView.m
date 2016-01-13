@@ -12,9 +12,12 @@
 
 
 
-#define CYCLESCROLLVIEW_HEIGHT 150
+#define CYCLESCROLLVIEW_HEIGHT (self.frame.size.height / 2)
+//#define DESCRIBEVIEW_HEIGHT (self.frame.size.height / 2 - 40) / 4
 #define DESCRIBEVIEW_HEIGHT 40
 #define LABEL_HEIGHT 20
+
+#define TOP_SPACE 5
 
 #define IMAGE_SIZE 10
 
@@ -76,19 +79,23 @@
 //    _phoneView.backgroundColor = [UIColor magentaColor];
     [self addSubview:_phoneView];
     
+    self.commentView = [[DescribeView alloc]initWithFrame:CGRectMake(0, _phoneView.bottom, self.width, DESCRIBEVIEW_HEIGHT)];
+    _commentView.iconView.image = [UIImage imageNamed:@"commentIcon.png"];
+    _commentView.backgroundColor = [UIColor whiteColor];
+    _commentView.titleLable.text = @"评论";
+    [self addSubview:_commentView];
     
-    
-    UIView * labelView = [[UIView alloc] initWithFrame:CGRectMake(0, _phoneView.bottom, self.width, DESCRIBEVIEW_HEIGHT)];
+    UIView * labelView = [[UIView alloc] initWithFrame:CGRectMake(0, _commentView.bottom, self.width, DESCRIBEVIEW_HEIGHT)];
     labelView.backgroundColor = [UIColor whiteColor];
     [self addSubview:labelView];
     
-    UILabel * aLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 10, 80, LABEL_HEIGHT)];
+    UILabel * aLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, TOP_SPACE, 80, LABEL_HEIGHT)];
     aLabel.text = @"查看详情";
     aLabel.textColor = TEXT_COLOR;
     aLabel.font = [UIFont systemFontOfSize:14];
     [labelView addSubview:aLabel];
     
-    self.wifiView = [[UIImageView alloc] initWithFrame:CGRectMake(aLabel.right + 5, (labelView.height - IMAGE_SIZE) / 2, IMAGE_SIZE, IMAGE_SIZE)];
+    self.wifiView = [[UIImageView alloc] initWithFrame:CGRectMake(aLabel.right + 5, aLabel.top +TOP_SPACE, IMAGE_SIZE, IMAGE_SIZE)];
     _wifiView.image = [UIImage imageNamed:@"wifi_on.png"];
     [labelView addSubview:_wifiView];
     
@@ -102,7 +109,7 @@
     [labelView addSubview:_foodView];
     
     self.detailsBT = [UIButton buttonWithType:UIButtonTypeCustom];
-    _detailsBT.frame = CGRectMake(0, _phoneView.bottom, self.width, DESCRIBEVIEW_HEIGHT);
+    _detailsBT.frame = CGRectMake(0, _commentView.bottom, self.width, DESCRIBEVIEW_HEIGHT);
 //    _detailsBT.backgroundColor = [UIColor whiteColor];
     [self addSubview:_detailsBT];
     

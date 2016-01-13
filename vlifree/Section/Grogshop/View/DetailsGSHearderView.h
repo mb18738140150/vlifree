@@ -27,6 +27,10 @@
  */
 @property (nonatomic, strong)DescribeView * phoneView;
 /**
+ *  评论详情
+ */
+@property (nonatomic, strong)DescribeView * commentView;
+/**
  *  设备详情查看按钮
  */
 @property (nonatomic, strong)UIButton * detailsBT;

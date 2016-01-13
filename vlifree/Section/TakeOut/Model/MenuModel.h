@@ -17,7 +17,8 @@
 @property (nonatomic, strong)NSNumber * price;
 @property (nonatomic, strong)NSNumber * soldCount;
 @property (nonatomic, strong)NSNumber * mealBoxMoney;
-
+@property (nonatomic, assign)int foodIntegral;
+@property (nonatomic, strong)NSMutableArray * PropertyList;
 
 - (id)initWithDictionary:(NSDictionary *)dic;
 

@@ -28,6 +28,7 @@
         _menuNameLB.backgroundColor = VIEW_COLOR;
         _menuNameLB.text = @"1号套餐猪排饭";
         _menuNameLB.textColor = TEXT_COLOR;
+        _menuNameLB.adjustsFontSizeToFitWidth = YES;
         _menuNameLB.font = [UIFont systemFontOfSize:14];
         [self addSubview:_menuNameLB];
         

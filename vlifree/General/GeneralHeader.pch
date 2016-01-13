@@ -24,6 +24,8 @@
 #import <BaiduMapAPI/BMapKit.h>
 #import <BaiduMapAPI/BMKMapView.h>
 
+#import <AlipaySDK/AlipaySDK.h>
+
 #define COUNT 15
 #define APP_ID_WX @"wxaac5e5f7421e84ac"
 #define APP_SECRET_WX @"055e7e10c698b7b140511d8d1a73cec4"
@@ -35,7 +37,7 @@
  *
  *  @return
  */
-#define POST_URL @"http://p.vlifee.com/User_getdata.ashx?md5="
+//#define POST_URL @"http://p.vlifee.com/User_getdata.ashx?md5="
 /**
  *  测试库URL
  *
@@ -43,7 +45,7 @@
  *
  *  @return
  */
-//#define POST_URL @"http://test.vlifee.com/User_getdata.ashx?md5="
+#define POST_URL @"http://ceshi.p.vlifee.com/User_getdata.ashx?md5="
 #define DATA_COUNT 15
 /**
  *  app主色调

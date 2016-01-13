@@ -216,10 +216,25 @@
         self.priceLB.text = [NSString stringWithFormat:@"     订单金额:¥%@", [data objectForKey:@"Price"]];
         self.personLB.text = [NSString stringWithFormat:@"预定人:%@", [data objectForKey:@"Name"]];
         self.telLB.text = [NSString stringWithFormat:@"预定号码:%@", [data objectForKey:@"PhoneNumber"]];
+        
+        NSDateFormatter * monthFomatter = [[NSDateFormatter alloc]init];
+        monthFomatter.dateFormat = @"yyyy/MM/dd hh:mm:ss";
+        
+        NSDateFormatter * monthFomatter1 = [[NSDateFormatter alloc]init];
+        monthFomatter1.dateFormat = @"yyyy/MM/dd";
+        
         NSString * checkInTime = [data objectForKey:@"CheckInTime"];
-        self.checkInDateLB.text = [NSString stringWithFormat:@"入住时间:%@", [checkInTime substringToIndex:10]];
+        NSDate * checkIndate = [NSDate date];
+        checkIndate = [monthFomatter dateFromString:checkInTime];
+        NSString * checkInstr = [monthFomatter1 stringFromDate:checkIndate];
+        self.checkInDateLB.text = [NSString stringWithFormat:@"入住时间:%@", checkInstr];
+        
         NSString * leaveTime = [data objectForKey:@"LeaveTime"];
-        self.leaveLB.text = [NSString stringWithFormat:@"离店时间:%@", [leaveTime substringToIndex:10]];
+        NSDate * leaveDate = [NSDate date];
+        leaveDate = [monthFomatter dateFromString:leaveTime];
+        NSString * leavestr = [monthFomatter1 stringFromDate:leaveDate];
+        self.leaveLB.text = [NSString stringWithFormat:@"离店时间:%@", leavestr];
+        
         self.roomLB.text = [NSString stringWithFormat:@"房型:%@", [data objectForKey:@"RoomType"]];
         self.countLB.text = [NSString stringWithFormat:@"预定房间:%@间", [data objectForKey:@"RoomCount"]];
         self.payType = [data objectForKey:@"PeyType"];

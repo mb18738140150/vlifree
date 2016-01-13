@@ -509,6 +509,8 @@
 {
 //    self.navigationController.tabBarController.selectedIndex = 2;
     if (self.orderDetailsMD != nil) {
+        
+        
         DetailTakeOutViewController * detailTakeOutVC = [[DetailTakeOutViewController alloc] init];
         detailTakeOutVC.takeOutID = self.orderDetailsMD.storeId;
         detailTakeOutVC.sendPrice = self.orderDetailsMD.sendPrice;
@@ -531,14 +533,13 @@
     [self.view addSubview:callWebView];
 }
 
-
 - (void)commentAction:(UIButton *)button
 {
     self.commentBT.hidden = YES;
     CreateCommentViewController * commentVC = [[CreateCommentViewController alloc] init];
     commentVC.icon = self.takeOutOrderMD.storeIcon;
     commentVC.storeName = self.orderDetailsMD.storeName;
-//    commentVC.decribe = self.orderDetailsMD.sto
+    commentVC.decribe = self.orderDetailsMD.storeDecribe;
     commentVC.storeId = self.orderDetailsMD.storeId;
     commentVC.orderId = self.takeOutOrderMD.orderID;
     [self.navigationController pushViewController:commentVC animated:YES];
@@ -628,7 +629,7 @@
 
 - (void)refresh:(id)data
 {
-    NSLog(@"+++%@", data);
+    NSLog(@"+++%@", [data description]);
     [self.hud dismiss];
     self.hud = nil;
     if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
@@ -648,7 +649,7 @@
                 OrderMenuVIew * menuView = [[OrderMenuVIew alloc] initWithFrame:CGRectMake(15, self.storeNameLB.bottom + 5 + i * 25, view3.width - 30, 25)];
                 menuView.menuNameLB.text = orderMneuMD.name;
                 menuView.countLabel.text = [NSString stringWithFormat:@"%@", orderMneuMD.count];
-                menuView.priceLabel.text = [NSString stringWithFormat:@"¥%@", orderMneuMD.money];
+                menuView.priceLabel.text = [NSString stringWithFormat:@"¥%g", orderMneuMD.money.doubleValue * orderMneuMD.count.intValue];
                 [view3 addSubview:menuView];
             }
             view3.height += 25 * self.orderArray.count + 5;
@@ -675,6 +676,21 @@
                 case 3:
                 {
                     self.orderPayTypeLB.text = @"支付方式:餐到付款";
+                }
+                    break;
+                case 4:
+                {
+                    self.orderPayTypeLB.text = @"支付方式:优惠券";
+                }
+                    break;
+                case 5:
+                {
+                    self.orderPayTypeLB.text = @"支付方式:积分";
+                }
+                    break;
+                case 6:
+                {
+                    self.orderPayTypeLB.text = @"支付方式:优惠券，积分";
                 }
                     break;
                 default:
@@ -851,11 +867,14 @@
             [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:1.5];
         }
         
-    }else
+    }else if ([self.payType isEqualToNumber:@2])
     {
         BDWalletSDKMainManager* payMainManager = [BDWalletSDKMainManager getInstance];
         NSString *orderInfo = [self buildOrderInfoWithOrderID:self.takeOutOrderMD.orderID];
         [payMainManager doPayWithOrderInfo:orderInfo params:nil delegate:self];
+    }else
+    {
+        NSLog(@"已经支付过了");
     }
 
 }

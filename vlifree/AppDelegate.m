@@ -14,6 +14,7 @@
 #import "DetailsGrogshopViewController.h"
 #import "DetailTakeOutViewController.h"
 #import "TakeOutOrderViewController.h"
+#import "OnlinePayViewController.h"
 #import "GSOrderPayViewController.h"
 #import "APService.h"
 #import "FinishOrderViewController.h"
@@ -145,9 +146,9 @@
 //                NSLog(@"支付成功");
                 UINavigationController * nav = (UINavigationController *)self.myTabBarVC.selectedViewController;
                 UIViewController * vc = [nav.viewControllers lastObject];
-                if ([vc isKindOfClass:[TakeOutOrderViewController class]]) {
-                    TakeOutOrderViewController * takeOutOrderVC = (TakeOutOrderViewController *)vc;
-                    [takeOutOrderVC pushFinishOrderVC];
+                if ([vc isKindOfClass:[OnlinePayViewController class]]) {
+                    OnlinePayViewController * onLineVC = (OnlinePayViewController *)vc;
+                    [onLineVC pushFinishOrderVC];
                 }else if ([vc isKindOfClass:[GSOrderPayViewController class]])
                 {
                     GSOrderPayViewController * gsOrderPayVC = (GSOrderPayViewController *)vc;

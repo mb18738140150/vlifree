@@ -22,7 +22,7 @@
 #define LOCATION_BUTTON_WIDTH 60
 #define LOCATION_LABEL_WIDTH LOCATION_BUTTON_WIDTH - LOCATION_IMAGE_WIDTH
 #define LOCATION_IMAGE_WIDTH BUTTON_HEIGTH
-
+#define LOADINGIMAGE_WIDTH 20
 
 @interface HomeViewController ()<CLLocationManagerDelegate, HTTPPostDelegate, UITableViewDataSource, UITableViewDelegate, BMKLocationServiceDelegate, BMKGeoCodeSearchDelegate>
 {
@@ -58,6 +58,9 @@
  */
 @property (nonatomic, strong)BMKGeoCodeSearch * geoSearcher;
 
+// 定位加载中动画
+@property (nonatomic, strong)UIImageView * loadingImageView;
+@property (nonatomic, strong)UIButton * locationBT;
 @end
 
 @implementation HomeViewController
@@ -139,26 +142,43 @@
     button.backgroundColor = MAIN_COLOR;
     [aView addSubview:button];
     
-    UIButton * locationBT = [UIButton buttonWithType:UIButtonTypeCustom];
-    locationBT.frame = CGRectMake(10, 10, LOCATION_BUTTON_WIDTH, BUTTON_HEIGTH);
-    locationBT.tag = 1000;
-    [locationBT addTarget:self action:@selector(locationAction:) forControlEvents:UIControlEventTouchUpInside];
+    self.locationBT = [UIButton buttonWithType:UIButtonTypeCustom];
+    _locationBT.frame = CGRectMake(10, 10, LOCATION_BUTTON_WIDTH, BUTTON_HEIGTH);
+    _locationBT.tag = 1000;
+    [_locationBT addTarget:self action:@selector(locationAction:) forControlEvents:UIControlEventTouchUpInside];
 //    locationBT.backgroundColor = [UIColor greenColor];
 //    [self.navigationController.navigationBar addSubview:locationBT];
-    self.locationLB = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, LOCATION_LABEL_WIDTH, locationBT.height)];
+    self.locationLB = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, LOCATION_LABEL_WIDTH, _locationBT.height)];
     _locationLB.text = @"郑州";
     _locationLB.font = [UIFont systemFontOfSize:13];
     _locationLB.textColor = [UIColor whiteColor];
     _locationLB.textAlignment = NSTextAlignmentRight;
-    [locationBT addSubview:_locationLB];
+    [_locationBT addSubview:_locationLB];
     
     
     UIImageView * locationIG = [[UIImageView alloc] initWithFrame:CGRectMake(_locationLB.right, 0, LOCATION_IMAGE_WIDTH, _locationLB.height)];
     locationIG.image = [UIImage imageNamed:@"location.png"];
-    [locationBT addSubview:locationIG];
+    [_locationBT addSubview:locationIG];
     
-    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:locationBT];
+//    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:_locationBT];
 
+    self.loadingImageView = [[UIImageView alloc]initWithFrame:CGRectMake(10, 10, LOADINGIMAGE_WIDTH, LOADINGIMAGE_WIDTH)];
+    self.loadingImageView.image = [UIImage imageNamed:@"icon1.png"];
+    
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]initWithCustomView:_loadingImageView];
+    // 菊花旋转
+    CABasicAnimation * rotationAnimation;
+    rotationAnimation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
+    rotationAnimation.toValue = [NSNumber numberWithFloat:M_PI * 2.0];
+    rotationAnimation.duration = 3;
+    // RepeatCount默认的是 0,意味着动画只会播放一次
+    rotationAnimation.repeatCount = FLT_MAX;
+    rotationAnimation.cumulative = NO;
+    // RemovedOnCompletion这个属性默认为 YES,那意味着,在指定的时间段完成后,动画就自动的从层上移除了。这个一般不用
+    rotationAnimation.removedOnCompletion = NO;
+    [self.loadingImageView.layer addAnimation:rotationAnimation forKey:@"Rotation"];
+    
+    
     _page = 1;
     
     //设置定位精确度，默认：kCLLocationAccuracyBest
@@ -232,13 +252,24 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
+    if (!self.locService) {
+        self.locService = [[BMKLocationService alloc]init];
+        _locService.delegate = self;
+    }
     self.navigationController.navigationBar.barTintColor = MAIN_COLOR;
     UIButton * locationBT = (UIButton *)[self.navigationController.navigationBar viewWithTag:1000];
     UIButton * searchBT = (UIButton *)[self.navigationController.navigationBar viewWithTag:2000];
     locationBT.hidden = NO;
     searchBT.hidden = NO;
     if ([UserLocation shareUserLocation].city) {
+        [self.loadingImageView removeFromSuperview];
+        self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]initWithCustomView:_locationBT];
         self.locationLB.text = [UserLocation shareUserLocation].city;
+    }else
+    {
+        [_locService stopUserLocationService];
+        NSLog(@"试图出现时定位");
+        [self.locService startUserLocationService];
     }
     UIView * aView = [self.view viewWithTag:10009];
     if ([UserInfo shareUserInfo].userId) {
@@ -296,13 +327,13 @@
 
 - (void)locationAction:(UIButton *)button
 {
+    [_locationBT removeFromSuperview];
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]initWithCustomView:_loadingImageView];
+    
     [_locService stopUserLocationService];
-    NSLog(@"定位");
+    NSLog(@"点击定位");
     [self.locService startUserLocationService];
 }
-
-
-
 
 
 - (void)didReceiveMemoryWarning {
@@ -456,6 +487,10 @@
         [UserLocation shareUserLocation].district = result.addressDetail.district;
         self.locationLB.text = result.addressDetail.city;
         [self downloadDataWithCommand:@1 page:_page count:DATA_COUNT];
+        
+        [self.loadingImageView removeFromSuperview];
+        self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]initWithCustomView:_locationBT];
+        
     }
     else {
         NSLog(@"抱歉，未找到结果");

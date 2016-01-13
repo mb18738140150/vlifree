@@ -48,6 +48,7 @@ static UserInfo * userInfo = nil;
                                    @"CID":[[NSUserDefaults standardUserDefaults] objectForKey:@"registrationID"]
                                    };
             [self playPostWithDictionary:dic];
+//             NSLog(@"******************%@", [[NSUserDefaults standardUserDefaults] objectForKey:@"registrationID"]);
         }
     }
 }

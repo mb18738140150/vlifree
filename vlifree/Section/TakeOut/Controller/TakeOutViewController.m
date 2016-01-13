@@ -19,7 +19,7 @@
 #define CELL_INDENTIFIER @"cell"
 
 #define CYCLESCROLLVIEW_HEIGHT 150
-
+#define LOADINGIMAGE_WIDTH 20
 @interface TakeOutViewController ()<UITableViewDataSource, UITableViewDelegate, CLLocationManagerDelegate, HTTPPostDelegate, BMKLocationServiceDelegate, BMKGeoCodeSearchDelegate>
 
 {
@@ -77,6 +77,8 @@
  *  监控是否定位的timer
  */
 @property (nonatomic, strong)NSTimer * timer;
+// 定位加载中动画
+@property (nonatomic, strong)UIImageView * loadingImageView;
 
 @end
 
@@ -111,7 +113,7 @@
 //    _addressBT.frame = CGRectMake(0, 5, 200, 30);
 //    _addressBT.backgroundColor = [UIColor greenColor];
     [_addressBT addTarget:self action:@selector(startLocation:) forControlEvents:UIControlEventTouchUpInside];
-    self.navigationItem.titleView = _addressBT;
+    
     
     self.addressIM = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 30, 30)];
     _addressIM.image = [UIImage imageNamed:@"location.png"];
@@ -124,7 +126,27 @@
     NSLog(@"11%@",     _addressLB.font.fontName);
     self.addressBT.frame = CGRectMake(0, 0, _addressIM.width, 30);
     
-    [self showLocationAddress];
+    
+    self.loadingImageView = [[UIImageView alloc]initWithFrame:CGRectMake(0, 0, LOADINGIMAGE_WIDTH, LOADINGIMAGE_WIDTH)];
+    UIImageView * loadView = [[UIImageView alloc]initWithFrame:CGRectMake(0, 0, 20, 20)];
+    loadView.image =[UIImage imageNamed:@"icon1.png"];
+//    self.loadingImageView.image = [UIImage imageNamed:@"icon1.png"];
+    [_loadingImageView addSubview:loadView];
+    // 菊花旋转
+    CABasicAnimation * rotationAnimation;
+    rotationAnimation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
+    rotationAnimation.toValue = [NSNumber numberWithFloat:M_PI * 2.0];
+    rotationAnimation.duration = 3;
+    // RepeatCount默认的是 0,意味着动画只会播放一次
+    rotationAnimation.repeatCount = FLT_MAX;
+    rotationAnimation.cumulative = NO;
+    // RemovedOnCompletion这个属性默认为 YES,那意味着,在指定的时间段完成后,动画就自动的从层上移除了。这个一般不用
+    rotationAnimation.removedOnCompletion = NO;
+    [loadView.layer addAnimation:rotationAnimation forKey:@"Rotation"];
+    
+    
+    self.navigationItem.titleView = _loadingImageView;
+//    [self showLocationAddress];
     
     UIButton * typeButton = [UIButton buttonWithType:UIButtonTypeCustom];
     typeButton.frame = CGRectMake(0, 0, self.view.width, 40);
@@ -269,6 +291,8 @@
 
 - (void)startLocation:(UIButton *)button
 {
+    [_addressBT removeFromSuperview];
+    self.navigationItem.titleView = _loadingImageView;
     [_locService stopUserLocationService];
     NSLog(@"11");
     [_locService startUserLocationService];
@@ -563,6 +587,9 @@
         [UserLocation shareUserLocation].streetName = result.addressDetail.streetName;
         [UserLocation shareUserLocation].streetNumber = result.addressDetail.streetNumber;
         [UserLocation shareUserLocation].district = result.addressDetail.district;
+        
+        [_loadingImageView removeFromSuperview];
+        self.navigationItem.titleView = _addressBT;
         [self showLocationAddress];
     }else {
         NSLog(@"抱歉，未找到结果");
@@ -633,26 +660,26 @@
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
 {
-    return 30;
+    return 0.1;
 }
 
-- (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
-{
-    NSMutableArray * array = [self.dataArray objectAtIndex:section];
-    TakeOutModel * takeOutMD = [array firstObject];
-    UILabel * label = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, self.view.width, 30)];
-    label.backgroundColor = [UIColor whiteColor];
-    label.textAlignment = NSTextAlignmentCenter;
-    label.textColor = [UIColor redColor];
-    label.font = [UIFont systemFontOfSize:13];
-    if ([takeOutMD.peyType isEqualToNumber:@YES]) {
-        label.text = @"在配送范围内";
-    }else
-    {
-        label.text = @"不在配送范围";
-    }
-    return label;
-}
+//- (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
+//{
+//    NSMutableArray * array = [self.dataArray objectAtIndex:section];
+//    TakeOutModel * takeOutMD = [array firstObject];
+//    UILabel * label = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, self.view.width, 30)];
+//    label.backgroundColor = [UIColor whiteColor];
+//    label.textAlignment = NSTextAlignmentCenter;
+//    label.textColor = [UIColor redColor];
+//    label.font = [UIFont systemFontOfSize:13];
+//    if ([takeOutMD.peyType isEqualToNumber:@YES]) {
+//        label.text = @"在配送范围内";
+//    }else
+//    {
+//        label.text = @"不在配送范围";
+//    }
+//    return label;
+//}
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {

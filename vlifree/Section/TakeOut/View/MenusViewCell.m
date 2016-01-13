@@ -49,10 +49,14 @@
 //    NSLog(@"---- key = %@,\n object = %@, \n change = %@", keyPath, object, change);
     MenusViewCell * cell = (MenusViewCell *)object;
     cell.countLabel.text = [NSString stringWithFormat:@"%@", [change objectForKey:@"new"]];
+    
     if ([[change objectForKey:@"new"] isEqualToNumber:@0]) {
         cell.subtractBT.hidden = YES;
     }else
     {
+        if (cell.menuModel.PropertyList.count != 0) {
+            cell.subtractBT.hidden = YES;
+        }
         cell.subtractBT.hidden = NO;
     }
 }

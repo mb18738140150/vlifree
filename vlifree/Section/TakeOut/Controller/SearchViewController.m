@@ -40,7 +40,7 @@
 
 @end
 
-@implementation SearchViewController
+@implementation SearchViewController  
 
 
 - (NSMutableArray *)dataArray
@@ -229,14 +229,25 @@
     NSLog(@"+++%@, error = %@", data, [data objectForKey:@"ErrorMsg"]);
     if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
         NSArray * array = [data objectForKey:@"StoreList"];
-        if (_page == 1) {
-            self.dataArray = nil;
+        if (array.count == 0) {
+            UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:@"搜索内容为空" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
+            [alert show];
+            [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:1.0];
+        }else {
+            
+            if (_page == 1) {
+                self.dataArray = nil;
+            }
+            for (NSDictionary * dic in array) {
+                TakeOutModel * takeOutMD = [[TakeOutModel alloc] initWithDictionary:dic];
+                [self.dataArray addObject:takeOutMD];
+            }
+            [self.tableView reloadData];
         }
-        for (NSDictionary * dic in array) {
-            TakeOutModel * takeOutMD = [[TakeOutModel alloc] initWithDictionary:dic];
-            [self.dataArray addObject:takeOutMD];
-        }
-        [self.tableView reloadData];
+    }else{
+        UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:[data objectForKey:@"ErrorMsg"] delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
+        [alert show];
+        [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:1.5];
     }
 }
 

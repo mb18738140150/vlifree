@@ -46,12 +46,14 @@
     if (!_menuNameLB) {
         self.menuNameLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, TOP_SPACE, self.width - PRICE_LABEL_WIDTH - 3 * BUTTON_SIZE - 5 * LEFT_SPACE, LABEL_HEIGHT)];
         _menuNameLB.backgroundColor = VIEW_COLOR;
+        _menuNameLB.adjustsFontSizeToFitWidth = YES;
         _menuNameLB.text = @"香干回锅肉";
         _menuNameLB.textColor = [UIColor grayColor];
         [self addSubview:_menuNameLB];
         
         self.priceLabel = [[UILabel alloc] initWithFrame:CGRectMake(_menuNameLB.right + LEFT_SPACE, TOP_SPACE, PRICE_LABEL_WIDTH, LABEL_HEIGHT)];
         _priceLabel.textColor = MAIN_COLOR;
+        _priceLabel.adjustsFontSizeToFitWidth = YES;
         _priceLabel.backgroundColor = VIEW_COLOR;
         _priceLabel.text = @"¥39";
         [self addSubview:_priceLabel];

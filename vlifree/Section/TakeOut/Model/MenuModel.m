@@ -7,7 +7,7 @@
 //
 
 #import "MenuModel.h"
-
+#import "PropertyModel.h"
 @implementation MenuModel
 
 
@@ -22,7 +22,14 @@
 
 - (void)setValue:(id)value forUndefinedKey:(NSString *)key
 {
-    
+    if ([key isEqualToString:@"AttrList"]) {
+        NSArray * array = value;
+        self.PropertyList = [NSMutableArray array];
+        for (NSDictionary * dic in array) {
+            PropertyModel * model = [[PropertyModel alloc]initWithDictionary:dic];
+            [self.PropertyList addObject:model];
+        }
+    }
 }
 
 

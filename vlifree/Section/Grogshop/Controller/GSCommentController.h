@@ -10,4 +10,9 @@
 
 @interface GSCommentController : UITableViewController
 
+@property (nonatomic, assign)int StoreId;
+@property (nonatomic, assign)int BusType;
+@property (nonatomic, assign)int CurPage;
+@property (nonatomic, assign)int CurCount;
+
 @end

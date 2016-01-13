@@ -280,6 +280,9 @@
                                };
         [self requestDataWithDictionary:dic];
     }
+    
+   
+    
     [UserInfo shareUserInfo].userId = nil;
 }
 

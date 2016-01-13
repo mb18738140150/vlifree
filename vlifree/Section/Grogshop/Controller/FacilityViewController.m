@@ -242,10 +242,19 @@
     }
     scrollView.contentSize = CGSizeMake(scrollView.width, detailsView.bottom);
     
+    UIButton * backBT = [UIButton buttonWithType:UIButtonTypeCustom];
+    backBT.frame = CGRectMake(0, 0, 15, 20);
+    [backBT setBackgroundImage:[UIImage imageNamed:@"back_r.png"] forState:UIControlStateNormal];
+    [backBT addTarget:self action:@selector(backLastVC:) forControlEvents:UIControlEventTouchUpInside];
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:backBT];
+    
     // Do any additional setup after loading the view.
 }
 
-
+- (void)backLastVC:(UIBarButtonItem *)button
+{
+    [self.navigationController popViewControllerAnimated:YES];
+}
 
 - (void)parser:(NSXMLParser *)parser foundCharacters:(NSString *)string
 {

@@ -20,8 +20,9 @@
 #import "CommentViewCell.h"
 #import "CommentModel.h"
 #import "StoreIntroView.h"
-
-
+#import "GSMapViewController.h"
+#import "PropertyModel.h"
+#import "PropertyView.h"
 
 #define SECTION_TABLEVIEW_CELL @"SECTIONCELL"
 #define MENUS_TABLEVIEW_CELL @"MENUSCELL"
@@ -29,6 +30,8 @@
 
 #define SUBTRACT_BUTTON_TAG 1000
 #define ADD_BUTTON_TAG 2000
+
+#define PROPERTY_BUTTON_TAG 3000
 
 #define SHOPPINGCARVIEW_HEIGHT 55
 
@@ -106,9 +109,23 @@
 @property (nonatomic, strong)NSMutableArray * commentArray;
 
 
+/**
+ *  简介界面
+ */
 @property (nonatomic, strong)StoreIntroView * introView;
 
-
+/**
+ *  酒店维度
+ */
+@property (nonatomic, copy)NSString * lat;
+/**
+ *  酒店经度
+ */
+@property (nonatomic, copy)NSString * lon;
+// 菜品属性弹出框
+// 弹出框
+@property (nonatomic, strong)UIView * tanchuView;
+@property (nonatomic, strong)MenuModel * menuModel;
 @end
 
 @implementation DetailTakeOutViewController
@@ -168,7 +185,7 @@
 //    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"评论" style:UIBarButtonItemStylePlain target:self action:@selector(lookComment:)];
 //    [self addObserver:self forKeyPath:@"shopArray" options:NSKeyValueObservingOptionNew context:nil];
     
-    self.segmentC = [[HYSegmentedControl alloc] initWithOriginY:0 Titles:@[@"点菜", @"评论"] delegate:self];
+    self.segmentC = [[HYSegmentedControl alloc] initWithOriginY:0 Titles:@[@"点菜", @"评论",@"简介"] delegate:self];
 //    self.segmentC = [[HYSegmentedControl alloc] initWithOriginY:0 Titles:@[@"点菜", @"评论", @"简介"] delegate:self];
     [self.view addSubview:_segmentC];
     
@@ -177,8 +194,8 @@
     _aScrollView.delegate = self;
     _aScrollView.pagingEnabled = YES;
     _aScrollView.showsHorizontalScrollIndicator = NO;
-//    _aScrollView.contentSize = CGSizeMake(_aScrollView.width * 3, _aScrollView.height);
-    _aScrollView.contentSize = CGSizeMake(_aScrollView.width * 2, _aScrollView.height);
+    _aScrollView.contentSize = CGSizeMake(_aScrollView.width * 3, _aScrollView.height);
+//    _aScrollView.contentSize = CGSizeMake(_aScrollView.width * 2, _aScrollView.height);
     [self.view addSubview:_aScrollView];
     
     
@@ -213,8 +230,6 @@
     [button addTarget:self action:@selector(removeNoticeView:) forControlEvents:UIControlEventTouchUpInside];
     [noticeView addSubview:button];
 //    NSLog(@"point =  %g, %g", noticeScrollV.contentOffset.x, _noticeScrollV.contentOffset.y);
-    
-    
     
     self.sectionTableView = [[UITableView alloc] initWithFrame:CGRectMake(0, noticeView.bottom, 80, self.aScrollView.height - SHOPPINGCARVIEW_HEIGHT - noticeView.height) style:UITableViewStylePlain];
 //    self.sectionTableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, 80, self.aScrollView.height - SHOPPINGCARVIEW_HEIGHT) style:UITableViewStylePlain];
@@ -288,6 +303,14 @@
     self.commentTableView.tableFooterView = [[UIView alloc] init];
     
     
+    self.introView = [[StoreIntroView alloc]initWithFrame:CGRectMake(2 * _aScrollView.width, 0, _aScrollView.width, _aScrollView.height)];
+    [_aScrollView addSubview:_introView];
+    [self.introView.addressBT addTarget:self action:@selector(addressAction:) forControlEvents:UIControlEventTouchUpInside];
+    NSDictionary *jsondic = @{
+                              @"Command":@43,
+                              @"StoreId":self.takeOutID,
+                              };
+    [self playPostWithDictionary:jsondic];
 //    self.introView = [[StoreIntroView alloc] initWithFrame:CGRectMake(_commentTableView.right, 0, _aScrollView.width, _aScrollView.height)];
 //    [_aScrollView addSubview:_introView];
     
@@ -301,17 +324,21 @@
     
     [self downloadData];
     
+    self.tanchuView = [[UIView alloc]initWithFrame:self.view.bounds];
+    _tanchuView.backgroundColor = [UIColor clearColor];
+
+    
 //    [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(scrollNotice) userInfo:nil repeats:YES];
 //    self.navigationController.navigationBar.tintColor = [UIColor clearColor];
     // Do any additional setup after loading the view.
 }
 
+#pragma mark - HYSegmentedControl 代理方法
 - (void)hySegmentedControlSelectAtIndex:(NSInteger)index
 {
 //    self.aScrollView.contentOffset = CGPointMake(index * _aScrollView.width, 0);
     [self.aScrollView setContentOffset:CGPointMake(index * _aScrollView.width, 0) animated:YES];
 }
-
 
 
 - (void)scrollNotice
@@ -408,16 +435,36 @@
             [self getAllCount];
         }
         NSMutableArray * array = [NSMutableArray array];
-        for (NSMutableArray * smallAry in self.shopArray) {
-            MenuModel * menuMD = [smallAry firstObject];
-            NSDictionary * dic = @{
-                                   @"Id":menuMD.Id,
-                                   @"Count":[NSNumber numberWithInteger:menuMD.count],
-                                   @"Name":menuMD.name,
-                                   @"Price":menuMD.price,
-                                   @"Money":[NSNumber numberWithDouble:menuMD.price.doubleValue * menuMD.count],
-                                   };
-            [array addObject:dic];
+        for (MenuModel * menuMD in self.shopArray) {
+            if (menuMD.PropertyList.count != 0) {
+                for (PropertyModel * proModel in menuMD.PropertyList) {
+                    if (proModel.count != 0) {
+                        NSDictionary * dic = @{
+                                               @"Id":menuMD.Id,
+                                               @"Count":[NSNumber numberWithInteger:proModel.count],
+                                               @"Name":menuMD.name,
+                                               @"Price":@(proModel.stylePrice),
+                                               @"Money":[NSNumber numberWithDouble:proModel.stylePrice * proModel.count],
+                                               @"StyleId":@(proModel.styleId),
+                                               @"StyleName":proModel.styleName
+                                               };
+                        [array addObject:dic];
+                    }
+                }
+            }else
+            {
+                NSDictionary * dic = @{
+                                       @"Id":menuMD.Id,
+                                       @"Count":[NSNumber numberWithInteger:menuMD.count],
+                                       @"Name":menuMD.name,
+                                       @"Price":menuMD.price,
+                                       @"Money":[NSNumber numberWithDouble:menuMD.price.doubleValue * menuMD.count],
+                                       @"StyleId":@(0),
+                                       @"StyleName":@""
+                                       };
+                [array addObject:dic];
+
+            }
         }
         NSDictionary * jsonDic = @{
                                    @"Command":@31,
@@ -550,8 +597,8 @@
             for (NSDictionary * dic in array) {
                 MenuModel * menuMD = [[MenuModel alloc] initWithDictionary:dic];
                 if (self.shopArray.count != 0) {
-                    for (NSMutableArray * smallAry in self.shopArray) {
-                        MenuModel * shopMenuMD = [smallAry firstObject];
+                    for (MenuModel * shopMenuMD in self.shopArray) {
+//                        MenuModel * shopMenuMD = [smallAry firstObject];
                         if ([shopMenuMD.Id isEqualToNumber:menuMD.Id]) {
                             menuMD = shopMenuMD;
                         }
@@ -604,6 +651,20 @@
                 [self.commentTableView.footer noticeNoMoreData];
             }
             [self.commentTableView reloadData];
+        }else if ([[data objectForKey:@"Command"]isEqualToNumber:@10043])
+        {
+            NSLog(@"***********data = %@", data);
+            self.introView.Describe.text = [data objectForKey:@"Describe"];
+            self.introView.StoreType.text = [data objectForKey:@"StoreType"];
+            self.introView.BusTime.text = [data objectForKey:@"BusTime"];
+            self.introView.StoreAdress.text = [data objectForKey:@"StoreAdress"];
+            self.introView.StoreTel.text = [data objectForKey:@"StoreTel"];
+            self.introView.StartSendMoney.text = [NSString stringWithFormat:@"%@", [data objectForKey:@"StartSendMoney"]];
+            self.introView.Delivery.text = [NSString stringWithFormat:@"%@", [data objectForKey:@"Delivery"]];
+            self.introView.ServiceDis.text = [NSString stringWithFormat:@"%@", [data objectForKey:@"ServiceDis"]];
+            self.introView.DeliveryDis.text = [data objectForKey:@"DeliveryDis"];
+            self.lat = [data objectForKey:@"StoreLat"];
+            self.lon = [data objectForKey:@"StoreLon"];
         }
     }else
     {
@@ -723,95 +784,247 @@
 }
 
 
-#pragma mark - 加减选菜个数
+#pragma mark - 无属性加减选菜个数
 
 - (void)subtractMenuCount:(UIButton *)button
 {
-//    MenusViewCell * cell = (MenusViewCell *)[self.menusTableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:button.tag - SUBTRACT_BUTTON_TAG inSection:0]];
+
     MenuModel * menuMD = [self.menusArray objectAtIndex:button.tag - SUBTRACT_BUTTON_TAG];
-    menuMD.count -= 1;
-//    NSInteger count = [self.shoppingCarView.countLabel.text integerValue];
-//    cell.countLabel.text = [NSString stringWithFormat:@"%ld", [cell.countLabel.text integerValue] - 1];
-//    if ([cell.countLabel.text integerValue] == 0) {
-//        button.hidden = YES;
-//    }
-//    if (count == 1) {
-//        self.shoppingCarView.changeButton.enabled = NO;
-//    }
-//    double allPrice = 0;
-////    NSLog(@"/// %@, %@", self.shopArray, [self.shopArray firstObject]);
-    for (int i = 0; i < self.shopArray.count; i++) {
-        NSMutableArray * ary = [self.shopArray objectAtIndex:i];
-        MenuModel * menuMD1 = [ary firstObject];
-        if ([menuMD1 isEqual:menuMD]) {
-            [ary removeLastObject];
+//    menuMD.count -= 1;
+
+    self.menuModel = menuMD;
+    if (menuMD.PropertyList.count != 0) {
+        [self tanchuPropertyWithModel:menuMD];
+    }else
+    {
+        
+        for (int i = 0; i < self.shopArray.count; i++) {
+            MenuModel * menuMD1 = [self.shopArray objectAtIndex:i];
+            //        MenuModel * menuMD1 = [ary firstObject];
+            if ([menuMD1 isEqual:menuMD]) {
+                //            [ary removeLastObject];
+                menuMD1.count -= 1;
+            }
+            if (menuMD1.count == 0) {
+                [self.shopArray removeObject:menuMD1];
+                continue;
+            }
         }
-        if (ary.count == 0) {
-            [self.shopArray removeObject:ary];
-            continue;
-        }
-//        for (MenuModel * menuMD2 in ary) {
-//            allPrice += [menuMD2.price doubleValue];
-//        }
     }
+    
     NSLog(@"-- shop = %@", self.shopArray);
     [self getAllPrice];
     [self getAllCount];
-//    if (allPrice < [self.sendPrice doubleValue]) {
-//        self.shoppingCarView.changeButton.enabled = NO;
-//    }
-//    self.shoppingCarView.priceLabel.text = [NSString stringWithFormat:@"¥%g(%@起送)", allPrice, self.sendPrice];
-//    self.shoppingCarView.countLabel.text = [NSString stringWithFormat:@"%ld", [self.shoppingCarView.countLabel.text integerValue] - 1];
 }
 
 - (void)addMenuCount:(UIButton *)button
 {
-//    MenusViewCell * cell = (MenusViewCell *)[self.menusTableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:button.tag - ADD_BUTTON_TAG inSection:0]];
+
     MenuModel * menuMD = [self.menusArray objectAtIndex:button.tag - ADD_BUTTON_TAG];
-    menuMD.count += 1;
-//    NSInteger count = [cell.countLabel.text integerValue];
-//    cell.countLabel.text = [NSString stringWithFormat:@"%ld", count + 1];
-//    cell.subtractBT.hidden = NO;
-    self.shoppingCarView.countLabel.text = [NSString stringWithFormat:@"%ld", [self.shoppingCarView.countLabel.text integerValue] + 1];
-    if (self.shopArray.count == 0) {
-        NSMutableArray * array = [NSMutableArray array];
-        [array addObject:menuMD];
-        [self.shopArray addObject:array];
-        if ([menuMD.price doubleValue] > [self.sendPrice doubleValue] || [menuMD.price doubleValue] == [self.sendPrice doubleValue]) {
-            self.shoppingCarView.changeButton.enabled = YES;
-        }
-//        self.shoppingCarView.priceLabel.text = [NSString stringWithFormat:@"¥%g(%@起送)", menuMD.price.doubleValue + self.mealBoxMoney.doubleValue, self.sendPrice];
+    self.menuModel = menuMD;
+    if (menuMD.PropertyList.count != 0) {
+        [self tanchuPropertyWithModel:menuMD];
     }else
     {
-        BOOL have = NO;
-        for (NSMutableArray * smallAry in self.shopArray) {
-            if ([[smallAry firstObject] isEqual:menuMD]) {
-                [smallAry addObject:menuMD];
-                have = YES;
-                break;
+        
+//        menuMD.count += 1;
+        self.shoppingCarView.countLabel.text = [NSString stringWithFormat:@"%ld", [self.shoppingCarView.countLabel.text integerValue] + 1];
+        if (self.shopArray.count == 0) {
+//            NSMutableArray * array = [NSMutableArray array];
+//            [array addObject:menuMD];
+            [self.shopArray addObject:menuMD];
+            menuMD.count += 1;
+            if ([menuMD.price doubleValue] > [self.sendPrice doubleValue] || [menuMD.price doubleValue] == [self.sendPrice doubleValue]) {
+                self.shoppingCarView.changeButton.enabled = YES;
+            }
+        }else
+        {
+            BOOL have = NO;
+            for (MenuModel * menuMOdel in self.shopArray) {
+                if ([menuMOdel isEqual:menuMD]) {
+//                    [smallAry addObject:menuMD];
+                    menuMD.count += 1;
+                    have = YES;
+                    break;
+                }
+            }
+            if (!have) {
+//                NSMutableArray * smallAry = [NSMutableArray array];
+//                [smallAry addObject:menuMD];
+                [self.shopArray addObject:menuMD];
+                menuMD.count += 1;
             }
         }
-        if (!have) {
-            NSMutableArray * smallAry = [NSMutableArray array];
-            [smallAry addObject:menuMD];
-            [self.shopArray addObject:smallAry];
-        }
+        [self getAllPrice];
+        NSLog(@"shop = %@", self.shopArray);
+        CGRect cellFrame = [self.menusTableView rectForRowAtIndexPath:[NSIndexPath indexPathForRow:button.tag - ADD_BUTTON_TAG inSection:0]];
+        CGRect btFrame = button.frame;
+        btFrame.origin.x = btFrame.origin.x + self.menusTableView.left;
+        btFrame.origin.y = cellFrame.origin.y - self.menusTableView.contentOffset.y + button.origin.y + self.menusTableView.top;
+        [self countLBAnimateWithFromeFrame:btFrame];
     }
-    [self getAllPrice];
-    NSLog(@"shop = %@", self.shopArray);
-    CGRect cellFrame = [self.menusTableView rectForRowAtIndexPath:[NSIndexPath indexPathForRow:button.tag - ADD_BUTTON_TAG inSection:0]];
-    CGRect btFrame = button.frame;
-    btFrame.origin.x = btFrame.origin.x + self.menusTableView.left;
-    btFrame.origin.y = cellFrame.origin.y - self.menusTableView.contentOffset.y + button.origin.y + self.menusTableView.top;
-    [self countLBAnimateWithFromeFrame:btFrame];
+    
     
 }
 
+// 菜品属性弹出
+- (void)tanchuPropertyWithModel:(MenuModel *)model
+{
+    [self.view addSubview:_tanchuView];
+    
+    [_tanchuView removeAllSubviews];
+    
+    
+    UIView * backView = [[UIView alloc]init];
+    backView.frame = _tanchuView.frame;
+    backView.backgroundColor = [UIColor blackColor];
+    backView.alpha = .5;
+    [_tanchuView addSubview:backView];
+    
+    UITapGestureRecognizer * tap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(removeTanchuAction)];
+    [backView addGestureRecognizer:tap];
+    
+    UIScrollView * scrollView = [[UIScrollView alloc]initWithFrame:CGRectMake(0, 0, _tanchuView.width - 40, self.view.height / 2)];
+    scrollView.backgroundColor = [UIColor whiteColor];
+    
+    UILabel * topLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, scrollView.width, 50)];
+    topLabel.text = @"菜品属性";
+    topLabel.textAlignment = NSTextAlignmentCenter;
+    [scrollView addSubview:topLabel];
+    
+    for (int i = 0; i < model.PropertyList.count; i++) {
+        PropertyModel * propertymodel = [model.PropertyList objectAtIndex:i];
+        PropertyView * propertyview = [[PropertyView alloc]initWithFrame:CGRectMake(0, 50 + 30 * i, scrollView.width, 30)];
+        propertyview.nameLabel.text = propertymodel.styleName;
+        propertyview.priceLabel.text = [NSString stringWithFormat:@"¥%.2f", propertymodel.stylePrice];
+        propertyview.integralLabel.text = [NSString stringWithFormat:@"积%d", propertymodel.styleIntegral];
+        propertyview.countLabel.text = [NSString stringWithFormat:@"%d", propertymodel.count];
+        propertyview.addButton.tag = PROPERTY_BUTTON_TAG + i;
+        [propertyview.addButton addTarget:self action:@selector(addMenuPropertyAcyion:) forControlEvents:UIControlEventTouchUpInside];
+        propertyview.subtractButton.tag = PROPERTY_BUTTON_TAG + i;
+        [propertyview.subtractButton addTarget:self action:@selector(substractMenuPropertyAction:) forControlEvents:UIControlEventTouchUpInside];
+        [scrollView addSubview:propertyview];
+    }
+    
+    if (model.PropertyList.count > 5) {
+        scrollView.frame = CGRectMake(0, 0, _tanchuView.width - 40 , 5 * 30 + 50);
+        scrollView.contentSize = CGSizeMake(scrollView.width, model.PropertyList.count * 30 + 50);
+    }else
+    {
+        scrollView.frame = CGRectMake(0, 0, _tanchuView.width - 40 , model.PropertyList.count * 30 + 50);
+    }
+    
+    scrollView.center = _tanchuView.center;
+    
+    UIButton * sureButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    sureButton.frame = CGRectMake(scrollView.left, scrollView.bottom, scrollView.width, 50);
+    [sureButton setTitle:@"确认" forState:UIControlStateNormal];
+    [sureButton setTintColor:[UIColor redColor]];
+    sureButton.backgroundColor = [UIColor whiteColor];
+    [sureButton addTarget:self action:@selector(sureAction:) forControlEvents:UIControlEventTouchUpInside];
+    [_tanchuView addSubview:sureButton];
+    
+    [_tanchuView addSubview:scrollView];
+    
+    [self animateIn];
+
+}
+#pragma mark - 有属性加减菜个数
+
+- (void)addMenuPropertyAcyion:(UIButton *)button
+{
+    if (self.shopArray.count == 0) {
+        [self.shopArray addObject:self.menuModel];
+        PropertyView * propertyView = (PropertyView *)[button superview];
+        PropertyModel * model = [self.menuModel.PropertyList objectAtIndex:button.tag - PROPERTY_BUTTON_TAG ];
+        
+        model.count++;
+        propertyView.countLabel.text = [NSString stringWithFormat:@"%d", model.count];
+        
+        self.menuModel.count++;
+        NSInteger allPrice = [self getAllPrice];
+        if (allPrice > [self.sendPrice doubleValue] || allPrice == [self.sendPrice doubleValue]) {
+            self.shoppingCarView.changeButton.enabled = YES;
+        }
+        
+    }else
+    {
+        BOOL isHave = NO;
+        for (MenuModel * model in self.shopArray) {
+            if ([model isEqual:self.menuModel]) {
+                isHave = YES;
+                break;
+            }
+        }
+        if (!isHave) {
+            [self.shopArray addObject:self.menuModel];
+        }
+        PropertyView * propertyView = (PropertyView *)[button superview];
+        PropertyModel * model = [self.menuModel.PropertyList objectAtIndex:button.tag - PROPERTY_BUTTON_TAG ];
+        
+        model.count++;
+        propertyView.countLabel.text = [NSString stringWithFormat:@"%d", model.count];
+        
+        self.menuModel.count++;
+    }
+    [self getAllPrice];
+    [self getAllCount];
+}
+
+- (void)substractMenuPropertyAction:(UIButton *)button
+{
+    PropertyView * propertyView = (PropertyView *)[button superview];
+    PropertyModel * model = [self.menuModel.PropertyList objectAtIndex:button.tag - PROPERTY_BUTTON_TAG ];
+    if (model.count == 0) {
+        ;
+    }else
+    {
+        model.count--;
+        int count = [propertyView.countLabel.text intValue];
+        count--;
+        propertyView.countLabel.text = [NSString stringWithFormat:@"%d", count];
+        
+        self.menuModel.count--;
+    }
+    
+    propertyView.countLabel.text = [NSString stringWithFormat:@"%d", model.count];
+    if (self.menuModel.count == 0) {
+        [self.shopArray removeObject:self.menuModel];
+    }
+    
+    [self getAllPrice];
+    [self getAllCount];
+
+}
+#pragma mark 弹出框动画
+- (void)animateIn
+{
+    self.tanchuView.transform = CGAffineTransformMakeScale(1.3, 1.3);
+    self.tanchuView.alpha = 0;
+    [UIView animateWithDuration:0.35 animations:^{
+        self.tanchuView.alpha = 1;
+        self.tanchuView.transform = CGAffineTransformMakeScale(1, 1);
+    }];
+}
+#pragma mark - 移除弹出框
+- (void)removeTanchuAction
+{
+    [_tanchuView removeFromSuperview];
+}
+- (void)sureAction:(UIButton *)button
+{
+    [_tanchuView removeFromSuperview];
+}
 - (void)clearShoppingCar:(UIButton *)button
 {
-    for (NSMutableArray * array in self.shopArray) {
-        MenuModel * menuMD = [array firstObject];
+    for (MenuModel * menuMD in self.shopArray) {
+//        MenuModel * menuMD = [array firstObject];
         menuMD.count = 0;
+        if (menuMD.PropertyList.count != 0) {
+            for (PropertyModel * model in menuMD.PropertyList) {
+                model.count = 0;
+            }
+        }
     }
     [self.shopArray removeAllObjects];
     [self.shoppingCarDetailsView removeFromSuperview];
@@ -822,9 +1035,17 @@
 - (NSInteger)getAllPrice
 {
     double allPrice = 0;
-    for (NSMutableArray * smallAry in self.shopArray) {
-        for (MenuModel * menuMD1 in smallAry) {
-            allPrice += [menuMD1.price doubleValue];
+    for (MenuModel * model in self.shopArray) {
+//        for (MenuModel * menuMD1 in smallAry) {
+//            allPrice += [menuMD1.price doubleValue];
+//        }
+        if (model.PropertyList.count!= 0) {
+            for (PropertyModel * propertyModel in model.PropertyList) {
+                allPrice += propertyModel.stylePrice * propertyModel.count;
+            }
+        }else
+        {
+            allPrice += [model.price doubleValue] * model.count;
         }
     }
     if (allPrice < [self.sendPrice doubleValue] || [self getAllCount] == 0) {
@@ -861,8 +1082,15 @@
 - (NSInteger)getAllCount
 {
     NSInteger allCount = 0;
-    for (NSMutableArray * smallAry in self.shopArray) {
-        allCount += smallAry.count;
+    for (MenuModel * model in self.shopArray) {
+        if (model.PropertyList.count != 0) {
+            for (PropertyModel * pModel in model.PropertyList) {
+                allCount += pModel.count;
+            }
+        }else
+        {
+            allCount += model.count;
+        }
     }
     self.shoppingCarView.countLabel.text = [NSString stringWithFormat:@"%ld", (long)allCount];
     return allCount;
@@ -870,6 +1098,12 @@
 
 - (void)countLBAnimateWithFromeFrame:(CGRect)frame
 {
+//    CGContextRef context = UIGraphicsGetCurrentContext();
+//    
+//    
+//    CGContextSetRGBFillColor (context,  100, 0, 0, 1.0);//设置填充颜色
+
+    
     UILabel * redView = [[UILabel alloc] initWithFrame:frame];
     redView.size = CGSizeMake(20, 20);
     redView.text = @"1";
@@ -879,6 +1113,11 @@
     redView.layer.cornerRadius = 10;
     [self.aScrollView addSubview:redView];
     CGRect rect = CGRectMake(65, _shoppingCarView.top - 10, 20, 20);
+    
+//    CGContextMoveToPoint(context, frame.origin.x, frame.origin.y);
+//    CGContextAddQuadCurveToPoint(context, frame.origin.x, frame.origin.y, rect.origin.x, rect.origin.y);
+//    CGContextStrokePath(context);
+    
     [UIView animateWithDuration:0.8 animations:^{
         redView.frame = rect;
     }];
@@ -1111,6 +1350,19 @@
     if ([scrollView isEqual:_aScrollView]) {
         [self.segmentC changeSegmentedControlWithIndex:scrollView.contentOffset.x / scrollView.width];
     }
+}
+
+#pragma mark - 商家简介地址点击事件
+- (void)addressAction:button
+{
+//    NSLog(@"查询商家地址");
+    
+    GSMapViewController *gsMapVC = [[GSMapViewController alloc]init];
+    gsMapVC.gsName = self.storeName;
+    gsMapVC.address = self.introView.StoreAdress.text;
+    gsMapVC.lat = self.lat;
+    gsMapVC.lon = self.lon;
+    [self.navigationController pushViewController:gsMapVC animated:YES];
 }
 
 /*
