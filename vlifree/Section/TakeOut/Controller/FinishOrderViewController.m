@@ -311,7 +311,7 @@
     [view5 addSubview:_orderDateLB];
     
     self.orderPayTypeLB = [[UILabel alloc] initWithFrame:CGRectMake(15, _orderDateLB.bottom + 5, lineView12.width - 10, 30)];
-    _orderPayTypeLB.text = @"支付方式: 餐到付款";
+    _orderPayTypeLB.text = @"支付方式: 现金支付";
     _orderPayTypeLB.textColor = TEXT_COLOR;
     _orderPayTypeLB.font = FONT;
     [view5 addSubview:_orderPayTypeLB];
@@ -459,7 +459,7 @@
                     break;
                 case 3:
                 {
-                    self.orderPayTypeLB.text = @"支付方式:餐到付款";
+                    self.orderPayTypeLB.text = @"支付方式:现金支付";
                 }
                     break;
                 case 4:
@@ -499,7 +499,7 @@
                     }else
                     {
                         if (_payType.intValue == 3) {
-                            self.stateLabel.text = @"餐到付款";
+                            self.stateLabel.text = @"现金支付";
 //                            _cancelBT.hidden = NO;
                         }else
                         {
@@ -793,7 +793,7 @@
             order.productName = self.orderID; //商品标题
             order.productDescription = self.orderID; //商品描述
             order.amount = [NSString stringWithFormat:@"%.2f",self.orderDetailsMD.allMoney.doubleValue]; //商品价格
-            order.notifyURL =  @"http://www.xxx.com"; //回调URL
+            order.notifyURL =  @"http://wap.vlifee.com/alipay/notify_url.aspx"; //回调URL
             
             order.service = @"mobile.securitypay.pay";
             order.paymentType = @"1";

@@ -12,6 +12,10 @@
 
 #import "WXApi.h"
 #import "payRequsestHandler.h"
+
+#import "AlipayOrder.h"
+#import "DataSigner.h"
+
 #import "BDWalletSDKMainManager.h"
 #import <CommonCrypto/CommonDigest.h>
 #import <ifaddrs.h>
@@ -38,6 +42,9 @@
  *  百度支付自定义页面
  */
 @property (nonatomic, strong)PayTypeView * baiduView;
+// 支付宝
+@property (nonatomic, strong)PayTypeView * aliPayView;
+
 /**
  *  时间控件
  */
@@ -299,14 +306,21 @@
     [_baiduView.changeButton addTarget:self action:@selector(changePayType:) forControlEvents:UIControlEventTouchUpInside];
     [view3 addSubview:_baiduView];
     
+    self.aliPayView = [[PayTypeView alloc]initWithFrame:CGRectMake(0, _baiduView.bottom, view3.width, 40)];
+    _aliPayView.iconView.image = [UIImage imageNamed:@"alipey_icon.png"];
+    _aliPayView.titleLabel.text = @"支付宝";
+    [_aliPayView.changeButton addTarget:self action:@selector(changePayType:) forControlEvents:UIControlEventTouchUpInside];
+    [view3 addSubview:_aliPayView];
+    
     if (![WXApi isWXAppInstalled]) {
         _weixinView.hidden = YES;
+        _aliPayView.top = _baiduView.top;
         _baiduView.top = _weixinView.top;
         _baiduView.changeButton.selected = YES;
         _payType = @2;
     }
     
-    view3.height = _baiduView.bottom + TOP_SPACE;
+    view3.height = _aliPayView.bottom + TOP_SPACE;
     
     UIView * line7 = [[UIView alloc] initWithFrame:CGRectMake(0, view3.height - 1, view3.width, 1)];
     line7.backgroundColor = LINE_COLOR;
@@ -453,20 +467,43 @@
 #pragma mark - 选择支付方式
 - (void)changePayType:(UIButton *)button
 {
+//    if (button.selected) {
+//        return;
+//    }
+//    if ([button isEqual:self.weixinView.changeButton]) {
+//        self.baiduView.changeButton.selected = NO;
+//        self.payType = @1;
+//        //        NSLog(@"微信");
+//    }else if ([button isEqual:self.baiduView.changeButton])
+//    {
+//        self.weixinView.changeButton.selected = NO;
+//        self.payType = @2;
+//        //        NSLog(@"百度");
+//    }
+//    button.selected = !button.selected;
+    
     if (button.selected) {
         return;
     }
     if ([button isEqual:self.weixinView.changeButton]) {
         self.baiduView.changeButton.selected = NO;
-        self.payType = @1;
-        //        NSLog(@"微信");
+        self.aliPayView.changeButton.selected = NO;
+        _payType = @1;
     }else if ([button isEqual:self.baiduView.changeButton])
     {
         self.weixinView.changeButton.selected = NO;
-        self.payType = @2;
-        //        NSLog(@"百度");
+        self.aliPayView.changeButton.selected = NO;
+        _payType = @2;
+    }else if ([button isEqual:self.aliPayView.changeButton])
+    {
+        self.baiduView.changeButton.selected = NO;
+        self.weixinView.changeButton.selected = NO;
+        _payType = @20;
     }
+    
+    
     button.selected = !button.selected;
+    
 }
 
 
@@ -474,7 +511,7 @@
 {
     self.dateButton = button;
     if (button.tag == 10002 & self.ruzhuDate != nil) {
-        self.datePicker.minimumDate = self.ruzhuDate;
+        self.datePicker.minimumDate = [NSDate dateWithTimeInterval:3600 * 24 sinceDate:self.ruzhuDate];
         self.datePicker.maximumDate = [NSDate dateWithTimeIntervalSinceNow:1000000000];
     }else if (button.tag == 10002 & self.ruzhuDate == nil)
     {
@@ -582,7 +619,7 @@
         {
             self.orderId = [data objectForKey:@"HotelOrder"];
             NSString * appid = [data objectForKey:@"AppId"];
-            if (![appid isEqual:[NSNull null]]) {
+            if ([self.payType isEqualToNumber:@1]) {
                 NSMutableDictionary *signParams = [NSMutableDictionary dictionary];
                 [signParams setObject: [NSString stringWithFormat:@"%@", [data objectForKey:@"AppId"]]       forKey:@"appid"];
                 [signParams setObject: [NSString stringWithFormat:@"%@", [data objectForKey:@"NonceStr"]]    forKey:@"noncestr"];
@@ -606,12 +643,62 @@
                 //            req.sign = sign;
                 BOOL a = [WXApi sendReq:req];
                 NSLog(@"%d", a);
-            }else
+            }else if([self.payType isEqualToNumber:@2])
             {
                 BDWalletSDKMainManager* payMainManager = [BDWalletSDKMainManager getInstance];
                 //            NSLog(@"order_no = %@", [data objectForKey:@"HotelOrder"]);
                 NSString *orderInfo = [self buildOrderInfoWithOrderID:[data objectForKey:@"HotelOrder"]];
                 [payMainManager doPayWithOrderInfo:orderInfo params:nil delegate:self];
+            }else
+            {
+                
+                NSString *partner = @"2088911824635467";
+                // 商户收款账号
+                NSString *seller = @"yfqpjp@163.com";
+                // 商户私钥，pkcs8格式
+                NSString *privateKey = @"MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBAOuotyOsHSZ4n2ZSjYdRJaukQi/6N3mYqGAL14aH3CyaHme9mIwP9a46cpYR8I72Vy2BqbJqce9fNNBjPtQgcmmnkJ1FfEWvMDHctyMHPdwXLZsQlqhNsHdLOymJiHcwo85S0k3SwbqkTivFAdlxJIHpvT3TdLPkurr8OTPCf5DXAgMBAAECgYB80z8+u/os2JPGRVAGLyt/AWC1vRoJZJ07Usp0zh4H2hLk7H6TIhkGkpsDdrkvYLjIt/fFM7DqFEoLX6Z2AkHXRNi8AX8k4lDRZfR7lan75N0suINGJWX/XX8RBduu+I766WlwIVR2RYR4i9ddq4uEwG5sx7dR3VEj3RToxQDp0QJBAPlPIzheyb8g0YLXC4XgaGqbjUOEX3NBFoJD4a/CaiitBKRVcumpORUX3JdWWZ/L4NPo+S6kbiJPCrsnHKHG0hUCQQDx+8u3Gs/OGFiOz4v2jL2eq0NfP+2cRD7/ozyLyjvIsNY3JnVT7wyg9u6Vk/LW1r8dYwQDIh5JQ6LQ7XgtcA47AkEAjhBjcH7LFcd8u8MQxOQAfCdRkxS+U23Whrppw37UgYM+LuqmRbHxXiyvvektvxotbnPGcqauP4ys/8Kk1Sb3lQJAPU6qAi4M0A5jAWub7k8iC30giJVNwfWYcHQO9uu50dLbswVPXICIFo/5SnQ9ZijqKqvXbGPMgIteSMihVgG52QJAKmub7CItcesOmgYrx76NUwlvBQ5ezJyNNNGIo76qaLvawvTY6B/C3o2ioAfgm8T0qfAyT9o4iI+xM7DY+Iulpg==";
+                /*
+                 * 生成订单信息及签名
+                 */
+                AlipayOrder * order = [[AlipayOrder alloc]init];
+                order.partner = partner;
+                order.seller = seller;
+                order.tradeNO = [data objectForKey:@"HotelOrder"]; //订单ID（由商家自行制定）
+                order.productName = [data objectForKey:@"HotelOrder"]; //商品标题
+                order.productDescription = [data objectForKey:@"HotelOrder"]; //商品描述
+                order.amount = [NSString stringWithFormat:@"%.2f",_allMoney]; //商品价格
+                order.notifyURL =  @"http://wap.vlifee.com/alipay/notify_url.aspx"; //回调URL
+                
+                order.service = @"mobile.securitypay.pay";
+                order.paymentType = @"1";
+                order.inputCharset = @"utf-8";
+                order.itBPay = @"30m";
+                order.showUrl = @"m.alipay.com";
+                
+                //应用注册scheme,在AlixPayDemo-Info.plist定义URL types
+                NSString *appScheme = @"wxaac5e5f7421e84ac";
+                
+                //将商品信息拼接成字符串
+                NSString *orderSpec = [order description];
+                NSLog(@"orderSpec = %@",orderSpec);
+                
+                id<DataSigner> signer = CreateRSADataSigner(privateKey);
+                NSString *signedString = [signer signString:orderSpec];
+                
+                //将签名成功字符串格式化为订单字符串,请严格按照该格式
+                NSString *orderString = nil;
+                if (signedString != nil) {
+                    orderString = [NSString stringWithFormat:@"%@&sign=\"%@\"&sign_type=\"%@\"",
+                                   orderSpec, signedString, @"RSA"];
+                    
+                    [[AlipaySDK defaultService] payOrder:orderString fromScheme:appScheme callback:^(NSDictionary *resultDic) {
+                        NSLog(@"reslut = %@",resultDic);
+                        [self pushOrderDetailsVC];
+                    }];
+                    
+                }
+                
+                
             }
         }
     }else
@@ -691,7 +778,7 @@
     [str appendString:@"&order_no="];
     [str appendString:orderId];
     [str appendString:@"&pay_type=2"];
-    [str appendString:@"&return_url=http://wap.vlifee.com/NotifyUrl.aspx&service_code=1&sign_method=1&sp_no="];
+    [str appendString:@"&return_url=http://wap.vlifee.com/bfbpay/notifyurl.aspx&service_code=1&sign_method=1&sp_no="];
     [str appendString:spNo];
     [str appendString:@"&sp_request_type="];
     [str appendString:@"0"];//收银类型
@@ -717,7 +804,7 @@
     [str1 appendString:@"&order_no="];
     [str1 appendString:orderId];
     [str1 appendString:@"&pay_type=2"];
-    [str1 appendString:@"&return_url=http://wap.vlifee.com/NotifyUrl.aspx&service_code=1&sign_method=1&sp_no="];
+    [str1 appendString:@"&return_url=http://wap.vlifee.com/bfbpay/notifyurl.aspx&service_code=1&sign_method=1&sp_no="];
     [str1 appendString:spNo];
     [str1 appendString:@"&sp_request_type="];
     [str1 appendString:@"0"];//收银类型

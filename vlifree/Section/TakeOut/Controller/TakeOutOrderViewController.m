@@ -64,7 +64,7 @@
  */
 @property (nonatomic, strong)PayTypeView * onLineView;
 /**
- *  餐到付款视图
+ *  现金支付视图
  */
 @property (nonatomic, strong)PayTypeView * candaoView;
 /**
@@ -439,7 +439,7 @@
     
     self.candaoView = [[PayTypeView alloc] initWithFrame:CGRectMake(0, _onLineView.bottom, payView.width, _onLineView.height)];
     _candaoView.iconView.image = [UIImage imageNamed:@"delivery.png"];
-    _candaoView.titleLabel.text = @"餐到付款";
+    _candaoView.titleLabel.text = @"现金支付";
     [_candaoView.changeButton addTarget:self action:@selector(changePayType:) forControlEvents:UIControlEventTouchUpInside];
     _candaoView.changeButton.tag = 10002;
     [payView addSubview:_candaoView];

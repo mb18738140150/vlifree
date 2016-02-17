@@ -701,7 +701,7 @@
                 order.productName = [data objectForKey:@"WakeOutOrder"]; //商品标题
                 order.productDescription = [data objectForKey:@"WakeOutOrder"]; //商品描述
                 order.amount = [NSString stringWithFormat:@"%.2f",self.realMonry.doubleValue]; //商品价格
-                order.notifyURL =  @"http://www.xxx.com"; //回调URL
+                order.notifyURL =  @"http://wap.vlifee.com/alipay/notify_url.aspx"; //回调URL
                 
                 order.service = @"mobile.securitypay.pay";
                 order.paymentType = @"1";
