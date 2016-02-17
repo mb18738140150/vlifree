@@ -31,7 +31,7 @@
  */
 @property (nonatomic, strong)NSNumber * storeState;
 /**
- *  微信登陆获取授权码的方法
+ *  微信登录获取授权码的方法
  *
  *  @param code 授权码
  */

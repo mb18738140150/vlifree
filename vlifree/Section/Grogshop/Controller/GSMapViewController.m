@@ -148,12 +148,13 @@
         BMKPinAnnotationView *newAnnotationView = [[BMKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"Annotation"];
         if ([annotation isEqual:_annotation]) {
             newAnnotationView.pinColor = BMKPinAnnotationColorRed;
+            NSLog(@"标注view我的位置");
         }else
         {
             newAnnotationView.pinColor = BMKPinAnnotationColorPurple;
+            NSLog(@"标注view商家位置");
         }
         newAnnotationView.animatesDrop = YES;// 设置该标注点动画显示
-        NSLog(@"标注view");
         return newAnnotationView;
     }
     return nil;

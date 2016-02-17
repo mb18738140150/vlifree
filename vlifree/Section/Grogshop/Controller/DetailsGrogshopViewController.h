@@ -31,9 +31,9 @@
 @property (nonatomic, copy)NSString * icon;
 
 /**
- *  微信登陆调用
+ *  微信登录调用
  *
- *  @param code 当没有登陆的时候, 在这也没登陆, 在APPdelete获取了微信code后调用这个方法登陆.
+ *  @param code 当没有登录的时候, 在这也没登录, 在APPdelete获取了微信code后调用这个方法登录.
  */
 - (void)getAccessToken:(NSString *)code;
 

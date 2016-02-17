@@ -12,15 +12,15 @@
 
 
 @property (nonatomic, copy)NSString * orderSn;
-@property (nonatomic, copy)NSString * checkinTime;
-@property (nonatomic, copy)NSString * leaveTime;
 @property (nonatomic, copy)NSString * name;
 @property (nonatomic, strong)NSNumber * money;
-@property (nonatomic, strong)NSNumber * payState;
 @property (nonatomic, copy)NSString * roomType;
+@property (nonatomic, copy)NSString * checkinTime;
+@property (nonatomic, copy)NSString * leaveTime;
 @property (nonatomic, strong)NSNumber * totalDay;
-
-
+@property (nonatomic, strong)NSNumber * payState;
+@property (nonatomic, strong)NSNumber * refundState;
+@property (nonatomic, strong)NSNumber * orderState;
 
 - (id)initWithDictionary:(NSDictionary *)dic;
 

@@ -70,6 +70,11 @@
     [self.navigationController popViewControllerAnimated:YES];
 }
 
+- (void)viewWillAppear:(BOOL)animated
+{
+    self.navigationController.navigationBar.barTintColor = [UIColor whiteColor];
+}
+
 - (void)viewWillDisappear:(BOOL)animated
 {
     [super viewWillDisappear:animated];
@@ -86,16 +91,14 @@
 
 - (void)footerRereshing
 {
-//    if (self.dataArray.count < [_allCount integerValue]) {
-//        self.tableView.footerRefreshingText = @"正在加载数据";
-//        [self.tableView.footer resetNoMoreData];
+    if (self.dataArray.count < [_allCount integerValue]) {
+        [self.tableView.footer resetNoMoreData];
         [self downloadDataWithCommand:@23 page:++_page count:COUNT];
-//    }else
-//    {
-////        self.tableView.footerRefreshingText = @"数据已经加载完";
-//        [self.tableView.footer noticeNoMoreData];
+    }else
+    {
+        [self.tableView.footer noticeNoMoreData];
 //        [self.tableView performSelector:@selector(footerEndRefreshing) withObject:nil afterDelay:1.5];
-//    }
+    }
     
 }
 

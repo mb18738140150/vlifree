@@ -92,7 +92,7 @@
         self.logInButton = [UIButton buttonWithType:UIButtonTypeCustom];
         _logInButton.frame = CGRectMake(LEFT_SPACE, passwordView.bottom + TOP_SPACE, passwordView.width, VIEW_HEIGHT);
         _logInButton.backgroundColor = MAIN_COLOR;
-        [_logInButton setTitle:@"登陆" forState:UIControlStateNormal];
+        [_logInButton setTitle:@"登录" forState:UIControlStateNormal];
         [_logInButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
         [view addSubview:_logInButton];
         
@@ -101,7 +101,7 @@
         weixinImageV.image = [UIImage imageNamed:@"weixinLogIn.png"];
         UILabel * weixinLB = [[UILabel alloc] initWithFrame:CGRectMake(0, weixinImageV.bottom, WEIXIN_BUTTON_WIDTH, WEIXIN_BUTTON_HEIGHT - WEIXIN_BUTTON_WIDTH)];
         weixinLB.textAlignment = NSTextAlignmentCenter;
-        weixinLB.text = @"微信登陆";
+        weixinLB.text = @"微信登录";
         weixinLB.font = [UIFont systemFontOfSize:14];
         self.weixinButton = [UIButton buttonWithType:UIButtonTypeCustom];
         _weixinButton.frame = CGRectMake(LEFT_SPACE, TOP_SPACE + _logInButton.bottom, WEIXIN_BUTTON_WIDTH, WEIXIN_BUTTON_HEIGHT);

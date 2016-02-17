@@ -547,7 +547,7 @@
     NSInteger day = 1;
     NSLog(@"////%ld", (long)hours);
     if (hours > 22) {
-        day = hours / 24 + 2;
+        day = hours / 24 + 1;
         NSLog(@"---%ld", (long)day);
     }
     return day;

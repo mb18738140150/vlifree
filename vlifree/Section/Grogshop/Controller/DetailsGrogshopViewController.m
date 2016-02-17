@@ -52,7 +52,7 @@
  */
 @property (nonatomic, copy)NSString * phoneNumber;
 /**
- *  自定义登陆弹出页面
+ *  自定义登录弹出页面
  */
 @property (nonatomic, strong)AlertLoginView * alertLoginV;
 /**
@@ -239,7 +239,7 @@
 }
 
 /**
- *  跳转到到房间预订页面(如果还没登陆则弹出登陆页面)
+ *  跳转到到房间预订页面(如果还没登录则弹出登录页面)
  *
  *  @param button cell上的有房按钮
  */
@@ -267,9 +267,9 @@
     
 }
 /**
- *  自定义登陆页面登陆按钮关联的登陆方法
+ *  自定义登录页面登录按钮关联的登录方法
  *
- *  @param button 自定义登陆弹出页面的登陆按钮
+ *  @param button 自定义登录弹出页面的登录按钮
  */
 - (void)userLogInAction:(UIButton *)button
 {
@@ -295,14 +295,14 @@
 }
 
 /**
- *  自定义登陆页面微信按钮关联的登陆方法
+ *  自定义登录页面微信按钮关联的登录方法
  *
- *  @param button 自定义登陆弹出页面的微信按钮
+ *  @param button 自定义登录弹出页面的微信按钮
  */
-- (void)weixinLogIn:(UIButton *)button//微信登陆
+- (void)weixinLogIn:(UIButton *)button//微信登录
 {
-    NSLog(@"微信登陆");
-//    [SVProgressHUD showWithStatus:@"登陆中..." maskType:SVProgressHUDMaskTypeClear];
+    NSLog(@"微信登录");
+//    [SVProgressHUD showWithStatus:@"登录中..." maskType:SVProgressHUDMaskTypeClear];
     if ([[NSUserDefaults standardUserDefaults] objectForKey:@"refresh_token"]) {
         if ([self compareDate]) {
             [self avoidweixinAuthorizeLogIn];
@@ -507,7 +507,7 @@
     return NO;
 }
 
-#pragma marc - 微信登陆
+#pragma marc - 微信登录
 
 //发送授权请求
 - (void)weixinAuthorizeLogIn

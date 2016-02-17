@@ -46,7 +46,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.title = @"登陆";
+    self.title = @"登录";
 //    self.navigationController.navigationBar.translucent = NO;
     
     self.navigationController.navigationBar.tintColor = [UIColor whiteColor];
@@ -93,6 +93,15 @@
                                                                     NSFontAttributeName : [UIFont boldSystemFontOfSize:17]
                                                                     };
     self.navigationController.navigationBar.barTintColor = MAIN_COLOR;
+    
+//    [[NSUserDefaults standardUserDefaults] objectForKey:@"haveLogIn"];
+//    if ([[[NSUserDefaults standardUserDefaults] objectForKey:@"haveLogIn"] intValue] == 1) {
+//        NSLog(@"已经登录了");
+//    }else if ([[[NSUserDefaults standardUserDefaults] objectForKey:@"haveLogIn"] intValue] == 0)
+//    {
+//        NSLog(@"已经退出了");
+//    }
+    
     if ([UserInfo shareUserInfo].userId) {
 //        [self removeLogInView];
         [self fiexdData];
@@ -101,6 +110,13 @@
         self.navigationItem.title = @"会员中心";
         self.navigationController.tabBarItem.title = @"我的";
         [_logInView textFiledResignFirstResponder];
+        
+        NSDictionary * dic = @{
+                               @"Command":@27,
+                               @"UserId":[UserInfo shareUserInfo].userId
+                               };
+        [self requestDataWithDictionary:dic];
+        
     }
     if (![WXApi isWXAppInstalled]) {
         _logInView.weixinButton.hidden = YES;
@@ -218,7 +234,7 @@
 {
     
     if ([WXApi isWXAppInstalled]) {
-        UIAlertView * alert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"请使用微信登陆注册" delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
+        UIAlertView * alert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"请使用微信登录注册" delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
         [alert show];
     }else
     {
@@ -240,9 +256,9 @@
 }
 
 
-- (void)weixinLogIn:(UIButton *)button//微信登陆
+- (void)weixinLogIn:(UIButton *)button//微信登录
 {
-//    NSLog(@"微信登陆");
+//    NSLog(@"微信登录");
 //    if ([[NSUserDefaults standardUserDefaults] objectForKey:@"refresh_token"]) {
 //        if ([self compareDate]) {
 //            [self avoidweixinAuthorizeLogIn];
@@ -270,13 +286,22 @@
     self.navigationItem.title = @"会员中心";
     NSLog(@"退出登录");
     [[NSUserDefaults standardUserDefaults] setValue:@NO forKey:@"haveLogIn"];
-    self.title = @"登陆";
+    self.title = @"登录";
     if ([[NSUserDefaults standardUserDefaults] objectForKey:@"registrationID"]) {
         NSDictionary * dic = @{
                                @"Command":@37,
                                @"UserId":[UserInfo shareUserInfo].userId,
                                @"Device":@1,
                                @"CID":[[NSUserDefaults standardUserDefaults] objectForKey:@"registrationID"]
+                               };
+        [self requestDataWithDictionary:dic];
+    }else
+    {
+        NSDictionary * dic = @{
+                               @"Command":@37,
+                               @"UserId":[UserInfo shareUserInfo].userId,
+                               @"Device":@1,
+                               @"CID":[NSNull null]
                                };
         [self requestDataWithDictionary:dic];
     }
@@ -364,6 +389,10 @@
         }else if ([[data objectForKey:@"Command"] isEqualToNumber:@10037])
         {
             NSLog(@"解除绑定");
+        }else if ([[data objectForKey:@"Command"] isEqualToNumber:@10027])
+        {
+            [[UserInfo shareUserInfo] setValuesForKeysWithDictionary:[data objectForKey:@"UserInfo"]];
+            [self fiexdData];
         }
         
     }else
@@ -486,7 +515,7 @@
 }
 
 
-#pragma marc - 微信登陆
+#pragma marc - 微信登录
 
 //发送授权请求
 - (void)weixinAuthorizeLogIn

@@ -335,6 +335,9 @@
 		738B82DE1B19B193008B386D /* orderDetails.png in Resources */ = {isa = PBXBuildFile; fileRef = 738B82DD1B19B193008B386D /* orderDetails.png */; };
 		738B82E11B19BAB8008B386D /* GSOrderViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 738B82E01B19BAB8008B386D /* GSOrderViewController.m */; };
 		738B82E41B19BC04008B386D /* GSOrderViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 738B82E31B19BC04008B386D /* GSOrderViewCell.m */; };
+		73906B2D1C73FF43004FBCFF /* cancel_order.png in Resources */ = {isa = PBXBuildFile; fileRef = 73906B2C1C73FF43004FBCFF /* cancel_order.png */; };
+		73906B2F1C741679004FBCFF /* alipey_icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 73906B2E1C741679004FBCFF /* alipey_icon.png */; };
+		73906B321C7420A2004FBCFF /* AlipayOrder.m in Sources */ = {isa = PBXBuildFile; fileRef = 73906B311C7420A2004FBCFF /* AlipayOrder.m */; };
 		7391E1D51B0C803200C622E9 /* UserModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 7391E1D41B0C803200C622E9 /* UserModel.m */; };
 		7397FAEC1B461EC50014E54C /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7397FAEB1B461EC50014E54C /* CoreFoundation.framework */; };
 		7397FAF21B4621300014E54C /* libPushSDK-1.8.3.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7397FAF11B4621300014E54C /* libPushSDK-1.8.3.a */; };
@@ -364,6 +367,7 @@
 		73D65AB81B1315D0002A22FE /* subtract.png in Resources */ = {isa = PBXBuildFile; fileRef = 73D65AB61B1315D0002A22FE /* subtract.png */; };
 		73D65ABB1B1319B6002A22FE /* ShoppingCartView.m in Sources */ = {isa = PBXBuildFile; fileRef = 73D65ABA1B1319B6002A22FE /* ShoppingCartView.m */; };
 		73D65ABD1B131B8B002A22FE /* shoppingCar.png in Resources */ = {isa = PBXBuildFile; fileRef = 73D65ABC1B131B8B002A22FE /* shoppingCar.png */; };
+		73FC199A1C71C775001CBAE8 /* back_money.png in Resources */ = {isa = PBXBuildFile; fileRef = 73FC19991C71C775001CBAE8 /* back_money.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -970,6 +974,10 @@
 		738B82E01B19BAB8008B386D /* GSOrderViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GSOrderViewController.m; sourceTree = "<group>"; };
 		738B82E21B19BC04008B386D /* GSOrderViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GSOrderViewCell.h; sourceTree = "<group>"; };
 		738B82E31B19BC04008B386D /* GSOrderViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GSOrderViewCell.m; sourceTree = "<group>"; };
+		73906B2C1C73FF43004FBCFF /* cancel_order.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = cancel_order.png; sourceTree = "<group>"; };
+		73906B2E1C741679004FBCFF /* alipey_icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = alipey_icon.png; sourceTree = "<group>"; };
+		73906B301C7420A2004FBCFF /* AlipayOrder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlipayOrder.h; sourceTree = "<group>"; };
+		73906B311C7420A2004FBCFF /* AlipayOrder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlipayOrder.m; sourceTree = "<group>"; };
 		7391E1D31B0C803200C622E9 /* UserModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserModel.h; sourceTree = "<group>"; };
 		7391E1D41B0C803200C622E9 /* UserModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserModel.m; sourceTree = "<group>"; };
 		7397FAEB1B461EC50014E54C /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
@@ -1010,6 +1018,7 @@
 		73D65AB91B1319B6002A22FE /* ShoppingCartView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShoppingCartView.h; sourceTree = "<group>"; };
 		73D65ABA1B1319B6002A22FE /* ShoppingCartView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShoppingCartView.m; sourceTree = "<group>"; };
 		73D65ABC1B131B8B002A22FE /* shoppingCar.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = shoppingCar.png; sourceTree = "<group>"; };
+		73FC19991C71C775001CBAE8 /* back_money.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = back_money.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1178,6 +1187,8 @@
 		733819521B0ACE0200E9F8AD /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				73906B2C1C73FF43004FBCFF /* cancel_order.png */,
+				73FC19991C71C775001CBAE8 /* back_money.png */,
 				73991C231C2CED3400F95711 /* icon1.png */,
 				73A7CA9B1B6625FC003933B7 /* anonymous_n@2x.png */,
 				73A7CA9C1B6625FC003933B7 /* anonymous_s@2x.png */,
@@ -1240,6 +1251,7 @@
 				7324923C1B18443000CC5B6C /* address.png */,
 				732492301B18374C00CC5B6C /* changeBT_n.png */,
 				732492311B18374C00CC5B6C /* changeBT_s.png */,
+				73906B2E1C741679004FBCFF /* alipey_icon.png */,
 				7324922C1B1836CB00CC5B6C /* baiduzhifu.png */,
 				7324922D1B1836CB00CC5B6C /* weixinzhifu.png */,
 				7350D3961C27E55000B99FEA /* online_pey_icon.png */,
@@ -1474,6 +1486,8 @@
 				73A7CA911B65D375003933B7 /* CommentModel.m */,
 				7350D37B1C27DC3F00B99FEA /* CouponModel.h */,
 				7350D37C1C27DC3F00B99FEA /* CouponModel.m */,
+				73906B301C7420A2004FBCFF /* AlipayOrder.h */,
+				73906B311C7420A2004FBCFF /* AlipayOrder.m */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -2269,6 +2283,7 @@
 				73A7CA9A1B66143B003933B7 /* starBT_s.png in Resources */,
 				735908661B33F69E005143E4 /* IQKeyboardManager.bundle in Resources */,
 				735174221B4787E500B2E273 /* fitness_off.png in Resources */,
+				73906B2F1C741679004FBCFF /* alipey_icon.png in Resources */,
 				734BDFFE1B0EFCA8003E2A22 /* food_on.png in Resources */,
 				7324922F1B1836CB00CC5B6C /* weixinzhifu.png in Resources */,
 				736556171B42A00A009BE98A /* delivery.png in Resources */,
@@ -2284,6 +2299,7 @@
 				7389DB941B0C7B1000F76582 /* user_1.png in Resources */,
 				732492431B1846CA00CC5B6C /* didChange.png in Resources */,
 				7338197C1B0AD56D00E9F8AD /* grogshop_s.png in Resources */,
+				73906B2D1C73FF43004FBCFF /* cancel_order.png in Resources */,
 				7351742C1B4787E500B2E273 /* wifis_off.png in Resources */,
 				7389DB891B0C70A800F76582 /* weixinLogIn.png in Resources */,
 				734BE0201B0F184A003E2A22 /* milkTea.png in Resources */,
@@ -2328,6 +2344,7 @@
 				734BE0211B0F184A003E2A22 /* pasta.png in Resources */,
 				732492331B18374C00CC5B6C /* changeBT_s.png in Resources */,
 				7389DB7A1B0C3B0A00F76582 /* all_s.png in Resources */,
+				73FC199A1C71C775001CBAE8 /* back_money.png in Resources */,
 				735174251B4787E500B2E273 /* meeting_on.png in Resources */,
 				735174261B4787E500B2E273 /* parking_off.png in Resources */,
 				7356C0E31B40DD9000D24B41 /* load_fail.png in Resources */,
@@ -2551,6 +2568,7 @@
 				7352A1C21B8C5B7D00DCF68B /* StoreIntroView.m in Sources */,
 				732492401B1844EF00CC5B6C /* AddressModel.m in Sources */,
 				7376416D1B54A1C6000E9BBC /* UIScrollView+MJRefresh.m in Sources */,
+				73906B321C7420A2004FBCFF /* AlipayOrder.m in Sources */,
 				734657CF1B1D4585000C3E9D /* NSScanner_Extensions.m in Sources */,
 				734657BF1B1D4585000C3E9D /* CDataScanner.m in Sources */,
 				7352CCA91B7987720053BBBC /* HYSegmentedControl.m in Sources */,

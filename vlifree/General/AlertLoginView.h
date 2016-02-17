@@ -19,11 +19,11 @@
  */
 @property (nonatomic, strong)UITextField * passwordTF;
 /**
- *  登陆按钮
+ *  登录按钮
  */
 @property (nonatomic, strong)UIButton * logInButton;
 /**
- *  微信登陆按钮
+ *  微信登录按钮
  */
 @property (nonatomic, strong)UIButton * weixinButton;
 

@@ -79,6 +79,7 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
+    [self.tableView.header beginRefreshing];
 }
 
 - (void)viewWillDisappear:(BOOL)animated

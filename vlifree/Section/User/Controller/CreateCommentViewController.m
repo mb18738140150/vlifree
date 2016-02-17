@@ -51,7 +51,10 @@
     self.navigationController.navigationBar.barTintColor = MAIN_COLOR;
 }
 
-
+- (void)viewWillDisappear:(BOOL)animated
+{
+    self.navigationController.navigationBar.barTintColor = [UIColor whiteColor];
+}
 - (void)createSubview
 {
     UIImageView * icon = [[UIImageView alloc] initWithFrame:CGRectMake(LEFT_SPACE, TOP_SPACE + self.navigationController.navigationBar.bottom, IMAGE_SIZE, IMAGE_SIZE)];

@@ -17,6 +17,7 @@
 @interface TOOrderViewCell ()
 
 @property (nonatomic, strong)UILabel * dateLabel;
+@property (nonatomic, strong)UILabel * orderStateLB;
 @property (nonatomic, strong)UIImageView * iconView;
 @property (nonatomic, strong)UILabel * titleLabel;
 @property (nonatomic, strong)UILabel * priceLabel;
@@ -51,6 +52,11 @@
         _dateLabel.font = [UIFont systemFontOfSize:13];
         [view addSubview:_dateLabel];
         
+        self.orderStateLB = [[UILabel alloc]initWithFrame:CGRectMake(frame.size.width - BUTTON_WIDTH - LEFT_SPACE, TOP_SPACE, BUTTON_WIDTH, LABEL_HEIGHT)];
+        self.orderStateLB.font = [UIFont systemFontOfSize:13];
+        _orderStateLB.textColor = TEXT_COLOR;
+        _orderStateLB.textAlignment = NSTextAlignmentRight;
+        [view addSubview:_orderStateLB];
 //        self.cancelButton = [UIButton buttonWithType:UIButtonTypeCustom];
 //        _cancelButton.frame = CGRectMake(frame.size.width - BUTTON_WIDTH - LEFT_SPACE, TOP_SPACE, BUTTON_WIDTH, LABEL_HEIGHT);
 //        [_cancelButton setTitle:@"取消订单" forState:UIControlStateNormal];
@@ -98,6 +104,35 @@
 - (void)setTakeOutOrderMD:(TakeOutOrderMD *)takeOutOrderMD
 {
     _takeOutOrderMD = takeOutOrderMD;
+    
+    int orderState = 0;
+    orderState = takeOutOrderMD.orderState.intValue;
+    switch (orderState) {
+        case 1:
+            self.orderStateLB.text = @"新订单";
+            break;
+        case 2:
+            self.orderStateLB.text = @"未配送";
+            break;
+        case 3:
+            self.orderStateLB.text = @"已配送";
+            break;
+        case 4:
+            self.orderStateLB.text = @"已作废";
+            break;
+        case 5:
+            self.orderStateLB.text = @"申请退款";
+            break;
+        case 6:
+            self.orderStateLB.text = @"退款成功";
+            break;
+        case 7:
+            self.orderStateLB.text = @"确认收货";
+            break;
+        default:
+            break;
+    }
+    
     __weak TOOrderViewCell * cell = self;
     [self.iconView setImageWithURL:[NSURL URLWithString:takeOutOrderMD.storeIcon] placeholderImage:[UIImage imageNamed:@"placeholderIM.png"] completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType) {
         if (error != nil) {

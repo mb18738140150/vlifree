@@ -18,7 +18,7 @@
 @property (nonatomic, copy)NSString * time;
 @property (nonatomic, copy)NSString * busiPhone;
 //@property (nonatomic, strong)NSNumber * money;
-//@property (nonatomic, strong)NSNumber * orderState;
+@property (nonatomic, strong)NSNumber * orderState;
 @property (nonatomic, strong)NSNumber * deliveryMoney;
 @property (nonatomic, strong)NSNumber * allMoney;
 @property (nonatomic, copy)NSString * nextphone;

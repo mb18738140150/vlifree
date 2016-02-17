@@ -76,7 +76,7 @@
  */
 @property (nonatomic, strong)NSMutableArray * shopArray;
 /**
- *  登陆提示页面
+ *  登录提示页面
  */
 @property (nonatomic, strong)AlertLoginView * alertLoginV;
 /**
@@ -279,6 +279,14 @@
     
     if ([self.storeState isEqualToNumber:@0]) {
         UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:@"商家休息中, 暂时不接受新订单." delegate:nil cancelButtonTitle:@"知道了" otherButtonTitles:nil, nil];
+        [alert show];
+        self.shoppingCarView.changeButton.enabled = NO;
+        self.shoppingCarDetailsView.changeBT.enabled = NO;
+        [self.shoppingCarDetailsView.changeBT setBackgroundImage:[UIImage imageNamed:@"storeState_g.png"] forState:UIControlStateDisabled];
+        [self.shoppingCarView.changeButton setBackgroundImage:[UIImage imageNamed:@"storeState_g.png"] forState:UIControlStateDisabled];
+    }else if ([self.storeState isEqualToNumber:@2])
+    {
+        UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:@"商家繁忙, 暂时不接受新订单." delegate:nil cancelButtonTitle:@"知道了" otherButtonTitles:nil, nil];
         [alert show];
         self.shoppingCarView.changeButton.enabled = NO;
         self.shoppingCarDetailsView.changeBT.enabled = NO;
@@ -1054,6 +1062,14 @@
             self.shoppingCarDetailsView.changeBT.enabled = NO;
             [self.shoppingCarDetailsView.changeBT setBackgroundImage:[UIImage imageNamed:@"storeState_g.png"] forState:UIControlStateDisabled];
             [self.shoppingCarView.changeButton setBackgroundImage:[UIImage imageNamed:@"storeState_g.png"] forState:UIControlStateDisabled];
+        }else if ([self.storeState isEqualToNumber:@2])
+        {
+//            UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:@"商家繁忙, 暂时不接受新订单." delegate:nil cancelButtonTitle:@"知道了" otherButtonTitles:nil, nil];
+//            [alert show];
+            self.shoppingCarView.changeButton.enabled = NO;
+            self.shoppingCarDetailsView.changeBT.enabled = NO;
+            [self.shoppingCarDetailsView.changeBT setBackgroundImage:[UIImage imageNamed:@"storeState_g.png"] forState:UIControlStateDisabled];
+            [self.shoppingCarView.changeButton setBackgroundImage:[UIImage imageNamed:@"storeState_g.png"] forState:UIControlStateDisabled];
         }
     }else
     {
@@ -1062,7 +1078,16 @@
             self.shoppingCarDetailsView.changeBT.enabled = NO;
 //            [self.shoppingCarDetailsView.changeBT setBackgroundImage:[UIImage imageNamed:@"storeState_g.png"] forState:UIControlStateDisabled];
 //            [self.shoppingCarView.changeButton setBackgroundImage:[UIImage imageNamed:@"storeState_g.png"] forState:UIControlStateDisabled];
-        }else
+        }else if ([self.storeState isEqualToNumber:@2])
+        {
+//            UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:@"商家繁忙, 暂时不接受新订单." delegate:nil cancelButtonTitle:@"知道了" otherButtonTitles:nil, nil];
+//            [alert show];
+            self.shoppingCarView.changeButton.enabled = NO;
+            self.shoppingCarDetailsView.changeBT.enabled = NO;
+//            [self.shoppingCarDetailsView.changeBT setBackgroundImage:[UIImage imageNamed:@"storeState_g.png"] forState:UIControlStateDisabled];
+//            [self.shoppingCarView.changeButton setBackgroundImage:[UIImage imageNamed:@"storeState_g.png"] forState:UIControlStateDisabled];
+        }
+        else
         {
             self.shoppingCarView.changeButton.enabled = YES;
         }
@@ -1125,7 +1150,7 @@
 }
 
 
-#pragma mark - 提示登陆页面
+#pragma mark - 提示登录页面
 
 - (void)userLogInAction:(UIButton *)button
 {
@@ -1150,9 +1175,9 @@
     }
 }
 
-- (void)weixinLogIn:(UIButton *)button//微信登陆
+- (void)weixinLogIn:(UIButton *)button//微信登录
 {
-    NSLog(@"微信登陆");
+    NSLog(@"微信登录");
     if ([[NSUserDefaults standardUserDefaults] objectForKey:@"refresh_token"]) {
         if ([self compareDate]) {
 //            [SVProgressHUD showWithStatus:@"登录中..." maskType:SVProgressHUDMaskTypeClear];

@@ -81,16 +81,32 @@
     NSString * ruzhuDate = [grogshopOrderMD.checkinTime substringToIndex:9];
     NSString * lidianDate = [grogshopOrderMD.leaveTime substringToIndex:9];
     self.dateLB.text = [NSString stringWithFormat:@"入住:%@  离店:%@", ruzhuDate, lidianDate];
-    if ([grogshopOrderMD.payState isEqualToNumber:@1]) {
-        [self.payButton setTitle:@"完成支付" forState:UIControlStateDisabled];
+    
+    if ([grogshopOrderMD.orderState isEqualToNumber:@6]) {
+        [self.payButton setTitle:@"退款成功" forState:UIControlStateDisabled];
+        self.payButton.enabled = NO;
+        _payButton.backgroundColor = [UIColor colorWithWhite:0.7 alpha:1];
+    }else if ([grogshopOrderMD.orderState isEqualToNumber:@4])
+    {
+        [self.payButton setTitle:@"已作废" forState:UIControlStateDisabled];
         self.payButton.enabled = NO;
         _payButton.backgroundColor = [UIColor colorWithWhite:0.7 alpha:1];
     }else
     {
-        [self.payButton setTitle:@"马上支付" forState:UIControlStateDisabled];
-        _payButton.backgroundColor = MAIN_COLOR;
-        self.payButton.enabled = YES;
+        if ([grogshopOrderMD.payState isEqualToNumber:@1]) {
+            [self.payButton setTitle:@"完成支付" forState:UIControlStateDisabled];
+            self.payButton.enabled = NO;
+            _payButton.backgroundColor = [UIColor colorWithWhite:0.7 alpha:1];
+        }else
+        {
+            [self.payButton setTitle:@"马上支付" forState:UIControlStateDisabled];
+            _payButton.backgroundColor = MAIN_COLOR;
+            self.payButton.enabled = YES;
+        }
+
     }
+    
+    
 }
 
 

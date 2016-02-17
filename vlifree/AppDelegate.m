@@ -88,7 +88,7 @@
 //    NSLog(@"---%@", resp);
     if ([resp isKindOfClass:[SendAuthResp class]]) {
         SendAuthResp * sendAR = (SendAuthResp *)resp;
-        if (sendAR.errCode == 0) {//0代表已授权登陆
+        if (sendAR.errCode == 0) {//0代表已授权登录
             UINavigationController * userNav = (UINavigationController *)[self.myTabBarVC selectedViewController];
             UIViewController * logInVC = [userNav.viewControllers lastObject];
             if ([logInVC isKindOfClass:[UserViewController class]]) {
@@ -98,7 +98,7 @@
                 [(DetailsGrogshopViewController *)logInVC getAccessToken:sendAR.code];
             }else if([logInVC isKindOfClass:[DetailTakeOutViewController class]])
             {
-//                NSLog(@"外卖登陆");
+//                NSLog(@"外卖登录");
                 [(DetailTakeOutViewController *)logInVC getAccessToken:sendAR.code];
             }
             /*
