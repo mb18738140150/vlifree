@@ -10,6 +10,7 @@
 
 @interface CreateCommentViewController : UIViewController
 
+@property (nonatomic, assign)int isHotel;
 
 @property (nonatomic, copy)NSString * icon;
 @property (nonatomic, copy)NSString * storeName;

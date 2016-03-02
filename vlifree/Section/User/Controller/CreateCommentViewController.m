@@ -170,18 +170,34 @@
         if (self.anonymousBT.selected) {
             anonymous = @1;
         }
-        NSDictionary * jsonDic = @{
-                                   @"Command":@40,
-                                   @"StoreId":self.storeId,
-                                   @"OrderId":self.orderId,
-                                   @"BusType":@2,
-                                   @"UserId":[UserInfo shareUserInfo].userId,
-                                   @"StarCount":[NSNumber numberWithInt:_starCount],
-                                   @"CommentContent":self.contentView.text,
-                                   @"Anonymous":anonymous
-                                   };
+        NSDictionary * jsondic = [NSDictionary dictionary];
+        if (self.isHotel == 1) {
+            jsondic = @{
+                        @"Command":@40,
+                        @"StoreId":self.storeId,
+                        @"OrderId":self.orderId,
+                        @"BusType":@1,
+                        @"UserId":[UserInfo shareUserInfo].userId,
+                        @"StarCount":[NSNumber numberWithInt:_starCount],
+                        @"CommentContent":self.contentView.text,
+                        @"Anonymous":anonymous
+                        };
+        }else
+        {
+            
+            jsondic = @{
+                        @"Command":@40,
+                        @"StoreId":self.storeId,
+                        @"OrderId":self.orderId,
+                        @"BusType":@2,
+                        @"UserId":[UserInfo shareUserInfo].userId,
+                        @"StarCount":[NSNumber numberWithInt:_starCount],
+                        @"CommentContent":self.contentView.text,
+                        @"Anonymous":anonymous
+                        };
+        }
         [self.hud showInView:self.view];
-        [self playPostWithDictionary:jsonDic];
+        [self playPostWithDictionary:jsondic];
     }else if (_starCount == 0)
     {
         UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:@"您真的忍心给0分吗?给打点分吧!" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];

@@ -167,7 +167,7 @@
     {
         _stateImage.image = [UIImage imageNamed:@"storeState_g.png"];
     }
-    self.soldLabel.text = [NSString stringWithFormat:@"月售%@份", takeOutModel.sold];
+    self.soldLabel.text = [NSString stringWithFormat:@"已售%@份", takeOutModel.sold];
     self.sendPriceLabel.text = [NSString stringWithFormat:@"起送价:%@", takeOutModel.sendPrice];
     self.outsideOrderLB.text = [NSString stringWithFormat:@"外送费:%@", takeOutModel.outSentMoney];
     self.addressLabel.text = takeOutModel.address;

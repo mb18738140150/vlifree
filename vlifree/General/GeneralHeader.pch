@@ -37,7 +37,7 @@
  *
  *  @return
  */
-//#define POST_URL @"http://p.vlifee.com/User_getdata.ashx?md5="
+#define POST_URL @"http://p.vlifee.com/User_getdata.ashx?md5="
 /**
  *  测试库URL
  *
@@ -45,7 +45,7 @@
  *
  *  @return
  */
-#define POST_URL @"http://ceshi.p.vlifee.com/User_getdata.ashx?md5="
+//#define POST_URL @"http://ceshi.p.vlifee.com/User_getdata.ashx?md5="
 #define DATA_COUNT 15
 /**
  *  app主色调

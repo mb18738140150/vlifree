@@ -374,6 +374,7 @@
                 self.headerView.iconUrlStingAry = photosAry;
             }
             self.describe = [dic objectForKey:@"Describe"];
+            NSLog(@"***%@", self.describe);
             self.headerView.addressView.titleLable.text = [dic objectForKey:@"Address"];
             self.headerView.phoneView.titleLable.text = [dic objectForKey:@"PhoneNumber"];
             self.phoneNumber = [dic objectForKey:@"PhoneNumber"];

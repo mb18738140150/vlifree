@@ -451,7 +451,7 @@
     [scrollView addSubview:lineView10];
     
     UIButton * confirmBT = [UIButton buttonWithType:UIButtonTypeCustom];
-    confirmBT.frame = CGRectMake(LEFT_SPACE, self.view.height - TOP_SPACE - 40 - self.navigationController.navigationBar.bottom, self.view.width - 2 * LEFT_SPACE, 40);
+    confirmBT.frame = CGRectMake(LEFT_SPACE, self.view.height - TOP_SPACE - 40 - self.navigationController.navigationBar.bottom , self.view.width - 2 * LEFT_SPACE, 40);
     confirmBT.backgroundColor = MAIN_COLOR;
     [confirmBT setTitle:@"确认支付" forState:UIControlStateNormal];
     [confirmBT setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
@@ -475,6 +475,23 @@
     // Do any additional setup after loading the view.
 }
 
+- (void)viewWillAppear:(BOOL)animated
+{
+    [self.navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"1px.png"] forBarMetrics:UIBarMetricsDefault];
+    [self.navigationController.navigationBar setShadowImage:nil];
+    [self.navigationController.navigationBar setTitleTextAttributes:
+     @{NSFontAttributeName:[UIFont systemFontOfSize:17],
+       NSForegroundColorAttributeName:[UIColor blackColor]}];
+
+}
+- (void)viewWillDisappear:(BOOL)animated
+{
+    [self.navigationController.navigationBar setTitleTextAttributes:
+     @{NSFontAttributeName:[UIFont systemFontOfSize:17],
+       NSForegroundColorAttributeName:[UIColor blackColor]}];
+    [self.navigationController.navigationBar setShadowImage:nil];
+    [self.navigationController.navigationBar setBackgroundImage:nil forBarMetrics:UIBarMetricsDefault];
+}
 - (void)backLastVC:(id)sender
 {
     [self.navigationController popViewControllerAnimated:YES];
@@ -758,7 +775,7 @@
 
 #pragma mark - 百度支付
 
-#warning 百度支付
+#warning ***baidupay百度支付
 -(void)dopay
 {
     BDWalletSDKMainManager* payMainManager = [BDWalletSDKMainManager getInstance];
@@ -975,7 +992,7 @@
 
 #pragma mark - 微信支付
 
-#warning 微信支付模型
+#warning ****weichat model微信支付模型
 
 - (void)weixinSendPay
 {

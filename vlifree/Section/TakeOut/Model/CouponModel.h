@@ -13,6 +13,7 @@
 @property (nonatomic, assign)int couponId;
 @property (nonatomic, assign)double couponFace;
 @property (nonatomic, copy)NSString * couponDate;
+@property (nonatomic, assign)int couponRecordId;
 
 - (id)initWithDictionary:(NSDictionary *)dic;
 

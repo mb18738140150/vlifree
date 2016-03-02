@@ -15,6 +15,7 @@
 @property (nonatomic, strong)NSNumber * Id;
 @property (nonatomic, copy)NSString * name;
 @property (nonatomic, strong)NSNumber * price;
+@property (nonatomic, strong)NSNumber * oldPrice;
 @property (nonatomic, strong)NSNumber * soldCount;
 @property (nonatomic, strong)NSNumber * mealBoxMoney;
 @property (nonatomic, assign)int foodIntegral;

@@ -275,58 +275,82 @@
 
     }else if ([self.payType isEqualToNumber:@2])
     {
-        BDWalletSDKMainManager* payMainManager = [BDWalletSDKMainManager getInstance];
-        NSString *orderInfo = [self buildOrderInfoWithOrderID:self.orderID];
-        [payMainManager doPayWithOrderInfo:orderInfo params:nil delegate:self];
+        NSDictionary * dic = @{
+                               @"Command":@34,
+                               @"UserId":[UserInfo shareUserInfo].userId,
+                               @"PayType":self.payType,
+                               @"OrderId":self.orderID,
+                               @"Cur_IP":[self getIPAddress],
+                               @"OrderType":@1
+                               };
+        [self playPostWithDictionary:dic];
+        self.hud = [JGProgressHUD progressHUDWithStyle:JGProgressHUDStyleLight];
+        [self.hud showInView:self.view];
+        
+//        BDWalletSDKMainManager* payMainManager = [BDWalletSDKMainManager getInstance];
+//        NSString *orderInfo = [self buildOrderInfoWithOrderID:self.orderID];
+//        [payMainManager doPayWithOrderInfo:orderInfo params:nil delegate:self];
     }else
     {
         
-            NSString *partner = @"2088911824635467";
-            // 商户收款账号
-            NSString *seller = @"yfqpjp@163.com";
-            // 商户私钥，pkcs8格式
-            NSString *privateKey = @"MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBAOuotyOsHSZ4n2ZSjYdRJaukQi/6N3mYqGAL14aH3CyaHme9mIwP9a46cpYR8I72Vy2BqbJqce9fNNBjPtQgcmmnkJ1FfEWvMDHctyMHPdwXLZsQlqhNsHdLOymJiHcwo85S0k3SwbqkTivFAdlxJIHpvT3TdLPkurr8OTPCf5DXAgMBAAECgYB80z8+u/os2JPGRVAGLyt/AWC1vRoJZJ07Usp0zh4H2hLk7H6TIhkGkpsDdrkvYLjIt/fFM7DqFEoLX6Z2AkHXRNi8AX8k4lDRZfR7lan75N0suINGJWX/XX8RBduu+I766WlwIVR2RYR4i9ddq4uEwG5sx7dR3VEj3RToxQDp0QJBAPlPIzheyb8g0YLXC4XgaGqbjUOEX3NBFoJD4a/CaiitBKRVcumpORUX3JdWWZ/L4NPo+S6kbiJPCrsnHKHG0hUCQQDx+8u3Gs/OGFiOz4v2jL2eq0NfP+2cRD7/ozyLyjvIsNY3JnVT7wyg9u6Vk/LW1r8dYwQDIh5JQ6LQ7XgtcA47AkEAjhBjcH7LFcd8u8MQxOQAfCdRkxS+U23Whrppw37UgYM+LuqmRbHxXiyvvektvxotbnPGcqauP4ys/8Kk1Sb3lQJAPU6qAi4M0A5jAWub7k8iC30giJVNwfWYcHQO9uu50dLbswVPXICIFo/5SnQ9ZijqKqvXbGPMgIteSMihVgG52QJAKmub7CItcesOmgYrx76NUwlvBQ5ezJyNNNGIo76qaLvawvTY6B/C3o2ioAfgm8T0qfAyT9o4iI+xM7DY+Iulpg==";
-            /*
-             * 生成订单信息及签名
-             */
-            AlipayOrder * order = [[AlipayOrder alloc]init];
-            order.partner = partner;
-            order.seller = seller;
-            order.tradeNO = self.orderID; //订单ID（由商家自行制定）
-            order.productName = self.orderID; //商品标题
-            order.productDescription = self.orderID; //商品描述
-            order.amount = [NSString stringWithFormat:@"%.2f",_price]; //商品价格
-            order.notifyURL =  @"http://wap.vlifee.com/alipay/notify_url.aspx"; //回调URL
-            
-            order.service = @"mobile.securitypay.pay";
-            order.paymentType = @"1";
-            order.inputCharset = @"utf-8";
-            order.itBPay = @"30m";
-            order.showUrl = @"m.alipay.com";
-            
-            //应用注册scheme,在AlixPayDemo-Info.plist定义URL types
-            NSString *appScheme = @"wxaac5e5f7421e84ac";
-            
-            //将商品信息拼接成字符串
-            NSString *orderSpec = [order description];
-            NSLog(@"orderSpec = %@",orderSpec);
-            
-            id<DataSigner> signer = CreateRSADataSigner(privateKey);
-            NSString *signedString = [signer signString:orderSpec];
-            
-            //将签名成功字符串格式化为订单字符串,请严格按照该格式
-            NSString *orderString = nil;
-            if (signedString != nil) {
-                orderString = [NSString stringWithFormat:@"%@&sign=\"%@\"&sign_type=\"%@\"",
-                               orderSpec, signedString, @"RSA"];
-                
-                [[AlipaySDK defaultService] payOrder:orderString fromScheme:appScheme callback:^(NSDictionary *resultDic) {
-                    NSLog(@"reslut = %@",resultDic);
-                    [self pushOrderDetailsVC];
-                }];
-                
-            }
-            
+        NSDictionary * dic = @{
+                               @"Command":@34,
+                               @"UserId":[UserInfo shareUserInfo].userId,
+                               @"PayType":self.payType,
+                               @"OrderId":self.orderID,
+                               @"Cur_IP":[self getIPAddress],
+                               @"OrderType":@1
+                               };
+        [self playPostWithDictionary:dic];
+        self.hud = [JGProgressHUD progressHUDWithStyle:JGProgressHUDStyleLight];
+        [self.hud showInView:self.view];
+        
+//            NSString *partner = @"2088911824635467";
+//            // 商户收款账号
+//            NSString *seller = @"yfqpjp@163.com";
+//            // 商户私钥，pkcs8格式
+//            NSString *privateKey = @"MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBAOuotyOsHSZ4n2ZSjYdRJaukQi/6N3mYqGAL14aH3CyaHme9mIwP9a46cpYR8I72Vy2BqbJqce9fNNBjPtQgcmmnkJ1FfEWvMDHctyMHPdwXLZsQlqhNsHdLOymJiHcwo85S0k3SwbqkTivFAdlxJIHpvT3TdLPkurr8OTPCf5DXAgMBAAECgYB80z8+u/os2JPGRVAGLyt/AWC1vRoJZJ07Usp0zh4H2hLk7H6TIhkGkpsDdrkvYLjIt/fFM7DqFEoLX6Z2AkHXRNi8AX8k4lDRZfR7lan75N0suINGJWX/XX8RBduu+I766WlwIVR2RYR4i9ddq4uEwG5sx7dR3VEj3RToxQDp0QJBAPlPIzheyb8g0YLXC4XgaGqbjUOEX3NBFoJD4a/CaiitBKRVcumpORUX3JdWWZ/L4NPo+S6kbiJPCrsnHKHG0hUCQQDx+8u3Gs/OGFiOz4v2jL2eq0NfP+2cRD7/ozyLyjvIsNY3JnVT7wyg9u6Vk/LW1r8dYwQDIh5JQ6LQ7XgtcA47AkEAjhBjcH7LFcd8u8MQxOQAfCdRkxS+U23Whrppw37UgYM+LuqmRbHxXiyvvektvxotbnPGcqauP4ys/8Kk1Sb3lQJAPU6qAi4M0A5jAWub7k8iC30giJVNwfWYcHQO9uu50dLbswVPXICIFo/5SnQ9ZijqKqvXbGPMgIteSMihVgG52QJAKmub7CItcesOmgYrx76NUwlvBQ5ezJyNNNGIo76qaLvawvTY6B/C3o2ioAfgm8T0qfAyT9o4iI+xM7DY+Iulpg==";
+//            /*
+//             * 生成订单信息及签名
+//             */
+//            AlipayOrder * order = [[AlipayOrder alloc]init];
+//            order.partner = partner;
+//            order.seller = seller;
+//            order.tradeNO = self.orderID; //订单ID（由商家自行制定）
+//            order.productName = self.orderID; //商品标题
+//            order.productDescription = self.orderID; //商品描述
+//            order.amount = [NSString stringWithFormat:@"%.2f",_price]; //商品价格
+//            order.notifyURL =  @"http://wap.vlifee.com/alipay/notify_url.aspx"; //回调URL
+//            
+//            order.service = @"mobile.securitypay.pay";
+//            order.paymentType = @"1";
+//            order.inputCharset = @"utf-8";
+//            order.itBPay = @"30m";
+//            order.showUrl = @"m.alipay.com";
+//            
+//            //应用注册scheme,在AlixPayDemo-Info.plist定义URL types
+//            NSString *appScheme = @"wxaac5e5f7421e84ac";
+//            
+//            //将商品信息拼接成字符串
+//            NSString *orderSpec = [order description];
+//            NSLog(@"orderSpec = %@",orderSpec);
+//            
+//            id<DataSigner> signer = CreateRSADataSigner(privateKey);
+//            NSString *signedString = [signer signString:orderSpec];
+//            
+//            //将签名成功字符串格式化为订单字符串,请严格按照该格式
+//            NSString *orderString = nil;
+//            if (signedString != nil) {
+//                orderString = [NSString stringWithFormat:@"%@&sign=\"%@\"&sign_type=\"%@\"",
+//                               orderSpec, signedString, @"RSA"];
+//                
+//                [[AlipaySDK defaultService] payOrder:orderString fromScheme:appScheme callback:^(NSDictionary *resultDic) {
+//                    NSLog(@"reslut = %@",resultDic);
+//                    [self pushOrderDetailsVC];
+//                }];
+//                
+//            }
+        
             
         
     }
@@ -412,7 +436,11 @@
 //            self.payType = [data objectForKey:@"PeyType"];
             if ([[data objectForKey:@"PeyType"] isEqualToNumber:@1]) {
                 self.payLB.text = @"支付方式:微信支付";
-            }else{
+            }else if ([[data objectForKey:@"PeyType"] isEqualToNumber:@20])
+            {
+                self.payLB.text = @"支付方式:支付宝支付";
+            }
+            else{
                 self.payLB.text = @"支付方式:百度支付";
             }
             self.requireLB.text = [NSString stringWithFormat:@"特殊需求:%@", [data objectForKey:@"Demand"]];
@@ -421,28 +449,88 @@
             self.telGSLB.text = [NSString stringWithFormat:@"%@", [data objectForKey:@"HotelTel"]];
         }else if ([[data objectForKey:@"Command"] isEqualToNumber:@10034])
         {
-            NSMutableDictionary *signParams = [NSMutableDictionary dictionary];
-            [signParams setObject: [NSString stringWithFormat:@"%@", [data objectForKey:@"AppId"]]       forKey:@"appid"];
-            [signParams setObject: [NSString stringWithFormat:@"%@", [data objectForKey:@"NonceStr"]]    forKey:@"noncestr"];
-            [signParams setObject: [NSString stringWithFormat:@"%@", [data objectForKey:@"Package"]]      forKey:@"package"];
-            [signParams setObject: [NSString stringWithFormat:@"%@", [data objectForKey:@"PartnerId"]]        forKey:@"partnerid"];
-            [signParams setObject: [data objectForKey:@"TimeStamp"]   forKey:@"timestamp"];
-            [signParams setObject: [data objectForKey:@"PrepayId"]    forKey:@"prepayid"];
-//            [signParams setObject: @"MD5"       forKey:@"signType"];
-            NSLog(@"signDic = %@", signParams);
-//            NSString * sign = [self createMd5Sign:signParams];
-            NSNumber * stamp = [data objectForKey:@"TimeStamp"];
-            //调起微信支付
-            PayReq* req             = [[PayReq alloc] init];
-            req.openID              =  [NSString stringWithFormat:@"%@", [data objectForKey:@"AppId"]];
-            req.partnerId           = [NSString stringWithFormat:@"%@", [data objectForKey:@"PartnerId"]];
-            req.prepayId            = [NSString stringWithFormat:@"%@", [data objectForKey:@"PrepayId"]];
-            req.nonceStr            = [NSString stringWithFormat:@"%@", [data objectForKey:@"NonceStr"]];
-            req.timeStamp           = stamp.intValue;
-            req.package             = [NSString stringWithFormat:@"%@", [data objectForKey:@"Package"]];
-            req.sign                = [NSString stringWithFormat:@"%@", [data objectForKey:@"Sign"]];
-//            req.sign = sign;
-            [WXApi sendReq:req];
+            
+            if (self.payType.intValue == 1) {
+                NSMutableDictionary *signParams = [NSMutableDictionary dictionary];
+                [signParams setObject: [NSString stringWithFormat:@"%@", [data objectForKey:@"AppId"]]       forKey:@"appid"];
+                [signParams setObject: [NSString stringWithFormat:@"%@", [data objectForKey:@"NonceStr"]]    forKey:@"noncestr"];
+                [signParams setObject: [NSString stringWithFormat:@"%@", [data objectForKey:@"Package"]]      forKey:@"package"];
+                [signParams setObject: [NSString stringWithFormat:@"%@", [data objectForKey:@"PartnerId"]]        forKey:@"partnerid"];
+                [signParams setObject: [data objectForKey:@"TimeStamp"]   forKey:@"timestamp"];
+                [signParams setObject: [data objectForKey:@"PrepayId"]    forKey:@"prepayid"];
+                //            [signParams setObject: @"MD5"       forKey:@"signType"];
+                NSLog(@"signDic = %@", signParams);
+                //            NSString * sign = [self createMd5Sign:signParams];
+                NSNumber * stamp = [data objectForKey:@"TimeStamp"];
+                //调起微信支付
+                PayReq* req             = [[PayReq alloc] init];
+                req.openID              =  [NSString stringWithFormat:@"%@", [data objectForKey:@"AppId"]];
+                req.partnerId           = [NSString stringWithFormat:@"%@", [data objectForKey:@"PartnerId"]];
+                req.prepayId            = [NSString stringWithFormat:@"%@", [data objectForKey:@"PrepayId"]];
+                req.nonceStr            = [NSString stringWithFormat:@"%@", [data objectForKey:@"NonceStr"]];
+                req.timeStamp           = stamp.intValue;
+                req.package             = [NSString stringWithFormat:@"%@", [data objectForKey:@"Package"]];
+                req.sign                = [NSString stringWithFormat:@"%@", [data objectForKey:@"Sign"]];
+                //            req.sign = sign;
+                [WXApi sendReq:req];
+            }else if (self.payType.intValue == 2)
+            {
+                BDWalletSDKMainManager* payMainManager = [BDWalletSDKMainManager getInstance];
+                NSString *orderInfo = [self buildOrderInfoWithOrderID:self.orderID];
+                [payMainManager doPayWithOrderInfo:orderInfo params:nil delegate:self];
+            }else if (self.payType.intValue == 20)
+            {
+                
+                NSString *partner = @"2088911824635467";
+                // 商户收款账号
+                NSString *seller = @"yfqpjp@163.com";
+                // 商户私钥，pkcs8格式
+                NSString *privateKey = @"MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBAOuotyOsHSZ4n2ZSjYdRJaukQi/6N3mYqGAL14aH3CyaHme9mIwP9a46cpYR8I72Vy2BqbJqce9fNNBjPtQgcmmnkJ1FfEWvMDHctyMHPdwXLZsQlqhNsHdLOymJiHcwo85S0k3SwbqkTivFAdlxJIHpvT3TdLPkurr8OTPCf5DXAgMBAAECgYB80z8+u/os2JPGRVAGLyt/AWC1vRoJZJ07Usp0zh4H2hLk7H6TIhkGkpsDdrkvYLjIt/fFM7DqFEoLX6Z2AkHXRNi8AX8k4lDRZfR7lan75N0suINGJWX/XX8RBduu+I766WlwIVR2RYR4i9ddq4uEwG5sx7dR3VEj3RToxQDp0QJBAPlPIzheyb8g0YLXC4XgaGqbjUOEX3NBFoJD4a/CaiitBKRVcumpORUX3JdWWZ/L4NPo+S6kbiJPCrsnHKHG0hUCQQDx+8u3Gs/OGFiOz4v2jL2eq0NfP+2cRD7/ozyLyjvIsNY3JnVT7wyg9u6Vk/LW1r8dYwQDIh5JQ6LQ7XgtcA47AkEAjhBjcH7LFcd8u8MQxOQAfCdRkxS+U23Whrppw37UgYM+LuqmRbHxXiyvvektvxotbnPGcqauP4ys/8Kk1Sb3lQJAPU6qAi4M0A5jAWub7k8iC30giJVNwfWYcHQO9uu50dLbswVPXICIFo/5SnQ9ZijqKqvXbGPMgIteSMihVgG52QJAKmub7CItcesOmgYrx76NUwlvBQ5ezJyNNNGIo76qaLvawvTY6B/C3o2ioAfgm8T0qfAyT9o4iI+xM7DY+Iulpg==";
+                /*
+                 * 生成订单信息及签名
+                 */
+                AlipayOrder * order = [[AlipayOrder alloc]init];
+                order.partner = partner;
+                order.seller = seller;
+                order.tradeNO = self.orderID; //订单ID（由商家自行制定）
+                order.productName = self.orderID; //商品标题
+                order.productDescription = self.orderID; //商品描述
+                order.amount = [NSString stringWithFormat:@"%.2f",_price]; //商品价格
+                order.notifyURL =  @"http://wap.vlifee.com/alipay/notify_url.aspx"; //回调URL
+                
+                order.service = @"mobile.securitypay.pay";
+                order.paymentType = @"1";
+                order.inputCharset = @"utf-8";
+                order.itBPay = @"30m";
+                order.showUrl = @"m.alipay.com";
+                
+                //应用注册scheme,在AlixPayDemo-Info.plist定义URL types
+                NSString *appScheme = @"wxaac5e5f7421e84ac";
+                
+                //将商品信息拼接成字符串
+                NSString *orderSpec = [order description];
+                NSLog(@"orderSpec = %@",orderSpec);
+                
+                id<DataSigner> signer = CreateRSADataSigner(privateKey);
+                NSString *signedString = [signer signString:orderSpec];
+                
+                //将签名成功字符串格式化为订单字符串,请严格按照该格式
+                NSString *orderString = nil;
+                if (signedString != nil) {
+                    orderString = [NSString stringWithFormat:@"%@&sign=\"%@\"&sign_type=\"%@\"",
+                                   orderSpec, signedString, @"RSA"];
+                    
+                    [[AlipaySDK defaultService] payOrder:orderString fromScheme:appScheme callback:^(NSDictionary *resultDic) {
+                        NSLog(@"reslut = %@",resultDic);
+                        [self pushOrderDetailsVC];
+                    }];
+                    
+                }
+                
+                
+                
+            }
+            
         }
     }else
     {

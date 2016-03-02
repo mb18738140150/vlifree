@@ -224,7 +224,8 @@
     _countLabel.textColor = [UIColor whiteColor];
     _countLabel.layer.backgroundColor = [UIColor redColor].CGColor;
     _countLabel.text = [NSString stringWithFormat:@"%ld", (long)[self getAllCount]];
-    _countLabel.font = [UIFont systemFontOfSize:14];
+//    _countLabel.font = [UIFont systemFontOfSize:14];
+    _countLabel.adjustsFontSizeToFitWidth = YES;
     _countLabel.textAlignment = NSTextAlignmentCenter;
     _countLabel.layer.cornerRadius = COUNT_LABEL_SIZE / 2;
     [self addSubview:_countLabel];
@@ -282,7 +283,7 @@
         self.priceLabel.text = [NSString stringWithFormat:@"¥%g", [self getAllPrice]];
     }
     
-    self.countLabel.text = [NSString stringWithFormat:@"¥%ld", (long)[self getAllCount]];
+    self.countLabel.text = [NSString stringWithFormat:@"%ld", (long)[self getAllCount]];
 }
 
 - (void)subtractMenu:(UIButton *)button
@@ -343,7 +344,7 @@
         self.priceLabel.text = [NSString stringWithFormat:@"¥%g", [self getAllPrice]];
     }
     
-    self.countLabel.text = [NSString stringWithFormat:@"¥%ld", (long)[self getAllCount]];
+    self.countLabel.text = [NSString stringWithFormat:@"%ld", (long)[self getAllCount]];
     
     
     

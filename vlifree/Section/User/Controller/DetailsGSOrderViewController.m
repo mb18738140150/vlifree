@@ -31,6 +31,11 @@
 @property (nonatomic, strong)UIView * commentView;
 
 @property (nonatomic, strong)NSNumber * payType;
+// 评论所需参数
+@property (nonatomic, strong)NSNumber * storeID;
+@property (nonatomic, copy)NSString * icon;
+@property (nonatomic, copy)NSString * storeName;
+
 
 @end
 
@@ -287,6 +292,47 @@
                 self.payLB.text = @"支付方式:百度支付";
             }
             
+            switch (_payType.intValue) {
+                case 1:
+                {
+                    self.payLB.text = @"支付方式:微信支付";
+                }
+                    break;
+                case 2:
+                {
+                    self.payLB.text = @"支付方式:百度支付";
+                }
+                    break;
+                case 3:
+                {
+                    self.payLB.text = @"支付方式:现金支付";
+                }
+                    break;
+                case 4:
+                {
+                    self.payLB.text = @"支付方式:优惠券";
+                }
+                    break;
+                case 5:
+                {
+                    self.payLB.text = @"支付方式:积分";
+                }
+                    break;
+                case 6:
+                {
+                    self.payLB.text = @"支付方式:优惠券，积分";
+                }
+                    break;
+                case 20:
+                {
+                    self.payLB.text = @"支付方式:支付宝";
+                }
+                    break;
+                default:
+                    break;
+            }
+
+            
             if ([[data objectForKey:@"PeyState"] intValue] == 1) {
                 if ([[data objectForKey:@"OrderState"] intValue] == 6) {
                     self.backMoneyImageview.image = [UIImage imageNamed:@"back_money.png"];
@@ -301,11 +347,19 @@
                     _cancleButton.hidden = NO;
                 }
                 
+                // 是否评论
                 if ([[data objectForKey:@"IsComment"] intValue] == 1) {
                     _commentView.hidden = YES;
                 }else
                 {
-                    _commentView.hidden = NO;
+                    if ([[data objectForKey:@"OrderState"] intValue] == 6 || [[data objectForKey:@"OrderState"] intValue] == 1) {
+                        // 已支付，已退款，不可以评论 ；已支付，酒店未处理不可以评论
+                        _commentView.hidden = YES;
+                    }else
+                    {
+                        // 已支付，未退款，可以评论
+                        _commentView.hidden = NO;
+                    }
                 }
                 
             }else if ([[data objectForKey:@"PeyState"] intValue] == 2)
@@ -348,13 +402,28 @@
             self.grogshopLB.text = [data objectForKey:@"HotelName"];
             self.addressLB.text = [data objectForKey:@"HotelAddress"];
             self.telGSLB.text = [NSString stringWithFormat:@"%@", [data objectForKey:@"HotelTel"]];
+            
+            self.storeID = [data objectForKey:@"HotelId"];
+            self.storeName = [data objectForKey:@"HotelName"];
+            self.icon = [data objectForKey:@"HotelIcon"];
+            
+            
         }else if ([[data objectForKey:@"Command"] isEqualToNumber:@10046])
         {
             if ([self.cancleButton.titleLabel.text isEqualToString:@"取消订单"]) {
                 self.cancleButton.hidden = YES;
                 self.backMoneyImageview.image = [UIImage imageNamed:@"cancel_order.png"];
                 _backMoneyImageview.hidden = NO;
+                UIAlertView * alert = [[UIAlertView alloc]initWithTitle:@"提示" message:@"取消订单成功" delegate:nil cancelButtonTitle:nil otherButtonTitles:@"确定", nil];
+                [alert show];
+                [alert performSelector:@selector(dismiss) withObject:nil afterDelay:0.8];
+            }else
+            {
+                UIAlertView * alert = [[UIAlertView alloc]initWithTitle:@"提示" message:@"退款成功" delegate:nil cancelButtonTitle:nil otherButtonTitles:@"确定", nil];
+                [alert show];
+                [alert performSelector:@selector(dismiss) withObject:nil afterDelay:0.8];
             }
+            [self.navigationController popViewControllerAnimated:YES];
         }
         
         
@@ -386,9 +455,11 @@
 }
 
 #pragma mark - 取消订单、退款
-#warning 取消订单、退款参数一样？
 - (void)cancleAction:(UIButton *)button
 {
+    
+#warning ***cancle order is same to tuikuan ? ***取消订单、退款参数一样？
+    
     if ([button.titleLabel.text isEqualToString:@"取消订单"]) {
         NSLog(@"取消订单");
         NSDictionary * dic = @{
@@ -411,10 +482,18 @@
 
 
 #pragma mark - 评论
-#warning 酒店订单与外卖订单请求参数一样？
+
 - (void)commentAction:(UIButton * )button
 {
+#warning  ****Hotel orders and delivery orders request parameters? *** 酒店订单与外卖订单请求参数一样？
     CreateCommentViewController * commentVC = [[CreateCommentViewController alloc]init];
+    NSString * str = @"http://image.vlifee.com";
+    NSString * icon = [str stringByAppendingString:self.icon];
+    commentVC.icon = icon;
+    commentVC.storeName = self.storeName;
+    commentVC.storeId = self.storeID;
+    commentVC.orderId = self.orderID;
+    commentVC.isHotel = 1;
     [self.navigationController pushViewController:commentVC animated:YES];
 }
 

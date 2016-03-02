@@ -199,7 +199,6 @@
     [self.view addSubview:_aScrollView];
     
     
-    
     UIView * noticeView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.aScrollView.width, 30)];
 //    UIView * noticeView = [[UIView alloc] initWithFrame:CGRectMake(0, self.navigationController.navigationBar.bottom, self.aScrollView.width, 30)];
     noticeView.tag = 80000;
@@ -386,13 +385,29 @@
     [self.navigationController popViewControllerAnimated:YES];
 }
 
-
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    self.navigationController.navigationBar.tintColor = MAIN_COLOR;
-    self.navigationController.navigationBar.barTintColor = [UIColor whiteColor];
+//    self.navigationController.navigationBar.tintColor = MAIN_COLOR;
+//    self.navigationController.navigationBar.barTintColor = [UIColor whiteColor];
+    
+    [self.navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"1px.png"] forBarMetrics:UIBarMetricsDefault];
+    [self.navigationController.navigationBar setShadowImage:nil];
+    [self.navigationController.navigationBar setTitleTextAttributes:
+     @{NSFontAttributeName:[UIFont systemFontOfSize:17],
+       NSForegroundColorAttributeName:[UIColor blackColor]}];
+    
 }
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+    [self.navigationController.navigationBar setTitleTextAttributes:
+     @{NSFontAttributeName:[UIFont systemFontOfSize:17],
+       NSForegroundColorAttributeName:[UIColor blackColor]}];
+    [self.navigationController.navigationBar setShadowImage:nil];
+    [self.navigationController.navigationBar setBackgroundImage:nil forBarMetrics:UIBarMetricsDefault];
+}
+
 /**
  *  跳转到评论查看页面
  *
@@ -434,6 +449,7 @@
     }
 }
 
+#pragma mark - 提交订单
 - (void)confirmMenusAction:(UIButton *)button
 {
     if ([UserInfo shareUserInfo].userId) {
@@ -582,7 +598,9 @@
         if ([[data objectForKey:@"Command"] intValue] == 10012) {
 //            self.mealBoxMoney = [data objectForKey:@"MealBoxMoney"];
 //            NSLog(@"餐具费  %@", self.mealBoxMoney);
-            [self noticeLBText:[data objectForKey:@"BusinessNotice"]];
+            if (![[data objectForKey:@"BusinessNotice"] isKindOfClass:[NSNull null]]) {
+                [self noticeLBText:[data objectForKey:@"BusinessNotice"]];
+            }
             NSArray * array = [data objectForKey:@"CatalogueList"];
             for (int i = 0; i < array.count; i++) {
                 NSDictionary * dic = [array objectAtIndex:i];
@@ -644,6 +662,13 @@
             orderVC.takeOutId = self.takeOutID;
             orderVC.storeName = self.storeName;
 //            orderVC.mealBoxMoney = [data objectForKey:@"MealBoxMoney"];
+            
+//            [self.navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"1px.png"] forBarMetrics:UIBarMetricsDefault];
+//            [self.navigationController.navigationBar setShadowImage:nil];
+//            [self.navigationController.navigationBar setTitleTextAttributes:
+//             @{NSFontAttributeName:[UIFont systemFontOfSize:17],
+//               NSForegroundColorAttributeName:[UIColor blackColor]}];
+            
             [self.navigationController pushViewController:orderVC animated:YES];
         }else if ([[data objectForKey:@"Command"] isEqualToNumber:@10039])
         {
@@ -1121,6 +1146,7 @@
     return allCount;
 }
 
+#pragma mark - 点菜抛物线动画
 - (void)countLBAnimateWithFromeFrame:(CGRect)frame
 {
 //    CGContextRef context = UIGraphicsGetCurrentContext();
@@ -1131,24 +1157,64 @@
     
     UILabel * redView = [[UILabel alloc] initWithFrame:frame];
     redView.size = CGSizeMake(20, 20);
+    redView.tag = 121212;
     redView.text = @"1";
     redView.textAlignment = NSTextAlignmentCenter;
     redView.textColor = [UIColor whiteColor];
     redView.layer.backgroundColor = [UIColor redColor].CGColor;
     redView.layer.cornerRadius = 10;
     [self.aScrollView addSubview:redView];
-    CGRect rect = CGRectMake(65, _shoppingCarView.top - 10, 20, 20);
+    
+    CAKeyframeAnimation * parabolic = [[CAKeyframeAnimation alloc]init];
+    
+    CGRect begainrect = redView.frame;
+    UIBezierPath * path = [UIBezierPath bezierPath];
+    [path moveToPoint:CGPointMake(begainrect.origin.x, begainrect.origin.y)];
+    [path addQuadCurveToPoint:CGPointMake(65, _shoppingCarView.top - 10) controlPoint:CGPointMake(self.view.width / 3 * 2, begainrect.origin.y - 150)];
+    parabolic.keyPath = @"position";
+    parabolic.path = path.CGPath;
+    parabolic.calculationMode = @"cubicPaced";
+    parabolic.duration = 0.8;
+    parabolic.repeatCount = 0;
+    parabolic.fillMode = kCAFillModeForwards;
+    parabolic.removedOnCompletion = NO;
+    parabolic.delegate = self;
+    [redView.layer addAnimation:parabolic forKey:nil];
+    
+//    CAShapeLayer *layer = [CAShapeLayer layer];
+//    layer.fillColor = [UIColor clearColor].CGColor;
+//    layer.lineWidth =  2.0f;
+//    layer.lineCap = kCALineCapRound;
+//    layer.lineJoin = kCALineJoinRound;
+//    layer.strokeColor = [UIColor redColor].CGColor;
+//    [self.view.layer addSublayer:layer];
+//    layer.path = path.CGPath;
+//    // 创建Animation
+//    CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"strokeEnd"];
+//    animation.fromValue = @(0.0);
+//    animation.toValue = @(1.0);
+//    layer.autoreverses = NO;
+//    animation.duration = 2.0;
+//    
+//    // 设置layer的animation
+//    [layer addAnimation:animation forKey:nil];
+    
+//    CGRect rect = CGRectMake(65, _shoppingCarView.top - 10, 20, 20);
     
 //    CGContextMoveToPoint(context, frame.origin.x, frame.origin.y);
 //    CGContextAddQuadCurveToPoint(context, frame.origin.x, frame.origin.y, rect.origin.x, rect.origin.y);
 //    CGContextStrokePath(context);
     
-    [UIView animateWithDuration:0.8 animations:^{
-        redView.frame = rect;
-    }];
-    [redView performSelector:@selector(removeFromSuperview) withObject:nil afterDelay:0.8];
+//    [UIView animateWithDuration:0.8 animations:^{
+//        redView.frame = rect;
+//    }];
+//    [redView performSelector:@selector(removeFromSuperview) withObject:nil afterDelay:0.8];
 }
-
+- (void)animationDidStop:(CAAnimation *)anim finished:(BOOL)flag
+{
+    UIView * redView = [self.aScrollView viewWithTag:121212];
+    [redView removeFromSuperview];
+}
 
 #pragma mark - 提示登录页面
 

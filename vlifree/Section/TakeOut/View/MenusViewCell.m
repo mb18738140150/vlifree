@@ -16,6 +16,8 @@
 #define LABEL_HEIGHT 20
 #define PRICE_LABEL_WIDTH 80
 
+#define HORIZON_TAG 100000
+
 //#define VIEW_COLOR [UIColor orangeColor]
 #define VIEW_COLOR [UIColor clearColor]
 
@@ -25,6 +27,8 @@
 @property (nonatomic, strong)UILabel * nameLabel;
 @property (nonatomic, strong)UILabel * soldCountLB;
 @property (nonatomic, strong)UILabel * priceLabel;
+@property (nonatomic, strong)UIView * oldPriceView;
+@property (nonatomic, strong)UILabel * oldPriceLabel;
 
 
 
@@ -100,10 +104,32 @@
         
         self.priceLabel = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, _iconView.bottom, PRICE_LABEL_WIDTH, LABEL_HEIGHT)];
         _priceLabel.text = @"23元/份";
-        _priceLabel.textColor = TEXT_COLOR;
-        _priceLabel.font = [UIFont systemFontOfSize:13];
+        _priceLabel.textColor = [UIColor redColor];
+        _priceLabel.font = [UIFont systemFontOfSize:15];
         _priceLabel.backgroundColor = VIEW_COLOR;
         [self.contentView addSubview:_priceLabel];
+        
+        self.oldPriceView = [[UIView alloc]initWithFrame:CGRectMake(_priceLabel.right, _priceLabel.top + 5, PRICE_LABEL_WIDTH, LABEL_HEIGHT - 5)];
+        self.oldPriceView.backgroundColor = [UIColor clearColor];
+        [self.contentView addSubview:_oldPriceView];
+        
+        self.oldPriceLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, _oldPriceView.width, _oldPriceView.height)];
+        self.oldPriceLabel.textColor = TEXT_COLOR;
+        self.oldPriceLabel.font = [UIFont systemFontOfSize:13];
+        [_oldPriceView addSubview:_oldPriceLabel];
+        
+        UIView * horizonline = [[UIView alloc]initWithFrame:CGRectMake(0,  _oldPriceView.height / 2, _oldPriceView.width, 1)];
+        horizonline.backgroundColor = TEXT_COLOR;
+        horizonline.tag = HORIZON_TAG;
+        [_oldPriceView addSubview:horizonline];
+        
+        UILabel * unitLabel = [[UILabel alloc]initWithFrame:CGRectMake(_oldPriceView.right, _oldPriceView.top, 40, _oldPriceView.height)];
+        unitLabel.text = @"元/份";
+        unitLabel.font = [UIFont systemFontOfSize:13];
+        unitLabel.textColor = TEXT_COLOR;
+        unitLabel.tag = 1111;
+        [self.contentView addSubview:unitLabel];
+        
         
         self.subtractBT = [UIButton buttonWithType:UIButtonTypeCustom];
         _subtractBT.frame = CGRectMake(_nameLabel.right - 3 * BUTTON_SIZE, _priceLabel.bottom - BUTTON_SIZE, BUTTON_SIZE, BUTTON_SIZE);
@@ -140,8 +166,26 @@
     _menuModel = menuModel;
     [self.iconView setImageWithURL:[NSURL URLWithString:menuModel.icon] placeholderImage:[UIImage imageNamed:@"placeholderIM.png"]];
     self.nameLabel.text = menuModel.name;
-    self.soldCountLB.text = [NSString stringWithFormat:@"月售%@份", menuModel.soldCount];
-    self.priceLabel.text = [NSString stringWithFormat:@"%@元/份", menuModel.price];
+    self.soldCountLB.text = [NSString stringWithFormat:@"已售%@份", menuModel.soldCount];
+    
+    NSString * priceStr = [NSString stringWithFormat:@"%@", menuModel.price];
+    NSDictionary * priceDic = @{NSFontAttributeName:[UIFont systemFontOfSize:15]};
+    CGRect priceRect = [priceStr boundingRectWithSize:CGSizeMake(MAXFLOAT, self.priceLabel.height) options:NSStringDrawingTruncatesLastVisibleLine attributes:priceDic context:nil];
+    self.priceLabel.frame = CGRectMake(LEFT_SPACE, _iconView.bottom, priceRect.size.width, LABEL_HEIGHT);
+    self.priceLabel.text = priceStr;
+    
+    NSString * oldPriceStr = [NSString stringWithFormat:@"%@", menuModel.oldPrice];
+    NSDictionary * oldpriceDic = @{NSFontAttributeName:[UIFont systemFontOfSize:13]};
+    CGRect oldpriceRect = [oldPriceStr boundingRectWithSize:CGSizeMake(MAXFLOAT, self.priceLabel.height) options:NSStringDrawingTruncatesLastVisibleLine attributes:oldpriceDic context:nil];
+    self.oldPriceView.frame = CGRectMake(_priceLabel.right, _priceLabel.top + 5, oldpriceRect.size.width + 4, LABEL_HEIGHT - 5);
+    self.oldPriceLabel.frame = CGRectMake(2, 0, oldpriceRect.size.width, _oldPriceView.height);
+    self.oldPriceLabel.text = oldPriceStr;
+    
+    UIView * horizonline = [_oldPriceView viewWithTag:HORIZON_TAG];
+    horizonline.frame = CGRectMake(0, _oldPriceView.height / 2, _oldPriceView.width, 1);
+    
+    UILabel * unitLabel = [self.contentView viewWithTag:1111];
+    unitLabel.frame = CGRectMake(_oldPriceView.right, _oldPriceView.top, 40, _oldPriceView.height);
 }
 
 

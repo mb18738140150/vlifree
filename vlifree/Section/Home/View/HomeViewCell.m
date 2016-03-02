@@ -120,7 +120,23 @@
     _collectModel = collectModel;
     self.titleLabel.text = collectModel.businessName;
     if (collectModel.describe) {
-        self.detailLabel.text = collectModel.describe;
+        
+        NSMutableString * str = [[NSString stringWithFormat:@"<body>%@<body>", collectModel.describe] mutableCopy];
+        //        NSXMLParser * parser = [[NSXMLParser alloc] initWithData:[[str copy] dataUsingEncoding:NSUTF8StringEncoding]];
+        //        parser.delegate = self;
+        //        [parser parse];
+        [str stringByReplacingOccurrencesOfString:@"\n" withString:@""];
+        [str stringByReplacingOccurrencesOfString:@" " withString:@""];
+        [str stringByReplacingOccurrencesOfString:@"\t" withString:@""];
+        while ([str rangeOfString:@"<"].location != NSNotFound) {
+            NSRange range1 = [str rangeOfString:@"<"];
+            NSRange range2 = [str rangeOfString:@">"];
+            NSRange strRange = NSMakeRange(range1.location, range2.location - range1.location + 1);
+            [str replaceCharactersInRange:strRange withString:@""];
+            //        NSLog(@"%d, %d", strRange.location, strRange.length);
+        }
+        
+        self.detailLabel.text = [str copy];
     }
     double m = [collectModel.distance doubleValue];
     if (m > 999.99) {
@@ -132,7 +148,7 @@
     }
     
     self.priceLabel.text = [NSString stringWithFormat:@"¥%@", collectModel.price];
-    self.soldCountLabel.text = [NSString stringWithFormat:@"月售%@", collectModel.sold];
+    self.soldCountLabel.text = [NSString stringWithFormat:@"已售%@", collectModel.sold];
     __weak HomeViewCell * cell = self;
     [self.icon setImageWithURL:[NSURL URLWithString:collectModel.icon] placeholderImage:[UIImage imageNamed:@"placeholderIM.png"] completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType) {
         if (error) {

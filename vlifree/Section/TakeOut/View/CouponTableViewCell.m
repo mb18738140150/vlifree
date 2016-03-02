@@ -39,11 +39,13 @@
         [self addSubview:line3];
         
         self.nameLabel = [[UILabel alloc]initWithFrame:CGRectMake(60 + LEFT_SPACE, TOP_SPACE + 5, frame.size.width - 2 * LEFT_SPACE - 120 - 60, 30)];
+        _nameLabel.textAlignment = NSTextAlignmentCenter;
         [self addSubview:_nameLabel];
         
         self.dateLabel = [[UILabel alloc]initWithFrame:CGRectMake(60 + LEFT_SPACE, _nameLabel.bottom, _nameLabel.width, 28)];
         _dateLabel.textColor = [UIColor grayColor];
-        _dateLabel.font = [UIFont systemFontOfSize:12];
+//        _dateLabel.font = [UIFont systemFontOfSize:12];
+        _dateLabel.adjustsFontSizeToFitWidth = YES;
         _dateLabel.numberOfLines = 0;
         [self addSubview:_dateLabel];
         
@@ -64,7 +66,7 @@
 
 - (void)setCouponModel:(CouponModel *)couponModel
 {
-    self.nameLabel.text = [NSString stringWithFormat:@"%d", couponModel.couponId];
+    self.nameLabel.text = @"优惠券";
     self.dateLabel.text = [NSString stringWithFormat:@"%@", couponModel.couponDate];
     self.faceLabel.text = [NSString stringWithFormat:@"¥%.2f", couponModel.couponFace];
     self.faceLabel.textAlignment = NSTextAlignmentCenter;

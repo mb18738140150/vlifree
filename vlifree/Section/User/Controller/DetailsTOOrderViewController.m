@@ -740,12 +740,14 @@
                 case 2:
                 {
                     self.stateLabel.text = @"餐厅已经接单";
-                    _cancelBT.hidden = YES;
+                    _cancelBT.hidden = NO;
                 }
                     break;
                 case 3:
                 {
                     self.stateLabel.text = @"订单已经在配送";
+                    _cancelBT.frame = CGRectMake(self.view.width - 190, _cancelBT.top, 80, 25);
+                    _cancelBT.hidden = NO;
                     self.confirmBT.hidden = NO;
                 }
                     break;

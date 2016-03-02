@@ -69,6 +69,8 @@
 @property (nonatomic, assign)int useIntegral;
 // 优惠券id
 @property (nonatomic, assign)int useCoupon;
+// 优惠券记录ID
+@property (nonatomic, assign)int couponRecordId;
 
 @property (nonatomic, strong)NSNumber * realMonry;
 
@@ -131,8 +133,14 @@
     [_scoreView.button addTarget:self action:@selector(useScoreAction:) forControlEvents:UIControlEventTouchUpInside];
     [scroView addSubview:_scoreView];
     
+    self.needMoneyView = [[BillingInfoView alloc]initWithFrame:CGRectMake(0, _scoreView.bottom, self.view.width, 40)];
+    _needMoneyView.titleLabel.text = @"需要支付金额";
+    [_needMoneyView.button setTitle:[NSString stringWithFormat:@"%.2f", self.totalMoney] forState:UIControlStateNormal];
+    [_needMoneyView.button setTitleColor:MAIN_COLOR forState:UIControlStateNormal];
+    [scroView addSubview:_needMoneyView];
     
-    UIView * payView = [[UIView alloc] initWithFrame:CGRectMake(0, _scoreView.bottom + TOP_SPACE, scroView.width, 100)];
+    
+    UIView * payView = [[UIView alloc] initWithFrame:CGRectMake(0, _needMoneyView.bottom + TOP_SPACE, scroView.width, 100)];
     payView.backgroundColor = [UIColor whiteColor];
     payView.tag = 1000;
     [scroView addSubview:payView];
@@ -198,6 +206,7 @@
     
     NSDictionary * jsondic = @{
                                @"Command":@44,
+                               @"TotalMonry":@(self.totalMoney),
                                @"UserId":[UserInfo shareUserInfo].userId,
                                @"StoreId":self.takeOutId
                                };
@@ -207,10 +216,30 @@
     [self.hud showInView:self.view];
     
     self.useCoupon = 0;
+    self.couponRecordId = 0;
     self.useIntegral = 0;
     
     // Do any additional setup after loading the view.
 }
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    [self.navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"1px.png"] forBarMetrics:UIBarMetricsDefault];
+    [self.navigationController.navigationBar setShadowImage:nil];
+    [self.navigationController.navigationBar setTitleTextAttributes:
+     @{NSFontAttributeName:[UIFont systemFontOfSize:17],
+       NSForegroundColorAttributeName:[UIColor blackColor]}];
+    
+}
+- (void)viewWillDisappear:(BOOL)animated
+{
+    [self.navigationController.navigationBar setTitleTextAttributes:
+     @{NSFontAttributeName:[UIFont systemFontOfSize:17],
+       NSForegroundColorAttributeName:[UIColor blackColor]}];
+    [self.navigationController.navigationBar setShadowImage:nil];
+    [self.navigationController.navigationBar setBackgroundImage:nil forBarMetrics:UIBarMetricsDefault];
+}
+
 - (void)backLastVC:(id)sender
 {
     [self.navigationController popViewControllerAnimated:YES];
@@ -293,8 +322,20 @@
     [self.couponsView.button setTitleColor:[UIColor greenColor] forState:UIControlStateNormal];
     self.couponsView.imageView.hidden = YES;
     self.useCoupon = 0;
+    self.couponRecordId = 0;
     self.couponMoney = 0;
     self.tanchuView.alpha = 0;
+    
+    NSDictionary * jsonDic = @{
+                               @"Command":@45,
+                               @"UserId":[UserInfo shareUserInfo].userId,
+                               @"StoreId":self.takeOutId,
+                               @"AllMoney":@(self.totalMoney),
+                               @"CouponId":@(self.useCoupon),
+                               @"Integral":@(self.useIntegral)
+                               };
+    [self playPostWithDictionary:jsonDic];
+    
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
@@ -324,18 +365,28 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    CouponModel * couponModel = [self.couponListArray objectAtIndex:indexPath.row];
     CouponTableViewCell * cell = [tableView cellForRowAtIndexPath:indexPath];
     cell.imageStateview.hidden = NO;
     self.couponView.stateImageview.hidden = YES;
-    self.couponFace = [cell.faceLabel.text substringFromIndex:1];
+    self.couponFace = [NSString stringWithFormat:@"%.2f", couponModel.couponFace];
     self.couponsView.titleLabel.text = [NSString stringWithFormat:@"您使用了%@元优惠券", self.couponFace];
-    self.useCoupon = [cell.nameLabel.text intValue];
+    self.useCoupon = couponModel.couponId;
+    self.couponRecordId = couponModel.couponRecordId;
     self.couponMoney = [self.couponFace intValue];
     [self.couponsView.button setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     self.couponsView.imageView.hidden = NO;
     self.tanchuView.alpha = 0;
     
-    
+    NSDictionary * jsonDic = @{
+                               @"Command":@45,
+                               @"UserId":[UserInfo shareUserInfo].userId,
+                               @"StoreId":self.takeOutId,
+                               @"AllMoney":@(self.totalMoney),
+                               @"CouponId":@(self.useCoupon),
+                               @"Integral":@(self.useIntegral)
+                               };
+    [self playPostWithDictionary:jsonDic];
     
 }
 - (void)tableView:(UITableView *)tableView didDeselectRowAtIndexPath:(NSIndexPath *)indexPath
@@ -423,6 +474,17 @@
     UIScrollView * scrollView = (UIScrollView *)[self.view viewWithTag:2000];
     UIView * payView = [scrollView viewWithTag:1000];
     payView.hidden = NO;
+    
+    NSDictionary * jsonDic = @{
+                               @"Command":@45,
+                               @"UserId":[UserInfo shareUserInfo].userId,
+                               @"StoreId":self.takeOutId,
+                               @"AllMoney":@(self.totalMoney),
+                               @"CouponId":@(self.useCoupon),
+                               @"Integral":@(self.useIntegral)
+                               };
+    [self playPostWithDictionary:jsonDic];
+    
 //    self.weixinView.hidden = NO;
 //    self.baiduView.hidden = NO;
 }
@@ -455,7 +517,15 @@
         
 //        [self.scoreView.button setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
         self.scoreView.imageView.hidden = NO;
-    
+    NSDictionary * jsonDic = @{
+                               @"Command":@45,
+                               @"UserId":[UserInfo shareUserInfo].userId,
+                               @"StoreId":self.takeOutId,
+                               @"AllMoney":@(self.totalMoney),
+                               @"CouponId":@(self.useCoupon),
+                               @"Integral":@(self.useIntegral)
+                               };
+    [self playPostWithDictionary:jsonDic];
 }
 
 - (void)choseIntegralAction:(UIButton *)button
@@ -508,6 +578,15 @@
                 }
 //                [self.scoreView.button setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
                 self.scoreView.imageView.hidden = NO;
+                NSDictionary * jsonDic = @{
+                                           @"Command":@45,
+                                           @"UserId":[UserInfo shareUserInfo].userId,
+                                           @"StoreId":self.takeOutId,
+                                           @"AllMoney":@(self.totalMoney),
+                                           @"CouponId":@(self.useCoupon),
+                                           @"Integral":@(self.useIntegral)
+                                           };
+                [self playPostWithDictionary:jsonDic];
             }
         }else
         {
@@ -579,14 +658,14 @@
         }
     }
     
-    NSDictionary * jsonDic = @{
-                               @"Command":@45,
-                               @"UserId":[UserInfo shareUserInfo].userId,
-                               @"StoreId":self.takeOutId,
-                               @"AllMoney":@(self.totalMoney),
-                               @"CouponId":@(self.useCoupon),
-                               @"Integral":@(self.useIntegral)
-                               };
+//    NSDictionary * jsonDic = @{
+//                               @"Command":@45,
+//                               @"UserId":[UserInfo shareUserInfo].userId,
+//                               @"StoreId":self.takeOutId,
+//                               @"AllMoney":@(self.totalMoney),
+//                               @"CouponId":@(self.useCoupon),
+//                               @"Integral":@(self.useIntegral)
+//                               };
     // 积分优惠券均使用
     if (self.useCoupon && self.useIntegral) {
         _payType = 6;
@@ -602,12 +681,37 @@
     
     [_jsondic setObject:[NSNumber numberWithInteger:_payType] forKey:@"PayType"];
     [_jsondic setObject:[NSNumber numberWithInteger:_useIntegral] forKey:@"Integral"];
-    [_jsondic setObject:[NSNumber numberWithInteger:_useCoupon] forKey:@"CouponId"];
+    [_jsondic setObject:[NSNumber numberWithInteger:_couponRecordId] forKey:@"CouponRecordId"];
     
-    [self playPostWithDictionary:jsonDic];
+//    [self playPostWithDictionary:jsonDic];
+//    self.hud = [JGProgressHUD progressHUDWithStyle:JGProgressHUDStyleLight];
+//    [self.hud showInView:self.view];
+
+    if ([self.needMoneyView.button.titleLabel.text doubleValue] == 0) {
+        //                [self pushFinishOrderVC];
+    }else
+    {
+        if (self.weixinView.changeButton.selected) {
+            _payType = 1;
+        }else if (self.baiduView.changeButton.selected)
+        {
+            _payType = 2;
+        }else if (self.aliPayView.changeButton.selected)
+        {
+            _payType = 20;
+        }
+    }
+    NSNumber * realMonry = @([self.needMoneyView.button.titleLabel.text doubleValue]);
+    [_jsondic setObject:[NSNumber numberWithInteger:_payType] forKey:@"PayType"];
+    [_jsondic setValue:realMonry forKey:@"TotalMoney"];
+    self.realMonry = realMonry;
+    [self playPostWithDictionary:_jsondic];
     self.hud = [JGProgressHUD progressHUDWithStyle:JGProgressHUDStyleLight];
     [self.hud showInView:self.view];
 
+    
+    
+    
 }
 
 
@@ -679,8 +783,8 @@
 #warning 百度支付登录
 //                    
 //                    [self paybyBaidu];
-//                    
-//                    
+//
+                
 //                }
 
             }
@@ -758,27 +862,30 @@
             
         }else if ([[data objectForKey:@"Command"] isEqualToNumber:@10045])
         {
-            double  realMoney = [[data objectForKey:@"RealMoney"] doubleValue];
-            if (realMoney == 0) {
-//                [self pushFinishOrderVC];
-            }else
-            {
-                if (self.weixinView.changeButton.selected) {
-                    _payType = 1;
-                }else if (self.baiduView.changeButton.selected)
-                {
-                    _payType = 2;
-                }else if (self.aliPayView.changeButton.selected)
-                {
-                    _payType = 20;
-                }
-            }
-            [_jsondic setObject:[NSNumber numberWithInteger:_payType] forKey:@"PayType"];
-            [_jsondic setValue:[data objectForKey:@"RealMoney"] forKey:@"TotalMoney"];
-            self.realMonry = [data objectForKey:@"RealMoney"];
-            [self playPostWithDictionary:_jsondic];
-            self.hud = [JGProgressHUD progressHUDWithStyle:JGProgressHUDStyleLight];
-            [self.hud showInView:self.view];
+            
+            [self.needMoneyView.button setTitle:[NSString stringWithFormat:@"%.2f", [[data objectForKey:@"RealMoney"] doubleValue]] forState:UIControlStateNormal];
+            
+//            double  realMoney = [[data objectForKey:@"RealMoney"] doubleValue];
+//            if (realMoney == 0) {
+////                [self pushFinishOrderVC];
+//            }else
+//            {
+//                if (self.weixinView.changeButton.selected) {
+//                    _payType = 1;
+//                }else if (self.baiduView.changeButton.selected)
+//                {
+//                    _payType = 2;
+//                }else if (self.aliPayView.changeButton.selected)
+//                {
+//                    _payType = 20;
+//                }
+//            }
+//            [_jsondic setObject:[NSNumber numberWithInteger:_payType] forKey:@"PayType"];
+//            [_jsondic setValue:[data objectForKey:@"RealMoney"] forKey:@"TotalMoney"];
+//            self.realMonry = [data objectForKey:@"RealMoney"];
+//            [self playPostWithDictionary:_jsondic];
+//            self.hud = [JGProgressHUD progressHUDWithStyle:JGProgressHUDStyleLight];
+//            [self.hud showInView:self.view];
             
             
         }
