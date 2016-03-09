@@ -69,7 +69,7 @@
     CGRect frame = _telLabel.frame;
     frame.origin.y = _addressLB.bottom;
     _telLabel.frame = frame;
-    self.telLabel.text = addressModel.phoneNumber;
+    self.telLabel.text = [NSString stringWithFormat:@"姓名:%@ 电话:%@", addressModel.receiveName, addressModel.phoneNumber];
    
 }
 

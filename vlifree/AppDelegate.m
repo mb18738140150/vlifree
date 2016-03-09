@@ -227,7 +227,46 @@
 
 - (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation
 {
-    return [WXApi handleOpenURL:url delegate:self];
+    NSString * str = [url absoluteString];
+    NSLog(@"sourceApplication%@ ****** %@", sourceApplication, str);
+    
+    if ([sourceApplication containsString:@"alipay"]) {
+        [[AlipaySDK defaultService] processOrderWithPaymentResult:url standbyCallback:^(NSDictionary *resultDic) {
+            NSLog(@"****短**** result = %@",resultDic);
+            
+            UINavigationController * nav = (UINavigationController *)self.myTabBarVC.selectedViewController;
+            UIViewController * vc = [nav.viewControllers lastObject];
+            if ([vc isKindOfClass:[OnlinePayViewController class]]) {
+                OnlinePayViewController * onLineVC = (OnlinePayViewController *)vc;
+                [onLineVC pushFinishOrderVC];
+            }else if ([vc isKindOfClass:[GSOrderPayViewController class]])
+            {
+                GSOrderPayViewController * gsOrderPayVC = (GSOrderPayViewController *)vc;
+                [gsOrderPayVC pushOrderDetailsVC];
+            }else if ([vc isKindOfClass:[FinishOrderViewController class]])
+            {
+                FinishOrderViewController * finishOrderVC = (FinishOrderViewController *)vc;
+                [finishOrderVC downloadData];
+            }else if ([vc isKindOfClass:[DetailsTOOrderViewController class]])
+            {
+                DetailsTOOrderViewController * detailsOrderVC = (DetailsTOOrderViewController *)vc;
+                [detailsOrderVC downloadData];
+            }else if ([vc isKindOfClass:[GSPayViewController class]])
+            {
+                GSPayViewController * gsPayVC = (GSPayViewController *)vc;
+                [gsPayVC pushOrderDetailsVC];
+            }
+
+            
+        }];
+        
+        return YES;
+    }else
+    {
+        return [WXApi handleOpenURL:url delegate:self];
+        
+    }
+    
 }
 
 

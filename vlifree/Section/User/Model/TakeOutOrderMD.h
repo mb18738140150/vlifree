@@ -28,6 +28,9 @@
 @property (nonatomic, strong)NSNumber * firstReduce;
 @property (nonatomic, strong)NSNumber * fullReduce;
 @property (nonatomic, strong)NSNumber * mealBoxMoney;
+@property (nonatomic, strong)NSNumber * reduceCard;//优惠券
+@property (nonatomic, strong)NSNumber * discount;//打折
+@property (nonatomic, strong)NSNumber * internal;//积分
 
 - (id)initWithDictionary:(NSDictionary *)dic;
 

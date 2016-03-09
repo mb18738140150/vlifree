@@ -134,15 +134,18 @@
     _addressLB.textColor = [UIColor whiteColor];
     _addressLB.numberOfLines = 0;
     _addressLB.font = [UIFont systemFontOfSize:15];
+//    _addressLB.adjustsFontSizeToFitWidth = YES;
     _addressLB.lineBreakMode = NSLineBreakByWordWrapping;
     _addressLB.text = @"请选择送餐地址";
     [_addressBT addSubview:_addressLB];
     NSString * address = [self.orderDic objectForKey:@"Address"];
     if (address.length) {
-        self.addressLB.text = [NSString stringWithFormat:@"送餐地址:%@\n%@", [self.orderDic objectForKey:@"Address"], [self.orderDic objectForKey:@"PhoneNumber"]];
-        CGSize size = [_addressLB sizeThatFits:CGSizeMake(_addressBT.width, CGFLOAT_MAX)];
+        self.addressLB.text = [NSString stringWithFormat:@"送餐地址:%@\n%@%@", [self.orderDic objectForKey:@"Address"],[self.orderDic objectForKey:@"ReceiveName"], [self.orderDic objectForKey:@"PhoneNumber"]];
+//        CGSize size = [_addressLB sizeThatFits:CGSizeMake(_addressBT.width, CGFLOAT_MAX)];
+        CGRect  rect = [_addressLB.text boundingRectWithSize:CGSizeMake(_addressLB.width, CGFLOAT_MAX) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:15]} context:nil];
+        
         //        CGFloat addY = size.height - _addressBT.height;
-        _addressLB.height = size.height;
+        _addressLB.height = rect.size.height;
         _addressBT.height = _addressLB.height + 2 * TOP_SPACE;
         self.phone = [self.orderDic objectForKey:@"PhoneNumber"];
         self.address = [self.orderDic objectForKey:@"Address"];
@@ -526,10 +529,14 @@
         NSLog(@"%@", addressModel.address);
         takeOutOrderVC.phone = addressModel.phoneNumber;
         takeOutOrderVC.address = addressModel.address;
-        self.addressLB.text = [NSString stringWithFormat:@"送餐地址:%@\n%@", addressModel.address, addressModel.phoneNumber];
-        CGSize size = [_addressLB sizeThatFits:CGSizeMake(_addressBT.width, CGFLOAT_MAX)];
-        CGFloat addY = size.height - _addressLB.height;
-        _addressLB.height = size.height;
+        self.addressLB.text = [NSString stringWithFormat:@"送餐地址:%@\n姓名:%@ 电话:%@", addressModel.address,addressModel.receiveName, addressModel.phoneNumber];
+//        CGSize size = [_addressLB sizeThatFits:CGSizeMake(_addressBT.width, CGFLOAT_MAX)];
+        
+        CGRect  rect = [_addressLB.text boundingRectWithSize:CGSizeMake(_addressLB.width, CGFLOAT_MAX) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:15]} context:nil];
+        
+//        CGFloat addY = size.height - _addressLB.height;
+        CGFloat addY = rect.size.height - _addressLB.height;
+        _addressLB.height = rect.size.height;
         _addressBT.height = _addressLB.height + 2 * TOP_SPACE;
 //        takeOutOrderVC.phoneLable.text = addressModel.phoneNumber;
         [takeOutOrderVC reloadViewFrameWithAddY:addY];

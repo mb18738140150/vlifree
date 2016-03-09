@@ -670,6 +670,62 @@
         
         top = lineView8.bottom + 5;
     }
+    if (![self.orderDetailsMD.reduceCard isEqualToNumber:@0]) {
+        UILabel * reduceCardTitleLB = [[UILabel alloc] initWithFrame:CGRectMake(15, top, 100, 25)];
+        reduceCardTitleLB.text = @"优惠券";
+        reduceCardTitleLB.textColor = TEXT_COLOR;
+        [view4 addSubview:reduceCardTitleLB];
+        
+        UILabel * reduceCardFaceLB = [[UILabel alloc] initWithFrame:CGRectMake(view4.width - 70, reduceCardTitleLB.top, 50, 25)];
+        reduceCardFaceLB.text = [NSString stringWithFormat:@"-%@", self.orderDetailsMD.reduceCard];
+        reduceCardFaceLB.textAlignment = NSTextAlignmentRight;
+        reduceCardFaceLB.textColor = [UIColor redColor];
+        [view4 addSubview:reduceCardFaceLB];
+        
+        UIView * reduceCardLineView = [[UIView alloc] initWithFrame:CGRectMake(10, reduceCardFaceLB.bottom, view4.width - 20, 1)];
+        reduceCardLineView.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
+        [view4 addSubview:reduceCardLineView];
+        top = reduceCardLineView.bottom + 5;
+    }
+    if (![self.orderDetailsMD.internal isEqualToNumber:@0]) {
+        UILabel * intenalTitleLB = [[UILabel alloc] initWithFrame:CGRectMake(15, top, 100, 25)];
+        intenalTitleLB.text = @"积分";
+        intenalTitleLB.textColor = TEXT_COLOR;
+        [view4 addSubview:intenalTitleLB];
+        
+        
+        
+        UILabel * intenalLB = [[UILabel alloc] initWithFrame:CGRectMake(view4.width - 70, intenalTitleLB.top, 50, 25)];
+        intenalLB.text = [NSString stringWithFormat:@"-%.2f", [self.orderDetailsMD.internal intValue] / 100.0];
+        intenalLB.textAlignment = NSTextAlignmentRight;
+        intenalLB.textColor = [UIColor redColor];
+        [view4 addSubview:intenalLB];
+        
+        UIView * intenalLineView = [[UIView alloc] initWithFrame:CGRectMake(10, intenalLB.bottom, view4.width - 20, 1)];
+        intenalLineView.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
+        [view4 addSubview:intenalLineView];
+        top = intenalLineView.bottom + 5;
+    }
+    if (![self.orderDetailsMD.discount isEqualToNumber:@0]) {
+        UILabel * discountTitleLB = [[UILabel alloc] initWithFrame:CGRectMake(15, top, 100, 25)];
+        discountTitleLB.text = @"打折优惠";
+        discountTitleLB.textColor = TEXT_COLOR;
+        [view4 addSubview:discountTitleLB];
+        
+        
+        
+        UILabel * discountLB = [[UILabel alloc] initWithFrame:CGRectMake(view4.width - 70, discountTitleLB.top, 50, 25)];
+        discountLB.text = [NSString stringWithFormat:@"%@折", self.orderDetailsMD.discount];
+        discountLB.textAlignment = NSTextAlignmentRight;
+        discountLB.textColor = [UIColor redColor];
+        [view4 addSubview:discountLB];
+        
+        UIView * dsicountLineView = [[UIView alloc] initWithFrame:CGRectMake(10, discountLB.bottom, view4.width - 20, 1)];
+        dsicountLineView.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
+        [view4 addSubview:dsicountLineView];
+        top = dsicountLineView.bottom + 5;
+    }
+    
     UILabel * totalLB = [[UILabel alloc] initWithFrame:CGRectMake(15, top, 100, 25)];
     totalLB.text = @"合计";
     totalLB.font = FONT;

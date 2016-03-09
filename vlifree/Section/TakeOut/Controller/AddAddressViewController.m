@@ -10,6 +10,12 @@
 #import "AddressModel.h"
 
 @interface AddAddressViewController ()<UITextFieldDelegate, HTTPPostDelegate>
+
+/**
+ *  地址输入框
+ */
+@property (nonatomic, strong)UITextField * receiveNameTF;
+
 /**
  *  地址输入框
  */
@@ -33,7 +39,22 @@
     self.view.backgroundColor = [UIColor colorWithWhite:0.9 alpha:1];
     self.navigationItem.title = @"添加地址";
     
-    UIView * addressView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, 60)];
+    UIView * receiveNameView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, 60)];
+    receiveNameView.backgroundColor = [UIColor whiteColor];
+    [self.view addSubview:receiveNameView];
+    
+    self.receiveNameTF = [[UITextField alloc] initWithFrame:CGRectMake(20, 15, receiveNameView.width - 60, 30)];
+    _receiveNameTF.delegate = self;
+    _receiveNameTF.placeholder = @"收货人姓名";
+    _receiveNameTF.textColor = TEXT_COLOR;
+    [receiveNameView addSubview:_receiveNameTF];
+    
+    UIView * lineView1 = [[UIView alloc] initWithFrame:CGRectMake(0, receiveNameView.bottom, self.view.width, 1)];
+    lineView1.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
+    [self.view addSubview:lineView1];
+    
+    
+    UIView * addressView = [[UIView alloc] initWithFrame:CGRectMake(0, lineView1.bottom, self.view.width, 60)];
 //    UIView * addressView = [[UIView alloc] initWithFrame:CGRectMake(0, self.navigationController.navigationBar.bottom, self.view.width, 60)];
     addressView.backgroundColor = [UIColor whiteColor];
     [self.view addSubview:addressView];
@@ -96,7 +117,12 @@
 {
     [self.addressTF resignFirstResponder];
     [self.telTF resignFirstResponder];
-    if (self.addressTF.text.length == 0) {
+    if (self.receiveNameTF.text.length == 0) {
+        UIAlertView * alert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"请输入收货人姓名" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
+        [alert show];
+        [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:2];
+    }else if (self.addressTF.text.length == 0)
+    {
         UIAlertView * alert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"请输入地址" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
         [alert show];
         [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:2];
@@ -105,7 +131,8 @@
         UIAlertView * alert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"请输入电话号码" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
         [alert show];
         [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:2];
-    }else
+    }
+    else
     {
         BOOL isPhoneNum = [NSString isTelPhoneNub:self.telTF.text];
         if (isPhoneNum) {
@@ -143,7 +170,7 @@
                                @"UserId":[UserInfo shareUserInfo].userId,
                                @"Address":self.addressTF.text,
                                @"PhoneNumber":self.telTF.text,
-                               @"UserName":[UserInfo shareUserInfo].name
+                               @"UserName":self.receiveNameTF.text
                                };
     [self playPostWithDictionary:jsonDic];
 }
@@ -155,7 +182,7 @@
                                @"UserId":[UserInfo shareUserInfo].userId,
                                @"Address":self.addressTF.text,
                                @"PhoneNumber":self.telTF.text,
-                               @"UserName":[UserInfo shareUserInfo].name,
+                               @"UserName":self.receiveNameTF.text,
                                @"AddressId":self.addressModel.addressId
                                };
     [self playPostWithDictionary:jsonDic];

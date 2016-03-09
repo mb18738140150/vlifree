@@ -326,7 +326,7 @@
                 self.addressLB.text = [NSString stringWithFormat:@"送餐地址:%@", addressMD.address];
                 CGSize size = [_addressLB sizeThatFits:CGSizeMake(_addressLB.width, MAXFLOAT)];
                 _addressLB.height = size.height;
-                self.telLabel.text = addressMD.phoneNumber;
+                self.telLabel.text = [NSString stringWithFormat:@"姓名:%@ 电话:%@", addressMD.receiveName, addressMD.phoneNumber];
                 [self reloadViewsFrame];
                 [self.addressTableView selectRowAtIndexPath:[NSIndexPath indexPathForRow:seletNum inSection:0] animated:YES scrollPosition:UITableViewScrollPositionNone];
             }

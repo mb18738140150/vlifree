@@ -741,6 +741,7 @@
             self.orderID = [data objectForKey:@"WakeOutOrder"];
             NSNumber * payType = [data objectForKey:@"PayType"];
             if ([payType isEqualToNumber:@1]) {
+                
                 NSMutableDictionary *signParams = [NSMutableDictionary dictionary];
                 [signParams setObject: [NSString stringWithFormat:@"%@", [data objectForKey:@"AppId"]]       forKey:@"appid"];
                 [signParams setObject: [NSString stringWithFormat:@"%@", [data objectForKey:@"NonceStr"]]    forKey:@"noncestr"];
@@ -828,9 +829,8 @@
                 if (signedString != nil) {
                     orderString = [NSString stringWithFormat:@"%@&sign=\"%@\"&sign_type=\"%@\"",
                                    orderSpec, signedString, @"RSA"];
-                    
                     [[AlipaySDK defaultService] payOrder:orderString fromScheme:appScheme callback:^(NSDictionary *resultDic) {
-                        NSLog(@"reslut = %@",resultDic);
+                        NSLog(@" ****长*****  reslut = %@",resultDic);
                         [self pushFinishOrderVC];
                     }];
                     

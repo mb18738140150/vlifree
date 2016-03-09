@@ -22,6 +22,10 @@
  */
 @property (nonatomic, strong)NSNumber * addressId;
 /**
+ *  收货人姓名
+ */
+@property (nonatomic, strong)NSNumber * receiveName;
+/**
  *  是否默认地址
  */
 @property (nonatomic, strong)NSNumber * isDefault;

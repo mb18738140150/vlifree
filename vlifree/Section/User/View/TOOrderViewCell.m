@@ -177,6 +177,7 @@
     //    [matter setTimeZone:[NSTimeZone timeZoneWithAbbreviation:@"GMT"]];
     matter.dateFormat = @"yyyy/MM/dd HH:mm:ss";
     NSDate * date = [matter dateFromString:dateStr];
+    NSString * dateStr1 = [matter stringFromDate:date];
     NSTimeInterval secondsPerDay = 24.0 * 60.0 * 60.0;
     NSDate *today = [NSDate date];
     NSDate *yesterday;
@@ -189,12 +190,12 @@
     NSString * dateString = [[date description] substringToIndex:10];
     
     if ([dateString isEqualToString:todayString]) {
-        return [NSString stringWithFormat:@"今天 %@", [dateStr substringFromIndex:10]];
+        return [NSString stringWithFormat:@"今天 %@", [dateStr1 substringFromIndex:10]];
     }else if ([dateString isEqualToString:yesterdayString])
     {
-        return [NSString stringWithFormat:@"昨天 %@", [dateStr substringFromIndex:10]];
+        return [NSString stringWithFormat:@"昨天 %@", [dateStr1 substringFromIndex:10]];
     }
-    return dateStr;
+    return dateStr1;
 }
 
 

@@ -89,6 +89,9 @@
  *  是否已经评论
  */
 @property (nonatomic, strong)NSNumber * isComment;
+@property (nonatomic, strong)NSNumber * reduceCard;//优惠券
+@property (nonatomic, strong)NSNumber * discount;//打折
+@property (nonatomic, strong)NSNumber * internal;//积分
 /**
  *  初始化方法
  *
