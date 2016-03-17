@@ -26,6 +26,10 @@
 
 #import <AlipaySDK/AlipaySDK.h>
 
+#import "AFNetworking.h"
+#import <AFNetworkReachabilityManager.h>
+#import "Reachability.h"
+
 #define COUNT 15
 #define APP_ID_WX @"wxaac5e5f7421e84ac"
 #define APP_SECRET_WX @"055e7e10c698b7b140511d8d1a73cec4"

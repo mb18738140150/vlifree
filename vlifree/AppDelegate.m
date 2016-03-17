@@ -20,12 +20,13 @@
 #import "FinishOrderViewController.h"
 #import "GSPayViewController.h"
 #import "DetailsTOOrderViewController.h"
+#import "Net.h"
 
 @interface AppDelegate ()<WXApiDelegate, HTTPPostDelegate, BMKGeneralDelegate>
 
 
 @property (nonatomic, strong)MyTabBarController * myTabBarVC;
-
+@property (nonatomic,  strong)UIAlertView * netalert;
 
 @end
 
@@ -45,6 +46,20 @@
     // Override point for customization after application launch.
     self.window.backgroundColor = [UIColor whiteColor];
     [self.window makeKeyAndVisible];
+    
+    // 检测网络变化
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(reachabilitysHHHChanged:)
+                                                 name: kNetReachabilityChangedNotification
+                                               object: nil];
+    
+    //初始化Reachability类，并添加一个监测的网址。
+    Net * hostReach = [Net reachabilityWithHostName:@"https://api.app.net/"];
+    //开始监测
+    [hostReach startNotifier];
+    
+    
     
     self.myTabBarVC = [[MyTabBarController alloc] init];
     self.window.rootViewController = _myTabBarVC;
@@ -76,6 +91,30 @@
         [self playPostWithDictionary:dic];
     }
     return YES;
+}
+#pragma mark - 网络变化通知
+- (void)reachabilitysHHHChanged:(NSNotification *)notification
+{
+//    NSLog(@"*******网络发生变化******");
+    Net * reach = [notification object];
+    if ([reach isKindOfClass:[Net class]]) {
+        NetworkStatus status = [reach currentReachabilityStatus];
+        if (status == NotReachable) {
+//            NSLog(@"*******网络断开******");
+            if (self.netalert) {
+//                NSLog(@"不该走了");
+            }else
+            {
+                self.netalert = [[UIAlertView alloc] initWithTitle:@"友情提示" message:@"网络不给力,请检查网络" delegate:self cancelButtonTitle:nil otherButtonTitles:@"确定", nil];
+                [self.netalert show];
+            }
+        }else if (status == ReachableViaWWAN || status == ReachableViaWiFi)
+        {
+//            NSLog(@"*******网络连接上******");
+            [self.netalert performSelector:@selector(dismiss) withObject:nil];
+            self.netalert = nil;
+        }
+    }
 }
 
 - (void)onReq:(BaseReq *)req
@@ -228,9 +267,14 @@
 - (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation
 {
     NSString * str = [url absoluteString];
-    NSLog(@"sourceApplication%@ ****** %@", sourceApplication, str);
+//    NSLog(@"sourceApplication%@ ****** %@", sourceApplication, str);
     
     if ([sourceApplication containsString:@"alipay"]) {
+        
+//        NSString * 
+        
+        
+        
         [[AlipaySDK defaultService] processOrderWithPaymentResult:url standbyCallback:^(NSDictionary *resultDic) {
             NSLog(@"****短**** result = %@",resultDic);
             

@@ -279,6 +279,7 @@
 		736E94EB1C2E3019006176AE /* AlipaySDK.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 736E94EA1C2E3019006176AE /* AlipaySDK.bundle */; };
 		736E94EE1C2E3BC7006176AE /* PropertyModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 736E94ED1C2E3BC7006176AE /* PropertyModel.m */; };
 		736E94F11C2E6B46006176AE /* PropertyView.m in Sources */ = {isa = PBXBuildFile; fileRef = 736E94F01C2E6B46006176AE /* PropertyView.m */; };
+		73731CB21C9931E3009F870D /* Net.m in Sources */ = {isa = PBXBuildFile; fileRef = 73731CB11C9931E3009F870D /* Net.m */; };
 		73735B6B1B4FB3650030D9BB /* BaiduMapAPI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73735B6A1B4FB3650030D9BB /* BaiduMapAPI.framework */; };
 		737377861B311AC900FA668C /* PhoneViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 737377851B311AC900FA668C /* PhoneViewController.m */; };
 		737377891B3128C700FA668C /* TakeOutOrderMD.m in Sources */ = {isa = PBXBuildFile; fileRef = 737377881B3128C700FA668C /* TakeOutOrderMD.m */; };
@@ -372,6 +373,7 @@
 		73D65ABB1B1319B6002A22FE /* ShoppingCartView.m in Sources */ = {isa = PBXBuildFile; fileRef = 73D65ABA1B1319B6002A22FE /* ShoppingCartView.m */; };
 		73D65ABD1B131B8B002A22FE /* shoppingCar.png in Resources */ = {isa = PBXBuildFile; fileRef = 73D65ABC1B131B8B002A22FE /* shoppingCar.png */; };
 		73FC199A1C71C775001CBAE8 /* back_money.png in Resources */ = {isa = PBXBuildFile; fileRef = 73FC19991C71C775001CBAE8 /* back_money.png */; };
+		A9F15B8E5AF4447412C7C766 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8A85160B12179A9CC646DF19 /* libPods.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -385,6 +387,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		3DFF3D7F17A2ECD732B04131 /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
 		730384E01B267CFF007C7ACB /* TakeOutModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TakeOutModel.h; sourceTree = "<group>"; };
 		730384E11B267CFF007C7ACB /* TakeOutModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TakeOutModel.m; sourceTree = "<group>"; };
 		730385121B269145007C7ACB /* SearchViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SearchViewController.h; sourceTree = "<group>"; };
@@ -891,6 +894,8 @@
 		736E94ED1C2E3BC7006176AE /* PropertyModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PropertyModel.m; sourceTree = "<group>"; };
 		736E94EF1C2E6B46006176AE /* PropertyView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PropertyView.h; sourceTree = "<group>"; };
 		736E94F01C2E6B46006176AE /* PropertyView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PropertyView.m; sourceTree = "<group>"; };
+		73731CB01C9931E3009F870D /* Net.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Net.h; sourceTree = "<group>"; };
+		73731CB11C9931E3009F870D /* Net.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Net.m; sourceTree = "<group>"; };
 		73735B6A1B4FB3650030D9BB /* BaiduMapAPI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = BaiduMapAPI.framework; sourceTree = "<group>"; };
 		737377841B311AC900FA668C /* PhoneViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PhoneViewController.h; sourceTree = "<group>"; };
 		737377851B311AC900FA668C /* PhoneViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PhoneViewController.m; sourceTree = "<group>"; };
@@ -1027,6 +1032,8 @@
 		73D65ABA1B1319B6002A22FE /* ShoppingCartView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShoppingCartView.m; sourceTree = "<group>"; };
 		73D65ABC1B131B8B002A22FE /* shoppingCar.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = shoppingCar.png; sourceTree = "<group>"; };
 		73FC19991C71C775001CBAE8 /* back_money.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = back_money.png; sourceTree = "<group>"; };
+		8180493168D81345026E245C /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
+		8A85160B12179A9CC646DF19 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1076,6 +1083,7 @@
 				73464F9F1B1D3CE4000C3E9D /* libstdc++.dylib in Frameworks */,
 				73464F9D1B1D3CDB000C3E9D /* libz.1.2.5.dylib in Frameworks */,
 				73464F9B1B1D3CAA000C3E9D /* CoreLocation.framework in Frameworks */,
+				A9F15B8E5AF4447412C7C766 /* libPods.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1089,6 +1097,23 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0A08A395BD8599A8C471804B /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				8180493168D81345026E245C /* Pods.debug.xcconfig */,
+				3DFF3D7F17A2ECD732B04131 /* Pods.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+		2477CB33367636F8CB61DC97 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				8A85160B12179A9CC646DF19 /* libPods.a */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		733819211B0ACB1E00E9F8AD = {
 			isa = PBXGroup;
 			children = (
@@ -1096,6 +1121,8 @@
 				733819401B0ACB1F00E9F8AD /* vlifreeTests */,
 				73464F731B1D3B3E000C3E9D /* Framework */,
 				7338192B1B0ACB1E00E9F8AD /* Products */,
+				0A08A395BD8599A8C471804B /* Pods */,
+				2477CB33367636F8CB61DC97 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -1171,6 +1198,8 @@
 				7357A2691B1FDC0100993A87 /* NSString+NSString_MD5.m */,
 				7357A26A1B1FDC0100993A87 /* HTTPPost.h */,
 				7357A26B1B1FDC0100993A87 /* HTTPPost.m */,
+				73731CB01C9931E3009F870D /* Net.h */,
+				73731CB11C9931E3009F870D /* Net.m */,
 				735B750E1B21307C0021D2F9 /* UserLocation.h */,
 				735B750F1B21307C0021D2F9 /* UserLocation.m */,
 				735F9C681B2AC6C700AE94D1 /* UserInfo.h */,
@@ -2183,9 +2212,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 733819471B0ACB1F00E9F8AD /* Build configuration list for PBXNativeTarget "vlifree" */;
 			buildPhases = (
+				F5EA0035530F33F03D1239F7 /* Check Pods Manifest.lock */,
 				733819261B0ACB1E00E9F8AD /* Sources */,
 				733819271B0ACB1E00E9F8AD /* Frameworks */,
 				733819281B0ACB1E00E9F8AD /* Resources */,
+				3867931DE4A4B4CF6DA5F209 /* Embed Pods Frameworks */,
+				DB785DB819C4859C3DBBDA86 /* Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -2411,6 +2443,54 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		3867931DE4A4B4CF6DA5F209 /* Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods/Pods-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		DB785DB819C4859C3DBBDA86 /* Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods/Pods-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		F5EA0035530F33F03D1239F7 /* Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		733819261B0ACB1E00E9F8AD /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -2515,6 +2595,7 @@
 				737641631B54A1C6000E9BBC /* MJRefreshAutoStateFooter.m in Sources */,
 				737641621B54A1C6000E9BBC /* MJRefreshAutoNormalFooter.m in Sources */,
 				7359086E1B33F69E005143E4 /* IQUITextFieldView+Additions.m in Sources */,
+				73731CB21C9931E3009F870D /* Net.m in Sources */,
 				730384E21B267CFF007C7ACB /* TakeOutModel.m in Sources */,
 				7350D38F1C27DD3500B99FEA /* OnlinePayViewController.m in Sources */,
 				735326701B535A5E004EEBAF /* JGProgressHUDAnimation.m in Sources */,
@@ -2713,6 +2794,7 @@
 		};
 		733819481B0ACB1F00E9F8AD /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8180493168D81345026E245C /* Pods.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
@@ -2735,7 +2817,7 @@
 					"$(PROJECT_DIR)/vlifree/Vendors",
 				);
 				INFOPLIST_FILE = vlifree/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -2756,11 +2838,13 @@
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "9d006c1a-826f-41c7-ae8d-11910c07e444";
+				VALID_ARCHS = "armv7 armv7s arm64";
 			};
 			name = Debug;
 		};
 		733819491B0ACB1F00E9F8AD /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3DFF3D7F17A2ECD732B04131 /* Pods.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
@@ -2783,7 +2867,7 @@
 					"$(PROJECT_DIR)/vlifree/Vendors",
 				);
 				INFOPLIST_FILE = vlifree/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -2804,6 +2888,7 @@
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "9d006c1a-826f-41c7-ae8d-11910c07e444";
+				VALID_ARCHS = "armv7 armv7s arm64";
 			};
 			name = Release;
 		};

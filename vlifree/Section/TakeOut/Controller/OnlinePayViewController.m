@@ -831,7 +831,30 @@
                                    orderSpec, signedString, @"RSA"];
                     [[AlipaySDK defaultService] payOrder:orderString fromScheme:appScheme callback:^(NSDictionary *resultDic) {
                         NSLog(@" ****长*****  reslut = %@",resultDic);
-                        [self pushFinishOrderVC];
+                        
+                        NSString * resultString = [resultDic objectForKey:@"result"];
+                        NSString * resultStr = nil;
+                        
+                        NSArray * rsultStringArray = [resultString componentsSeparatedByString:NSLocalizedString(@"&", nil)];
+                        for (NSString * str in rsultStringArray) {
+                            NSString * newString = nil;
+                            newString = [str stringByReplacingOccurrencesOfString:@"\"" withString:@""];
+                            NSArray * strArray = [newString componentsSeparatedByString:NSLocalizedString(@"=", nil)];
+                            if ([[strArray objectAtIndex:0] isEqualToString:@"success"] && [[strArray objectAtIndex:1] boolValue] == 1) {
+                                resultStr = @"true";
+                                break;
+                            }
+                        }
+                        
+                        if ([resultDic[@"resultStatus"] integerValue] == 9000 && [resultStr isEqualToString:@"true"]) {
+                            NSLog(@"****支付成功**");
+                            [self pushFinishOrderVC];
+                        }else
+                        {
+                            NSLog(@"****支付出现问题*****");
+                            [self pushFinishOrderVC];
+                        }
+                        
                     }];
                     
                 }
