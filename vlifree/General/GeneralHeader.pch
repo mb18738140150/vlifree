@@ -41,7 +41,7 @@
  *
  *  @return
  */
-//#define POST_URL @"http://p.vlifee.com/User_getdata.ashx?md5="
+//#define POST_URL @"http://p3o1r7t.vlifee.com/User_getdata.ashx?md5="
 /**
  *  测试库URL
  *

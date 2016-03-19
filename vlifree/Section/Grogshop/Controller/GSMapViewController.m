@@ -7,8 +7,8 @@
 //
 
 #import "GSMapViewController.h"
-
-@interface GSMapViewController ()<BMKMapViewDelegate, BMKLocationServiceDelegate, BMKGeoCodeSearchDelegate>
+#import "PoiAnnotation.h"
+@interface GSMapViewController ()< QMapViewDelegate, QMSSearchDelegate>
 
 
 @property (nonatomic, strong)BMKMapView * mapView;
@@ -16,8 +16,13 @@
 @property (nonatomic, strong)BMKGeoCodeSearch * geoSearcher;
 @property (nonatomic, assign)id annotation;
 
-
-
+// 腾讯地图
+@property (nonatomic, strong) QMapView * qMapView;
+@property (nonatomic, strong) QMSSearcher * mapSearcher;
+@property (nonatomic, strong) QMSSuggestionResult * suggestionResult;
+@property (nonatomic, strong) QMSGeoCodeSearchResult * geoResult;
+@property (nonatomic, strong) QMSReverseGeoCodeSearchResult *reGeoResult;
+@property (nonatomic, assign) CLLocationCoordinate2D longPressedCoordinate;
 @end
 
 @implementation GSMapViewController
@@ -27,7 +32,7 @@
     self.navigationItem.title = @"地图";
 
     self.mapView = [[BMKMapView alloc] initWithFrame:self.view.bounds];
-    _mapView.delegate = self;
+//    _mapView.delegate = self;
     _mapView.zoomLevel = 18.5;
     _mapView.userTrackingMode = BMKUserTrackingModeFollow;
     _mapView.showMapScaleBar = YES;
@@ -43,7 +48,7 @@
     [_mapView addAnnotation:annotation];
     [_mapView setCenterCoordinate:annotation.coordinate animated:YES];
     
-    [self.view addSubview:_mapView];
+//    [self.view addSubview:_mapView];
     
     //设置定位精确度，默认：kCLLocationAccuracyBest
 //    [BMKLocationService setLocationDesiredAccuracy:kCLLocationAccuracyBest];
@@ -52,13 +57,13 @@
 //    
     //初始化BMKLocationService
     self.locService = [[BMKLocationService alloc]init];
-    _locService.delegate = self;
+//    _locService.delegate = self;
     //    [BMKLocationService setLocationDesiredAccuracy:kCLLocationAccuracyBest];
     //启动LocationService
     [_locService startUserLocationService];
     
     self.geoSearcher =[[BMKGeoCodeSearch alloc]init];
-    _geoSearcher.delegate = self;
+//    _geoSearcher.delegate = self;
     
     
     UIButton * button = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -69,19 +74,35 @@
     button.backgroundColor = [UIColor colorWithWhite:0.7 alpha:1];
     button.hidden = YES;
     [button addTarget:self action:@selector(skipBaiduMap:) forControlEvents:UIControlEventTouchUpInside];
-    [self.view addSubview:button];
+//    [self.view addSubview:button];
     
     //    NSString * mapUrlStr = [NSString stringWithFormat:@"baidumap://map/marker?location=%@,%@&title=%@&content=%@&zoom=19&coord_type=bd09ll&src=微生活", self.lat, self.lon, self.gsName, self.address];
     //    NSString * mapUrlStr = @"baidumap://map/marker?location=40.047669,116.313082&title=我的位置&content=百度奎科大厦&src=yourCompanyName|yourAppName";
-    BOOL isHaveBDMap = [[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"baidumap://"]];
-    if (isHaveBDMap) {
-        button.hidden = NO;
-        //        NSLog(@"url = %@", mapUrlStr);
-        //        NSString * newUrlStr = [mapUrlStr stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-        //        BOOL a = [[UIApplication sharedApplication] openURL:[NSURL URLWithString:newUrlStr]];
-        //        NSLog(@"a = %d", a);
-    }
+//    BOOL isHaveBDMap = [[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"baidumap://"]];
+//    if (isHaveBDMap) {
+//        button.hidden = NO;
+//        //        NSLog(@"url = %@", mapUrlStr);
+//        //        NSString * newUrlStr = [mapUrlStr stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+//        //        BOOL a = [[UIApplication sharedApplication] openURL:[NSURL URLWithString:newUrlStr]];
+//        //        NSLog(@"a = %d", a);
+//    }
     
+    // 腾讯地图
+    self.qMapView = [[QMapView alloc]initWithFrame:self.view.bounds];
+    self.qMapView.delegate = self;
+    [self.view addSubview:self.qMapView];
+    self.qMapView.showsUserLocation = NO;
+    self.qMapView.zoomLevel = 16;
+    
+    
+    self.longPressedCoordinate = (CLLocationCoordinate2D){[self.lat doubleValue], [self.lon doubleValue]};
+    [self.qMapView setCenterCoordinate:self.longPressedCoordinate];
+    
+    self.mapSearcher = [[QMSSearcher alloc]initWithDelegate:self];
+    QMSReverseGeoCodeSearchOption *reGeoSearchOption = [[QMSReverseGeoCodeSearchOption alloc] init];
+    [reGeoSearchOption setLocationWithCenterCoordinate:coor];
+    [reGeoSearchOption setGet_poi:YES];
+    [self.mapSearcher searchWithReverseGeoCodeSearchOption:reGeoSearchOption];
     
     UIButton * backBT = [UIButton buttonWithType:UIButtonTypeCustom];
     backBT.frame = CGRectMake(0, 0, 15, 20);
@@ -98,7 +119,46 @@
 {
     [self.navigationController popViewControllerAnimated:YES];
 }
+#pragma mark - 腾讯反地理编码
+- (void)searchWithReverseGeoCodeSearchOption:(QMSReverseGeoCodeSearchOption *)reverseGeoCodeSearchOption didReceiveResult:(QMSReverseGeoCodeSearchResult *)reverseGeoCodeSearchResult
+{
+    self.reGeoResult = reverseGeoCodeSearchResult;
+    [self setupAnnotation1];
+}
+- (void)setupAnnotation1
+{
+    
+    [self.qMapView removeAnnotations:self.qMapView.annotations];
+    
+    PoiAnnotation *annotation = [[PoiAnnotation alloc] initWithPoiData:self.reGeoResult];
+    [annotation setTitle:self.reGeoResult.address];
+    [annotation setCoordinate:self.longPressedCoordinate];
+    
+    [self.qMapView addAnnotation:annotation];
+}
 
+- (QAnnotationView *)mapView:(QMapView *)mapView viewForAnnotation:(id<QAnnotation>)annotation
+{
+    //    if ([annotation isKindOfClass:[QAnnotationView class]]) {
+    NSLog(@"[annotation class] = %@", [annotation class]);
+    static NSString * pointReuseIndetifier = @"pointReuseIndetifier";
+    QPinAnnotationView * annotationView = (QPinAnnotationView *)[mapView dequeueReusableAnnotationViewWithIdentifier:pointReuseIndetifier];
+    if (annotationView == nil) {
+        annotationView = [[QPinAnnotationView alloc]initWithAnnotation:annotation reuseIdentifier:pointReuseIndetifier];
+    }
+    
+    annotationView.animatesDrop = YES;
+    //            annotationView.draggable = YES;
+    annotationView.canShowCallout = YES;
+    
+    //            annotationView.leftCalloutAccessoryView = [UIButton buttonWithType:UIButtonTypeDetailDisclosure];
+    return annotationView;
+    
+    
+}
+
+#pragma mark - 百度地图
+/*
 
 - (void)skipBaiduMap:(UIButton *)button
 {
@@ -194,7 +254,7 @@
     [_mapView viewWillDisappear];
     _mapView.delegate = nil; // 不用时，置nil
 }
-
+*/
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     

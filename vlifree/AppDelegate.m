@@ -74,6 +74,10 @@
     BMKMapManager * mapManager = [[BMKMapManager alloc] init];
     [mapManager start:@"4Fra3gSOChrExioQUdEq54dk" generalDelegate:self];
     
+    // 初始化腾讯地图
+    [[QMapServices sharedServices] setApiKey:@"HZ4BZ-JX7RF-M6BJ7-NQRVB-HX3SH-TGF4Z"];
+    [[QMSSearchServices sharedServices] setApiKey:@"HZ4BZ-JX7RF-M6BJ7-NQRVB-HX3SH-TGF4Z"];
+    
     [APService registerForRemoteNotificationTypes:(UIUserNotificationTypeAlert |
                                                    UIUserNotificationTypeBadge |
                                                    UIUserNotificationTypeSound)
@@ -95,14 +99,19 @@
 #pragma mark - 网络变化通知
 - (void)reachabilitysHHHChanged:(NSNotification *)notification
 {
-//    NSLog(@"*******网络发生变化******");
+    NSLog(@"*******网络发生变化******");
+    
+    
+    NSLog(@"%@", notification.object);
+    
     Net * reach = [notification object];
     if ([reach isKindOfClass:[Net class]]) {
         NetworkStatus status = [reach currentReachabilityStatus];
+        NSLog(@"%d", status);
         if (status == NotReachable) {
-//            NSLog(@"*******网络断开******");
+            NSLog(@"*******网络断开******");
             if (self.netalert) {
-//                NSLog(@"不该走了");
+                NSLog(@"不该走了");
             }else
             {
                 self.netalert = [[UIAlertView alloc] initWithTitle:@"友情提示" message:@"网络不给力,请检查网络" delegate:self cancelButtonTitle:nil otherButtonTitles:@"确定", nil];

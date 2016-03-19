@@ -8,6 +8,9 @@
 
 #import <UIKit/UIKit.h>
 
+#import <QMapKit/QMapKit.h>
+#import <QMapSearchKit/QMapSearchKit.h>
+
 @interface GSMapViewController : UIViewController
 /**
  *  酒店名

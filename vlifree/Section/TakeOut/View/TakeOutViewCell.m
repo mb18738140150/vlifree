@@ -108,7 +108,7 @@
     */
     
         
-        self.firstOrderV = [[UIView alloc] initWithFrame:CGRectMake(_addressLabel.left, _addressLabel.bottom, _addressLabel.width, _addressLabel.height)];
+        self.firstOrderV = [[UIView alloc] initWithFrame:CGRectMake(_icon.left, _addressLabel.bottom, self.width - 2 * LEFT_SPACE, _addressLabel.height)];
         UIImageView * firstIM = [[UIImageView alloc] initWithFrame:CGRectMake(0, 3, _firstOrderV.height - 6, _firstOrderV.height - 6)];
         firstIM.image = [UIImage imageNamed:@"shou.png"];
         [_firstOrderV addSubview:firstIM];
@@ -120,7 +120,7 @@
         [_firstOrderV addSubview:firstLB];
         [self.contentView addSubview:_firstOrderV];
         
-        self.fullOrderV = [[UIView alloc] initWithFrame:CGRectMake(_firstOrderV.left, _firstOrderV.bottom, _firstOrderV.width, _firstOrderV.height)];
+        self.fullOrderV = [[UIView alloc] initWithFrame:CGRectMake(_firstOrderV.left, _firstOrderV.bottom, self.width - 2 * LEFT_SPACE, _firstOrderV.height)];
         UIImageView * fullIM = [[UIImageView alloc] initWithFrame:CGRectMake(0, 3, _fullOrderV.height - 6, _fullOrderV.height - 6)];
         fullIM.image = [UIImage imageNamed:@"jian.png"];
         [_fullOrderV addSubview:fullIM];
@@ -140,7 +140,7 @@
 + (CGFloat)cellHeightWithTakeOutModel:(TakeOutModel *)takeOutModel
 {
 //    CGFloat height = 2 * TOP_SPACE + IMAGE_SIZE + takeOutModel.activityArray.count * LABEL_HEIGTH;
-    CGFloat height = 2 * TOP_SPACE + IMAGE_SIZE;
+    CGFloat height = 3 * TOP_SPACE + IMAGE_SIZE;
     if ([takeOutModel.isFirstOrder isEqualToNumber:@YES]) {
         height += LABEL_HEIGTH;
     }
@@ -194,7 +194,7 @@
     */
     
     if ([takeOutModel.isFirstOrder isEqualToNumber:@YES]) {
-        self.firstOrderV.frame = CGRectMake(_addressLabel.left, _addressLabel.bottom, _addressLabel.width, _addressLabel.height);
+        self.firstOrderV.frame = CGRectMake(_icon.left, _addressLabel.bottom + TOP_SPACE, self.width - 2 * LEFT_SPACE, _addressLabel.height);
         self.firstOrderV.hidden = NO;
         UILabel * aLabel = (UILabel *)[self.firstOrderV viewWithTag:2000];
         for (ActivityReduce * activity in takeOutModel.activityArray) {
@@ -204,7 +204,7 @@
         }
     }else
     {
-        self.firstOrderV.frame = CGRectMake(_addressLabel.left, _addressLabel.bottom, _addressLabel.width, 0);
+        self.firstOrderV.frame = CGRectMake(_icon.left, _addressLabel.bottom+ TOP_SPACE, self.width - 2 * LEFT_SPACE, 0);
         self.firstOrderV.hidden = YES;
     }
     if ([takeOutModel.isFull isEqualToNumber:@YES]) {
