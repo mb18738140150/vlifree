@@ -12,7 +12,7 @@
 @interface AddAddressViewController ()<UITextFieldDelegate, HTTPPostDelegate>
 
 /**
- *  地址输入框
+ *  联系人输入框
  */
 @property (nonatomic, strong)UITextField * receiveNameTF;
 
@@ -89,6 +89,7 @@
     [self.view addSubview:saveButton];
     
     if (_addressModel) {
+        _receiveNameTF.text = _addressModel.receiveName;
         _addressTF.text = _addressModel.address;
         _telTF.text = _addressModel.phoneNumber;
     }
@@ -101,7 +102,16 @@
     
     // Do any additional setup after loading the view.
 }
-
+- (void)viewWillAppear:(BOOL)animated
+{
+    [self.navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"1px.png"] forBarMetrics:UIBarMetricsDefault];
+    [self.navigationController.navigationBar setShadowImage:nil];
+}
+- (void)viewWillDisappear:(BOOL)animated
+{
+    [self.navigationController.navigationBar setShadowImage:nil];
+    [self.navigationController.navigationBar setBackgroundImage:nil forBarMetrics:UIBarMetricsDefault];
+}
 
 - (void)backLastVC:(id)sender
 {

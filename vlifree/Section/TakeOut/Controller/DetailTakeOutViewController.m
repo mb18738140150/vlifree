@@ -23,6 +23,7 @@
 #import "GSMapViewController.h"
 #import "PropertyModel.h"
 #import "PropertyView.h"
+#import "CollectStroeDB.h"
 
 #define SECTION_TABLEVIEW_CELL @"SECTIONCELL"
 #define MENUS_TABLEVIEW_CELL @"MENUSCELL"
@@ -126,6 +127,14 @@
 // 弹出框
 @property (nonatomic, strong)UIView * tanchuView;
 @property (nonatomic, strong)MenuModel * menuModel;
+
+@property (nonatomic, strong)UISegmentedControl * segment;
+@property (nonatomic, strong)UIView * segmentView;
+
+@property (nonatomic, strong)CollectStroeDB * collectDB;
+@property (nonatomic, strong)CollectStoreModel * collectModel;
+@property (nonatomic, strong)UIButton * collectBT;
+
 @end
 
 @implementation DetailTakeOutViewController
@@ -185,11 +194,16 @@
 //    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"评论" style:UIBarButtonItemStylePlain target:self action:@selector(lookComment:)];
 //    [self addObserver:self forKeyPath:@"shopArray" options:NSKeyValueObservingOptionNew context:nil];
     
-    self.segmentC = [[HYSegmentedControl alloc] initWithOriginY:0 Titles:@[@"点菜", @"评论",@"简介"] delegate:self];
+//    self.segmentC = [[HYSegmentedControl alloc] initWithOriginY:45 Titles:@[@"点菜", @"评论",@"简介"] delegate:self];
 //    self.segmentC = [[HYSegmentedControl alloc] initWithOriginY:0 Titles:@[@"点菜", @"评论", @"简介"] delegate:self];
-    [self.view addSubview:_segmentC];
+//    self.navigationItem.titleView = _segmentC;
+    //    [self.view addSubview:_segmentC];
     
-    self.aScrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, _segmentC.bottom, self.view.width, self.view.height - self.navigationController.navigationBar.bottom - _segmentC.height)];
+    self.collectDB = [[CollectStroeDB alloc]init];
+    
+    [self addHeadView];
+    
+    self.aScrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, self.view.height - self.navigationController.navigationBar.bottom )];
 //    _aScrollView.backgroundColor = [UIColor redColor];
     _aScrollView.delegate = self;
     _aScrollView.pagingEnabled = YES;
@@ -328,6 +342,21 @@
     [backBT addTarget:self action:@selector(backLastVC:) forControlEvents:UIControlEventTouchUpInside];
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:backBT];
     
+    self.collectBT = [UIButton buttonWithType:UIButtonTypeCustom];
+    _collectBT.frame = CGRectMake(0, 0, 25, 25);
+    [_collectBT setBackgroundImage:[UIImage imageNamed:@"collection.png"] forState:UIControlStateNormal];
+    [_collectBT setBackgroundImage:[UIImage imageNamed:@"collection1.png"] forState:UIControlStateSelected];
+    [_collectBT addTarget:self action:@selector(collectAction:) forControlEvents:UIControlEventTouchUpInside];
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:_collectBT];
+    
+    self.collectModel = [[CollectStoreModel alloc]init];
+    _collectModel.businessName = self.storeName;
+    _collectModel.businessId = self.takeOutID.intValue;
+    _collectModel.businessType = 2;
+    if ([self.collectDB retrieveList:_collectModel]) {
+        _collectBT.selected = YES;
+    }
+    
     
     [self downloadData];
     
@@ -340,11 +369,88 @@
     // Do any additional setup after loading the view.
 }
 
+#pragma mark - 收藏店铺
+- (void)collectAction:(UIButton *)button
+{
+    if (button.selected) {
+        // 取消收藏
+        NSDictionary * jsonDic = @{
+                                   @"UserId":[UserInfo shareUserInfo].userId,
+                                   @"Command":@29,
+                                   @"Flag":@(_collectModel.businessType),
+                                   @"Id":@(_collectModel.businessId)
+                                   };
+        [self playPostWithDictionary:jsonDic];
+    }else
+    {
+        // 收藏
+        NSDictionary * jsonDic = @{
+                                   @"UserId":[UserInfo shareUserInfo].userId,
+                                   @"Command":@28,
+                                   @"Flag":@(_collectModel.businessType),
+                                   @"Id":@(_collectModel.businessId)
+                                   };
+        [self playPostWithDictionary:jsonDic];
+    }
+    NSLog(@"收藏");
+}
+
 #pragma mark - HYSegmentedControl 代理方法
 - (void)hySegmentedControlSelectAtIndex:(NSInteger)index
 {
 //    self.aScrollView.contentOffset = CGPointMake(index * _aScrollView.width, 0);
     [self.aScrollView setContentOffset:CGPointMake(index * _aScrollView.width, 0) animated:YES];
+}
+
+
+- (void)addHeadView
+{
+    self.segment = [[UISegmentedControl alloc] initWithItems:@[@"点  菜", @"评  论",@"简  介"]];
+    self.segment.tintColor = [UIColor clearColor];//去掉颜色,现在整个segment都看不见
+    self.segment.backgroundColor = [UIColor whiteColor];;
+    
+    NSDictionary* selectedTextAttributes = @{NSFontAttributeName:[UIFont boldSystemFontOfSize:16],
+                                             NSForegroundColorAttributeName: BACKGROUNDCOLOR};
+    [self.segment setTitleTextAttributes:selectedTextAttributes forState:UIControlStateSelected];//设置文字属性
+    NSDictionary* unselectedTextAttributes = @{NSFontAttributeName:[UIFont boldSystemFontOfSize:16],
+                                               NSForegroundColorAttributeName: [UIColor grayColor]};
+    [self.segment setTitleTextAttributes:unselectedTextAttributes forState:UIControlStateNormal];
+    self.segment.selectedSegmentIndex = 0;
+    _segment.frame = CGRectMake(20, 15, 180, 30);
+    [_segment addTarget:self action:@selector(changeDeliveryState:) forControlEvents:UIControlEventValueChanged];
+    self.segmentView = [[UIView alloc]initWithFrame:CGRectMake(20, 52, 60, 1)];
+    self.segmentView.backgroundColor = [UIColor orangeColor];
+    
+    UIView * hearderView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, 60)];
+    hearderView.backgroundColor = [UIColor clearColor];
+    [hearderView addSubview:_segment];
+        [hearderView addSubview:_segmentView];
+    self.navigationItem.titleView = hearderView;
+
+}
+- (void)changeDeliveryState:(UISegmentedControl *)segment
+{
+    if (self.segment.selectedSegmentIndex == 2) {
+        [self.aScrollView setContentOffset:CGPointMake(self.segment.selectedSegmentIndex * _aScrollView.width, 0) animated:YES];
+        [UIView animateWithDuration:0.35 animations:^{
+            _segmentView.frame = CGRectMake(140, 52, 60, 1);
+            
+        }];
+    }else if (segment.selectedSegmentIndex == 1) {
+        [self.aScrollView setContentOffset:CGPointMake(self.segment.selectedSegmentIndex * _aScrollView.width, 0) animated:YES];
+        [UIView animateWithDuration:0.35 animations:^{
+            _segmentView.frame = CGRectMake(80, 52, 60, 1);
+            
+        }];
+    }else if (segment.selectedSegmentIndex == 0)
+    {
+        [self.aScrollView setContentOffset:CGPointMake(self.segment.selectedSegmentIndex * _aScrollView.width, 0) animated:YES];
+        [UIView animateWithDuration:0.35 animations:^{
+            _segmentView.frame = CGRectMake(20, 52, 60, 1);
+            
+        }];
+    }
+    
 }
 
 
@@ -698,6 +804,30 @@
             self.introView.DeliveryDis.text = [data objectForKey:@"DeliveryDis"];
             self.lat = [data objectForKey:@"StoreLat"];
             self.lon = [data objectForKey:@"StoreLon"];
+        }else if ([[data objectForKey:@"Command"]isEqualToNumber:@10028])
+        {
+            if ([self.collectDB insert:_collectModel]) {
+                NSLog(@"写入数据成功");
+            }else
+            {
+                NSLog(@"写入数据失败");
+            }
+            self.collectBT.selected = YES;
+            UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:@"收藏成功" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
+            [alert show];
+            [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:1.5];
+        }else if([[data objectForKey:@"Command"]isEqualToNumber:@10029])
+        {
+            if ([self.collectDB deletemodel:_collectModel]) {
+                NSLog(@"删除数据成功");
+            }else
+            {
+                NSLog(@"删除数据失败");
+            }
+            self.collectBT.selected = NO;
+            UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:@"取消收藏成功" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
+            [alert show];
+            [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:1.5];
         }
     }else
     {
@@ -1439,7 +1569,28 @@
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
 {
     if ([scrollView isEqual:_aScrollView]) {
-        [self.segmentC changeSegmentedControlWithIndex:scrollView.contentOffset.x / scrollView.width];
+        
+        self.segment.selectedSegmentIndex = scrollView.contentOffset.x / scrollView.width;
+        
+        
+        if (self.segment.selectedSegmentIndex == 2) {
+            [UIView animateWithDuration:0.35 animations:^{
+                _segmentView.frame = CGRectMake(140, 52, 60, 1);
+                
+            }];
+        }else if (self.segment.selectedSegmentIndex == 1) {
+            [UIView animateWithDuration:0.35 animations:^{
+                _segmentView.frame = CGRectMake(80, 52, 60, 1);
+                
+            }];
+        }else if (self.segment.selectedSegmentIndex == 0)
+        {
+            [UIView animateWithDuration:0.35 animations:^{
+                _segmentView.frame = CGRectMake(20, 52, 60, 1);
+                
+            }];
+        }
+        
     }
 }
 

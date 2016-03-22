@@ -10,7 +10,7 @@
 #import "GrogshopViewCell.h"
 #import "GrogshopHeaderView.h"
 #import "DetailsGrogshopViewController.h"
-
+#import "CollectStroeDB.h"
 
 #define CELL_INDENTIFIER @"CELL"
 @interface GrogshopViewController ()<UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate, HTTPPostDelegate>
@@ -53,7 +53,9 @@
  */
 @property (nonatomic, copy)NSString * keyWord;
 
+@property (nonatomic, strong)HotelModel * collectModel;
 
+@property (nonatomic, strong)CollectStroeDB * collectDB;
 
 @end
 
@@ -71,7 +73,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    
+    self.collectDB = [[CollectStroeDB alloc]init];
     self.cancelBT = [UIButton buttonWithType:UIButtonTypeCustom];
     _cancelBT.frame = CGRectMake(0, 0, 40, 30);
     [_cancelBT setTitle:@"取消" forState:UIControlStateNormal];
@@ -312,6 +314,17 @@
     if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
         if([[data objectForKey:@"Command"] isEqualToNumber:@10028])
         {
+            CollectStoreModel * collectMD = [[CollectStoreModel alloc]init];
+            collectMD.businessName = self.collectModel.hotelName;
+            collectMD.businessId = self.collectModel.hotelId.intValue;
+            collectMD.businessType = 1;
+            if ([self.collectDB insert:collectMD]) {
+                NSLog(@"写入数据成功");
+            }else
+            {
+                NSLog(@"写入数据失败");
+            }
+            
             UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:@"收藏成功" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
             [alert show];
             [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:1.5];
@@ -408,6 +421,7 @@
     cell.rightButtons = @[[MGSwipeButton buttonWithTitle:@"关注酒店" backgroundColor:[UIColor redColor] callback:^BOOL(MGSwipeTableCell *sender) {
         NSLog(@"111");
         if ([UserInfo shareUserInfo].userId) {
+            self.collectModel = hotelMD;
             NSDictionary * jsonDic = @{
                                        @"UserId":[UserInfo shareUserInfo].userId,
                                        @"Command":@28,
@@ -500,7 +514,6 @@
     UIView * view = [self.view.window viewWithTag:70000];
     [view removeFromSuperview];
 }
-
 
 
 

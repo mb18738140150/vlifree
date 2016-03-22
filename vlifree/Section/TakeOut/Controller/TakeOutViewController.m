@@ -15,6 +15,7 @@
 #import "MGSwipeTableCell.h"
 #import "TakeOutModel.h"
 #import "SearchViewController.h"
+#import "CollectStroeDB.h"
 
 #define CELL_INDENTIFIER @"cell"
 
@@ -80,6 +81,10 @@
 // 定位加载中动画
 @property (nonatomic, strong)UIImageView * loadingImageView;
 
+@property (nonatomic, strong)TakeOutModel * collectModel;
+
+@property (nonatomic, strong)CollectStroeDB * collectDB;
+
 @end
 
 @implementation TakeOutViewController
@@ -109,6 +114,8 @@
     self.navigationController.navigationBar.translucent = NO;
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSearch target:self action:@selector(searchTakeOut:)];
 
+    self.collectDB = [[CollectStroeDB alloc]init];
+    
     self.addressBT = [UIButton buttonWithType:UIButtonTypeCustom];
 //    _addressBT.frame = CGRectMake(0, 5, 200, 30);
 //    _addressBT.backgroundColor = [UIColor greenColor];
@@ -523,6 +530,17 @@
             
         }else if([[data objectForKey:@"Command"] isEqualToNumber:@10028])
         {
+            CollectStoreModel * collectMD = [[CollectStoreModel alloc]init];
+            collectMD.businessName = self.collectModel.storeName;
+            collectMD.businessId = self.collectModel.storeId.intValue;
+            collectMD.businessType = 2;
+            if ([self.collectDB insert:collectMD]) {
+                NSLog(@"写入数据成功");
+            }else
+            {
+                NSLog(@"写入数据失败");
+            }
+            
             UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:@"收藏成功" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
             [alert show];
             [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:1.5];
@@ -631,6 +649,7 @@
     __weak TakeOutViewController * takeOutVC = self;
     cell.rightButtons = @[[MGSwipeButton buttonWithTitle:@"关注商店" backgroundColor:[UIColor redColor] callback:^BOOL(MGSwipeTableCell *sender) {
         if ([UserInfo shareUserInfo].userId) {
+            self.collectModel = takeOutMD;
             NSDictionary * jsonDic = @{
                                        @"UserId":[UserInfo shareUserInfo].userId,
                                        @"Command":@28,

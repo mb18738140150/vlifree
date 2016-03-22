@@ -15,6 +15,7 @@
 #import "DetailsGrogshopViewController.h"
 #import "MGSwipeButton.h"
 #import "TakeOutViewController.h"
+#import "CollectStroeDB.h"
 
 #define CELL_INDENTIFIER @"cell"
 
@@ -62,6 +63,11 @@
 // 定位加载中动画
 @property (nonatomic, strong)UIImageView * loadingImageView;
 @property (nonatomic, strong)UIButton * locationBT;
+
+@property (nonatomic, strong)CollectModel * collectModel;
+
+@property (nonatomic, strong)CollectStroeDB * collectDB;
+
 @end
 
 @implementation HomeViewController
@@ -106,6 +112,8 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    self.collectDB = [[CollectStroeDB alloc]init];
     
     self.homeTableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, self.view.height) style:UITableViewStylePlain];
     _homeTableView.dataSource = self;
@@ -421,6 +429,17 @@
             [self.homeTableView reloadData];
         }else if([[data objectForKey:@"Command"] isEqualToNumber:@10029])
         {
+            CollectStoreModel * collectMD = [[CollectStoreModel alloc]init];
+            collectMD.businessName = self.collectModel.businessName;
+            collectMD.businessId = self.collectModel.businessId.intValue;
+            collectMD.businessType = self.collectModel.businessType.intValue;
+            if ([self.collectDB deletemodel:collectMD]) {
+                NSLog(@"删除数据成功");
+            }else
+            {
+                NSLog(@"删除数据失败");
+            }
+
             UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:@"删除成功" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
             [alert show];
             [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:1.5];
@@ -529,6 +548,7 @@
     __weak HomeViewController * homeVC = self;
     cell.rightButtons = @[[MGSwipeButton buttonWithTitle:@"取消收藏" backgroundColor:[UIColor redColor] callback:^BOOL(MGSwipeTableCell *sender) {
         if ([UserInfo shareUserInfo].userId) {
+            self.collectModel = collectMD;
             NSDictionary * jsonDic = @{
                                        @"UserId":[UserInfo shareUserInfo].userId,
                                        @"Command":@29,

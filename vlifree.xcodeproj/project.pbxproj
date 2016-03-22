@@ -354,6 +354,18 @@
 		7399919B1B6B197700D7E757 /* AutoSlideScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = 739991961B6B197700D7E757 /* AutoSlideScrollView.m */; };
 		7399919C1B6B197700D7E757 /* MyPageControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 739991981B6B197700D7E757 /* MyPageControl.m */; };
 		7399919D1B6B197700D7E757 /* NSTimer+Addition.m in Sources */ = {isa = PBXBuildFile; fileRef = 7399919A1B6B197700D7E757 /* NSTimer+Addition.m */; };
+		73A29B251CA0DE74005BA705 /* collection.png in Resources */ = {isa = PBXBuildFile; fileRef = 73A29B221CA0DE74005BA705 /* collection.png */; };
+		73A29B261CA0DE74005BA705 /* collection1.png in Resources */ = {isa = PBXBuildFile; fileRef = 73A29B231CA0DE74005BA705 /* collection1.png */; };
+		73A29B271CA0DE74005BA705 /* defaultaddress.png in Resources */ = {isa = PBXBuildFile; fileRef = 73A29B241CA0DE74005BA705 /* defaultaddress.png */; };
+		73A29B2B1CA0EA88005BA705 /* libsqlite3.0.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 73A29B2A1CA0EA88005BA705 /* libsqlite3.0.tbd */; };
+		73A29B381CA0EDDB005BA705 /* FMDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 73A29B2E1CA0EDDB005BA705 /* FMDatabase.m */; };
+		73A29B391CA0EDDB005BA705 /* FMDatabaseAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 73A29B301CA0EDDB005BA705 /* FMDatabaseAdditions.m */; };
+		73A29B3A1CA0EDDB005BA705 /* FMDatabasePool.m in Sources */ = {isa = PBXBuildFile; fileRef = 73A29B321CA0EDDB005BA705 /* FMDatabasePool.m */; };
+		73A29B3B1CA0EDDB005BA705 /* FMDatabaseQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 73A29B341CA0EDDB005BA705 /* FMDatabaseQueue.m */; };
+		73A29B3C1CA0EDDB005BA705 /* FMResultSet.m in Sources */ = {isa = PBXBuildFile; fileRef = 73A29B371CA0EDDB005BA705 /* FMResultSet.m */; };
+		73A29B401CA0EE1C005BA705 /* SDBManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 73A29B3F1CA0EE1C005BA705 /* SDBManager.m */; };
+		73A29B431CA0F074005BA705 /* CollectStroeDB.m in Sources */ = {isa = PBXBuildFile; fileRef = 73A29B421CA0F074005BA705 /* CollectStroeDB.m */; };
+		73A29B461CA0F0D1005BA705 /* CollectStoreModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 73A29B451CA0F0D1005BA705 /* CollectStoreModel.m */; };
 		73A41B3E1C9D33C2001F0F3E /* PasswordVIewHelpView.m in Sources */ = {isa = PBXBuildFile; fileRef = 73A41B3D1C9D33C2001F0F3E /* PasswordVIewHelpView.m */; };
 		73A733B51B9D892D0034C3DB /* commentIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 73A733B41B9D892D0034C3DB /* commentIcon.png */; };
 		73A7CA8C1B65BDD4003933B7 /* back@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 73A7CA8B1B65BDD4003933B7 /* back@2x.png */; };
@@ -365,6 +377,8 @@
 		73A7CA9A1B66143B003933B7 /* starBT_s.png in Resources */ = {isa = PBXBuildFile; fileRef = 73A7CA981B66143B003933B7 /* starBT_s.png */; };
 		73A7CA9D1B6625FC003933B7 /* anonymous_n@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 73A7CA9B1B6625FC003933B7 /* anonymous_n@2x.png */; };
 		73A7CA9E1B6625FC003933B7 /* anonymous_s@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 73A7CA9C1B6625FC003933B7 /* anonymous_s@2x.png */; };
+		73A8BF201C9FE37000FCB9CD /* addicon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 73A8BF1F1C9FE37000FCB9CD /* addicon@2x.png */; };
+		73A8BF221C9FF20C00FCB9CD /* go@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 73A8BF211C9FF20C00FCB9CD /* go@2x.png */; };
 		73A9501D1C9BA84C00CC4E4A /* QMapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73A9501C1C9BA84C00CC4E4A /* QMapKit.framework */; };
 		73A9501F1C9BA85600CC4E4A /* QMapKit.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 73A9501E1C9BA85600CC4E4A /* QMapKit.bundle */; };
 		73A950211C9BA86400CC4E4A /* QMapSearchKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73A950201C9BA86400CC4E4A /* QMapSearchKit.framework */; };
@@ -1013,6 +1027,27 @@
 		739991981B6B197700D7E757 /* MyPageControl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyPageControl.m; sourceTree = "<group>"; };
 		739991991B6B197700D7E757 /* NSTimer+Addition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSTimer+Addition.h"; sourceTree = "<group>"; };
 		7399919A1B6B197700D7E757 /* NSTimer+Addition.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSTimer+Addition.m"; sourceTree = "<group>"; };
+		73A29B221CA0DE74005BA705 /* collection.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = collection.png; sourceTree = "<group>"; };
+		73A29B231CA0DE74005BA705 /* collection1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = collection1.png; sourceTree = "<group>"; };
+		73A29B241CA0DE74005BA705 /* defaultaddress.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = defaultaddress.png; sourceTree = "<group>"; };
+		73A29B2A1CA0EA88005BA705 /* libsqlite3.0.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.0.tbd; path = usr/lib/libsqlite3.0.tbd; sourceTree = SDKROOT; };
+		73A29B2D1CA0EDDB005BA705 /* FMDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FMDatabase.h; sourceTree = "<group>"; };
+		73A29B2E1CA0EDDB005BA705 /* FMDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FMDatabase.m; sourceTree = "<group>"; };
+		73A29B2F1CA0EDDB005BA705 /* FMDatabaseAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FMDatabaseAdditions.h; sourceTree = "<group>"; };
+		73A29B301CA0EDDB005BA705 /* FMDatabaseAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FMDatabaseAdditions.m; sourceTree = "<group>"; };
+		73A29B311CA0EDDB005BA705 /* FMDatabasePool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FMDatabasePool.h; sourceTree = "<group>"; };
+		73A29B321CA0EDDB005BA705 /* FMDatabasePool.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FMDatabasePool.m; sourceTree = "<group>"; };
+		73A29B331CA0EDDB005BA705 /* FMDatabaseQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FMDatabaseQueue.h; sourceTree = "<group>"; };
+		73A29B341CA0EDDB005BA705 /* FMDatabaseQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FMDatabaseQueue.m; sourceTree = "<group>"; };
+		73A29B351CA0EDDB005BA705 /* FMDB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FMDB.h; sourceTree = "<group>"; };
+		73A29B361CA0EDDB005BA705 /* FMResultSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FMResultSet.h; sourceTree = "<group>"; };
+		73A29B371CA0EDDB005BA705 /* FMResultSet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FMResultSet.m; sourceTree = "<group>"; };
+		73A29B3E1CA0EE1C005BA705 /* SDBManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SDBManager.h; sourceTree = "<group>"; };
+		73A29B3F1CA0EE1C005BA705 /* SDBManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SDBManager.m; sourceTree = "<group>"; };
+		73A29B411CA0F074005BA705 /* CollectStroeDB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CollectStroeDB.h; sourceTree = "<group>"; };
+		73A29B421CA0F074005BA705 /* CollectStroeDB.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CollectStroeDB.m; sourceTree = "<group>"; };
+		73A29B441CA0F0D1005BA705 /* CollectStoreModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CollectStoreModel.h; sourceTree = "<group>"; };
+		73A29B451CA0F0D1005BA705 /* CollectStoreModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CollectStoreModel.m; sourceTree = "<group>"; };
 		73A41B3C1C9D33C2001F0F3E /* PasswordVIewHelpView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PasswordVIewHelpView.h; sourceTree = "<group>"; };
 		73A41B3D1C9D33C2001F0F3E /* PasswordVIewHelpView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PasswordVIewHelpView.m; sourceTree = "<group>"; };
 		73A733B41B9D892D0034C3DB /* commentIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = commentIcon.png; sourceTree = "<group>"; };
@@ -1027,6 +1062,8 @@
 		73A7CA981B66143B003933B7 /* starBT_s.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = starBT_s.png; sourceTree = "<group>"; };
 		73A7CA9B1B6625FC003933B7 /* anonymous_n@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "anonymous_n@2x.png"; sourceTree = "<group>"; };
 		73A7CA9C1B6625FC003933B7 /* anonymous_s@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "anonymous_s@2x.png"; sourceTree = "<group>"; };
+		73A8BF1F1C9FE37000FCB9CD /* addicon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "addicon@2x.png"; sourceTree = "<group>"; };
+		73A8BF211C9FF20C00FCB9CD /* go@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "go@2x.png"; sourceTree = "<group>"; };
 		73A9501C1C9BA84C00CC4E4A /* QMapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = QMapKit.framework; sourceTree = "<group>"; };
 		73A9501E1C9BA85600CC4E4A /* QMapKit.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = QMapKit.bundle; sourceTree = "<group>"; };
 		73A950201C9BA86400CC4E4A /* QMapSearchKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = QMapSearchKit.framework; sourceTree = "<group>"; };
@@ -1053,6 +1090,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				73A29B2B1CA0EA88005BA705 /* libsqlite3.0.tbd in Frameworks */,
 				736E947C1C2E23E3006176AE /* CoreMotion.framework in Frameworks */,
 				736E947A1C2E239B006176AE /* CoreText.framework in Frameworks */,
 				736E94811C2E2D27006176AE /* libssl.a in Frameworks */,
@@ -1123,6 +1161,7 @@
 		2477CB33367636F8CB61DC97 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				73A29B2A1CA0EA88005BA705 /* libsqlite3.0.tbd */,
 				8A85160B12179A9CC646DF19 /* libPods.a */,
 			);
 			name = Frameworks;
@@ -1220,6 +1259,7 @@
 				735F9C691B2AC6C700AE94D1 /* UserInfo.m */,
 				737A3E581C43391800949457 /* TimeSelectorView.h */,
 				737A3E591C43391800949457 /* TimeSelectorView.m */,
+				73A29B3D1CA0EDFF005BA705 /* DB */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -1238,6 +1278,8 @@
 		733819521B0ACE0200E9F8AD /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				73A29B291CA0E8D4005BA705 /* 店铺 */,
+				73A29B281CA0DE7D005BA705 /* 添加地址 */,
 				73C95BD61C86DA3800A62823 /* check_list.png */,
 				73C95BD71C86DA3800A62823 /* hong_bao_bg.png */,
 				73906B331C746634004FBCFF /* 1px.png */,
@@ -1249,8 +1291,6 @@
 				73A7CA9C1B6625FC003933B7 /* anonymous_s@2x.png */,
 				73A7CA971B66143B003933B7 /* starBT_n.png */,
 				73A7CA981B66143B003933B7 /* starBT_s.png */,
-				73A7CA931B65DDDD003933B7 /* colect_n.png */,
-				73A7CA941B65DDDD003933B7 /* colect_s.png */,
 				73A7CA8B1B65BDD4003933B7 /* back@2x.png */,
 				735326031B535229004EEBAF /* mapapi.bundle */,
 				7352365F1B4B855F0048B9FF /* grogshop_n@2x.png */,
@@ -1333,7 +1373,6 @@
 				734BDFF61B0EFCA8003E2A22 /* wifi_off@2x.png */,
 				734BDFF81B0EFCA8003E2A22 /* wifi_on.png */,
 				734BDFF91B0EFCA8003E2A22 /* wifi_on@2x.png */,
-				734BDFE21B0EC8C5003E2A22 /* addressIcon.png */,
 				73A733B41B9D892D0034C3DB /* commentIcon.png */,
 				734BDFE31B0EC8C5003E2A22 /* phoneIcon.png */,
 				7389DB8D1B0C7B1000F76582 /* user_0.png */,
@@ -1653,6 +1692,7 @@
 		733819641B0ACE0200E9F8AD /* Vendors */ = {
 			isa = PBXGroup;
 			children = (
+				73A29B2C1CA0EDDB005BA705 /* FMDB */,
 				736E947D1C2E2D03006176AE /* AliPay */,
 				7352CCA71B7987720053BBBC /* HYSegmentedControl.h */,
 				7352CCA81B7987720053BBBC /* HYSegmentedControl.m */,
@@ -2224,6 +2264,59 @@
 			path = AutoSlideScrollView;
 			sourceTree = "<group>";
 		};
+		73A29B281CA0DE7D005BA705 /* 添加地址 */ = {
+			isa = PBXGroup;
+			children = (
+				73A29B241CA0DE74005BA705 /* defaultaddress.png */,
+				73A8BF211C9FF20C00FCB9CD /* go@2x.png */,
+				73A8BF1F1C9FE37000FCB9CD /* addicon@2x.png */,
+			);
+			name = "添加地址";
+			sourceTree = "<group>";
+		};
+		73A29B291CA0E8D4005BA705 /* 店铺 */ = {
+			isa = PBXGroup;
+			children = (
+				73A29B221CA0DE74005BA705 /* collection.png */,
+				73A29B231CA0DE74005BA705 /* collection1.png */,
+				73A7CA931B65DDDD003933B7 /* colect_n.png */,
+				73A7CA941B65DDDD003933B7 /* colect_s.png */,
+				734BDFE21B0EC8C5003E2A22 /* addressIcon.png */,
+			);
+			name = "店铺";
+			sourceTree = "<group>";
+		};
+		73A29B2C1CA0EDDB005BA705 /* FMDB */ = {
+			isa = PBXGroup;
+			children = (
+				73A29B2D1CA0EDDB005BA705 /* FMDatabase.h */,
+				73A29B2E1CA0EDDB005BA705 /* FMDatabase.m */,
+				73A29B2F1CA0EDDB005BA705 /* FMDatabaseAdditions.h */,
+				73A29B301CA0EDDB005BA705 /* FMDatabaseAdditions.m */,
+				73A29B311CA0EDDB005BA705 /* FMDatabasePool.h */,
+				73A29B321CA0EDDB005BA705 /* FMDatabasePool.m */,
+				73A29B331CA0EDDB005BA705 /* FMDatabaseQueue.h */,
+				73A29B341CA0EDDB005BA705 /* FMDatabaseQueue.m */,
+				73A29B351CA0EDDB005BA705 /* FMDB.h */,
+				73A29B361CA0EDDB005BA705 /* FMResultSet.h */,
+				73A29B371CA0EDDB005BA705 /* FMResultSet.m */,
+			);
+			path = FMDB;
+			sourceTree = "<group>";
+		};
+		73A29B3D1CA0EDFF005BA705 /* DB */ = {
+			isa = PBXGroup;
+			children = (
+				73A29B3E1CA0EE1C005BA705 /* SDBManager.h */,
+				73A29B3F1CA0EE1C005BA705 /* SDBManager.m */,
+				73A29B411CA0F074005BA705 /* CollectStroeDB.h */,
+				73A29B421CA0F074005BA705 /* CollectStroeDB.m */,
+				73A29B441CA0F0D1005BA705 /* CollectStoreModel.h */,
+				73A29B451CA0F0D1005BA705 /* CollectStoreModel.m */,
+			);
+			name = DB;
+			sourceTree = "<group>";
+		};
 		73A950221C9BA87200CC4E4A /* 腾讯地图 */ = {
 			isa = PBXGroup;
 			children = (
@@ -2331,6 +2424,7 @@
 				7352366A1B4B855F0048B9FF /* home_s@2x.png in Resources */,
 				733819831B0AD56D00E9F8AD /* user_s.png in Resources */,
 				7329E3961B1C5B2C0058137E /* tel_order_detail_icon.png in Resources */,
+				73A8BF221C9FF20C00FCB9CD /* go@2x.png in Resources */,
 				734BE0021B0EFCA8003E2A22 /* P_off@2x.png in Resources */,
 				733819911B0AE56B00E9F8AD /* superMarket.png in Resources */,
 				734BE01E1B0F184A003E2A22 /* fruit.png in Resources */,
@@ -2347,6 +2441,7 @@
 				735236671B4B855F0048B9FF /* grogshop_n@2x.png in Resources */,
 				734BE0221B0F184A003E2A22 /* snacks.png in Resources */,
 				73A7CA961B65DDDD003933B7 /* colect_s.png in Resources */,
+				73A29B261CA0DE74005BA705 /* collection1.png in Resources */,
 				73A733B51B9D892D0034C3DB /* commentIcon.png in Resources */,
 				733819961B0B04E200E9F8AD /* location.png in Resources */,
 				733819A51B0B2AC900E9F8AD /* storeState_g.png in Resources */,
@@ -2372,6 +2467,7 @@
 				735236691B4B855F0048B9FF /* home_n@2x.png in Resources */,
 				734BDFE51B0EC8C5003E2A22 /* phoneIcon.png in Resources */,
 				734BE00B1B0EFCA8003E2A22 /* wifi_on@2x.png in Resources */,
+				73A29B271CA0DE74005BA705 /* defaultaddress.png in Resources */,
 				7389DB941B0C7B1000F76582 /* user_1.png in Resources */,
 				732492431B1846CA00CC5B6C /* didChange.png in Resources */,
 				7338197C1B0AD56D00E9F8AD /* grogshop_s.png in Resources */,
@@ -2403,6 +2499,7 @@
 				7389DB981B0C7B1000F76582 /* user_5.png in Resources */,
 				733819351B0ACB1E00E9F8AD /* Images.xcassets in Resources */,
 				734BDFFC1B0EFCA8003E2A22 /* food_off@2x.png in Resources */,
+				73A29B251CA0DE74005BA705 /* collection.png in Resources */,
 				738B82D81B198CE6008B386D /* orderState2.png in Resources */,
 				73461F041B0DE3130089352E /* 1-4.jpg in Resources */,
 				735174291B4787E500B2E273 /* restaurant_on.png in Resources */,
@@ -2458,6 +2555,7 @@
 				73991C241C2CED3400F95711 /* icon1.png in Resources */,
 				734BDFFB1B0EFCA8003E2A22 /* food_off.png in Resources */,
 				738B82DA1B198CE6008B386D /* orderState4.png in Resources */,
+				73A8BF201C9FE37000FCB9CD /* addicon@2x.png in Resources */,
 				7389DB7E1B0C3B0A00F76582 /* price_s.png in Resources */,
 				736BB8221B1EFA0800F03419 /* close.png in Resources */,
 				732492441B1846CA00CC5B6C /* willChange.png in Resources */,
@@ -2531,6 +2629,7 @@
 				737641671B54A1C6000E9BBC /* MJRefreshGifHeader.m in Sources */,
 				734657C41B1D4585000C3E9D /* CFilteringJSONSerializer.m in Sources */,
 				735D945E1B1415D2002B0980 /* ShoppingDetailsCarView.m in Sources */,
+				73A29B391CA0EDDB005BA705 /* FMDatabaseAdditions.m in Sources */,
 				7397FAFF1B4688780014E54C /* JSONKit.m in Sources */,
 				736E94EE1C2E3BC7006176AE /* PropertyModel.m in Sources */,
 				737641681B54A1C6000E9BBC /* MJRefreshNormalHeader.m in Sources */,
@@ -2541,12 +2640,14 @@
 				7329E3931B1C373A0058137E /* CustomSearchBar.m in Sources */,
 				73A7CA921B65D375003933B7 /* CommentModel.m in Sources */,
 				735DD7BB1B25248300E3E93E /* WXUtil.mm in Sources */,
+				73A29B3A1CA0EDDB005BA705 /* FMDatabasePool.m in Sources */,
 				730385171B269212007C7ACB /* ResultViewController.m in Sources */,
 				7363600A1B12C71900EE8F56 /* MGSwipeButton.m in Sources */,
 				734657F11B1D4586000C3E9D /* SDWebImageDownloader.m in Sources */,
 				734657B71B1D4585000C3E9D /* ASIHTTPRequest.m in Sources */,
 				7357A26C1B1FDC0100993A87 /* NSString+NSString_MD5.m in Sources */,
 				736E949B1C2E2D2F006176AE /* RSADataVerifier.m in Sources */,
+				73A29B401CA0EE1C005BA705 /* SDBManager.m in Sources */,
 				7359086A1B33F69E005143E4 /* IQSegmentedNextPrevious.m in Sources */,
 				733819861B0ADCCA00E9F8AD /* HomeHeaderView.m in Sources */,
 				734657F01B1D4585000C3E9D /* SDWebImageDecoder.m in Sources */,
@@ -2567,6 +2668,7 @@
 				7376415E1B54A1C6000E9BBC /* MJRefreshComponent.m in Sources */,
 				7350D38B1C27DCF600B99FEA /* DetailsIntegralView.m in Sources */,
 				7389DB591B0C223C00F76582 /* GrogshopHeaderView.m in Sources */,
+				73A29B431CA0F074005BA705 /* CollectStroeDB.m in Sources */,
 				7399919D1B6B197700D7E757 /* NSTimer+Addition.m in Sources */,
 				7355A2131B2FB62300095764 /* RoomModel.m in Sources */,
 				734BE0121B0F0A6D003E2A22 /* DetailsGSViewCell.m in Sources */,
@@ -2629,12 +2731,14 @@
 				73731CB21C9931E3009F870D /* Net.m in Sources */,
 				730384E21B267CFF007C7ACB /* TakeOutModel.m in Sources */,
 				7350D38F1C27DD3500B99FEA /* OnlinePayViewController.m in Sources */,
+				73A29B3B1CA0EDDB005BA705 /* FMDatabaseQueue.m in Sources */,
 				735326701B535A5E004EEBAF /* JGProgressHUDAnimation.m in Sources */,
 				73D65AB41B13084E002A22FE /* MenusViewCell.m in Sources */,
 				7353266F1B535A5E004EEBAF /* JGProgressHUD.m in Sources */,
 				734657F21B1D4586000C3E9D /* SDWebImageDownloaderOperation.m in Sources */,
 				734657D91B1D4585000C3E9D /* CSerializedJSONData.m in Sources */,
 				734657B41B1D4585000C3E9D /* ASIDataDecompressor.m in Sources */,
+				73A29B461CA0F0D1005BA705 /* CollectStoreModel.m in Sources */,
 				7399919B1B6B197700D7E757 /* AutoSlideScrollView.m in Sources */,
 				737A3E5A1C43391800949457 /* TimeSelectorView.m in Sources */,
 				73A7CA8F1B65C78E003933B7 /* CreateCommentViewController.m in Sources */,
@@ -2689,6 +2793,7 @@
 				7389DB701B0C379C00F76582 /* TypeView.m in Sources */,
 				734657F81B1D4586000C3E9D /* UIImage+WebP.m in Sources */,
 				7357A26D1B1FDC0100993A87 /* HTTPPost.m in Sources */,
+				73A29B381CA0EDDB005BA705 /* FMDatabase.m in Sources */,
 				7376416B1B54A1C6000E9BBC /* MJRefreshConst.m in Sources */,
 				733819671B0ACE4100E9F8AD /* MyTabBarController.m in Sources */,
 				7351C27D1B329E4C0086711B /* WXLoginViewController.m in Sources */,
@@ -2699,6 +2804,7 @@
 				7376416D1B54A1C6000E9BBC /* UIScrollView+MJRefresh.m in Sources */,
 				73906B321C7420A2004FBCFF /* AlipayOrder.m in Sources */,
 				734657CF1B1D4585000C3E9D /* NSScanner_Extensions.m in Sources */,
+				73A29B3C1CA0EDDB005BA705 /* FMResultSet.m in Sources */,
 				734657BF1B1D4585000C3E9D /* CDataScanner.m in Sources */,
 				7352CCA91B7987720053BBBC /* HYSegmentedControl.m in Sources */,
 				7324922B1B181B7800CC5B6C /* PayTypeView.m in Sources */,

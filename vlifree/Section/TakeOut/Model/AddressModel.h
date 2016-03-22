@@ -24,7 +24,7 @@
 /**
  *  收货人姓名
  */
-@property (nonatomic, strong)NSNumber * receiveName;
+@property (nonatomic, copy)NSString * receiveName;
 /**
  *  是否默认地址
  */

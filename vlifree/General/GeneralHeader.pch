@@ -30,6 +30,11 @@
 #import <AFNetworkReachabilityManager.h>
 #import "Reachability.h"
 
+#import "SDBManager.h"
+#import "FMDatabase.h"
+#import "FMDatabaseAdditions.h"
+#import "CollectStoreModel.h"
+
 #define COUNT 15
 #define APP_ID_WX @"wxaac5e5f7421e84ac"
 #define APP_SECRET_WX @"055e7e10c698b7b140511d8d1a73cec4"
@@ -49,7 +54,7 @@
  *
  *  @return
  */
-#define POST_URL @"http://ceshi.p.vlifee.com/User_getdata.ashx?md5="
+#define POST_URL @"http://test.p3o1r7t.vlifee.com/User_getdata.ashx?md5="
 #define DATA_COUNT 15
 /**
  *  app主色调
@@ -59,6 +64,7 @@
  *  @return 颜色
  */
 #define MAIN_COLOR [UIColor colorWithRed:251 / 250.0 green:51 / 250.0 blue:46 / 250.0 alpha:1]
+#define BACKGROUNDCOLOR [UIColor colorWithRed:253 / 255.0 green:91 / 255.0 blue:53 / 255.0 alpha:1]
 /**
  *  app字体主颜色
  *

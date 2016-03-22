@@ -12,6 +12,9 @@
 @interface AddressViewCell : UITableViewCell
 
 @property (nonatomic, strong)AddressModel * addressModel;
+@property (nonatomic, strong)UIButton * defaultAddressButton;
+
+@property (nonatomic, strong)UIButton * editButton;
 
 - (void)createSubview:(CGRect)frame;
 + (CGFloat)cellHeightFrome:(NSString *)address frame:(CGRect)frame;

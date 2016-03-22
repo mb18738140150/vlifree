@@ -10,7 +10,7 @@
 
 #define HYSegmentedControl_Height 30.0
 #define HYSegmentedControl_Width ([UIScreen mainScreen].bounds.size.width)
-#define Min_Width_4_Button 80.0
+#define Min_Width_4_Button ([UIScreen mainScreen].bounds.size.width / 6)
 
 #define Define_Tag_add 1000
 
@@ -37,7 +37,7 @@
 
 - (id)initWithOriginY:(CGFloat)y Titles:(NSArray *)titles delegate:(id)delegate
 {
-    CGRect rect4View = CGRectMake(.0f, y, HYSegmentedControl_Width, HYSegmentedControl_Height);
+    CGRect rect4View = CGRectMake(HYSegmentedControl_Width / 4, y, HYSegmentedControl_Width / 2, HYSegmentedControl_Height);
     if (self = [super initWithFrame:rect4View]) {
         
 //        self.backgroundColor = UIColorFromRGBValue(0xf3f3f3);
@@ -71,7 +71,7 @@
             btn.frame = CGRectMake(i*width4btn, .0f, width4btn, HYSegmentedControl_Height);
             [btn setTitleColor:UIColorFromRGBValue(0x999999) forState:UIControlStateNormal];
             btn.titleLabel.font = [UIFont systemFontOfSize:14];
-            [btn setTitleColor:UIColorFromRGBValue(0x454545) forState:UIControlStateSelected];
+            [btn setTitleColor:[UIColor colorWithRed:210 / 255.0 green:60 / 255.0 blue:70 / 255.0 alpha:1] forState:UIControlStateSelected];
             [btn setTitle:[titles objectAtIndex:i] forState:UIControlStateNormal];
             [btn addTarget:self action:@selector(segmentedControlChange:) forControlEvents:UIControlEventTouchUpInside];
             btn.tag = Define_Tag_add+i;
@@ -92,7 +92,7 @@
             UIView *lineView = [[UIView alloc] initWithFrame:CGRectMake(i*width4btn-1.0f, originY, 1.0f, height4Line)];
             lineView.backgroundColor = UIColorFromRGBValue(0xcccccc);
 //            lineView.backgroundColor = UIColorFromRGBValue(0x228b22);
-            [_scrollView addSubview:lineView];
+//            [_scrollView addSubview:lineView];
         }
         
         //
@@ -100,7 +100,7 @@
         //
         _bottomLineView = [[UIView alloc] initWithFrame:CGRectMake(5.0f, HYSegmentedControl_Height-1, width4btn-10.0f, 1.0f)];
 //        _bottomLineView.backgroundColor = UIColorFromRGBValue(0x454545);
-        _bottomLineView.backgroundColor = UIColorFromRGBValue(0x228b22);
+        _bottomLineView.backgroundColor = [UIColor colorWithRed:210 / 255.0 green:60 / 255.0 blue:70 / 255.0 alpha:1];
         [_scrollView addSubview:_bottomLineView];
         
         [self addSubview:_scrollView];
