@@ -7,7 +7,7 @@
 //
 
 #import "UserInfo.h"
-
+NSString *const CollectCountCHange = @"CollectCountCHange";
 static UserInfo * userInfo = nil;
 
 @interface UserInfo ()<HTTPPostDelegate>
@@ -22,8 +22,15 @@ static UserInfo * userInfo = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         userInfo = [[UserInfo alloc] init];
+        
     });
     return userInfo;
+}
+
+- (instancetype)init
+{
+    [self addObserver:self forKeyPath:@"self.collectCount" options:NSKeyValueObservingOptionNew context:nil];
+    return self;
 }
 
 - (void)setPropertyWithDictionary:(NSDictionary *)dic
@@ -34,6 +41,16 @@ static UserInfo * userInfo = nil;
 - (void)setValue:(id)value forUndefinedKey:(NSString *)key
 {
     
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSString *,id> *)change context:(void *)context
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [[NSNotificationCenter defaultCenter]postNotificationName:CollectCountCHange object:self userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[change objectForKey:@"new"],@"newCollectCount", nil]];
+        
+//        NSLog(@"***********%@****", [change objectForKey:@"new"]);
+        
+    }) ;
 }
 
 - (void)setUserId:(NSNumber *)userId
@@ -48,7 +65,7 @@ static UserInfo * userInfo = nil;
                                    @"CID":[[NSUserDefaults standardUserDefaults] objectForKey:@"registrationID"]
                                    };
             [self playPostWithDictionary:dic];
-//             NSLog(@"******************%@", [[NSUserDefaults standardUserDefaults] objectForKey:@"registrationID"]);
+             NSLog(@"******************%@", [[NSUserDefaults standardUserDefaults] objectForKey:@"registrationID"]);
         }
     }
 }
@@ -57,7 +74,7 @@ static UserInfo * userInfo = nil;
 - (void)playPostWithDictionary:(NSDictionary *)dic
 {
     NSString * jsonStr = [dic JSONString];
-    //    NSLog(@"%@", jsonStr);
+        NSLog(@"userinfo - %@", jsonStr);
     NSString * str = [NSString stringWithFormat:@"%@231618", jsonStr];
     NSString * md5Str = [str md5];
     NSString * urlString = [NSString stringWithFormat:@"%@%@", POST_URL, md5Str];
@@ -72,7 +89,13 @@ static UserInfo * userInfo = nil;
     NSLog(@"+++%@", data);
 }
 
-
-
+- (void)failWithError:(NSError *)error
+{
+    
+}
+- (void)dealloc
+{
+    [self removeObserver:self forKeyPath:@"self.collectCount"];
+}
 
 @end

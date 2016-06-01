@@ -109,7 +109,7 @@
 NSString *const kInternetConnection  = @"InternetConnection";
 NSString *const kLocalWiFiConnection = @"LocalWiFiConnection";
 NSString *const kReachabilityChangedNotification = @"NetworkReachabilityChangedNotification";
-
+NSString * const kkNReachabilityChangedNotification = @"kkNetworkReachabilityChangedNotification";
 #define CLASS_DEBUG 1 // Turn on logReachabilityFlags. Must also have a project wide defined DEBUG.
 
 #if (defined DEBUG && defined CLASS_DEBUG)
@@ -261,6 +261,9 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 	[[NSNotificationCenter defaultCenter] postNotificationName: kReachabilityChangedNotification 
 														object: (Reachability *) info];
 	
+//    [[NSNotificationCenter defaultCenter] postNotificationName: kkNReachabilityChangedNotification
+//                                                        object: (Reachability *) info];
+    
 	[pool release];
 
 } // ReachabilityCallback()

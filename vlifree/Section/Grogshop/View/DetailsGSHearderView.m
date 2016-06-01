@@ -29,16 +29,10 @@
 @property (nonatomic, strong)AutoSlideScrollView * cycleScrollView;//轮播图
 
 
-
-
-
-
 @end
 
 
 @implementation DetailsGSHearderView
-
-
 
 
 - (instancetype)initWithFrame:(CGRect)frame

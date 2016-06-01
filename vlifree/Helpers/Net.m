@@ -362,19 +362,19 @@ static void TMReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkRea
 
 #pragma mark - reachability status stuff
 
--(NetworkStatus)currentReachabilityStatus
+-(NetStatus)currentReachabilityStatus
 {
     if([self isReachable])
     {
         if([self isReachableViaWiFi])
-            return ReachableViaWiFi;
+            return ReachableViaWiFi_net;
         
 #if	TARGET_OS_IPHONE
-        return ReachableViaWWAN;
+        return ReachableViaWWAN_net;
 #endif
     }
     
-    return NotReachable;
+    return NotReachable_net;
 }
 
 -(SCNetworkReachabilityFlags)reachabilityFlags
@@ -391,14 +391,14 @@ static void TMReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkRea
 
 -(NSString*)currentReachabilityString
 {
-    NetworkStatus temp = [self currentReachabilityStatus];
+    NetStatus temp = [self currentReachabilityStatus];
     
-    if(temp == ReachableViaWWAN)
+    if(temp == ReachableViaWWAN_net)
     {
         // Updated for the fact that we have CDMA phones now!
         return NSLocalizedString(@"Cellular", @"");
     }
-    if (temp == ReachableViaWiFi)
+    if (temp == ReachableViaWiFi_net)
     {
         return NSLocalizedString(@"WiFi", @"");
     }
@@ -436,6 +436,7 @@ static void TMReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkRea
     }
 //    NSLog(@"^^^^^^网络变化……………………");
     // this makes sure the change notification happens on the MAIN THREAD
+    NSLog(@"^^^^^^%d……………………", flags);
     dispatch_async(dispatch_get_main_queue(), ^{
         [[NSNotificationCenter defaultCenter] postNotificationName:kNetReachabilityChangedNotification
                                                             object:self];

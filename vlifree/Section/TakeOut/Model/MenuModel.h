@@ -20,6 +20,7 @@
 @property (nonatomic, strong)NSNumber * mealBoxMoney;
 @property (nonatomic, assign)int foodIntegral;
 @property (nonatomic, strong)NSMutableArray * PropertyList;
+@property (nonatomic, copy)NSString * commodityDescription;
 
 - (id)initWithDictionary:(NSDictionary *)dic;
 

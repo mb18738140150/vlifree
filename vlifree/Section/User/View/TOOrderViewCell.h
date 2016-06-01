@@ -9,6 +9,9 @@
 #import <UIKit/UIKit.h>
 #import "TakeOutOrderMD.h"
 
+typedef void(^DeleteBlock)();
+typedef void(^AgainOrderBlock)();
+
 @interface TOOrderViewCell : UITableViewCell
 
 
@@ -20,5 +23,7 @@
 - (void)crateSubview:(CGRect)frame;
 + (CGFloat)cellHeight;
 
+- (void)deleteOrderAction:(DeleteBlock)deleteBlock;
+- (void)againOrderAction:(AgainOrderBlock)againBlock;
 
 @end

@@ -7,10 +7,10 @@
 //
 
 #import "StoreIntroView.h"
-
-
+#import "AppDelegate.h"
+#import "AutoSlideScrollView.h"
 #define LEFT_SPACE 10
-#define TOP_SPACE 2
+#define TOP_SPACE 10
 //#define LABEL_HEIGHT ([UIScreen mainScreen].bounds.size.height / 15)
 #define LABEL_HEIGHT 40
 #define RIGHT_LB_WIDTH 75
@@ -19,9 +19,11 @@
 #define LABEL_FONT [UIFont systemFontOfSize:15]
 #define COLOT_TEXT [UIColor colorWithWhite:0.5 alpha:1]
 
-@interface StoreIntroView ()
+#define ImageHeight ([UIScreen mainScreen].bounds.size.width * 173 / 360)
+#define HelpViewHeight 42
+@interface StoreIntroView ()<UIScrollViewDelegate>
 
-
+@property (nonatomic, copy)NSString * tel;
 //@property (nonatomic, strong)UILabel * introLB;
 //@property (nonatomic, strong)UILabel * typeLB;
 //@property (nonatomic, strong)UILabel * openTimeLB;
@@ -30,9 +32,25 @@
 //@property (nonatomic, strong)UILabel * sendPriceLB;
 //@property (nonatomic, strong)UILabel * outSendLB;
 //@property (nonatomic, strong)UILabel * distanceLB;
-//
-//
+@property (nonatomic, strong)UIScrollView * myScrollview;
+@property (nonatomic, strong)UIImageView * describeImageView;
+@property (nonatomic, strong)AutoSlideScrollView * lunboScrollView;
+@property (nonatomic, strong)UILabel * startSendLabel;
+@property (nonatomic, strong)UILabel * deliveryLabel;
+@property (nonatomic, strong)UILabel * averageSendTimeLabel;
+@property (nonatomic, strong)UIView * sendInformationView;
+@property (nonatomic, strong)StoreIntroHelpView * bussTime;
+@property (nonatomic, strong)StoreIntroHelpView * storeType;
+@property (nonatomic, strong)StoreIntroHelpView * deliveryDistance;//配送距离
+@property (nonatomic, strong)StoreIntroHelpView * serviceDistance;//配送区域
 
+@property (nonatomic, strong)UIView * describeView;
+@property (nonatomic, strong)UILabel * describeLabel;
+
+/**
+ *  放大比例
+ */
+@property (nonatomic,assign)CGFloat scale;
 
 @end
 
@@ -54,180 +72,261 @@
 
 - (void)createSubview
 {
-    UIScrollView *scroll = [[UIScrollView alloc]initWithFrame:CGRectMake(0, 0, self.width, self.height)];
-    [self addSubview:scroll];
+    self.myScrollview = [[UIScrollView alloc]initWithFrame:CGRectMake(0, 0, self.width, self.height)];
+    self.myScrollview.backgroundColor = [UIColor colorWithWhite:.9 alpha:1];
+    _myScrollview.delegate = self;
+    [self addSubview:_myScrollview];
     
-    UILabel * introTitleLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, TOP_SPACE, RIGHT_LB_WIDTH , LABEL_HEIGHT)];
-    introTitleLB.text = @"餐厅简介";
-    [scroll addSubview:introTitleLB];
+    self.describeImage = nil;
     
-    UIView * line1 = [[UIView alloc] initWithFrame:CGRectMake(LEFT_SPACE, introTitleLB.bottom + TOP_SPACE, self.width - 2 * LEFT_SPACE, 1)];
-    line1.backgroundColor = LINE_COLOR;
-    [scroll addSubview:line1];
+    self.lunboScrollView = [[AutoSlideScrollView alloc]initWithFrame:CGRectMake(0, 0, _myScrollview.width, ImageHeight) animationDuration:2.0];
     
-    self.Describe = [[UILabel alloc] initWithFrame:CGRectMake(introTitleLB.left, line1.bottom + TOP_SPACE, self.width - 2 * introTitleLB.left, LABEL_HEIGHT)];
-    //    _introLB.text = @"百年老店, 值得信赖";
-    _Describe.textColor = COLOT_TEXT;
-    _Describe.font = LABEL_FONT;
-    _Describe.numberOfLines = 0;
-    [scroll addSubview:_Describe];
+    [_myScrollview addSubview:_lunboScrollView];
     
-    UIView * line2 = [[UIView alloc] initWithFrame:CGRectMake(LEFT_SPACE, _Describe.bottom + TOP_SPACE, self.width - 2 * LEFT_SPACE, 1)];
-    line2.backgroundColor = LINE_COLOR;
-    [scroll addSubview:line2];
+    self.describeImageView = [[UIImageView alloc]initWithFrame:CGRectMake(0, 0, _myScrollview.width, ImageHeight)];
+    _describeImageView.backgroundColor = [UIColor whiteColor];
+//    [_lunboScrollView addSubview:_describeImageView];
     
-    UILabel * storeLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, TOP_SPACE + line2.bottom, RIGHT_LB_WIDTH, LABEL_HEIGHT)];
-    storeLB.text = @"店铺信息";
-    [scroll addSubview:storeLB];
+    self.scale = self.describeImageView.width / self.describeImageView.height;
     
-    UIView * line3 = [[UIView alloc] initWithFrame:CGRectMake(LEFT_SPACE, storeLB.bottom + TOP_SPACE, self.width - 2 * LEFT_SPACE, 1)];
-    line3.backgroundColor = LINE_COLOR;
-    [scroll addSubview:line3];
+    self.sendInformationView = [[UIView alloc]initWithFrame:CGRectMake(0, _lunboScrollView.bottom, _myScrollview.width, 84)];
+    _sendInformationView.backgroundColor = [UIColor whiteColor];
+    [_myScrollview addSubview:_sendInformationView];
     
-    UILabel * storeTypeLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, TOP_SPACE + line3.bottom, RIGHT_LB_WIDTH, LABEL_HEIGHT)];
-    storeTypeLB.text = @"店铺类型:";
-    storeTypeLB.textColor = COLOT_TEXT;
-    storeTypeLB.font = LABEL_FONT;
-    [scroll addSubview:storeTypeLB];
+    UILabel * startSendLB = [[UILabel alloc]initWithFrame:CGRectMake(0, TOP_SPACE + 9, _myScrollview.width / 3, 12)];
+    startSendLB.textColor = [UIColor grayColor];
+    startSendLB.textAlignment = NSTextAlignmentCenter;
+    startSendLB.font = [UIFont systemFontOfSize:12];
+    startSendLB.text = @"起送价";
+    [_sendInformationView addSubview:startSendLB];
     
-    self.StoreType = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE + storeTypeLB.right, storeTypeLB.top, self.width - 3 * LEFT_SPACE - RIGHT_LB_WIDTH, LABEL_HEIGHT)];
-    //    _typeLB.text = @"中式餐厅";
-    _StoreType.textColor = COLOT_TEXT;
-    _StoreType.font = LABEL_FONT;
-    [scroll addSubview:_StoreType];
-    
-    UIView * line4 = [[UIView alloc] initWithFrame:CGRectMake(LEFT_SPACE, _StoreType.bottom + TOP_SPACE, self.width - 2 * LEFT_SPACE, 1)];
-    line4.backgroundColor = LINE_COLOR;
-    [scroll addSubview:line4];
+    self.startSendLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, startSendLB.bottom + TOP_SPACE, _myScrollview.width / 3, 22)];
+    _startSendLabel.textColor = [UIColor grayColor];
+    _startSendLabel.textAlignment = NSTextAlignmentCenter;
+    _startSendLabel.font = [UIFont systemFontOfSize:12];
+    _startSendLabel.text = @"￥";
+    [_sendInformationView addSubview:_startSendLabel];
     
     
-    UILabel * storeTimeLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, TOP_SPACE + line4.bottom, RIGHT_LB_WIDTH, LABEL_HEIGHT)];
-    storeTimeLB.text = @"营业时间:";
-    storeTimeLB.textColor = COLOT_TEXT;
-    storeTimeLB.font = LABEL_FONT;
-    [scroll addSubview:storeTimeLB];
+    UILabel * deliveryLB = [[UILabel alloc]initWithFrame:CGRectMake(startSendLB.right, startSendLB.top, _myScrollview.width / 3, startSendLB.height)];
+    deliveryLB.textColor = [UIColor grayColor];
+    deliveryLB.textAlignment = NSTextAlignmentCenter;
+    deliveryLB.font = [UIFont systemFontOfSize:12];
+    deliveryLB.text = @"配送价";
+    [_sendInformationView addSubview:deliveryLB];
     
-    self.BusTime = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE + storeTimeLB.right, storeTimeLB.top, self.width - 3 * LEFT_SPACE - RIGHT_LB_WIDTH, LABEL_HEIGHT)];
-    //    _openTimeLB.text = @"10:00-20:00";
-    _BusTime.textColor = COLOT_TEXT;
-    _BusTime.font = LABEL_FONT;
-    [scroll addSubview:_BusTime];
+    self.deliveryLabel = [[UILabel alloc]initWithFrame:CGRectMake(_startSendLabel.right, deliveryLB.bottom + TOP_SPACE, _myScrollview.width / 3, 22)];
+    _deliveryLabel.textColor = [UIColor grayColor];
+    _deliveryLabel.textAlignment = NSTextAlignmentCenter;
+    _deliveryLabel.font = [UIFont systemFontOfSize:12];
+    _deliveryLabel.text = @"￥";
+    [_sendInformationView addSubview:_deliveryLabel];
     
-    UIView * line5 = [[UIView alloc] initWithFrame:CGRectMake(LEFT_SPACE, _BusTime.bottom + TOP_SPACE, self.width - 2 * LEFT_SPACE, 1)];
-    line5.backgroundColor = LINE_COLOR;
-    [scroll addSubview:line5];
+    UILabel * averageSendTimeLB = [[UILabel alloc]initWithFrame:CGRectMake(deliveryLB.right, startSendLB.top, _myScrollview.width / 3, startSendLB.height)];
+    averageSendTimeLB.textColor = [UIColor grayColor];
+    averageSendTimeLB.textAlignment = NSTextAlignmentCenter;
+    averageSendTimeLB.font = [UIFont systemFontOfSize:12];
+    averageSendTimeLB.text = @"平均配送时间";
+    [_sendInformationView addSubview:averageSendTimeLB];
     
+    self.averageSendTimeLabel = [[UILabel alloc]initWithFrame:CGRectMake(_deliveryLabel.right, averageSendTimeLB.bottom + TOP_SPACE, _myScrollview.width / 3, 22)];
+    _averageSendTimeLabel.textColor = [UIColor grayColor];
+    _averageSendTimeLabel.textAlignment = NSTextAlignmentCenter;
+    _averageSendTimeLabel.font = [UIFont systemFontOfSize:12];
+    _averageSendTimeLabel.text = @"￥";
+    [_sendInformationView addSubview:_averageSendTimeLabel];
     
-    UILabel * storeAddressLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, TOP_SPACE + line5.bottom, RIGHT_LB_WIDTH, LABEL_HEIGHT)];
-    storeAddressLB.text = @"店铺地址:";
-    storeAddressLB.textColor = COLOT_TEXT;
-    storeAddressLB.font = LABEL_FONT;
-    [scroll addSubview:storeAddressLB];
+    UIView * line1 = [[UIView alloc]initWithFrame:CGRectMake(startSendLB.right, startSendLB.bottom, 1, 30)];
+    line1.backgroundColor = [UIColor colorWithWhite:.9 alpha:1];
+    [_sendInformationView addSubview:line1];
     
-    self.StoreAdress = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE + storeAddressLB.right, storeAddressLB.top, self.width - 6 * LEFT_SPACE - RIGHT_LB_WIDTH, LABEL_HEIGHT)];
-    //    _addressLB.text = @"未来路丹尼斯下";
-    _StoreAdress.numberOfLines = 0;
-    _StoreAdress.textColor = COLOT_TEXT;
-    _StoreAdress.font = LABEL_FONT;
-    [scroll addSubview:_StoreAdress];
+    UIView * line2 = [[UIView alloc]initWithFrame:CGRectMake(deliveryLB.right, startSendLB.bottom, 1, 30)];
+    line2.backgroundColor = [UIColor colorWithWhite:.9 alpha:1];
+    [_sendInformationView addSubview:line2];
     
-    self.addressBT = [UIButton buttonWithType:UIButtonTypeSystem];
-    [_addressBT setImage:[UIImage imageNamed:@"addressIcon"] forState:UIControlStateNormal];
-    _addressBT.frame = CGRectMake(_StoreAdress.right, _StoreAdress.top, 3 * LEFT_SPACE, 3 * LEFT_SPACE);
-    [scroll addSubview:_addressBT];
+    self.bussTime = [[StoreIntroHelpView alloc]initWithFrame:CGRectMake(0, _sendInformationView.bottom + TOP_SPACE, _myScrollview.width, HelpViewHeight)];
+    _bussTime.titleLabel.text = @"营业时间";
+    [self.myScrollview addSubview:_bussTime];
     
-    UIView * line6 = [[UIView alloc] initWithFrame:CGRectMake(LEFT_SPACE, _StoreAdress.bottom + TOP_SPACE, self.width - 2 * LEFT_SPACE, 1)];
-    line6.backgroundColor = LINE_COLOR;
-    [scroll addSubview:line6];
+    self.storeType = [[StoreIntroHelpView alloc]initWithFrame:CGRectMake(0, _bussTime.bottom + 1, _myScrollview.width, HelpViewHeight)];
+    _storeType.titleLabel.text = @"店铺类型";
+    [self.myScrollview addSubview:_storeType];
     
-    UILabel * storeTelLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, TOP_SPACE + line6.bottom, RIGHT_LB_WIDTH, LABEL_HEIGHT)];
-    storeTelLB.text = @"电话:";
-    storeTelLB.textColor = COLOT_TEXT;
-    storeTelLB.font = LABEL_FONT;
-    [scroll addSubview:storeTelLB];
+    self.deliveryDistance = [[StoreIntroHelpView alloc]initWithFrame:CGRectMake(0, _storeType.bottom + 1, _myScrollview.width, HelpViewHeight)];
+    _deliveryDistance.titleLabel.text = @"配送距离";
+    [self.myScrollview addSubview:_deliveryDistance];
     
-    self.StoreTel = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE + storeTelLB.right, storeTelLB.top, self.width - 3 * LEFT_SPACE - RIGHT_LB_WIDTH, LABEL_HEIGHT)];
-    //    _telNumLB.text = @"13788052976";
-    _StoreTel.font = LABEL_FONT;
-    _StoreTel.textColor = COLOT_TEXT;
-    [scroll addSubview:_StoreTel];
+    self.serviceDistance = [[StoreIntroHelpView alloc]initWithFrame:CGRectMake(0, _deliveryDistance.bottom + 1, _myScrollview.width, HelpViewHeight)];
+    _serviceDistance.titleLabel.text = @"配送区域";
+    [_serviceDistance.button setBackgroundImage:[UIImage imageNamed:@"icon_hua.png"] forState:UIControlStateNormal];
+    [_serviceDistance.button addTarget:self action:@selector(telAction:) forControlEvents:UIControlEventTouchUpInside];
+    [_myScrollview addSubview:_serviceDistance];
     
-    UIView * line7 = [[UIView alloc] initWithFrame:CGRectMake(LEFT_SPACE, _StoreTel.bottom + TOP_SPACE, self.width - 2 * LEFT_SPACE, 1)];
-    line7.backgroundColor = LINE_COLOR;
-    [scroll addSubview:line7];
+    self.storeAddress = [[StoreIntroHelpView alloc]initWithFrame:CGRectMake(0, _serviceDistance.bottom + 1, _myScrollview.width, HelpViewHeight)];
+    _storeAddress.titleLabel.text = @"店铺地址";
+    [_storeAddress.button setBackgroundImage:[UIImage imageNamed:@"addressIcon.png"] forState:UIControlStateNormal];
+    [_myScrollview addSubview:_storeAddress];
     
+    self.describeView = [[UIView alloc]initWithFrame:CGRectMake(0, _storeAddress.bottom + TOP_SPACE, _myScrollview.width, 130)];
+    _describeView.backgroundColor = [UIColor whiteColor];
+    [_myScrollview addSubview:_describeView];
     
-    UILabel * storeSendLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, TOP_SPACE + line7.bottom, RIGHT_LB_WIDTH, LABEL_HEIGHT)];
-    storeSendLB.text = @"起送价:";
-    storeSendLB.textColor = COLOT_TEXT;
-    storeSendLB.font = LABEL_FONT;
-    [scroll addSubview:storeSendLB];
+    UILabel * describelB = [[UILabel alloc]initWithFrame:CGRectMake(TOP_SPACE, TOP_SPACE, _describeView.width - 2 * TOP_SPACE, 14)];
+    describelB.text = @"商家介绍";
+//    describelB.font = [UIFont fontWithName:@"Georgia-BoldItalic" size:describelB.height];
+    [_describeView addSubview:describelB];
     
-    self.StartSendMoney = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE + storeSendLB.right, storeSendLB.top, self.width - 3 * LEFT_SPACE - RIGHT_LB_WIDTH, LABEL_HEIGHT)];
-    //    _sendPriceLB.text = @"¥12";
-    _StartSendMoney.font = LABEL_FONT;
-    _StartSendMoney.textColor = COLOT_TEXT;
-    [scroll addSubview:_StartSendMoney];
+    UIView * describeLine = [[UIView alloc]initWithFrame:CGRectMake(TOP_SPACE, describelB.bottom + TOP_SPACE, _describeView.width - 2 * TOP_SPACE, 1)];
+    describeLine.backgroundColor = [UIColor colorWithWhite:.9 alpha:1];
+    [_describeView addSubview:describeLine];
     
-    UIView * line8 = [[UIView alloc] initWithFrame:CGRectMake(LEFT_SPACE, _StartSendMoney.bottom + TOP_SPACE, self.width - 2 * LEFT_SPACE, 1)];
-    line8.backgroundColor = LINE_COLOR;
-    [scroll addSubview:line8];
+    self.describeLabel = [[UILabel alloc]initWithFrame:CGRectMake(TOP_SPACE, describeLine.bottom + TOP_SPACE, _describeView.width - 2 * TOP_SPACE, 60)];
+    _describeLabel.textColor = [UIColor grayColor];
+    _describeLabel.backgroundColor = [UIColor whiteColor];
+    [_describeView addSubview:_describeLabel];
     
+    self.myScrollview.contentSize = CGSizeMake(self.myScrollview.width, _describeView.bottom);
+}
+
+- (void)setDescribeImage:(NSString *)describeImage
+{
+    __weak UIImageView * iconV = self.describeImageView;
+    [self.describeImageView setImageWithURL:[NSURL URLWithString:describeImage] placeholderImage:[UIImage imageNamed:@"placeholderIM.png"] completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType) {
+        if (error) {
+            iconV.image = [UIImage imageNamed:@"load_fail.png"];
+        }
+    }];
+}
+
+- (void)creatSoreWithDic:(NSDictionary *)dic
+{
+    NSDictionary * attribute = @{NSForegroundColorAttributeName:BACKGROUNDCOLOR, NSFontAttributeName:[UIFont systemFontOfSize:20]};
     
+    NSString * startSend = [NSString stringWithFormat:@"￥%@", [dic objectForKey:@"StartSendMoney"]];
+    NSMutableAttributedString * startSendM = [[NSMutableAttributedString alloc]initWithString:startSend];
+    [startSendM setAttributes:attribute range:NSMakeRange(1, startSend.length - 1)];
     
-    UILabel * storeOutLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, TOP_SPACE + line8.bottom, RIGHT_LB_WIDTH, LABEL_HEIGHT)];
-    storeOutLB.text = @"外送费:";
-    storeOutLB.textColor = COLOT_TEXT;
-    storeOutLB.font = LABEL_FONT;
-    [scroll addSubview:storeOutLB];
+    self.startSendLabel.attributedText = startSendM;
+    NSString * delivery = [NSString stringWithFormat:@"￥%@", [dic objectForKey:@"Delivery"]];
+    NSMutableAttributedString * deliveryM = [[NSMutableAttributedString alloc]initWithString:delivery];
+    [deliveryM setAttributes:attribute range:NSMakeRange(1, delivery.length - 1)];
     
-    self.Delivery = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE + storeOutLB.right, storeOutLB.top, self.width - 3 * LEFT_SPACE - RIGHT_LB_WIDTH, LABEL_HEIGHT)];
-    //    _outSendLB.text = @"¥2";
-    _Delivery.textColor = COLOT_TEXT;
-    _Delivery.font = LABEL_FONT;
-    [scroll addSubview:_Delivery];
+    self.deliveryLabel.attributedText = deliveryM;
+    NSString * averageSendTime = [NSString stringWithFormat:@"%@分钟", [dic objectForKey:@"AverageSendtime"]];
+    NSMutableAttributedString *averageSendTimeM = [[NSMutableAttributedString alloc]initWithString:averageSendTime];
+    [averageSendTimeM setAttributes:attribute range:NSMakeRange(0, averageSendTime.length - 2)];
+    self.averageSendTimeLabel.attributedText = averageSendTimeM;
     
-    UIView * line9 = [[UIView alloc] initWithFrame:CGRectMake(LEFT_SPACE, _Delivery.bottom + TOP_SPACE, self.width - 2 * LEFT_SPACE, 1)];
-    line9.backgroundColor = LINE_COLOR;
-    [scroll addSubview:line9];
+    NSString * busstimeStr = [dic objectForKey:@"BusTime"];
+    NSArray * timeArr = [busstimeStr componentsSeparatedByString:@"-"];
+    NSString * str1 = [NSString stringWithFormat:@"%@:%@", [[[timeArr objectAtIndex:0] componentsSeparatedByString:@":"] objectAtIndex:0], [[[[timeArr objectAtIndex:0] componentsSeparatedByString:@":"] objectAtIndex:1] substringToIndex:2]];
+    NSString * str2 = [NSString stringWithFormat:@"%@:%@", [[[timeArr objectAtIndex:1] componentsSeparatedByString:@":"] objectAtIndex:0], [[[[timeArr objectAtIndex:1] componentsSeparatedByString:@":"] objectAtIndex:1] substringToIndex:2]];
+//    NSLog(@"%@***%@***", [timeArr objectAtIndex:0], [[[timeArr objectAtIndex:0] componentsSeparatedByString:@":"] objectAtIndex:0]);
     
+    self.bussTime.informationLabel.text = [NSString stringWithFormat:@"%@ - %@", str1, str2];
     
+    self.storeType.informationLabel.text = [dic objectForKey:@"StoreType"];
+    [self.storeType.button setTitle:[NSString stringWithFormat:@"%@分", [dic objectForKey:@"StoreScore"]] forState:UIControlStateNormal];
+    [self.storeType.button setTitleColor:BACKGROUNDCOLOR forState:UIControlStateNormal];
+    self.storeType.button.titleLabel.font = [UIFont systemFontOfSize:12];
+    CGRect buttonRect = [self.storeType.button.titleLabel.text boundingRectWithSize:CGSizeMake(MAXFLOAT, self.storeType.button.height) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:12]} context:nil];
+    self.storeType.button.frame = CGRectMake(self.width - TOP_SPACE - buttonRect.size.width, self.storeType.button.top, buttonRect.size.width, self.storeType.button.height);
     
-    UILabel * storeDistanceLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, TOP_SPACE + line9.bottom, RIGHT_LB_WIDTH, LABEL_HEIGHT)];
-    storeDistanceLB.text = @"服务距离:";
-    storeDistanceLB.textColor = COLOT_TEXT;
-    storeDistanceLB.font = LABEL_FONT;
-    [scroll addSubview:storeDistanceLB];
+    self.deliveryDistance.informationLabel.text = [NSString stringWithFormat:@"%@公里", [dic objectForKey:@"ServiceDis"]];
+    self.serviceDistance.informationLabel.text = [dic objectForKey:@"DeliveryDis"];
+    CGRect serverDisRect = [self.serviceDistance.informationLabel.text boundingRectWithSize:CGSizeMake(self.storeAddress.informationLabel.width, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:12]} context:nil];
+    if (serverDisRect.size.height > 14) {
+        self.serviceDistance.informationLabel.height = serverDisRect.size.height;
+        self.serviceDistance.height = self.storeAddress.height + serverDisRect.size.height - 14;
+        self.serviceDistance.button.top = self.serviceDistance.height / 2 - 10;
+        _storeAddress.top = _serviceDistance.bottom + 1;
+    }
     
-    self.ServiceDis = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE + storeDistanceLB.right, storeDistanceLB.top, self.width - 3 * LEFT_SPACE - RIGHT_LB_WIDTH, LABEL_HEIGHT)];
-    //    _distanceLB.text = @"3公里";
-    _ServiceDis.font = LABEL_FONT;
-    _ServiceDis.textColor = COLOT_TEXT;
-    [scroll addSubview:_ServiceDis];
+    self.storeAddress.informationLabel.text = [dic objectForKey:@"StoreAdress"];
+    CGRect addressRect = [self.storeAddress.informationLabel.text boundingRectWithSize:CGSizeMake(self.storeAddress.informationLabel.width, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:12]} context:nil];
+    if (addressRect.size.height > 14) {
+        self.storeAddress.informationLabel.height = addressRect.size.height;
+        self.storeAddress.height = self.storeAddress.height + addressRect.size.height - 14;
+        self.storeAddress.button.top = self.storeAddress.height / 2 - 10;
+        self.describeView.top = self.storeAddress.bottom + TOP_SPACE;
+    }
+    NSMutableArray * viewsAry = [NSMutableArray arrayWithCapacity:1];
+    if ([dic objectForKey:@"StorePhotos"]) {
+        NSArray * photosarr = [dic objectForKey:@"StorePhotos"];
+        for (int i = 0; i < photosarr.count; i++) {
+            NSString * imageStr = [photosarr objectAtIndex:i];
+            UIImageView * imageview = [[UIImageView alloc]initWithFrame:CGRectMake(0 , 0, _lunboScrollView.width, _lunboScrollView.height)];
+            __weak UIImageView * imageView_block = imageview;
+            [imageview setImageWithURL:[NSURL URLWithString:imageStr] placeholderImage:[UIImage imageNamed:@"placeholderIM.png"] completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType) {
+                if (error) {
+                    imageView_block.image = [UIImage imageNamed:@"load_fail.png"];
+                }
+            }];
+            [viewsAry addObject:imageview];
+        }
+        
+    }else
+    {
+        [viewsAry addObject:self.describeImageView];
+
+    }
     
-    UIView * line10 = [[UIView alloc] initWithFrame:CGRectMake(LEFT_SPACE, _ServiceDis.bottom + TOP_SPACE, self.width - 2 * LEFT_SPACE, 1)];
-    line10.backgroundColor = LINE_COLOR;
-    [scroll addSubview:line10];
+    self.lunboScrollView.fetchContentViewAtIndex = ^UIView *(NSInteger pageIndex){
+        return [viewsAry objectAtIndex:pageIndex];
+    };
+    self.lunboScrollView.totalPagesCount = ^NSInteger(void){
+        return viewsAry.count;
+    };
     
-    UILabel * deliverdis = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, TOP_SPACE + line10.bottom, RIGHT_LB_WIDTH, LABEL_HEIGHT)];
-    deliverdis.text = @"配送区域:";
-    deliverdis.textColor = COLOT_TEXT;
-    deliverdis.font = LABEL_FONT;
-    [scroll addSubview:deliverdis];
-    
-    self.DeliveryDis = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE + deliverdis.right, deliverdis.top, self.width - 3 * LEFT_SPACE - RIGHT_LB_WIDTH, LABEL_HEIGHT)];
-    //    _DeliveryDis.text = @"3公里";
-    _DeliveryDis.font = LABEL_FONT;
-    _DeliveryDis.textColor = COLOT_TEXT;
-    [scroll addSubview:_DeliveryDis];
-    
-    
-    UIView * line11 = [[UIView alloc] initWithFrame:CGRectMake(LEFT_SPACE, _DeliveryDis.bottom + TOP_SPACE, self.width - 2 * LEFT_SPACE, 1)];
-    line11.backgroundColor = LINE_COLOR;
-    [scroll addSubview:line11];
-    
-    scroll.contentSize = CGSizeMake(self.width, line11.bottom + TOP_SPACE);
-    
+    self.describeLabel.text = [dic objectForKey:@"Describe"];
+    self.tel = [dic objectForKey:@"StoreTel"];
+    self.myScrollview.contentSize = CGSizeMake(self.myScrollview.width, self.describeView.bottom + TOP_SPACE);
+}
+
+- (void)telAction:(UIButton *)button
+{
+    if (self.tel.length != 0) {
+        UIWebView * callWebView = [[UIWebView alloc]init];
+        NSURL * telUrl = [NSURL URLWithString:[NSString stringWithFormat:@"tel:%@", self.tel]];
+        [callWebView loadRequest:[NSURLRequest requestWithURL:telUrl]];
+        AppDelegate * appdelegate = [UIApplication sharedApplication].delegate;
+        [appdelegate.window addSubview:callWebView];
+    }
+}
+
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView
+{
+    CGFloat offset = scrollView.contentOffset.y;
+    if (scrollView.contentOffset.y<0) {
+        // 高度宽度同时拉伸，从中心放大
+        CGFloat imgH = ImageHeight - scrollView.contentOffset.y * 2;
+        CGFloat imgW = imgH * self.scale;
+        if (self.lunboScrollView.scrollView.subviews.count == 1) {
+            self.lunboScrollView.frame =  CGRectMake(scrollView.contentOffset.y * self.scale, scrollView.contentOffset.y , imgW, imgH);
+            
+            for (UIImageView * imageView in self.lunboScrollView.scrollView.subviews) {
+                imageView.frame = CGRectMake(0, 0 , _lunboScrollView.width, _lunboScrollView.height);
+            }
+            
+            [self aginlayout];
+        }else
+        {
+            
+        }
+        
+        
+    }
+     NSLog(@"%0.0f",scrollView.contentOffset.y);
+}
+- (void)aginlayout
+{
+    self.sendInformationView.frame = CGRectMake(self.sendInformationView.left, CGRectGetMaxY(self.lunboScrollView.frame), self.sendInformationView.width, self.sendInformationView.height);
+    self.bussTime.top = self.sendInformationView.bottom + TOP_SPACE;
+    self.storeType.top = self.bussTime.bottom + 1;
+    self.deliveryDistance.top = self.storeType.bottom + 1;
+    self.serviceDistance.top = self.deliveryDistance.bottom + 1;
+    self.storeAddress.top = self.serviceDistance.bottom + 1;
+    self.describeView.top = self.storeAddress.bottom + TOP_SPACE;
 }
 
 /*

@@ -9,7 +9,7 @@
 #import "AddAddressViewController.h"
 #import "AddressModel.h"
 
-@interface AddAddressViewController ()<UITextFieldDelegate, HTTPPostDelegate>
+@interface AddAddressViewController ()<UITextFieldDelegate, HTTPPostDelegate, UITextViewDelegate>
 
 /**
  *  联系人输入框
@@ -19,7 +19,7 @@
 /**
  *  地址输入框
  */
-@property (nonatomic, strong)UITextField * addressTF;
+@property (nonatomic, strong)UITextView * addressTF;
 /**
  *  电话输入框
  */
@@ -46,60 +46,59 @@
     self.receiveNameTF = [[UITextField alloc] initWithFrame:CGRectMake(20, 15, receiveNameView.width - 60, 30)];
     _receiveNameTF.delegate = self;
     _receiveNameTF.placeholder = @"收货人姓名";
+    [_receiveNameTF setValue:[UIColor colorWithWhite:0.7 alpha:1] forKeyPath:@"_placeholderLabel.textColor"];
     _receiveNameTF.textColor = TEXT_COLOR;
     [receiveNameView addSubview:_receiveNameTF];
     
-    UIView * lineView1 = [[UIView alloc] initWithFrame:CGRectMake(0, receiveNameView.bottom, self.view.width, 1)];
-    lineView1.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
-    [self.view addSubview:lineView1];
-    
-    
-    UIView * addressView = [[UIView alloc] initWithFrame:CGRectMake(0, lineView1.bottom, self.view.width, 60)];
-//    UIView * addressView = [[UIView alloc] initWithFrame:CGRectMake(0, self.navigationController.navigationBar.bottom, self.view.width, 60)];
-    addressView.backgroundColor = [UIColor whiteColor];
-    [self.view addSubview:addressView];
-    
-    self.addressTF = [[UITextField alloc] initWithFrame:CGRectMake(20, 15, addressView.width - 60, 30)];
-    _addressTF.delegate = self;
-    _addressTF.placeholder = @"地址";
-    _addressTF.textColor = TEXT_COLOR;
-    [addressView addSubview:_addressTF];
-    
-    UIView * lineView = [[UIView alloc] initWithFrame:CGRectMake(0, addressView.bottom, self.view.width, 1)];
-    lineView.backgroundColor = [UIColor colorWithWhite:0.8 alpha:0.8];
-    [self.view addSubview:lineView];
-    
-    UIView * telView = [[UIView alloc] initWithFrame:CGRectMake(0, lineView.bottom, self.view.width, 60)];
+    UIView * telView = [[UIView alloc] initWithFrame:CGRectMake(0, receiveNameView.bottom + 1, self.view.width, 60)];
     telView.backgroundColor = [UIColor whiteColor];
     [self.view addSubview:telView];
     
-    self.telTF = [[UITextField alloc] initWithFrame:CGRectMake(20, 15, addressView.width - 60, 30)];
+    self.telTF = [[UITextField alloc] initWithFrame:CGRectMake(20, 15, telView.width - 60, 30)];
     _telTF.delegate = self;
     _telTF.placeholder = @"手机号";
+    [_telTF setValue:[UIColor colorWithWhite:0.7 alpha:1] forKeyPath:@"_placeholderLabel.textColor"];
     _telTF.textColor = TEXT_COLOR;
     [telView addSubview:_telTF];
     
+    UIView * addressView = [[UIView alloc] initWithFrame:CGRectMake(0, telView.bottom + 1, self.view.width, 60)];
+    addressView.backgroundColor = [UIColor whiteColor];
+    addressView.tag = 10000;
+    [self.view addSubview:addressView];
     
-    UIButton * saveButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    saveButton.frame = CGRectMake(15, telView.bottom + 20, self.view.width - 30, 45);
-    saveButton.backgroundColor = MAIN_COLOR;
-    [saveButton setTitle:@"保存" forState:UIControlStateNormal];
-    [saveButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-    [saveButton addTarget:self action:@selector(saveAddressAndPhone:) forControlEvents:UIControlEventTouchUpInside];
-    [self.view addSubview:saveButton];
+    self.addressTF = [[UITextView alloc] initWithFrame:CGRectMake(18, 15, addressView.width - 60, 30)];
+    _addressTF.delegate = self;
+    _addressTF.text = @"地址";
+    _addressTF.font = [UIFont systemFontOfSize:17];
+//    _addressTF.backgroundColor = [UIColor redColor];
+    _addressTF.textColor = [UIColor colorWithWhite:0.7 alpha:1];
+    [addressView addSubview:_addressTF];
+    
     
     if (_addressModel) {
+        _addressTF.textColor = [UIColor blackColor];
         _receiveNameTF.text = _addressModel.receiveName;
         _addressTF.text = _addressModel.address;
         _telTF.text = _addressModel.phoneNumber;
     }
     
+    NSString * str = _addressTF.text;
+    CGRect  addRect = [str boundingRectWithSize:CGSizeMake(self.addressTF.width, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:17]} context:nil];
+    if (addRect.size.height > 30) {
+        UIView * addressView = [self.view viewWithTag:10000];
+        self.addressTF.frame = CGRectMake(20, 15, addressView.width - 60, addRect.size.height + 10);
+        addressView.height = 30 + addRect.size.height;
+    }
+    
     UIButton * backBT = [UIButton buttonWithType:UIButtonTypeCustom];
     backBT.frame = CGRectMake(0, 0, 15, 20);
-    [backBT setBackgroundImage:[UIImage imageNamed:@"back_r.png"] forState:UIControlStateNormal];
+    [backBT setBackgroundImage:[UIImage imageNamed:@"back_black.png"] forState:UIControlStateNormal];
     [backBT addTarget:self action:@selector(backLastVC:) forControlEvents:UIControlEventTouchUpInside];
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:backBT];
     
+    NSDictionary * attribute = @{NSForegroundColorAttributeName:[UIColor colorWithWhite:.2 alpha:1]};
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"完成" style:UIBarButtonItemStylePlain target:self action:@selector(saveAddressAndPhone:)];
+    [self.navigationItem.rightBarButtonItem setTitleTextAttributes:attribute forState:UIControlStateNormal];
     // Do any additional setup after loading the view.
 }
 - (void)viewWillAppear:(BOOL)animated
@@ -123,7 +122,7 @@
     // Dispose of any resources that can be recreated.
 }
 
-- (void)saveAddressAndPhone:(UIButton *)button
+- (void)saveAddressAndPhone:(UIBarButtonItem *)button
 {
     [self.addressTF resignFirstResponder];
     [self.telTF resignFirstResponder];
@@ -162,11 +161,43 @@
     [self.addressTF resignFirstResponder];
     [self.telTF resignFirstResponder];
 }
+#pragma mark - textFiled Delegate
 
+- (void)textViewDidBeginEditing:(UITextView *)textView
+{
+    if ([textView.text isEqualToString:@"地址"]) {
+        textView.text = @"";
+        textView.textColor = [UIColor blackColor];
+    }
+}
 
+- (void)textViewDidEndEditing:(UITextView *)textView
+{
+    if (textView.text.length != 0) {
+        textView.textColor = TEXT_COLOR;
+        CGRect  addRect = [textView.text boundingRectWithSize:CGSizeMake(self.addressTF.width, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:17]} context:nil];
+        
+        if (addRect.size.height > 30) {
+            UIView * addressView = [self.view viewWithTag:10000];
+            self.addressTF.frame = CGRectMake(20, 15, self.view.width - 60, addRect.size.height + 10);
+            addressView.height = 30 + addRect.size.height;
+        }else
+        {
+            UIView * addressView = [self.view viewWithTag:10000];
+            self.addressTF.height = 30;
+            addressView.height = 60;
+        }
+    }else
+    {
+        textView.text = @"地址";
+        textView.textColor = [UIColor colorWithWhite:0.7 alpha:1];
+        UIView * addressView = [self.view viewWithTag:10000];
+        self.addressTF.height = 30;
+        addressView.height = 60;
+    }
+}
 - (BOOL)textFieldShouldReturn:(UITextField *)textField
 {
-    [self.addressTF resignFirstResponder];
     [self.telTF resignFirstResponder];
     return YES;
 }

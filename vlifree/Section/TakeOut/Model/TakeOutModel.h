@@ -43,6 +43,18 @@
  */
 @property (nonatomic, strong)NSNumber * peyType;
 /**
+ *  距离
+ */
+@property (nonatomic, strong)NSNumber * distance;
+/**
+ *  配送时间
+ */
+@property (nonatomic, strong)NSNumber * sendTime;
+/**
+ *  评论数
+ */
+@property (nonatomic, strong)NSNumber * commentCount;
+/**
  *  商店地址
  */
 @property (nonatomic, copy)NSString * address;

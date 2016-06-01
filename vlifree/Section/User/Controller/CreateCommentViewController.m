@@ -36,7 +36,7 @@
     self.view.backgroundColor = [UIColor whiteColor];
     self.hud = [JGProgressHUD progressHUDWithStyle:JGProgressHUDStyleLight];
     [self createSubview];
-    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[[UIImage imageNamed:@"back.png"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] style:UIBarButtonItemStylePlain target:self action:@selector(backLastVC:)];
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[[UIImage imageNamed:@"back_black.png"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] style:UIBarButtonItemStylePlain target:self action:@selector(backLastVC:)];
     
     // Do any additional setup after loading the view.
 }
@@ -247,6 +247,11 @@
     NSLog(@"%@", [data objectForKey:@"ErrorMsg"]);
     [self.hud dismiss];
     if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
+        
+        UIAlertView * alert = [[UIAlertView alloc]initWithTitle:nil message:@"评论成功" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
+        [alert show];
+        [alert performSelector:@selector(dismiss) withObject:nil afterDelay:1.0];
+        
         [self.navigationController popViewControllerAnimated:YES];
     }else
     {

@@ -37,7 +37,7 @@
  */
 @property (nonatomic, strong)NSMutableArray * dataArray;
 
-
+@property (nonatomic, copy)NSString * myStr;
 @end
 
 @implementation SearchViewController  
@@ -55,7 +55,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    
+    self.myStr = @"";
 //    self.searchBar = [[UISearchBar alloc] initWithFrame:CGRectMake(0, 5, 150, 30)];
 //    self.searchBar.center = CGPointMake(self.view.centerX, self.searchBar.centerY);
 //    self.searchBar.placeholder = @"关键字";
@@ -81,12 +81,13 @@
     _searchVC.searchBar.placeholder = @"请输入关键字";
     
     [self.tableView registerClass:[TakeOutViewCell class] forCellReuseIdentifier:@"cell"];
-    
-    self.tableView.tableFooterView = [[UIView alloc] init];
+//    self.tableView.header = [MJRefreshNormalHeader headerWithRefreshingTarget:self refreshingAction:@selector(headerRereshing)];
+//    self.tableView.footer = [MJRefreshAutoNormalFooter footerWithRefreshingTarget:self refreshingAction:@selector(footerRereshing)];
+//    self.tableView.tableFooterView = [[UIView alloc] init];
     
     UIButton * backBT = [UIButton buttonWithType:UIButtonTypeCustom];
     backBT.frame = CGRectMake(0, 0, 15, 20);
-    [backBT setBackgroundImage:[UIImage imageNamed:@"back_w.png"] forState:UIControlStateNormal];
+    [backBT setBackgroundImage:[UIImage imageNamed:@"back_black.png"] forState:UIControlStateNormal];
     [backBT addTarget:self action:@selector(backLastVC:) forControlEvents:UIControlEventTouchUpInside];
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:backBT];
     
@@ -94,12 +95,55 @@
     // Do any additional setup after loading the view.
 }
 
+#pragma mark - 数据刷新,加载更多
 
-
+//- (void)headerRereshing
+//{
+////    [self.tableView.footer resetNoMoreData];
+//    _page = 1;
+//    [self downloadDataWithCommand:@6 page:1 ];
+//}
+//
+//- (void)footerRereshing
+//{
+//    //    NSInteger count = 0;
+//    //    for (NSMutableArray * array in self.dataArray) {
+//    //        count += array.count;
+//    //    }
+//    //    if (count < [_allCount integerValue]) {
+//    ////        self.takeOutTabelView.footerRefreshingText = @"正在加载数据";
+//    //        [self.takeOutTabelView.footer resetNoMoreData];
+//    [self downloadDataWithCommand:@6 page:++_page ];
+//    //    }else
+//    //    {
+//    ////        self.takeOutTabelView.footerRefreshingText = @"数据已经加载完";
+//    //        [self.takeOutTabelView.footer noticeNoMoreData];
+//    //        [self.takeOutTabelView performSelector:@selector(footerEndRefreshing) withObject:nil afterDelay:1.5];
+//    //    }
+//    
+//}
+#pragma mark - 数据请求
+- (void)downloadDataWithCommand:(NSNumber *)command page:(int)page
+{
+    if ([UserLocation shareUserLocation].city) {
+        NSDictionary * jsonDic = @{
+                                   @"Command":@19,
+                                   @"KeyWord":self.myStr,
+                                   @"CurPage":@(page),
+                                   @"CurCount":[NSNumber numberWithInt:COUNT],
+                                   @"City":[UserLocation shareUserLocation].city
+                                   };
+        [self playPostWithDictionary:jsonDic];
+    
+    }
+    
+    
+}
 - (void)searchHotTaglibWithKeyWord:(NSString *)keyWords
 {
     NSLog(@"%@", keyWords);
     _page = 1;
+    self.myStr = keyWords;
     NSDictionary * jsonDic = @{
                                @"Command":@19,
                                @"KeyWord":keyWords,
@@ -108,9 +152,9 @@
                                @"City":[UserLocation shareUserLocation].city
                                };
     [self playPostWithDictionary:jsonDic];
+    
     self.searchVC.active = NO;
 }
-
 
 - (void)backLastVC:(id)sender
 {
@@ -173,6 +217,7 @@
     detailTakeOutVC.sendPrice = takeOutMD.sendPrice;
     detailTakeOutVC.outSentMoney = takeOutMD.outSentMoney;
     detailTakeOutVC.storeName = takeOutMD.storeName;
+    detailTakeOutVC.iConimageURL = takeOutMD.icon;
     detailTakeOutVC.navigationItem.title = takeOutMD.storeName;
     [self.navigationController pushViewController:detailTakeOutVC animated:YES];
 }
@@ -226,10 +271,13 @@
 
 - (void)refresh:(id)data
 {
+    
     NSLog(@"+++%@, error = %@", data, [data objectForKey:@"ErrorMsg"]);
     if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
         NSArray * array = [data objectForKey:@"StoreList"];
         if (array.count == 0) {
+            
+            [self.tableView.footer noticeNoMoreData];
             UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:@"搜索内容为空" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
             [alert show];
             [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:1.0];
@@ -253,6 +301,7 @@
 
 - (void)failWithError:(NSError *)error
 {
+
     NSLog(@"%@", error);
 }
 

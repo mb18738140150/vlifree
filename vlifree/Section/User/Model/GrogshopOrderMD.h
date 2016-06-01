@@ -13,6 +13,7 @@
 
 @property (nonatomic, copy)NSString * orderSn;
 @property (nonatomic, copy)NSString * name;
+@property (nonatomic, copy)NSString * storeIcon;
 @property (nonatomic, strong)NSNumber * money;
 @property (nonatomic, copy)NSString * roomType;
 @property (nonatomic, copy)NSString * checkinTime;
@@ -21,7 +22,7 @@
 @property (nonatomic, strong)NSNumber * payState;
 @property (nonatomic, strong)NSNumber * refundState;
 @property (nonatomic, strong)NSNumber * orderState;
-
+@property (nonatomic, copy)NSString * createTime;
 - (id)initWithDictionary:(NSDictionary *)dic;
 
 @end

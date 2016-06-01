@@ -30,32 +30,37 @@
     
     self.nameLabel = [[UILabel alloc]initWithFrame:CGRectMake(LEFT_SPACE, TOP_SPACE, self.width * 2 / 5 - LEFT_SPACE, LABEL_HEIGHT)];
     _nameLabel.font = [UIFont systemFontOfSize:13];
+    self.nameLabel.layer.cornerRadius = LABEL_HEIGHT / 2;
+    self.nameLabel.layer.masksToBounds = YES;
+    self.nameLabel.layer.borderColor = [UIColor colorWithWhite:.9 alpha:1].CGColor;
+    self.nameLabel.layer.borderWidth = 1;
     _nameLabel.backgroundColor = [UIColor clearColor];
+    _nameLabel.textAlignment = NSTextAlignmentCenter;
     _nameLabel.textColor = [UIColor blackColor];
     [self addSubview:_nameLabel];
     
-    self.priceLabel = [[UILabel alloc]initWithFrame:CGRectMake(_nameLabel.right, _nameLabel.top, self.width / 5, LABEL_HEIGHT)];
-    _priceLabel.backgroundColor = [UIColor clearColor];
+    self.priceLabel = [[UILabel alloc]initWithFrame:CGRectMake(_nameLabel.right, _nameLabel.top, self.width / 5 + self.width / 10, LABEL_HEIGHT)];
+    _priceLabel.backgroundColor = [UIColor whiteColor];
     _priceLabel.textColor = MAIN_COLOR;
     _priceLabel.adjustsFontSizeToFitWidth = YES;
     [self addSubview:_priceLabel];
     
-    self.integralLabel = [[UILabel alloc]initWithFrame:CGRectMake(_priceLabel.right, _priceLabel.top, self.width / 10, LABEL_HEIGHT)];
-    _integralLabel.layer.cornerRadius = 5;
-    _integralLabel.layer.masksToBounds = YES;
-    _integralLabel.adjustsFontSizeToFitWidth = YES;
-    _integralLabel.textColor = [UIColor whiteColor];
-    _integralLabel.backgroundColor = MAIN_COLOR;
-    _integralLabel.textAlignment = NSTextAlignmentCenter;
-    [self addSubview:_integralLabel];
+//    self.integralLabel = [[UILabel alloc]initWithFrame:CGRectMake(_priceLabel.right, _priceLabel.top, self.width / 10, LABEL_HEIGHT)];
+//    _integralLabel.layer.cornerRadius = 5;
+//    _integralLabel.layer.masksToBounds = YES;
+//    _integralLabel.adjustsFontSizeToFitWidth = YES;
+//    _integralLabel.textColor = [UIColor whiteColor];
+//    _integralLabel.backgroundColor = MAIN_COLOR;
+//    _integralLabel.textAlignment = NSTextAlignmentCenter;
+//    [self addSubview:_integralLabel];
     
     self.subtractButton = [UIButton buttonWithType:UIButtonTypeSystem];
-    _subtractButton.frame = CGRectMake(_integralLabel.right, 0, BUTTON_SIZE, BUTTON_SIZE);
+    _subtractButton.frame = CGRectMake(_priceLabel.right, 0, BUTTON_SIZE, BUTTON_SIZE);
 //    [_subtractButton setImage:[UIImage imageNamed:@"subtract.png"] forState:UIControlStateNormal];
     [_subtractButton setBackgroundImage:[UIImage imageNamed:@"subtract.png"] forState:UIControlStateNormal];
     [self addSubview:_subtractButton];
     
-    self.countLabel = [[UILabel alloc]initWithFrame:CGRectMake(_subtractButton.right, _integralLabel.top, self.width - _subtractButton.right - BUTTON_SIZE, LABEL_HEIGHT)];
+    self.countLabel = [[UILabel alloc]initWithFrame:CGRectMake(_subtractButton.right, _priceLabel.top, self.width - _subtractButton.right - BUTTON_SIZE, LABEL_HEIGHT)];
     _countLabel.backgroundColor = [UIColor clearColor];
     _countLabel.textAlignment = NSTextAlignmentCenter;
     _countLabel.textColor = [UIColor blackColor];

@@ -31,6 +31,7 @@
 @property (nonatomic, strong)NSNumber * reduceCard;//优惠券
 @property (nonatomic, strong)NSNumber * discount;//打折
 @property (nonatomic, strong)NSNumber * internal;//积分
+@property (nonatomic, strong)NSNumber * mealCount;// 订单菜品数量
 
 - (id)initWithDictionary:(NSDictionary *)dic;
 

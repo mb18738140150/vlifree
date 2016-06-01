@@ -54,6 +54,34 @@
     MenusViewCell * cell = (MenusViewCell *)object;
     cell.countLabel.text = [NSString stringWithFormat:@"%@", [change objectForKey:@"new"]];
     
+//    if (cell.menuModel.PropertyList.count != 0) {
+//        if ([[change objectForKey:@"new"] isEqualToNumber:@0]) {
+//            cell.countLabel.hidden = YES;
+//            cell.addButton.hidden = YES;
+//            cell.subtractBT.hidden = YES;
+//            cell.choosePropertyButton.hidden = NO;
+//        }else
+//        {
+//            cell.choosePropertyButton.hidden = YES;
+//            cell.addButton.hidden = NO;
+//            cell.countLabel.hidden = NO;
+//            if (cell.menuModel.PropertyList.count != 0) {
+//                cell.subtractBT.hidden = YES;
+//            }
+//            cell.subtractBT.hidden = NO;
+//        }
+//    }else
+//    {
+//        if ([[change objectForKey:@"new"] isEqualToNumber:@0]) {
+//            cell.subtractBT.hidden = YES;
+//        }else
+//        {
+//            if (cell.menuModel.PropertyList.count != 0) {
+//                cell.subtractBT.hidden = YES;
+//            }
+//            cell.subtractBT.hidden = NO;
+//        }
+//    }
     if ([[change objectForKey:@"new"] isEqualToNumber:@0]) {
         cell.subtractBT.hidden = YES;
     }else
@@ -151,6 +179,21 @@
 //        [_addButton setTitle:@"+" forState:UIControlStateNormal];
 //        [_addButton setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
         [self.contentView addSubview:_addButton];
+        
+        
+        
+        self.choosePropertyButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        _choosePropertyButton.frame = CGRectMake(_nameLabel.right - 60, _priceLabel.bottom - BUTTON_SIZE, 60, BUTTON_SIZE);
+        _choosePropertyButton.backgroundColor = [UIColor whiteColor];
+        _choosePropertyButton.layer.cornerRadius = 15;
+        _choosePropertyButton.layer.masksToBounds = YES;
+        _choosePropertyButton.layer.borderColor = [UIColor colorWithWhite:.7 alpha:1].CGColor;
+        _choosePropertyButton.layer.borderWidth = .5;
+        [_choosePropertyButton setTitle:@"选口味" forState:UIControlStateNormal];
+        _choosePropertyButton.titleLabel.font = [UIFont systemFontOfSize:13];
+        [_choosePropertyButton setTitleColor:BACKGROUNDCOLOR forState:UIControlStateNormal];
+        [self.contentView addSubview:_choosePropertyButton];
+        _choosePropertyButton.hidden = YES;
     }
 }
 
@@ -166,7 +209,7 @@
     _menuModel = menuModel;
     [self.iconView setImageWithURL:[NSURL URLWithString:menuModel.icon] placeholderImage:[UIImage imageNamed:@"placeholderIM.png"]];
     self.nameLabel.text = menuModel.name;
-    self.soldCountLB.text = [NSString stringWithFormat:@"已售%@份", menuModel.soldCount];
+    self.soldCountLB.text = [NSString stringWithFormat:@"%@", menuModel.commodityDescription];
     
     NSString * priceStr = [NSString stringWithFormat:@"%@", menuModel.price];
     NSDictionary * priceDic = @{NSFontAttributeName:[UIFont systemFontOfSize:15]};
@@ -186,6 +229,13 @@
     
     UILabel * unitLabel = [self.contentView viewWithTag:1111];
     unitLabel.frame = CGRectMake(_oldPriceView.right, _oldPriceView.top, 40, _oldPriceView.height);
+    
+//    if (menuModel.PropertyList.count != 0) {
+//        self.choosePropertyButton.hidden = NO;
+//        self.addButton.hidden = YES;
+//        self.countLabel.hidden = YES;
+//    }
+    
 }
 
 

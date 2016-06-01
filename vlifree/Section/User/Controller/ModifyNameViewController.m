@@ -33,8 +33,8 @@
     
     self.navigationItem.title = @"修改昵称";
     self.navigationController.navigationBar.titleTextAttributes = @{
-                                                                    NSForegroundColorAttributeName: [UIColor whiteColor],
-                                                                    NSFontAttributeName : [UIFont boldSystemFontOfSize:15]};
+                                                                    NSForegroundColorAttributeName: [UIColor blackColor],
+                                                                    NSFontAttributeName : [UIFont boldSystemFontOfSize:17]};
     self.navigationController.navigationBar.tintColor = [UIColor whiteColor];
     UIView * aView = [[UIView alloc] initWithFrame:CGRectMake(LEFT_SPACE, TOP_SPACE + self.navigationController.navigationBar.bottom, self.view.width - 2 *  LEFT_SPACE, VIEW_HEIGHT)];
     aView.layer.borderColor = [UIColor colorWithWhite:0.7 alpha:0.7].CGColor;
@@ -57,10 +57,11 @@
     
     
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"确定" style:UIBarButtonItemStyleDone target:self action:@selector(determineModifyName:)];
+    [self.navigationItem.rightBarButtonItem setTitleTextAttributes:@{NSForegroundColorAttributeName:[UIColor blackColor]} forState:UIControlStateNormal];
     
     UIButton * backBT = [UIButton buttonWithType:UIButtonTypeCustom];
     backBT.frame = CGRectMake(0, 0, 15, 20);
-    [backBT setBackgroundImage:[UIImage imageNamed:@"back_w.png"] forState:UIControlStateNormal];
+    [backBT setBackgroundImage:[UIImage imageNamed:@"back_black.png"] forState:UIControlStateNormal];
     [backBT addTarget:self action:@selector(backLastVC:) forControlEvents:UIControlEventTouchUpInside];
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:backBT];
     
@@ -135,7 +136,7 @@
     NSLog(@"+++%@", data);
     if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
         [UserInfo shareUserInfo].name = self.nameTF.text;
-        _refreshBlock();
+//        _refreshBlock();
         [self.navigationController popViewControllerAnimated:YES];
     }
 //    [SVProgressHUD dismiss];
@@ -147,10 +148,10 @@
     NSLog(@"%@", error);
 }
 
-- (void)refreshUserName:(RefreshUserInfo)refreshBlock
-{
-    _refreshBlock = refreshBlock;
-}
+//- (void)refreshUserName:(RefreshUserInfo)refreshBlock
+//{
+//    _refreshBlock = refreshBlock;
+//}
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];

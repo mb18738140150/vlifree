@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-
+extern NSString *const CollectCountCHange;
 @interface UserInfo : NSObject
 /**
  *  用户名
@@ -29,6 +29,10 @@
  *  外卖订单数
  */
 @property (nonatomic, strong)NSNumber * wakeoutOrderCount;
+/**
+ *  我的收藏个数
+ */
+@property (nonatomic, strong)NSNumber * collectCount;
 /**
  *  用户id
  */

@@ -24,6 +24,8 @@
 #import "PropertyModel.h"
 #import "PropertyView.h"
 #import "CollectStroeDB.h"
+#import "AppDelegate.h"
+
 
 #define SECTION_TABLEVIEW_CELL @"SECTIONCELL"
 #define MENUS_TABLEVIEW_CELL @"MENUSCELL"
@@ -31,6 +33,7 @@
 
 #define SUBTRACT_BUTTON_TAG 1000
 #define ADD_BUTTON_TAG 2000
+#define ChoosePropertyButton_tag 9999
 
 #define PROPERTY_BUTTON_TAG 3000
 
@@ -126,7 +129,9 @@
 // 菜品属性弹出框
 // 弹出框
 @property (nonatomic, strong)UIView * tanchuView;
-@property (nonatomic, strong)MenuModel * menuModel;
+@property (nonatomic, strong)MenuModel * menuModel;// 记录被选择的菜品
+@property (nonatomic, assign)int menCount;// 记录被选择的菜品选择时候的数量
+@property (nonatomic, strong)NSMutableArray * menuspropertyArr;// 记录被选择的菜品选择时候的不同属性数量
 
 @property (nonatomic, strong)UISegmentedControl * segment;
 @property (nonatomic, strong)UIView * segmentView;
@@ -134,6 +139,8 @@
 @property (nonatomic, strong)CollectStroeDB * collectDB;
 @property (nonatomic, strong)CollectStoreModel * collectModel;
 @property (nonatomic, strong)UIButton * collectBT;
+
+@property (nonatomic, strong)JGProgressHUD * hud;
 
 @end
 
@@ -169,6 +176,13 @@
         self.shopArray = [NSMutableArray array];
     }
     return _shopArray;
+}
+- (NSMutableArray *)menuspropertyArr
+{
+    if (!_menuspropertyArr) {
+        self.menuspropertyArr = [NSMutableArray array];
+    }
+    return _menuspropertyArr;
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
@@ -326,19 +340,31 @@
     
     self.introView = [[StoreIntroView alloc]initWithFrame:CGRectMake(2 * _aScrollView.width, 0, _aScrollView.width, _aScrollView.height)];
     [_aScrollView addSubview:_introView];
-    [self.introView.addressBT addTarget:self action:@selector(addressAction:) forControlEvents:UIControlEventTouchUpInside];
-    NSDictionary *jsondic = @{
-                              @"Command":@43,
-                              @"StoreId":self.takeOutID,
-                              };
-    [self playPostWithDictionary:jsondic];
+    [self.introView.storeAddress.button addTarget:self action:@selector(addressAction:) forControlEvents:UIControlEventTouchUpInside];
+    if ([UserInfo shareUserInfo].userId) {
+        NSDictionary *jsondic = @{
+                                  @"Command":@43,
+                                  @"UserId":[UserInfo shareUserInfo].userId,
+                                  @"StoreId":self.takeOutID,
+                                  };
+        [self playPostWithDictionary:jsondic];
+    }else
+    {
+        NSDictionary *jsondic = @{
+                                  @"Command":@43,
+                                  @"UserId":@0,
+                                  @"StoreId":self.takeOutID,
+                                  };
+        [self playPostWithDictionary:jsondic];
+    }
+    
 //    self.introView = [[StoreIntroView alloc] initWithFrame:CGRectMake(_commentTableView.right, 0, _aScrollView.width, _aScrollView.height)];
 //    [_aScrollView addSubview:_introView];
     
     
     UIButton * backBT = [UIButton buttonWithType:UIButtonTypeCustom];
     backBT.frame = CGRectMake(0, 0, 15, 20);
-    [backBT setBackgroundImage:[UIImage imageNamed:@"back_r.png"] forState:UIControlStateNormal];
+    [backBT setBackgroundImage:[UIImage imageNamed:@"back_black.png"] forState:UIControlStateNormal];
     [backBT addTarget:self action:@selector(backLastVC:) forControlEvents:UIControlEventTouchUpInside];
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:backBT];
     
@@ -353,16 +379,16 @@
     _collectModel.businessName = self.storeName;
     _collectModel.businessId = self.takeOutID.intValue;
     _collectModel.businessType = 2;
-    if ([self.collectDB retrieveList:_collectModel]) {
-        _collectBT.selected = YES;
-    }
+//    if ([self.collectDB retrieveList:_collectModel]) {
+//        _collectBT.selected = YES;
+//    }
     
     
     [self downloadData];
     
     self.tanchuView = [[UIView alloc]initWithFrame:self.view.bounds];
     _tanchuView.backgroundColor = [UIColor clearColor];
-
+    self.menCount = 0;
     
 //    [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(scrollNotice) userInfo:nil repeats:YES];
 //    self.navigationController.navigationBar.tintColor = [UIColor clearColor];
@@ -372,25 +398,32 @@
 #pragma mark - 收藏店铺
 - (void)collectAction:(UIButton *)button
 {
-    if (button.selected) {
-        // 取消收藏
-        NSDictionary * jsonDic = @{
-                                   @"UserId":[UserInfo shareUserInfo].userId,
-                                   @"Command":@29,
-                                   @"Flag":@(_collectModel.businessType),
-                                   @"Id":@(_collectModel.businessId)
-                                   };
-        [self playPostWithDictionary:jsonDic];
+    if ([UserInfo shareUserInfo].userId) {
+        if (button.selected) {
+            // 取消收藏
+            NSDictionary * jsonDic = @{
+                                       @"UserId":[UserInfo shareUserInfo].userId,
+                                       @"Command":@29,
+                                       @"Flag":@(_collectModel.businessType),
+                                       @"Id":@(_collectModel.businessId)
+                                       };
+            [self playPostWithDictionary:jsonDic];
+        }else
+        {
+            // 收藏
+            NSDictionary * jsonDic = @{
+                                       @"UserId":[UserInfo shareUserInfo].userId,
+                                       @"Command":@28,
+                                       @"Flag":@(_collectModel.businessType),
+                                       @"Id":@(_collectModel.businessId)
+                                       };
+            [self playPostWithDictionary:jsonDic];
+        }
     }else
     {
-        // 收藏
-        NSDictionary * jsonDic = @{
-                                   @"UserId":[UserInfo shareUserInfo].userId,
-                                   @"Command":@28,
-                                   @"Flag":@(_collectModel.businessType),
-                                   @"Id":@(_collectModel.businessId)
-                                   };
-        [self playPostWithDictionary:jsonDic];
+        UIAlertView * alertView = [[UIAlertView alloc]initWithTitle:nil message:@"收藏需要先登录" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
+        [alertView show];
+        [alertView performSelector:@selector(dismiss) withObject:nil afterDelay:1.5];
     }
     NSLog(@"收藏");
 }
@@ -466,17 +499,22 @@
 
 - (void)noticeLBText:(NSString *)notice
 {
-    if (notice.length > 0) {
-        self.noticeLB.text = notice;
-        CGSize size = [self.noticeLB sizeThatFits:CGSizeMake(CGFLOAT_MAX, self.noticeLB.height)];
-        self.noticeLB.width = size.width;
-        self.noticeScrollV.contentSize = CGSizeMake(size.width + 5, _noticeScrollV.height);
-        if (self.noticeTimer != nil) {
-            [self.noticeTimer invalidate];
-        }
-        self.noticeTimer = nil;
-        if (size.width > _noticeScrollV.width) {
-            self.noticeTimer = [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(scrollNotice) userInfo:nil repeats:YES];
+    if (![notice isKindOfClass:[NSNull class]]) {
+        if (notice.length > 0) {
+            self.noticeLB.text = notice;
+            CGSize size = [self.noticeLB sizeThatFits:CGSizeMake(CGFLOAT_MAX, self.noticeLB.height)];
+            self.noticeLB.width = size.width;
+            self.noticeScrollV.contentSize = CGSizeMake(size.width + 5, _noticeScrollV.height);
+            if (self.noticeTimer != nil) {
+                [self.noticeTimer invalidate];
+            }
+            self.noticeTimer = nil;
+            if (size.width > _noticeScrollV.width) {
+                self.noticeTimer = [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(scrollNotice) userInfo:nil repeats:YES];
+            }
+        }else
+        {
+            [self deleteNOticeView];
         }
     }else
     {
@@ -684,6 +722,8 @@
 
 - (void)playPostWithDictionary:(NSDictionary *)dic
 {
+//    self.hud = [JGProgressHUD progressHUDWithStyle:JGProgressHUDStyleLight];
+//    [self.hud showInView:self.view];
     NSString * jsonStr = [dic JSONString];
     NSLog(@"%@", jsonStr);
     NSString * str = [NSString stringWithFormat:@"%@231618", jsonStr];
@@ -697,7 +737,9 @@
 
 - (void)refresh:(id)data
 {
-    NSLog(@"+++%@", data);
+//    NSLog(@"+++%@", data);
+    [self.hud dismiss];
+    self.hud = nil;
     [self.commentTableView.header endRefreshing];
     [self.commentTableView.footer endRefreshing];
     if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
@@ -793,37 +835,50 @@
         }else if ([[data objectForKey:@"Command"]isEqualToNumber:@10043])
         {
             NSLog(@"***********data = %@", data);
-            self.introView.Describe.text = [data objectForKey:@"Describe"];
-            self.introView.StoreType.text = [data objectForKey:@"StoreType"];
-            self.introView.BusTime.text = [data objectForKey:@"BusTime"];
-            self.introView.StoreAdress.text = [data objectForKey:@"StoreAdress"];
-            self.introView.StoreTel.text = [data objectForKey:@"StoreTel"];
-            self.introView.StartSendMoney.text = [NSString stringWithFormat:@"%@", [data objectForKey:@"StartSendMoney"]];
-            self.introView.Delivery.text = [NSString stringWithFormat:@"%@", [data objectForKey:@"Delivery"]];
-            self.introView.ServiceDis.text = [NSString stringWithFormat:@"%@", [data objectForKey:@"ServiceDis"]];
-            self.introView.DeliveryDis.text = [data objectForKey:@"DeliveryDis"];
+            
+            if ([[data objectForKey:@"IsCollect"] intValue] == 1) {
+                self.collectBT.selected = NO;
+            }else if([[data objectForKey:@"IsCollect"] intValue] == 2)
+            {
+                self.collectBT.selected = YES;
+            }
+            
+            self.introView.describeImage = self.iConimageURL;
+            NSLog(@"***%@---%@", self.introView.describeImage, self.iConimageURL);
+            [self.introView creatSoreWithDic:data];
+//            self.introView.Describe.text = [data objectForKey:@"Describe"];
+//            self.introView.StoreType.text = [data objectForKey:@"StoreType"];
+//            self.introView.BusTime.text = [data objectForKey:@"BusTime"];
+//            self.introView.StoreAdress.text = [data objectForKey:@"StoreAdress"];
+//            self.introView.StoreTel.text = [data objectForKey:@"StoreTel"];
+//            self.introView.StartSendMoney.text = [NSString stringWithFormat:@"%@", [data objectForKey:@"StartSendMoney"]];
+//            self.introView.Delivery.text = [NSString stringWithFormat:@"%@", [data objectForKey:@"Delivery"]];
+//            self.introView.ServiceDis.text = [NSString stringWithFormat:@"%@", [data objectForKey:@"ServiceDis"]];
+//            self.introView.DeliveryDis.text = [data objectForKey:@"DeliveryDis"];
             self.lat = [data objectForKey:@"StoreLat"];
             self.lon = [data objectForKey:@"StoreLon"];
         }else if ([[data objectForKey:@"Command"]isEqualToNumber:@10028])
         {
-            if ([self.collectDB insert:_collectModel]) {
-                NSLog(@"写入数据成功");
-            }else
-            {
-                NSLog(@"写入数据失败");
-            }
+//            if ([self.collectDB insert:_collectModel]) {
+//                NSLog(@"写入数据成功");
+//            }else
+//            {
+//                NSLog(@"写入数据失败");
+//            }
+            [UserInfo shareUserInfo].collectCount = [NSNumber numberWithInt:([UserInfo shareUserInfo].collectCount.intValue + 1)];
             self.collectBT.selected = YES;
             UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:@"收藏成功" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
             [alert show];
             [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:1.5];
         }else if([[data objectForKey:@"Command"]isEqualToNumber:@10029])
         {
-            if ([self.collectDB deletemodel:_collectModel]) {
-                NSLog(@"删除数据成功");
-            }else
-            {
-                NSLog(@"删除数据失败");
-            }
+//            if ([self.collectDB deletemodel:_collectModel]) {
+//                NSLog(@"删除数据成功");
+//            }else
+//            {
+//                NSLog(@"删除数据失败");
+//            }
+            [UserInfo shareUserInfo].collectCount = [NSNumber numberWithInt:([UserInfo shareUserInfo].collectCount.intValue - 1)];
             self.collectBT.selected = NO;
             UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:@"取消收藏成功" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
             [alert show];
@@ -853,6 +908,8 @@
     [self.commentTableView.header endRefreshing];
     [self.commentTableView.footer endRefreshing];
 //    [SVProgressHUD dismiss];
+    [self.hud dismiss];
+    self.hud = nil;
     NSLog(@"%@", error);
 }
 
@@ -904,8 +961,10 @@
     cell.subtractBT.tag = indexPath.row + SUBTRACT_BUTTON_TAG;
     [cell.addButton addTarget:self action:@selector(addMenuCount:) forControlEvents:UIControlEventTouchUpInside];
     [cell.iconButton addTarget:self action:@selector(lookBigImage:) forControlEvents:UIControlEventTouchUpInside];
+//    [cell.choosePropertyButton addTarget:self action:@selector(addPropertyMenuCount:) forControlEvents:UIControlEventTouchUpInside];
     cell.iconButton.tag = indexPath.row + 10000;
     cell.addButton.tag = indexPath.row + ADD_BUTTON_TAG;
+    cell.choosePropertyButton.tag = indexPath.row + ChoosePropertyButton_tag;
     cell.menuModel = menuMD;
 //    cell.textLabel.text = @"menu";
     return cell;
@@ -980,6 +1039,13 @@
     [self getAllCount];
 }
 
+- (void)addPropertyMenuCount:(UIButton *)button
+{
+    MenuModel * menuMD = [self.menusArray objectAtIndex:button.tag - ChoosePropertyButton_tag];
+    self.menuModel = menuMD;
+    [self tanchuPropertyWithModel:self.menuModel];
+}
+
 - (void)addMenuCount:(UIButton *)button
 {
 
@@ -1033,10 +1099,13 @@
 // 菜品属性弹出
 - (void)tanchuPropertyWithModel:(MenuModel *)model
 {
-    [self.view addSubview:_tanchuView];
+    AppDelegate * appdelegate = [UIApplication sharedApplication].delegate;
+    
+    [appdelegate.window addSubview:_tanchuView];
     
     [_tanchuView removeAllSubviews];
     
+    self.menCount = model.count;
     
     UIView * backView = [[UIView alloc]init];
     backView.frame = _tanchuView.frame;
@@ -1049,18 +1118,47 @@
     
     UIScrollView * scrollView = [[UIScrollView alloc]initWithFrame:CGRectMake(0, 0, _tanchuView.width - 40, self.view.height / 2)];
     scrollView.backgroundColor = [UIColor whiteColor];
+    [_tanchuView addSubview:scrollView];
     
-    UILabel * topLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, scrollView.width, 50)];
-    topLabel.text = @"菜品属性";
-    topLabel.textAlignment = NSTextAlignmentCenter;
+    UIBezierPath * scrmaskPath = [UIBezierPath bezierPathWithRoundedRect:scrollView.bounds byRoundingCorners:UIRectCornerTopLeft | UIRectCornerTopRight cornerRadii:CGSizeMake(5, 5)];
+    CAShapeLayer * scrmaskLayer = [[CAShapeLayer alloc]init];
+    scrmaskLayer.frame = scrollView.bounds;
+    scrmaskLayer.path = scrmaskPath.CGPath;
+    scrollView.layer.mask = scrmaskLayer;
+    
+    UILabel * topLabel = [[UILabel alloc]initWithFrame:CGRectMake(10, 0, scrollView.width - 20, 50)];
+    NSString * topStr = [NSString stringWithFormat:@"您已选择%ld个,共%.2f元", (long)[self getAllCount], [self getAllPrice]];
+    NSArray * topArr = [topStr componentsSeparatedByString:@","];
+    NSString * topstr1 = [topArr objectAtIndex:0];
+    NSString * topstr2 = [topArr objectAtIndex:1];
+    NSDictionary * attribute = @{NSForegroundColorAttributeName:BACKGROUNDCOLOR};
+    NSMutableAttributedString * topM1 = [[NSMutableAttributedString alloc]initWithString:topStr];
+    [topM1 setAttributes:attribute range:NSMakeRange(4, topstr1.length - 5)];
+    [topM1 setAttributes:attribute range:NSMakeRange(topstr1.length + 2, topstr2.length - 2)];
+    topLabel.attributedText = topM1;
+    
+    
+    
     [scrollView addSubview:topLabel];
+    
+    if (self.menuspropertyArr.count != 0) {
+        [self.menuspropertyArr removeAllObjects];
+    }
     
     for (int i = 0; i < model.PropertyList.count; i++) {
         PropertyModel * propertymodel = [model.PropertyList objectAtIndex:i];
+        
+        NSNumber * countNum = [NSNumber numberWithInt:propertymodel.count];
+        [self.menuspropertyArr addObject:countNum];
+        
         PropertyView * propertyview = [[PropertyView alloc]initWithFrame:CGRectMake(0, 50 + 30 * i, scrollView.width, 30)];
         propertyview.nameLabel.text = propertymodel.styleName;
+        
+        CGRect nameRect = [propertyview.nameLabel.text boundingRectWithSize:CGSizeMake(MAXFLOAT, propertyview.nameLabel.height) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:13]} context:nil];
+        propertyview.nameLabel.width = nameRect.size.width + 10;
+        
         propertyview.priceLabel.text = [NSString stringWithFormat:@"¥%.2f", propertymodel.stylePrice];
-        propertyview.integralLabel.text = [NSString stringWithFormat:@"积%d", propertymodel.styleIntegral];
+//        propertyview.integralLabel.text = [NSString stringWithFormat:@"积%d", propertymodel.styleIntegral];
         propertyview.countLabel.text = [NSString stringWithFormat:@"%d", propertymodel.count];
         propertyview.addButton.tag = PROPERTY_BUTTON_TAG + i;
         [propertyview.addButton addTarget:self action:@selector(addMenuPropertyAcyion:) forControlEvents:UIControlEventTouchUpInside];
@@ -1079,15 +1177,32 @@
     
     scrollView.center = _tanchuView.center;
     
+    UIView * bottomView = [[UIView alloc]initWithFrame:CGRectMake(scrollView.left, scrollView.bottom, scrollView.width, 50)];
+    bottomView.backgroundColor = [UIColor whiteColor];
+    [_tanchuView addSubview:bottomView];
+    UIBezierPath * bottommaskPath = [UIBezierPath bezierPathWithRoundedRect:bottomView.bounds byRoundingCorners:UIRectCornerBottomLeft | UIRectCornerBottomRight cornerRadii:CGSizeMake(5, 5)];
+    CAShapeLayer *bottommasklayer = [[CAShapeLayer alloc]init];
+    bottommasklayer.frame = bottomView.bounds;
+    bottommasklayer.path = bottommaskPath.CGPath;
+    bottomView.layer.mask = bottommasklayer;
+    
     UIButton * sureButton = [UIButton buttonWithType:UIButtonTypeSystem];
-    sureButton.frame = CGRectMake(scrollView.left, scrollView.bottom, scrollView.width, 50);
+    sureButton.frame = CGRectMake(scrollView.right - 60, scrollView.bottom, 35, 40);
     [sureButton setTitle:@"确认" forState:UIControlStateNormal];
     [sureButton setTintColor:[UIColor redColor]];
     sureButton.backgroundColor = [UIColor whiteColor];
     [sureButton addTarget:self action:@selector(sureAction:) forControlEvents:UIControlEventTouchUpInside];
     [_tanchuView addSubview:sureButton];
     
-    [_tanchuView addSubview:scrollView];
+    UIButton * cancleButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    cancleButton.frame = CGRectMake(sureButton.left - 70, scrollView.bottom, 35, 40);
+    [cancleButton setTitle:@"取消" forState:UIControlStateNormal];
+    [cancleButton setTintColor:[UIColor grayColor]];
+    cancleButton.backgroundColor = [UIColor whiteColor];
+    [cancleButton addTarget:self action:@selector(cancleAction:) forControlEvents:UIControlEventTouchUpInside];
+    [_tanchuView addSubview:cancleButton];
+    
+    
     
     [self animateIn];
 
@@ -1172,12 +1287,34 @@
 #pragma mark - 移除弹出框
 - (void)removeTanchuAction
 {
+//    [_tanchuView removeFromSuperview];
+}
+- (void)cancleAction:(UIButton *)button
+{
+    if (self.menuModel.count == 0 && self.menCount != 0 ) {
+        [self.shopArray addObject:self.menuModel];
+    }
+    self.menuModel.count = self.menCount;
+    
+    
+    for (int i = 0; i < self.menuModel.PropertyList.count; i++) {
+        PropertyModel * propertymodel = [self.menuModel.PropertyList objectAtIndex:i];
+//        NSLog(@"propertymodel.count = ********%d", propertymodel.count);
+        propertymodel.count = [[self.menuspropertyArr objectAtIndex:i] intValue];
+//        NSLog(@"********%d", [[self.menuspropertyArr objectAtIndex:i] intValue]);
+    }
+    
+    [self getAllCount];
+    [self getAllPrice];
     [_tanchuView removeFromSuperview];
 }
+
 - (void)sureAction:(UIButton *)button
 {
     [_tanchuView removeFromSuperview];
 }
+
+
 - (void)clearShoppingCar:(UIButton *)button
 {
     for (MenuModel * menuMD in self.shopArray) {
@@ -1195,7 +1332,7 @@
     [self getAllPrice];
 }
 
-- (NSInteger)getAllPrice
+- (double)getAllPrice
 {
     double allPrice = 0;
     for (MenuModel * model in self.shopArray) {
@@ -1250,6 +1387,12 @@
 //    allPrice += self.mealBoxMoney.doubleValue * [self getAllCount] + self.outSentMoney.doubleValue;
     if (self.sendPrice != nil) {
        self.shoppingCarView.priceLabel.text = [NSString stringWithFormat:@"¥%g(¥%@起送)", allPrice, self.sendPrice];
+        if (allPrice < [self.sendPrice doubleValue] || [self getAllCount] == 0) {
+            self.shoppingCarView.changeButton.enabled = NO;
+        }else
+        {
+            self.shoppingCarView.changeButton.enabled = YES;
+        }
     }else
     {
         self.shoppingCarView.priceLabel.text = [NSString stringWithFormat:@"¥%g", allPrice];
@@ -1273,6 +1416,7 @@
         }
     }
     self.shoppingCarView.countLabel.text = [NSString stringWithFormat:@"%ld", (long)allCount];
+    
     return allCount;
 }
 
@@ -1601,7 +1745,7 @@
     
     GSMapViewController *gsMapVC = [[GSMapViewController alloc]init];
     gsMapVC.gsName = self.storeName;
-    gsMapVC.address = self.introView.StoreAdress.text;
+    gsMapVC.address = self.introView.storeAddress.informationLabel.text;
     gsMapVC.lat = self.lat;
     gsMapVC.lon = self.lon;
     [self.navigationController pushViewController:gsMapVC animated:YES];

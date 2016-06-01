@@ -547,7 +547,7 @@
     
     UIButton * backBT = [UIButton buttonWithType:UIButtonTypeCustom];
     backBT.frame = CGRectMake(0, 0, 15, 20);
-    [backBT setBackgroundImage:[UIImage imageNamed:@"back_w.png"] forState:UIControlStateNormal];
+    [backBT setBackgroundImage:[UIImage imageNamed:@"back_black.png"] forState:UIControlStateNormal];
     [backBT addTarget:self action:@selector(backLastVC:) forControlEvents:UIControlEventTouchUpInside];
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:backBT];
     // Do any additional setup after loading the view.
@@ -682,6 +682,8 @@
 
 - (void)playPostWithDictionary:(NSDictionary *)dic
 {
+    self.hud = [JGProgressHUD progressHUDWithStyle:JGProgressHUDStyleLight];
+    [self.hud showInView:self.view];
     NSString * jsonStr = [dic JSONString];
     NSLog(@"%@", jsonStr);
     NSString * str = [NSString stringWithFormat:@"%@231618", jsonStr];
@@ -795,15 +797,26 @@
                 case 2:
                 {
                     self.stateLabel.text = @"餐厅已经接单";
-                    _cancelBT.hidden = NO;
+                    if (_payType.intValue == 3) {
+                        _cancelBT.hidden = YES;
+                    }else
+                    {
+                        _cancelBT.hidden = NO;
+                    }
                 }
                     break;
                 case 3:
                 {
                     self.stateLabel.text = @"订单已经在配送";
-                    _cancelBT.frame = CGRectMake(self.view.width - 190, _cancelBT.top, 80, 25);
-                    _cancelBT.hidden = NO;
-                    self.confirmBT.hidden = NO;
+                    if (_payType.intValue == 3) {
+                        _cancelBT.hidden = YES;
+                        self.confirmBT.hidden = NO;
+                    }else
+                    {
+                        _cancelBT.frame = CGRectMake(self.view.width - 190, _cancelBT.top, 80, 25);
+                        _cancelBT.hidden = NO;
+                        self.confirmBT.hidden = NO;
+                    }
                 }
                     break;
                 case 4:
@@ -868,6 +881,8 @@
 - (void)failWithError:(NSError *)error
 {
 //    [SVProgressHUD dismiss];
+    [self.hud dismiss];
+    self.hud = nil;
     NSLog(@"error = %@", error);
 }
 
@@ -904,8 +919,7 @@
                            };
     [self playPostWithDictionary:dic];
 //    [SVProgressHUD showWithStatus:@"取消请求中..." maskType:SVProgressHUDMaskTypeClear];
-    self.hud = [JGProgressHUD progressHUDWithStyle:JGProgressHUDStyleLight];
-    [self.hud showInView:self.view];
+   
 }
 
 

@@ -16,15 +16,22 @@
 #import "TakeOutOrderViewController.h"
 #import "OnlinePayViewController.h"
 #import "GSOrderPayViewController.h"
-#import "APService.h"
+#import "JPUSHService.h"
 #import "FinishOrderViewController.h"
 #import "GSPayViewController.h"
 #import "DetailsTOOrderViewController.h"
 #import "Net.h"
 
+#import <AVFoundation/AVFoundation.h>
+#import <AudioToolbox/AudioToolbox.h>
+
+#import "Reachability.h"
+//#import "AFAppDotNetAPIClient.h"
+
+
 @interface AppDelegate ()<WXApiDelegate, HTTPPostDelegate, BMKGeneralDelegate>
 
-
+@property (nonatomic, strong)NSTimer * noticeTimer;
 @property (nonatomic, strong)MyTabBarController * myTabBarVC;
 @property (nonatomic,  strong)UIAlertView * netalert;
 
@@ -48,17 +55,23 @@
     [self.window makeKeyAndVisible];
     
     // 检测网络变化
-    
+//    [AFAppDotNetAPIClient shareClientWithView:self.window];
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(reachabilitysHHHChanged:)
                                                  name: kNetReachabilityChangedNotification
                                                object: nil];
     
+   
+//    [[NSNotificationCenter defaultCenter] addObserver:self
+//                                             selector:@selector(reachabilitysHHHChanged:)
+//                                                 name: kNetReachabilityChangedNotification
+//                                               object: nil];
+    
     //初始化Reachability类，并添加一个监测的网址。
-    Net * hostReach = [Net reachabilityWithHostName:@"https://api.app.net/"];
+     Net* hostReach = [Net reachabilityWithHostName:@"www.baidu.com"];
+// Reach * hostReach = [Reach reachabilityWithHostName:@"https://api.app.net/"];
     //开始监测
     [hostReach startNotifier];
-    
     
     
     self.myTabBarVC = [[MyTabBarController alloc] init];
@@ -75,14 +88,27 @@
     [mapManager start:@"4Fra3gSOChrExioQUdEq54dk" generalDelegate:self];
     
     // 初始化腾讯地图
-    [[QMapServices sharedServices] setApiKey:@"HZ4BZ-JX7RF-M6BJ7-NQRVB-HX3SH-TGF4Z"];
-    [[QMSSearchServices sharedServices] setApiKey:@"HZ4BZ-JX7RF-M6BJ7-NQRVB-HX3SH-TGF4Z"];
+    [[QMapServices sharedServices] setApiKey:@"FK4BZ-FIY35-SCVIC-QLRZK-ZYH23-PAFOX"];
+    [[QMSSearchServices sharedServices] setApiKey:@"FK4BZ-FIY35-SCVIC-QLRZK-ZYH23-PAFOX"];
     
-    [APService registerForRemoteNotificationTypes:(UIUserNotificationTypeAlert |
-                                                   UIUserNotificationTypeBadge |
-                                                   UIUserNotificationTypeSound)
-                                       categories:nil];
-    [APService setupWithOption:launchOptions];
+    
+    if ([[UIDevice currentDevice].systemVersion floatValue] >= 8.0) {
+        [JPUSHService registerForRemoteNotificationTypes:(UIUserNotificationTypeBadge | UIUserNotificationTypeSound | UIUserNotificationTypeAlert) categories:nil];
+    }else
+    {
+        [JPUSHService registerForRemoteNotificationTypes:(UIRemoteNotificationTypeBadge |
+                                                          UIRemoteNotificationTypeSound |
+                                                          UIRemoteNotificationTypeAlert)
+                                              categories:nil];
+    }
+    
+    [JPUSHService setupWithOption:launchOptions appKey:JPappKey channel:JPchannel apsForProduction:isProductionJP advertisingIdentifier:nil];
+
+//    [APService registerForRemoteNotificationTypes:(UIUserNotificationTypeAlert |
+//                                                   UIUserNotificationTypeBadge |
+//                                                   UIUserNotificationTypeSound)
+//                                       categories:nil];
+//    [APService setupWithOption:launchOptions];
     
     
     if ([[[NSUserDefaults standardUserDefaults] objectForKey:@"haveLogIn"] isEqualToNumber:@YES]) {
@@ -94,6 +120,12 @@
                                };
         [self playPostWithDictionary:dic];
     }
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(CIDAction:)
+                                                 name: @"CID"
+                                               object: nil];
+    
     return YES;
 }
 #pragma mark - 网络变化通知
@@ -106,9 +138,9 @@
     
     Net * reach = [notification object];
     if ([reach isKindOfClass:[Net class]]) {
-        NetworkStatus status = [reach currentReachabilityStatus];
+        NetStatus status = [reach currentReachabilityStatus];
         NSLog(@"%d", status);
-        if (status == NotReachable) {
+        if (status == NotReachable_net) {
             NSLog(@"*******网络断开******");
             if (self.netalert) {
                 NSLog(@"不该走了");
@@ -117,13 +149,14 @@
                 self.netalert = [[UIAlertView alloc] initWithTitle:@"友情提示" message:@"网络不给力,请检查网络" delegate:self cancelButtonTitle:nil otherButtonTitles:@"确定", nil];
                 [self.netalert show];
             }
-        }else if (status == ReachableViaWWAN || status == ReachableViaWiFi)
+        }else if (status == ReachableViaWWAN_net || status == ReachableViaWiFi_net)
         {
 //            NSLog(@"*******网络连接上******");
             [self.netalert performSelector:@selector(dismiss) withObject:nil];
             self.netalert = nil;
         }
     }
+    
 }
 
 - (void)onReq:(BaseReq *)req
@@ -351,10 +384,17 @@
 
 - (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
 //    NSLog(@"%@", [NSString stringWithFormat:@"Device Token: %@", deviceToken]);
-    [APService registerDeviceToken:deviceToken];
-    NSString * registrationID = [APService registrationID];
-//    NSLog(@"registrID = %@", registrationID);
-    [[NSUserDefaults standardUserDefaults] setObject:registrationID forKey:@"registrationID"];
+    [JPUSHService registerDeviceToken:deviceToken];
+    NSString * registrationID = [JPUSHService registrationID];
+    NSLog(@"registrID = %@", registrationID);
+    
+    if (registrationID.length == 0) {
+        self.noticeTimer = [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(scrollNotice) userInfo:nil repeats:YES];
+    }else
+    {
+        [[NSUserDefaults standardUserDefaults] setObject:registrationID forKey:@"registrationID"];
+    }
+    
     if ([UserInfo shareUserInfo].userId) {
         NSDictionary * dic = @{
                                @"Command":@36,
@@ -365,23 +405,79 @@
         [self playPostWithDictionary:dic];
     }
 }
+- (void)scrollNotice
+{
+    NSString * registrationID = [JPUSHService registrationID];
+    if (registrationID.length != 0) {
+        [[NSUserDefaults standardUserDefaults] setObject:registrationID forKey:@"registrationID"];
+        [[NSNotificationCenter defaultCenter]postNotificationName:@"CID" object:self];
+        NSLog(@"registrID = %@", registrationID);
+        [self.noticeTimer invalidate];
+        self.noticeTimer = nil;
+    }
+}
+- (void)CIDAction:(NSNotification *)notification
+{
+    if ([UserInfo shareUserInfo].userId) {
+        NSDictionary * dic = @{
+                               @"Command":@36,
+                               @"UserId":[UserInfo shareUserInfo].userId,
+                               @"Device":@1,
+                               @"CID":[[NSUserDefaults standardUserDefaults] objectForKey:@"registrationID"]
+                               };
+        [self playPostWithDictionary:dic];
+    }
+}
 
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
 {
-    [APService handleRemoteNotification:userInfo];
+    
+    [self playSound];
+    
+     NSLog(@"11%@, %@", userInfo, [[userInfo objectForKey:@"aps"] objectForKey:@"alert"]);
+    
+    [JPUSHService handleRemoteNotification:userInfo];
     completionHandler(UIBackgroundFetchResultNewData);
+}
+static SystemSoundID shake_sound_male_id = 0;
+
+-(void) playSound
+
+{
+    NSString *path = nil;
+    
+        path = [[NSBundle mainBundle] pathForResource:@"tangshi" ofType:@"caf"];
+    
+    if (path) {
+        //注册声音到系统
+        NSURL *url = [NSURL fileURLWithPath:path];
+        CFURLRef inFileURL = (__bridge CFURLRef)url;
+        OSStatus err =  AudioServicesCreateSystemSoundID(inFileURL,&shake_sound_male_id);
+        if (err != kAudioServicesNoError) {
+            NSLog(@"Cound not load %@, error code %@", url, err);
+        }
+        
+        AudioServicesPlaySystemSound(shake_sound_male_id);
+        //        AudioServicesPlaySystemSound(shake_sound_male_id);//如果无法再下面播放，可以尝试在此播放
+        NSLog(@"走了******");
+    }
+    
+    AudioServicesPlaySystemSound(shake_sound_male_id);   //播放注册的声音，（此句代码，可以在本类中的任意位置调用，不限于本方法中）
+    
+    AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);   //让手机震动
+    
 }
 
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo
 {
-    [APService handleRemoteNotification:userInfo];
+    [JPUSHService handleRemoteNotification:userInfo];
 }
 
 #pragma mark - 数据请求--绑定推送registerID
 - (void)playPostWithDictionary:(NSDictionary *)dic
 {
     NSString * jsonStr = [dic JSONString];
-    //    NSLog(@"%@", jsonStr);
+        NSLog(@"apdelegate - %@", jsonStr);
     NSString * str = [NSString stringWithFormat:@"%@231618", jsonStr];
     NSString * md5Str = [str md5];
     NSString * urlString = [NSString stringWithFormat:@"%@%@", POST_URL, md5Str];

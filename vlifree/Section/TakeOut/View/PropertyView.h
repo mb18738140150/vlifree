@@ -12,7 +12,7 @@
 
 @property (nonatomic, strong)UILabel * nameLabel;
 @property (nonatomic, strong)UILabel * priceLabel;
-@property (nonatomic, strong)UILabel * integralLabel;
+//@property (nonatomic, strong)UILabel * integralLabel;
 @property (nonatomic, strong)UIButton * subtractButton;
 @property (nonatomic, strong)UILabel * countLabel;
 @property (nonatomic, strong)UIButton * addButton;

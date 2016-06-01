@@ -15,6 +15,7 @@
 @property (nonatomic, strong)UILabel * countLabel;
 @property (nonatomic, strong)UIButton * subtractBT;
 @property (nonatomic, strong)UIButton * addButton;
+@property (nonatomic, strong)UIButton * choosePropertyButton;
 @property (nonatomic, strong)UIButton * iconButton;
 
 @property (nonatomic, strong)MenuModel * menuModel;

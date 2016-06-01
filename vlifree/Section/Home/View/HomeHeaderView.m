@@ -39,7 +39,7 @@
     if (!_grogshopBT) {
         
         UIImageView * grogshopImageV = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, IMAGE_SIZE, IMAGE_SIZE)];
-        grogshopImageV.image = [UIImage imageNamed:@"home_grogshop.png"];
+        grogshopImageV.image = [UIImage imageNamed:@"hotel.png"];
         UILabel * grogshopLB = [[UILabel alloc] initWithFrame:CGRectMake(0, grogshopImageV.bottom, IMAGE_SIZE, LABEL_HEIGTH)];
         grogshopLB.textAlignment = NSTextAlignmentCenter;
         grogshopLB.text = @"微酒店";

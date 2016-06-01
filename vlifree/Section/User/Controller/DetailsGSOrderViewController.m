@@ -11,6 +11,7 @@
 
 #define LEFT_SPACE 20
 #define TOP_SPACE 5
+#define COMMENTBT_TAG 1000000
 
 @interface DetailsGSOrderViewController ()<HTTPPostDelegate>
 
@@ -35,7 +36,7 @@
 @property (nonatomic, strong)NSNumber * storeID;
 @property (nonatomic, copy)NSString * icon;
 @property (nonatomic, copy)NSString * storeName;
-
+@property (nonatomic, strong)JGProgressHUD * hud;
 
 @end
 
@@ -74,7 +75,13 @@
     _cancleButton.hidden = YES;
     [view1 addSubview:_cancleButton];
     
-    self.personLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, _priceLB.bottom + TOP_SPACE, view1.width  - 2 * LEFT_SPACE, 30)];
+    UILabel * idLabel = [[UILabel alloc]initWithFrame:CGRectMake(LEFT_SPACE, _priceLB.bottom + TOP_SPACE, view1.width - 2 * LEFT_SPACE, 15)];
+    idLabel.font = [UIFont systemFontOfSize:15];
+    idLabel.textColor = TEXT_COLOR;
+    idLabel.text = [NSString stringWithFormat:@"订单号:%@", self.orderID];
+    [view1 addSubview:idLabel];
+    
+    self.personLB = [[UILabel alloc] initWithFrame:CGRectMake(LEFT_SPACE, idLabel.bottom + TOP_SPACE, view1.width  - 2 * LEFT_SPACE, 30)];
     _personLB.text = @"预定人:马哥";
     _personLB.font = [UIFont systemFontOfSize:15];
     _personLB.textColor = TEXT_COLOR;
@@ -199,11 +206,11 @@
     [commentBT setTintColor:[UIColor whiteColor]];
     [commentBT setTitleColor:TEXT_COLOR forState:UIControlStateNormal];
     [commentBT addTarget:self action:@selector(commentAction:) forControlEvents:UIControlEventTouchUpInside];
+    commentBT.tag = COMMENTBT_TAG;
     _commentView.hidden = YES;
     [_commentView addSubview:commentBT];
     
     scrollView.contentSize = CGSizeMake(scrollView.width, _commentView.bottom + 10);
-
     
 //    UIButton * payButton = [UIButton buttonWithType:UIButtonTypeCustom];
 //    payButton.frame = CGRectMake(50, self.view.height - 40, self.view.width - 100, 30);
@@ -214,19 +221,22 @@
     
     
     
+    UIButton * backBT = [UIButton buttonWithType:UIButtonTypeCustom];
+    backBT.frame = CGRectMake(0, 0, 15, 20);
+    [backBT setBackgroundImage:[UIImage imageNamed:@"back_black.png"] forState:UIControlStateNormal];
+    [backBT addTarget:self action:@selector(backLastVC:) forControlEvents:UIControlEventTouchUpInside];
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:backBT];
+
+    // Do any additional setup after loading the view.
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
     NSDictionary * jsonDic = @{
                                @"Command":@26,
                                @"Id":self.orderID
                                };
     [self playPostWithDictionary:jsonDic];
-    
-    UIButton * backBT = [UIButton buttonWithType:UIButtonTypeCustom];
-    backBT.frame = CGRectMake(0, 0, 15, 20);
-    [backBT setBackgroundImage:[UIImage imageNamed:@"back_r.png"] forState:UIControlStateNormal];
-    [backBT addTarget:self action:@selector(backLastVC:) forControlEvents:UIControlEventTouchUpInside];
-    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:backBT];
-
-    // Do any additional setup after loading the view.
 }
 
 - (void)backLastVC:(id)sender
@@ -243,6 +253,8 @@
 
 - (void)playPostWithDictionary:(NSDictionary *)dic
 {
+    self.hud = [JGProgressHUD progressHUDWithStyle:JGProgressHUDStyleLight];
+    [self.hud showInView:self.view];
     NSString * jsonStr = [dic JSONString];
     NSLog(@"%@", jsonStr);
     NSString * str = [NSString stringWithFormat:@"%@231618", jsonStr];
@@ -256,6 +268,8 @@
 
 - (void)refresh:(id)data
 {
+    [self.hud dismiss];
+    self.hud = nil;
     NSLog(@"+++%@", data);
     NSLog(@"%@", [data objectForKey:@"ErrorMsg"]);
     if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
@@ -349,7 +363,9 @@
                 
                 // 是否评论
                 if ([[data objectForKey:@"IsComment"] intValue] == 1) {
-                    _commentView.hidden = YES;
+                    UIButton * bt = [_commentView viewWithTag:COMMENTBT_TAG];
+                    [bt setTitle:@"已评论" forState:UIControlStateNormal];
+                    _commentView.hidden = NO;
                 }else
                 {
                     if ([[data objectForKey:@"OrderState"] intValue] == 6 || [[data objectForKey:@"OrderState"] intValue] == 1) {
@@ -439,6 +455,8 @@
 
 - (void)failWithError:(NSError *)error
 {
+    [self.hud dismiss];
+    self.hud = nil;
     NSLog(@"%@", error);
 }
 
@@ -486,15 +504,23 @@
 - (void)commentAction:(UIButton * )button
 {
 #warning  ****Hotel orders and delivery orders request parameters? *** 酒店订单与外卖订单请求参数一样？
-    CreateCommentViewController * commentVC = [[CreateCommentViewController alloc]init];
-    NSString * str = @"http://image.vlifee.com";
-    NSString * icon = [str stringByAppendingString:self.icon];
-    commentVC.icon = icon;
-    commentVC.storeName = self.storeName;
-    commentVC.storeId = self.storeID;
-    commentVC.orderId = self.orderID;
-    commentVC.isHotel = 1;
-    [self.navigationController pushViewController:commentVC animated:YES];
+    
+    if ([button.titleLabel.text isEqualToString:@"已评论"]) {
+                
+    }else
+    {
+        
+        CreateCommentViewController * commentVC = [[CreateCommentViewController alloc]init];
+        NSString * str = @"http://image.vlifee.com";
+        NSString * icon = [str stringByAppendingString:self.icon];
+        commentVC.icon = icon;
+        commentVC.storeName = self.storeName;
+        commentVC.storeId = self.storeID;
+        commentVC.orderId = self.orderID;
+        commentVC.isHotel = 1;
+        [self.navigationController pushViewController:commentVC animated:YES];
+    }
+    
 }
 
 

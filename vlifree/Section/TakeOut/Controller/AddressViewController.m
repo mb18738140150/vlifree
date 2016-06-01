@@ -47,9 +47,11 @@
  *  回调block
  */
 @property (nonatomic, copy)ReturnAddresssModelBlock returnModelBlock;
-
+@property (nonatomic, strong)AddressModel * defaultModel;
+@property (nonatomic, strong)AddressModel * deleteModel;
 @property (nonatomic, strong)UIScrollView * noticeScrollV;
 @property (nonatomic, strong)UILabel * noticeLB;
+@property (nonatomic, strong)NSNumber * selectaddressid;
 
 @end
 
@@ -214,7 +216,7 @@
     
     UIButton * backBT = [UIButton buttonWithType:UIButtonTypeCustom];
     backBT.frame = CGRectMake(0, 0, 15, 20);
-    [backBT setBackgroundImage:[UIImage imageNamed:@"back_r.png"] forState:UIControlStateNormal];
+    [backBT setBackgroundImage:[UIImage imageNamed:@"back_black.png"] forState:UIControlStateNormal];
     [backBT addTarget:self action:@selector(backLastVC:) forControlEvents:UIControlEventTouchUpInside];
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:backBT];
     
@@ -333,7 +335,7 @@
 - (void)playPostWithDictionary:(NSDictionary *)dic
 {
     NSString * jsonStr = [dic JSONString];
-    //    NSLog(@"%@", jsonStr);
+        NSLog(@"%@", jsonStr);
     NSString * str = [NSString stringWithFormat:@"%@231618", jsonStr];
     NSString * md5Str = [str md5];
     NSString * urlString = [NSString stringWithFormat:@"%@%@", POST_URL, md5Str];
@@ -385,9 +387,43 @@
         }else if ([[data objectForKey:@"Command"] isEqualToNumber:@10030])
         {
             [self downloadData];
+            
+            NSLog(@"****** deleteModel.addressId - %@***** defaultModel.addressId - %@", self.deleteModel.addressId, self.defaultModel.addressId);
+            if ([self.deleteModel.addressId isEqualToNumber:self.defaultModel.addressId]) {
+                self.defaultModel.address = @"";
+                if (_returnModelBlock) {
+                    _returnModelBlock(self.defaultModel);
+                }
+                
+            }
             UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:@"删除成功" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
             [alert show];
             [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:1.5];
+        }else if ([[data objectForKey:@"Command"] isEqualToNumber:@10047])
+        {
+//            for (AddressModel * addModel in self.dataArray) {
+//                if ([addModel.addressId isEqualToNumber:_selectaddressid]) {
+//                    addModel.isDefault = @1;
+//                    if (_returnModelBlock) {
+//                        _returnModelBlock(addModel);
+//                    }
+//                }else
+//                {
+//                    addModel.isDefault = @0;
+//                }
+//            }
+//            
+//            [self.addressTableView reloadData];
+            
+            NSDictionary * jsonDic = @{
+                                       @"Command":@15,
+                                       @"UserId":[UserInfo shareUserInfo].userId
+                                       };
+            [self playPostWithDictionary:jsonDic];
+            if (_returnModelBlock) {
+                _returnModelBlock(self.defaultModel);
+            }
+            
         }
     }else
     {
@@ -427,6 +463,9 @@
     [cell.editButton addTarget:self action:@selector(editAction:event:) forControlEvents:UIControlEventTouchUpInside];
     AddressModel * addressModel = [self.dataArray objectAtIndex:indexPath.row];
     cell.addressModel = addressModel;
+    if (cell.addressModel.isDefault.intValue == 1) {
+        self.defaultModel = addressModel;
+    }
 //    cell.textLabel.text = @"23333";
     return cell;
 }
@@ -451,7 +490,7 @@
 - (NSArray<UITableViewRowAction *> *)tableView:(UITableView *)tableView editActionsForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     AddressModel * model = [self.dataArray objectAtIndex:indexPath.row];
-    
+    self.deleteModel = model;
     UITableViewRowAction * deleteAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDefault title:@"删除" handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
         NSDictionary * jsonDic = @{
                                    @"Command":@30,
@@ -507,17 +546,29 @@
     CGPoint currentPoint = [touch locationInView:self.addressTableView];
     NSIndexPath * seletedIndexP = [self.addressTableView indexPathForRowAtPoint:currentPoint];
     AddressModel * model = [self.dataArray objectAtIndex:seletedIndexP.row];
-    NSNumber * selectaddressid = model.addressId;
-    for (AddressModel * addModel in self.dataArray) {
-        if ([addModel.addressId isEqualToNumber:selectaddressid]) {
-            addModel.isDefault = @1;
-        }else
-        {
-            addModel.isDefault = @0;
-        }
-    }
-    _returnModelBlock(model);
-    [self.addressTableView reloadData];
+    self.defaultModel = model;
+    self.selectaddressid = model.addressId;
+//    for (AddressModel * addModel in self.dataArray) {
+//        if ([addModel.addressId isEqualToNumber:_selectaddressid]) {
+//            addModel.isDefault = @1;
+//        }else
+//        {
+//            addModel.isDefault = @0;
+//        }
+//    }
+    
+//    if (_returnModelBlock) {
+//        _returnModelBlock(model);
+//    }
+    
+    NSDictionary * dic = @{
+                           @"Command":@47,
+                           @"UserId":[UserInfo shareUserInfo].userId,
+                           @"AddressId":model.addressId
+                           };
+    [self playPostWithDictionary:dic];
+    
+//    [self.addressTableView reloadData];
     
 }
 

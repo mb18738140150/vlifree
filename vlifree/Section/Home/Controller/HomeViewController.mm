@@ -25,7 +25,7 @@
 #define LOCATION_IMAGE_WIDTH BUTTON_HEIGTH
 #define LOADINGIMAGE_WIDTH 20
 
-@interface HomeViewController ()<CLLocationManagerDelegate, HTTPPostDelegate, UITableViewDataSource, UITableViewDelegate, BMKLocationServiceDelegate, BMKGeoCodeSearchDelegate>
+@interface HomeViewController ()<CLLocationManagerDelegate, HTTPPostDelegate, UITableViewDataSource, UITableViewDelegate,QMapViewDelegate, QMSSearchDelegate>
 {
     /**
      *  请求数据的页数
@@ -54,11 +54,16 @@
 /**
  *  百度地图SDK定位对象
  */
-@property (nonatomic, strong)BMKLocationService * locService;
+//@property (nonatomic, strong)BMKLocationService * locService;
 /**
  *  百度地图SDK地理编码对象
  */
-@property (nonatomic, strong)BMKGeoCodeSearch * geoSearcher;
+//@property (nonatomic, strong)BMKGeoCodeSearch * geoSearcher;
+
+// 腾讯地图
+@property (nonatomic, strong) QMapView * qMapView;
+@property (nonatomic, strong) QMSSearcher * mapSearcher;
+@property (nonatomic, strong) QMSReverseGeoCodeSearchResult *reGeoResult;
 
 // 定位加载中动画
 @property (nonatomic, strong)UIImageView * loadingImageView;
@@ -86,6 +91,7 @@
     self = [super init];
     if (self) {
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didLoginNOtification) name:@"login" object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didlocationNOtification) name:@"location" object:nil];
     }
     return self;
 }
@@ -97,12 +103,23 @@
         self.homeTableView.scrollEnabled = YES;
         //        [self.homeTableView.header beginRefreshing];
         [self downloadDataWithCommand:@1 page:_page count:DATA_COUNT];
-        aView.hidden = YES;
+        
     }
     self.homeTableView.scrollEnabled = YES;
 //    self.dataArray = nil;
     [self.homeTableView reloadData];
     aView.hidden = NO;
+}
+
+- (void)didlocationNOtification
+{
+    UIView * aView = [self.view viewWithTag:10009];
+    if ([UserInfo shareUserInfo].userId) {
+        self.homeTableView.scrollEnabled = YES;
+        //        [self.homeTableView.header beginRefreshing];
+        [self downloadDataWithCommand:@1 page:_page count:DATA_COUNT];
+        aView.hidden = YES;
+    }
 }
 
 - (void)dealloc
@@ -152,29 +169,33 @@
     [aView addSubview:button];
     
     self.locationBT = [UIButton buttonWithType:UIButtonTypeCustom];
-    _locationBT.frame = CGRectMake(10, 10, LOCATION_BUTTON_WIDTH, BUTTON_HEIGTH);
+    _locationBT.frame = CGRectMake(0, 0, LOCATION_BUTTON_WIDTH, 30);
     _locationBT.tag = 1000;
     [_locationBT addTarget:self action:@selector(locationAction:) forControlEvents:UIControlEventTouchUpInside];
 //    locationBT.backgroundColor = [UIColor greenColor];
 //    [self.navigationController.navigationBar addSubview:locationBT];
     self.locationLB = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, LOCATION_LABEL_WIDTH, _locationBT.height)];
     _locationLB.text = @"郑州";
-    _locationLB.font = [UIFont systemFontOfSize:13];
-    _locationLB.textColor = [UIColor whiteColor];
+    _locationLB.font = [UIFont systemFontOfSize:15];
+    _locationLB.textColor = [UIColor blackColor];
     _locationLB.textAlignment = NSTextAlignmentRight;
     [_locationBT addSubview:_locationLB];
     
     
-    UIImageView * locationIG = [[UIImageView alloc] initWithFrame:CGRectMake(_locationLB.right, 0, LOCATION_IMAGE_WIDTH, _locationLB.height)];
-    locationIG.image = [UIImage imageNamed:@"location.png"];
-    [_locationBT addSubview:locationIG];
+//    UIImageView * locationIG = [[UIImageView alloc] initWithFrame:CGRectMake(_locationLB.right, 0, LOCATION_IMAGE_WIDTH, _locationLB.height)];
+//    locationIG.image = [UIImage imageNamed:@"location.png"];
+//    [_locationBT addSubview:locationIG];
     
 //    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:_locationBT];
 
-    self.loadingImageView = [[UIImageView alloc]initWithFrame:CGRectMake(10, 10, LOADINGIMAGE_WIDTH, LOADINGIMAGE_WIDTH)];
-    self.loadingImageView.image = [UIImage imageNamed:@"icon1.png"];
     
-    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]initWithCustomView:_loadingImageView];
+    self.loadingImageView = [[UIImageView alloc]initWithFrame:CGRectMake(0, 0, LOADINGIMAGE_WIDTH, LOADINGIMAGE_WIDTH)];
+    UIImageView * loadView = [[UIImageView alloc]initWithFrame:CGRectMake(0, 0, 20, 20)];
+    loadView.image =[UIImage imageNamed:@"icon1.png"];
+    //    self.loadingImageView.image = [UIImage imageNamed:@"icon1.png"];
+    [_loadingImageView addSubview:loadView];
+    
+    self.navigationItem.titleView = _loadingImageView;
     // 菊花旋转
     CABasicAnimation * rotationAnimation;
     rotationAnimation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
@@ -190,19 +211,15 @@
     
     _page = 1;
     
-    //设置定位精确度，默认：kCLLocationAccuracyBest
-    [BMKLocationService setLocationDesiredAccuracy:kCLLocationAccuracyBest];
-    //指定最小距离更新(米)，默认：kCLDistanceFilterNone
-    [BMKLocationService setLocationDistanceFilter:10.f];
     
-    //初始化BMKLocationService
-    self.locService = [[BMKLocationService alloc]init];
-    _locService.delegate = self;
-    //    [BMKLocationService setLocationDesiredAccuracy:kCLLocationAccuracyBest];
-    //启动LocationService
-    [_locService startUserLocationService];
-    self.geoSearcher =[[BMKGeoCodeSearch alloc]init];
-    _geoSearcher.delegate = self;
+    
+    self.qMapView = [[QMapView alloc]init];
+    self.qMapView.delegate = self;
+    self.qMapView.showsUserLocation = YES;
+    
+    self.mapSearcher = [[QMSSearcher alloc]initWithDelegate:self];
+    
+    
     [self performSelector:@selector(isLocationsuccess) withObject:nil afterDelay:2];
     /*
     self.locationManager = [[CLLocationManager alloc] init];
@@ -256,8 +273,9 @@
         [self downloadDataWithCommand:@1 page:_page count:DATA_COUNT];
     }else
     {
-        [self.locService stopUserLocationService];
-        [self.locService startUserLocationService];
+//        [self.locService stopUserLocationService];
+//        [self.locService startUserLocationService];
+        
     }
 }
 
@@ -265,25 +283,12 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    if (!self.locService) {
-        self.locService = [[BMKLocationService alloc]init];
-        _locService.delegate = self;
-    }
+    
     self.navigationController.navigationBar.barTintColor = MAIN_COLOR;
-    UIButton * locationBT = (UIButton *)[self.navigationController.navigationBar viewWithTag:1000];
-    UIButton * searchBT = (UIButton *)[self.navigationController.navigationBar viewWithTag:2000];
-    locationBT.hidden = NO;
-    searchBT.hidden = NO;
-    if ([UserLocation shareUserLocation].city) {
-        [self.loadingImageView removeFromSuperview];
-        self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]initWithCustomView:_locationBT];
-        self.locationLB.text = [UserLocation shareUserLocation].city;
-    }else
-    {
-        [_locService stopUserLocationService];
-        NSLog(@"试图出现时定位");
-        [self.locService startUserLocationService];
-    }
+    
+    self.navigationController.navigationBar.tintColor = [UIColor blackColor];
+    self.navigationController.navigationBar.barTintColor = [UIColor whiteColor];
+    
     UIView * aView = [self.view viewWithTag:10009];
     if ([UserInfo shareUserInfo].userId) {
         self.homeTableView.scrollEnabled = YES;
@@ -303,7 +308,6 @@
 - (void)viewWillDisappear:(BOOL)animated
 {
     [super viewWillDisappear:animated];
-    self.locService = nil;
 //    [self.homeTableView headerEndRefreshing];
 //    UIButton * locationBT = (UIButton *)[self.navigationController.navigationBar viewWithTag:1000];
 //    UIButton * searchBT = (UIButton *)[self.navigationController.navigationBar viewWithTag:2000];
@@ -338,15 +342,7 @@
 }
 
 
-- (void)locationAction:(UIButton *)button
-{
-    [_locationBT removeFromSuperview];
-    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]initWithCustomView:_loadingImageView];
-    
-    [_locService stopUserLocationService];
-    NSLog(@"点击定位");
-    [self.locService startUserLocationService];
-}
+
 
 
 - (void)didReceiveMemoryWarning {
@@ -401,7 +397,7 @@
 - (void)playPostWithDictionary:(NSDictionary *)dic
 {
     NSString * jsonStr = [dic JSONString];
-    //    NSLog(@"%@", jsonStr);
+        NSLog(@"%@", jsonStr);
     NSString * str = [NSString stringWithFormat:@"%@231618", jsonStr];
     NSString * md5Str = [str md5];
     NSString * urlString = [NSString stringWithFormat:@"%@%@", POST_URL, md5Str];
@@ -433,13 +429,13 @@
             collectMD.businessName = self.collectModel.businessName;
             collectMD.businessId = self.collectModel.businessId.intValue;
             collectMD.businessType = self.collectModel.businessType.intValue;
-            if ([self.collectDB deletemodel:collectMD]) {
-                NSLog(@"删除数据成功");
-            }else
-            {
-                NSLog(@"删除数据失败");
-            }
-
+//            if ([self.collectDB deletemodel:collectMD]) {
+//                NSLog(@"删除数据成功");
+//            }else
+//            {
+//                NSLog(@"删除数据失败");
+//            }
+            [UserInfo shareUserInfo].collectCount = [NSNumber numberWithInt:([UserInfo shareUserInfo].collectCount.intValue - 1)];
             UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:@"删除成功" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
             [alert show];
             [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:1.5];
@@ -448,9 +444,13 @@
         
     }else
     {
-        UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:[data objectForKey:@"ErrorMsg"] delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
-        [alert show];
-        [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:1.5];
+        
+        if (((NSString *)[data objectForKey:@"ErrorMsg"]).length != 0) {
+            UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:[data objectForKey:@"ErrorMsg"] delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
+            [alert show];
+            [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:1.5];
+        }
+        
     }
     [self.homeTableView.header endRefreshing];
 //    [SVProgressHUD dismiss];
@@ -462,64 +462,112 @@
     NSLog(@"%@", error);
 }
 
+#pragma mark - 腾讯地图定位
 
-
-#pragma mark - 定位
-
-- (void)didUpdateBMKUserLocation:(BMKUserLocation *)userLocation
+- (void)locationAction:(UIButton *)button
 {
-//    NSLog(@"title = %@, subtitle = %@", userLocation.title, userLocation.subtitle);
-    if (userLocation.location != nil) {
-        [UserLocation shareUserLocation].userLocation = userLocation.location.coordinate;
-        if (!_isLOC) {
-            [self downloadDataWithCommand:@1 page:_page count:DATA_COUNT];
-            _isLOC = YES;
-        }
-        //发起反向地理编码检索
-        BMKReverseGeoCodeOption *reverseGeoCodeSearchOption = [[BMKReverseGeoCodeOption alloc] init];
-        reverseGeoCodeSearchOption.reverseGeoPoint = userLocation.location.coordinate;
-        BOOL flag = [_geoSearcher reverseGeoCode:reverseGeoCodeSearchOption];
-        if(flag)
-        {
-            NSLog(@"反geo检索发送成功");
-        }
-        else
-        {
-            NSLog(@"反geo检索发送失败");
-        }
-        [self.locService stopUserLocationService];
-    }
+    [_locationBT removeFromSuperview];
+    self.navigationItem.titleView = _loadingImageView;
+    
+    self.qMapView.showsUserLocation = YES;
+}
+- (void)mapView:(QMapView *)mapView didUpdateUserLocation:(QUserLocation *)userLocation updatingLocation:(BOOL)updatingLocation
+{
+//    NSLog(@"刷新位置");
+    
+    
+    [UserLocation shareUserLocation].userLocation = userLocation.coordinate;
+    QMSReverseGeoCodeSearchOption *reGeoSearchOption = [[QMSReverseGeoCodeSearchOption alloc] init];
+    [reGeoSearchOption setLocationWithCenterCoordinate:userLocation.coordinate];
+    [reGeoSearchOption setGet_poi:YES];
+    [self.mapSearcher searchWithReverseGeoCodeSearchOption:reGeoSearchOption];
+    
+}
+- (void)mapView:(QMapView *)mapView didFailToLocateUserWithError:(NSError *)error
+{
+    NSLog(@"定位失败");
+    UIAlertController * alertController = [UIAlertController alertControllerWithTitle:@"提示" message:@"对不起，定位失败" preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction * cancelAction = [UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleCancel handler:nil];
+    [alertController addAction:cancelAction];
+    
+    [self presentViewController:alertController animated:YES completion:nil];
 }
 
-- (void)didFailToLocateUserWithError:(NSError *)error
+#pragma mark - 腾讯反地理编码
+- (void)searchWithReverseGeoCodeSearchOption:(QMSReverseGeoCodeSearchOption *)reverseGeoCodeSearchOption didReceiveResult:(QMSReverseGeoCodeSearchResult *)reverseGeoCodeSearchResult
 {
-    NSLog(@"定位失败 error = %@", error);
-    [self.locService stopUserLocationService];
-    [self.locService startUserLocationService];
-}
-
-
-- (void)onGetReverseGeoCodeResult:(BMKGeoCodeSearch *)searcher result:(BMKReverseGeoCodeResult *)result errorCode:(BMKSearchErrorCode)error
-{
-    if (error == BMK_SEARCH_NO_ERROR) {
-        //在此处理正常结果
-        //        result.addressDetail.district
-        NSLog(@"处理结果2 %@, %@, %@ %@", result.address, result.addressDetail.streetName, result.addressDetail.streetNumber, result.addressDetail.district);
-        [UserLocation shareUserLocation].city = result.addressDetail.city;
-        [UserLocation shareUserLocation].streetName = result.addressDetail.streetName;
-        [UserLocation shareUserLocation].streetNumber = result.addressDetail.streetNumber;
-        [UserLocation shareUserLocation].district = result.addressDetail.district;
-        self.locationLB.text = result.addressDetail.city;
-        [self downloadDataWithCommand:@1 page:_page count:DATA_COUNT];
+    self.reGeoResult = reverseGeoCodeSearchResult;
+    if (self.reGeoResult.address.length != 0) {
         
-        [self.loadingImageView removeFromSuperview];
-        self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]initWithCustomView:_locationBT];
+        NSLog(@"******%@",self.reGeoResult.ad_info.city);
+        [UserLocation shareUserLocation].city = self.reGeoResult.ad_info.city;
+         [[NSNotificationCenter defaultCenter] postNotificationName:@"location" object:nil];
+        self.qMapView.showsUserLocation = NO;
         
-    }
-    else {
-        NSLog(@"抱歉，未找到结果");
+        [_loadingImageView removeFromSuperview];
+        _locationLB.text = self.reGeoResult.address;
+        CGSize size = [self.locationLB.text sizeWithAttributes:[NSDictionary dictionaryWithObjectsAndKeys:[UIFont systemFontOfSize:17], NSFontAttributeName, nil]];
+        _locationLB.frame = CGRectMake(0, _locationLB.top, size.width, 30);
+        _locationBT.frame = CGRectMake(self.view.width / 2 - size.width / 2, _locationBT.top,  size.width, _locationBT.height);
+        self.navigationItem.titleView = _locationBT;
     }
 }
+
+
+//- (void)didUpdateBMKUserLocation:(BMKUserLocation *)userLocation
+//{
+////    NSLog(@"title = %@, subtitle = %@", userLocation.title, userLocation.subtitle);
+//    if (userLocation.location != nil) {
+//        [UserLocation shareUserLocation].userLocation = userLocation.location.coordinate;
+//        if (!_isLOC) {
+//            [self downloadDataWithCommand:@1 page:_page count:DATA_COUNT];
+//            _isLOC = YES;
+//        }
+//        //发起反向地理编码检索
+//        BMKReverseGeoCodeOption *reverseGeoCodeSearchOption = [[BMKReverseGeoCodeOption alloc] init];
+//        reverseGeoCodeSearchOption.reverseGeoPoint = userLocation.location.coordinate;
+//        BOOL flag = [_geoSearcher reverseGeoCode:reverseGeoCodeSearchOption];
+//        if(flag)
+//        {
+//            NSLog(@"反geo检索发送成功");
+//        }
+//        else
+//        {
+//            NSLog(@"反geo检索发送失败");
+//        }
+//        [self.locService stopUserLocationService];
+//    }
+//}
+//
+//- (void)didFailToLocateUserWithError:(NSError *)error
+//{
+//    NSLog(@"定位失败 error = %@", error);
+//    [self.locService stopUserLocationService];
+//    [self.locService startUserLocationService];
+//}
+//
+//
+//- (void)onGetReverseGeoCodeResult:(BMKGeoCodeSearch *)searcher result:(BMKReverseGeoCodeResult *)result errorCode:(BMKSearchErrorCode)error
+//{
+//    if (error == BMK_SEARCH_NO_ERROR) {
+//        //在此处理正常结果
+//        //        result.addressDetail.district
+//        NSLog(@"处理结果2 %@, %@, %@ %@", result.address, result.addressDetail.streetName, result.addressDetail.streetNumber, result.addressDetail.district);
+//        [UserLocation shareUserLocation].city = result.addressDetail.city;
+//        [UserLocation shareUserLocation].streetName = result.addressDetail.streetName;
+//        [UserLocation shareUserLocation].streetNumber = result.addressDetail.streetNumber;
+//        [UserLocation shareUserLocation].district = result.addressDetail.district;
+//        self.locationLB.text = result.addressDetail.city;
+//        [self downloadDataWithCommand:@1 page:_page count:DATA_COUNT];
+//        
+//        [self.loadingImageView removeFromSuperview];
+//        self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]initWithCustomView:_locationBT];
+//        
+//    }
+//    else {
+//        NSLog(@"抱歉，未找到结果");
+//    }
+//}
 
 
 #pragma mark - Table view data source
@@ -598,6 +646,7 @@
         detaiTOVC.takeOutID = collectMD.businessId;
         detaiTOVC.sendPrice = collectMD.sendPrice;
         detaiTOVC.storeState = collectMD.storeState;
+        detaiTOVC.iConimageURL = collectMD.icon;
         detaiTOVC.hidesBottomBarWhenPushed = YES;
         detaiTOVC.navigationItem.title = collectMD.businessName;
         [self.navigationController pushViewController:detaiTOVC animated:YES];

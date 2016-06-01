@@ -7,7 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
-
+#import <QMapKit/QMapKit.h>
+#import <QMapSearchKit/QMapSearchKit.h>
 @interface TakeOutViewController : UIViewController
 /**
  *  是否是微超市按钮跳转过来的

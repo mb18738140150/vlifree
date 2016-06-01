@@ -7,19 +7,22 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "StoreIntroHelpView.h"
 
 @interface StoreIntroView : UIScrollView
 
-@property (nonatomic, strong)UILabel *Describe;
-@property (nonatomic, strong)UILabel *StoreType;
-@property (nonatomic, strong)UILabel *BusTime;
-@property (nonatomic, strong)UILabel *StoreAdress;
-@property (nonatomic, strong)UILabel *StoreTel;
-@property (nonatomic, strong)UILabel *StartSendMoney;
-@property (nonatomic, strong)UILabel *Delivery;
-@property (nonatomic, strong)UILabel *ServiceDis;
-@property (nonatomic, strong)UILabel *DeliveryDis;
-@property (nonatomic, strong)UIButton *addressBT;
-
+@property (nonatomic, copy)NSString * describeImage;// 店铺图片
+//@property (nonatomic, strong)UILabel *Describe; //店铺描述
+//@property (nonatomic, strong)UILabel *StoreType;//店铺类型
+//@property (nonatomic, strong)UILabel *BusTime;//营业时间
+//@property (nonatomic, strong)UILabel *StoreAdress;//店铺地址
+//@property (nonatomic, strong)UILabel *StoreTel;//店铺电话
+//@property (nonatomic, strong)UILabel *StartSendMoney;//起送价
+//@property (nonatomic, strong)UILabel *Delivery;//配送费
+//@property (nonatomic, strong)UILabel *ServiceDis;//服务距离
+//@property (nonatomic, strong)UILabel *DeliveryDis;// 配送区域
+//@property (nonatomic, strong)UIButton *addressBT;// 查看地址按钮
+@property (nonatomic, strong)StoreIntroHelpView * storeAddress;//地址
+- (void)creatSoreWithDic:(NSDictionary *)dic;
 
 @end

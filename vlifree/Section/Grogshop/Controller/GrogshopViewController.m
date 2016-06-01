@@ -74,6 +74,7 @@
     [super viewDidLoad];
 
     self.collectDB = [[CollectStroeDB alloc]init];
+    
     self.cancelBT = [UIButton buttonWithType:UIButtonTypeCustom];
     _cancelBT.frame = CGRectMake(0, 0, 40, 30);
     [_cancelBT setTitle:@"取消" forState:UIControlStateNormal];
@@ -160,7 +161,7 @@
 - (void)viewWillDisappear:(BOOL)animated
 {
     [super viewWillDisappear:animated];
-//    [self.groshopTabelView headerEndRefreshing];
+    [self.groshopTabelView.header beginRefreshing];
 }
 /**
  *  检测是否已经定位成功了
@@ -308,7 +309,7 @@
 
 - (void)refresh:(id)data
 {
-    NSLog(@"+++%@", data);
+//    NSLog(@"+++%@", data);
     [self.groshopTabelView.header endRefreshing];
     [self.groshopTabelView.footer endRefreshing];
     if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
@@ -318,13 +319,13 @@
             collectMD.businessName = self.collectModel.hotelName;
             collectMD.businessId = self.collectModel.hotelId.intValue;
             collectMD.businessType = 1;
-            if ([self.collectDB insert:collectMD]) {
-                NSLog(@"写入数据成功");
-            }else
-            {
-                NSLog(@"写入数据失败");
-            }
-            
+//            if ([self.collectDB insert:collectMD]) {
+//                NSLog(@"写入数据成功");
+//            }else
+//            {
+//                NSLog(@"写入数据失败");
+//            }
+            [UserInfo shareUserInfo].collectCount = [NSNumber numberWithInt:([UserInfo shareUserInfo].collectCount.intValue + 1)];
             UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:@"收藏成功" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
             [alert show];
             [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:1.5];
@@ -336,24 +337,32 @@
             {
                 _dataArray = nil;
             }
+            int count = 0;
             for (NSDictionary * dic in array) {
                 HotelModel * hotelMD = [[HotelModel alloc] initWithDictionary:dic];
                 [self.dataArray addObject:hotelMD];
+                count++;
             }
             
             [self.groshopTabelView reloadData];
            
-//            if (self.dataArray.count == [_allCount integerValue]) {
+            if (count > 0) {
+                [self.groshopTabelView.footer resetNoMoreData];
+            }else
+            {
                 [self.groshopTabelView.footer noticeNoMoreData];
-//            }
+            }
         }
         
         NSLog(@"%@", [data objectForKey:@"ErrorMsg"]);
     }else
     {
-        UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:[data objectForKey:@"ErrorMsg"] delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
-        [alert show];
-        [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:1.5];
+        if (((NSString *)[data objectForKey:@"ErrorMsg"]).length != 0) {
+            UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:[data objectForKey:@"ErrorMsg"] delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
+            [alert show];
+            [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:1.5];
+        }
+        
     }
 }
 

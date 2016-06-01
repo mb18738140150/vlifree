@@ -468,7 +468,7 @@
     
     UIButton * backBT = [UIButton buttonWithType:UIButtonTypeCustom];
     backBT.frame = CGRectMake(0, 0, 15, 20);
-    [backBT setBackgroundImage:[UIImage imageNamed:@"back_r.png"] forState:UIControlStateNormal];
+    [backBT setBackgroundImage:[UIImage imageNamed:@"back_black.png"] forState:UIControlStateNormal];
     [backBT addTarget:self action:@selector(backLastVC:) forControlEvents:UIControlEventTouchUpInside];
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:backBT];
     
@@ -526,20 +526,29 @@
     __weak TakeOutOrderViewController * takeOutOrderVC = self;
     AddressViewController * addressVC = [[AddressViewController alloc] init];
     [addressVC returnAddressModel:^(AddressModel *addressModel) {
-        NSLog(@"%@", addressModel.address);
-        takeOutOrderVC.phone = addressModel.phoneNumber;
-        takeOutOrderVC.address = addressModel.address;
-        self.addressLB.text = [NSString stringWithFormat:@"送餐地址:%@\n姓名:%@ 电话:%@", addressModel.address,addressModel.receiveName, addressModel.phoneNumber];
-//        CGSize size = [_addressLB sizeThatFits:CGSizeMake(_addressBT.width, CGFLOAT_MAX)];
-        
-        CGRect  rect = [_addressLB.text boundingRectWithSize:CGSizeMake(_addressLB.width, CGFLOAT_MAX) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:15]} context:nil];
-        
-//        CGFloat addY = size.height - _addressLB.height;
-        CGFloat addY = rect.size.height - _addressLB.height;
-        _addressLB.height = rect.size.height;
-        _addressBT.height = _addressLB.height + 2 * TOP_SPACE;
-//        takeOutOrderVC.phoneLable.text = addressModel.phoneNumber;
-        [takeOutOrderVC reloadViewFrameWithAddY:addY];
+        if (addressModel.address.length != 0) {
+            NSLog(@"%@", addressModel.address);
+            takeOutOrderVC.phone = addressModel.phoneNumber;
+            takeOutOrderVC.address = addressModel.address;
+            self.addressLB.text = [NSString stringWithFormat:@"送餐地址:%@\n姓名:%@ 电话:%@", addressModel.address,addressModel.receiveName, addressModel.phoneNumber];
+            //        CGSize size = [_addressLB sizeThatFits:CGSizeMake(_addressBT.width, CGFLOAT_MAX)];
+            
+            CGRect  rect = [_addressLB.text boundingRectWithSize:CGSizeMake(_addressLB.width, CGFLOAT_MAX) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:15]} context:nil];
+            
+            //        CGFloat addY = size.height - _addressLB.height;
+            CGFloat addY = rect.size.height - _addressLB.height;
+            _addressLB.height = rect.size.height;
+            _addressBT.height = _addressLB.height + 2 * TOP_SPACE;
+            //        takeOutOrderVC.phoneLable.text = addressModel.phoneNumber;
+            [takeOutOrderVC reloadViewFrameWithAddY:addY];
+        }else
+        {
+            CGFloat height = _addressLB.height;
+            _addressLB.text = @"请选择送餐地址";
+            _addressLB.height = LABEL_HEIGHT;
+            _addressBT.height = 50;
+            [takeOutOrderVC reloadViewFrameWithAddY:LABEL_HEIGHT - height];
+        }
     }];
     [self.navigationController pushViewController:addressVC animated:YES];
 }

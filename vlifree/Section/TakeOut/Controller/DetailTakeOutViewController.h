@@ -30,6 +30,7 @@
  *  商店营业状态
  */
 @property (nonatomic, strong)NSNumber * storeState;
+@property (nonatomic, copy)NSString * iConimageURL;
 /**
  *  微信登录获取授权码的方法
  *

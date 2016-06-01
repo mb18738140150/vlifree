@@ -21,11 +21,19 @@
     return self;
 }
 
+- (NSMutableArray *)activityArray
+{
+    if (!_activityArray) {
+        self.activityArray = [NSMutableArray array];
+    }
+    return _activityArray;
+}
+
 - (void)setValue:(id)value forUndefinedKey:(NSString *)key
 {
     if ([key isEqualToString:@"ActivityReduce"]) {
         NSArray * array = (NSArray *)value;
-        self.activityArray = [NSMutableArray array];
+//        self.activityArray = [NSMutableArray array];
         for (NSDictionary * dic in array) {
             ActivityReduce * activityRD = [[ActivityReduce alloc] initWithDictionary:dic];
             [self.activityArray addObject:activityRD];

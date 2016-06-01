@@ -7,6 +7,7 @@
 //
 
 #import "ResultViewController.h"
+#import "UserLocation.h"
 
 @interface ResultViewController ()<HTTPPostDelegate>
 
@@ -79,34 +80,38 @@
 {
     NSLog(@"%@", searchController.searchBar.text);
     if (searchController.searchBar.text.length) {
-        NSDictionary * jsonDic = @{
-                                   @"Command":@18,
-                                   @"KeyWord":searchController.searchBar.text
-                                   };
-        //    [self playPostWithDictionary:jsonDic];
-        NSString * jsonStr = [jsonDic JSONString];
-        //    NSLog(@"%@", jsonStr);
-        NSString * str = [NSString stringWithFormat:@"%@231618", jsonStr];
-        NSString * md5Str = [str md5];
-        NSString * urlString = [NSString stringWithFormat:@"%@%@", POST_URL, md5Str];
-        NSMutableURLRequest * request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:urlString]];
-        [request setHTTPMethod:@"POST"];
-        [request setHTTPBody:[jsonStr dataUsingEncoding:NSUTF8StringEncoding]];
-        NSOperationQueue * queue = [NSOperationQueue mainQueue];
-        [NSURLConnection sendAsynchronousRequest:request queue:queue completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
-            NSLog(@"%@", data);
-            if (data != nil) {
-                NSDictionary * dic = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-                NSArray * array = [dic objectForKey:@"KeyWordList"];
-                self.dataArray = nil;
-                for (NSDictionary * wordDic in array) {
-                    [self.dataArray addObject:[wordDic objectForKey:@"KeyWord"]];
+        if ([UserLocation shareUserLocation].city.length != 0) {
+            NSDictionary * jsonDic = @{
+                                       @"Command":@18,
+                                       @"KeyWord":searchController.searchBar.text,
+                                       @"City":[UserLocation shareUserLocation].city
+                                       };
+            //    [self playPostWithDictionary:jsonDic];
+            NSString * jsonStr = [jsonDic JSONString];
+            //    NSLog(@"%@", jsonStr);
+            NSString * str = [NSString stringWithFormat:@"%@231618", jsonStr];
+            NSString * md5Str = [str md5];
+            NSString * urlString = [NSString stringWithFormat:@"%@%@", POST_URL, md5Str];
+            NSMutableURLRequest * request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:urlString]];
+            [request setHTTPMethod:@"POST"];
+            [request setHTTPBody:[jsonStr dataUsingEncoding:NSUTF8StringEncoding]];
+            NSOperationQueue * queue = [NSOperationQueue mainQueue];
+            [NSURLConnection sendAsynchronousRequest:request queue:queue completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
+                NSLog(@"%@", data);
+                if (data != nil) {
+                    NSDictionary * dic = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
+                    NSArray * array = [dic objectForKey:@"KeyWordList"];
+                    self.dataArray = nil;
+                    for (NSDictionary * wordDic in array) {
+                        [self.dataArray addObject:[wordDic objectForKey:@"KeyWord"]];
+                    }
+                    [self.tableView reloadData];
+                    NSLog(@"%@, error = %@", dic, connectionError);
                 }
-                [self.tableView reloadData];
-                NSLog(@"%@, error = %@", dic, connectionError);
-            }
-        }];
+            }];
 
+        }
+        
     }
 }
 

@@ -65,6 +65,7 @@
 
     self.navigationItem.title = @"修改号码";
     self.view.backgroundColor = [UIColor whiteColor];
+    
     UIView * phoneView = [[UIView alloc] initWithFrame:CGRectMake(LEFT_SPACE, TOP_SPACE + self.navigationController.navigationBar.bottom, self.view.width - 2 * LEFT_SPACE, VIEW_HEIGHT)];
     phoneView.layer.borderColor = [UIColor colorWithWhite:0.8 alpha:1].CGColor;
     phoneView.layer.borderWidth = 0.7;
@@ -90,9 +91,7 @@
     _phoneTF.clearButtonMode = UITextFieldViewModeWhileEditing;
     [phoneView addSubview:_phoneTF];
     
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"确定" style:UIBarButtonItemStylePlain target:self action:@selector(determineModifyPhoneNum:)];
-    
-    self.verifyTF = [[UITextField alloc] initWithFrame:CGRectMake(phoneLB.left + phoneView.left, phoneView.bottom + 20, 140, 30)];
+        self.verifyTF = [[UITextField alloc] initWithFrame:CGRectMake(phoneLB.left + phoneView.left, phoneView.bottom + 20, 140, 30)];
     _verifyTF.placeholder = @"请输入验证码";
     _verifyTF.textColor = TEXT_COLOR;
     _verifyTF.borderStyle = UITextBorderStyleRoundedRect;
@@ -111,10 +110,17 @@
     
     self.hud = [[JGProgressHUD alloc] initWithStyle:JGProgressHUDStyleLight];
     
+    self.navigationController.navigationBar.titleTextAttributes = @{
+                                                                    NSForegroundColorAttributeName: [UIColor blackColor],
+                                                                    NSFontAttributeName : [UIFont boldSystemFontOfSize:17]
+                                                                    };
+    
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"确定" style:UIBarButtonItemStylePlain target:self action:@selector(determineModifyPhoneNum:)];
+    [self.navigationItem.rightBarButtonItem setTitleTextAttributes:@{NSForegroundColorAttributeName:[UIColor blackColor], NSFontAttributeName:[UIFont boldSystemFontOfSize:17]} forState:UIControlStateNormal];
     
     UIButton * backBT = [UIButton buttonWithType:UIButtonTypeCustom];
     backBT.frame = CGRectMake(0, 0, 15, 20);
-    [backBT setBackgroundImage:[UIImage imageNamed:@"back_w.png"] forState:UIControlStateNormal];
+    [backBT setBackgroundImage:[UIImage imageNamed:@"back_black.png"] forState:UIControlStateNormal];
     [backBT addTarget:self action:@selector(backLastVC:) forControlEvents:UIControlEventTouchUpInside];
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:backBT];
     
@@ -262,6 +268,7 @@ static int t = 60;
     HTTPPost * httpPost = [HTTPPost shareHTTPPost];
     [httpPost post:urlString HTTPBody:[jsonStr dataUsingEncoding:NSUTF8StringEncoding]];
     httpPost.delegate = self;
+
 }
 
 - (void)refresh:(id)data
@@ -284,6 +291,7 @@ static int t = 60;
         UIAlertView * alert = [[UIAlertView alloc] initWithTitle:@"失败" message:[data objectForKey:@"ErrorMsg"] delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
         [alert show];
         [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:2];
+        [self passSixtySeconds];
     }
 //    [SVProgressHUD dismiss];
 }

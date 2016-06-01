@@ -38,10 +38,10 @@
     self.view.backgroundColor = [UIColor whiteColor];
 //    self.navigationController.navigationBar.translucent = NO;
     self.navigationController.navigationBar.titleTextAttributes = @{
-                                                                    NSForegroundColorAttributeName: [UIColor whiteColor],
-                                                                    NSFontAttributeName : [UIFont boldSystemFontOfSize:18]
+                                                                    NSForegroundColorAttributeName: [UIColor blackColor],
+                                                                    NSFontAttributeName : [UIFont boldSystemFontOfSize:17]
                                                                     };
-    self.navigationItem.title = @"修改密码";
+//    self.navigationItem.title = @"修改密码";
     
     /*
 //    UIView * oldView = [[UIView alloc] initWithFrame:CGRectMake(LEFT_SPACE, TOP_SPACE + self.navigationController.navigationBar.bottom, self.view.width - 2 * LEFT_SPACE, VIEW_HEIGHT)];
@@ -154,7 +154,7 @@
     
     UIButton * backBT = [UIButton buttonWithType:UIButtonTypeCustom];
     backBT.frame = CGRectMake(0, 0, 15, 20);
-    [backBT setBackgroundImage:[UIImage imageNamed:@"back_w.png"] forState:UIControlStateNormal];
+    [backBT setBackgroundImage:[UIImage imageNamed:@"back_black.png"] forState:UIControlStateNormal];
     [backBT addTarget:self action:@selector(backLastVC:) forControlEvents:UIControlEventTouchUpInside];
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:backBT];
     
@@ -255,7 +255,7 @@
 
 - (void)failWithError:(NSError *)error
 {
-//    [SVProgressHUD dismiss];
+    [self.hud dismiss];
     NSLog(@"%@", error);
 }
 

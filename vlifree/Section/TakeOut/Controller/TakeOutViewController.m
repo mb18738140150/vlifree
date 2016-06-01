@@ -9,6 +9,7 @@
 #import "TakeOutViewController.h"
 #import "TakeOutViewCell.h"
 #import "TypeView.h"
+#import "TakeoutTypeController.h"
 #import <CoreLocation/CoreLocation.h>
 #import "DetailTakeOutViewController.h"
 #import "MGSwipeButton.h"
@@ -16,12 +17,13 @@
 #import "TakeOutModel.h"
 #import "SearchViewController.h"
 #import "CollectStroeDB.h"
-
+#import "PoiAnnotation.h"
+//#import "StoreTypeModel.h"
 #define CELL_INDENTIFIER @"cell"
 
 #define CYCLESCROLLVIEW_HEIGHT 150
 #define LOADINGIMAGE_WIDTH 20
-@interface TakeOutViewController ()<UITableViewDataSource, UITableViewDelegate, CLLocationManagerDelegate, HTTPPostDelegate, BMKLocationServiceDelegate, BMKGeoCodeSearchDelegate>
+@interface TakeOutViewController ()<UITableViewDataSource, UITableViewDelegate, CLLocationManagerDelegate, HTTPPostDelegate, QMapViewDelegate, QMSSearchDelegate>
 
 {
     /**
@@ -43,15 +45,22 @@
  *  类型页面
  */
 @property (nonatomic, strong)TypeView * typeView;
+
+@property (nonatomic, strong)NSMutableArray * typeArray;
 //@property (nonatomic, strong)CLLocationManager * locationManager;
 /**
  *  百度地图SDK定位对象
  */
-@property (nonatomic, strong)BMKLocationService * locService;
+//@property (nonatomic, strong)BMKLocationService * locService;
 /**
  *  百度地图SDK地理编码对象
  */
-@property (nonatomic, strong)BMKGeoCodeSearch * geoSearcher;
+//@property (nonatomic, strong)BMKGeoCodeSearch * geoSearcher;
+// 腾讯地图
+@property (nonatomic, strong) QMapView * qMapView;
+@property (nonatomic, strong) QMSSearcher * mapSearcher;
+@property (nonatomic, strong) QMSReverseGeoCodeSearchResult *reGeoResult;
+
 /**
  *  定位按钮
  */
@@ -89,6 +98,13 @@
 
 @implementation TakeOutViewController
 
+- (NSMutableArray *)typeArray
+{
+    if (!_typeArray) {
+        self.typeArray = [NSMutableArray array];
+    }
+    return _typeArray;
+}
 - (NSMutableArray *)dataArray
 {
     if (!_dataArray) {
@@ -100,8 +116,9 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    self.navigationController.navigationBar.tintColor = [UIColor whiteColor];
-    self.navigationController.navigationBar.barTintColor = MAIN_COLOR;
+    self.navigationController.navigationBar.tintColor = [UIColor blackColor];
+    self.navigationController.navigationBar.barTintColor = [UIColor whiteColor];
+    [self downloadData];
 //    [self.takeOutTabelView headerEndRefreshing];
 }
 
@@ -122,16 +139,17 @@
     [_addressBT addTarget:self action:@selector(startLocation:) forControlEvents:UIControlEventTouchUpInside];
     
     
-    self.addressIM = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 30, 30)];
-    _addressIM.image = [UIImage imageNamed:@"location.png"];
-    [_addressBT addSubview:_addressIM];
+//    self.addressIM = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 30, 30)];
+//    _addressIM.image = [UIImage imageNamed:@"location.png"];
+//    [_addressBT addSubview:_addressIM];
     
-    self.addressLB = [[UILabel alloc] initWithFrame:CGRectMake(_addressIM.right, 0, 0, 30)];
-    _addressLB.textColor = [UIColor whiteColor];
+    self.addressLB = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 0, 30)];
+    _addressLB.textColor = [UIColor blackColor];
     _addressLB.font = [UIFont systemFontOfSize:15];
+    _addressLB.textAlignment = NSTextAlignmentCenter;
     [_addressBT addSubview:_addressLB];
     NSLog(@"11%@",     _addressLB.font.fontName);
-    self.addressBT.frame = CGRectMake(0, 0, _addressIM.width, 30);
+    self.addressBT.frame = CGRectMake(0, 0, 60, 30);
     
     
     self.loadingImageView = [[UIImageView alloc]initWithFrame:CGRectMake(0, 0, LOADINGIMAGE_WIDTH, LOADINGIMAGE_WIDTH)];
@@ -155,26 +173,26 @@
     self.navigationItem.titleView = _loadingImageView;
 //    [self showLocationAddress];
     
-    UIButton * typeButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    typeButton.frame = CGRectMake(0, 0, self.view.width, 40);
-//    typeButton.frame = CGRectMake(0, self.navigationController.navigationBar.bottom, self.view.width, 40);
-    typeButton.tag = 2000;
-    [typeButton setTitle:@"外卖分类" forState:UIControlStateNormal];
-    [typeButton setTitle:@"外卖分类" forState:UIControlStateSelected];
-    [typeButton setTitleColor:TEXT_COLOR forState:UIControlStateNormal];
-    [typeButton setTitleColor:TEXT_COLOR forState:UIControlStateSelected];
-    [typeButton setImage:[UIImage imageNamed:@"open.png"] forState:UIControlStateNormal];
-    [typeButton setImage:[UIImage imageNamed:@"close.png"] forState:UIControlStateSelected];
-    typeButton.imageView.contentMode = UIViewContentModeTopLeft;
-    typeButton.titleLabel.textAlignment = NSTextAlignmentLeft;
-    typeButton.imageEdgeInsets = UIEdgeInsetsMake(15, typeButton.titleLabel.right, 15, 15);
-    [typeButton addTarget:self action:@selector(changeTakeOutType:) forControlEvents:UIControlEventTouchUpInside];
-    typeButton.layer.borderWidth = 1;
-    typeButton.layer.borderColor = [UIColor colorWithWhite:0.7 alpha:1].CGColor;
+//    UIButton * typeButton = [UIButton buttonWithType:UIButtonTypeCustom];
+//    typeButton.frame = CGRectMake(0, 0, self.view.width, 40);
+////    typeButton.frame = CGRectMake(0, self.navigationController.navigationBar.bottom, self.view.width, 40);
+//    typeButton.tag = 2000;
+//    [typeButton setTitle:@"外卖分类" forState:UIControlStateNormal];
+//    [typeButton setTitle:@"外卖分类" forState:UIControlStateSelected];
+//    [typeButton setTitleColor:TEXT_COLOR forState:UIControlStateNormal];
+//    [typeButton setTitleColor:TEXT_COLOR forState:UIControlStateSelected];
+//    [typeButton setImage:[UIImage imageNamed:@"open.png"] forState:UIControlStateNormal];
+//    [typeButton setImage:[UIImage imageNamed:@"close.png"] forState:UIControlStateSelected];
+//    typeButton.imageView.contentMode = UIViewContentModeTopLeft;
+//    typeButton.titleLabel.textAlignment = NSTextAlignmentLeft;
+//    typeButton.imageEdgeInsets = UIEdgeInsetsMake(15, typeButton.titleLabel.right, 15, 15);
+//    [typeButton addTarget:self action:@selector(changeTakeOutType:) forControlEvents:UIControlEventTouchUpInside];
+//    typeButton.layer.borderWidth = 1;
+//    typeButton.layer.borderColor = [UIColor colorWithWhite:0.7 alpha:1].CGColor;
 //    typeButton.backgroundColor = [UIColor grayColor];
-    [self.view addSubview:typeButton];
+//    [self.view addSubview:typeButton];
     
-    self.takeOutTabelView = [[UITableView alloc] initWithFrame:CGRectMake(0, typeButton.bottom, self.view.width, self.view.height - self.tabBarController.tabBar.height - typeButton.bottom - self.navigationController.navigationBar.bottom) style:UITableViewStyleGrouped];
+    self.takeOutTabelView = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, self.view.height - self.tabBarController.tabBar.height) style:UITableViewStylePlain];
 //    self.takeOutTabelView = [[UITableView alloc] initWithFrame:CGRectMake(0, typeButton.bottom, self.view.width, self.view.height - typeButton.bottom - self.tabBarController.tabBar.height) style:UITableViewStyleGrouped];
     _takeOutTabelView.dataSource = self;
     _takeOutTabelView.delegate = self;
@@ -208,37 +226,32 @@
     };
     */
     
-    [self createTypeView];
     
+    [self createTypeView];
     
     _page = 1;
     _isLoc = NO;
     _type = 0;
     if ([UserLocation shareUserLocation].city) {
         if (!_isSupermark) {
-            [self downloadDataWithCommand:@6 page:_page count:DATA_COUNT type:0];
+            [self.takeOutTabelView.header beginRefreshing];
 //            [SVProgressHUD showWithStatus:@"加载中..." maskType:SVProgressHUDMaskTypeClear];
         }
         _isLoc = YES;
-    }else
-    {
-        self.timer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(downloadData) userInfo:nil repeats:YES];
-        [_timer fire];
     }
+//    else
+//    {
+//        self.timer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(downloadData) userInfo:nil repeats:YES];
+//        [_timer fire];
+//    }
     
-    //设置定位精确度，默认：kCLLocationAccuracyBest
-    [BMKLocationService setLocationDesiredAccuracy:kCLLocationAccuracyBest];
-    //指定最小距离更新(米)，默认：kCLDistanceFilterNone
-    [BMKLocationService setLocationDistanceFilter:10.f];
     
-    //初始化BMKLocationService
-    self.locService = [[BMKLocationService alloc]init];
-    _locService.delegate = self;
-    //    [BMKLocationService setLocationDesiredAccuracy:kCLLocationAccuracyBest];
-    //启动LocationService
-    [_locService startUserLocationService];
-    self.geoSearcher =[[BMKGeoCodeSearch alloc]init];
-    _geoSearcher.delegate = self;
+    self.qMapView = [[QMapView alloc]init];
+    self.qMapView.delegate = self;
+    self.qMapView.showsUserLocation = YES;
+    
+    self.mapSearcher = [[QMSSearcher alloc]initWithDelegate:self];
+    
     /*
     self.locationManager = [[CLLocationManager alloc] init];
     self.locationManager.delegate = self;
@@ -251,32 +264,67 @@
     // Do any additional setup after loading the view.
 }
 
-
-- (void)showLocationAddress
+#pragma mark - 腾讯地图定位
+- (void)startLocation:(UIButton *)button
 {
-    NSMutableString * addressStr = [NSMutableString string];
-    if ([UserLocation shareUserLocation].district.length) {
-        [addressStr appendString:[UserLocation shareUserLocation].district];
+    [_addressBT removeFromSuperview];
+    self.navigationItem.titleView = _loadingImageView;
+    self.qMapView.showsUserLocation = YES;
+}
+- (void)mapView:(QMapView *)mapView didUpdateUserLocation:(QUserLocation *)userLocation updatingLocation:(BOOL)updatingLocation
+{
+//    NSLog(@"刷新位置");
+    
+    PoiAnnotation *annotation = [[PoiAnnotation alloc] init];
+    [annotation setCoordinate:userLocation.coordinate];
+    [annotation setTitle:[NSString stringWithFormat:@"%@", userLocation.title]];
+    
+    [annotation setSubtitle:[NSString stringWithFormat:@"lat:%f, lng:%f", userLocation.coordinate.latitude, userLocation.coordinate.longitude]];
+    
+    [UserLocation shareUserLocation].userLocation = userLocation.coordinate;
+//    NSLog(@"****%f***%f", [UserLocation shareUserLocation].userLocation.latitude, [UserLocation shareUserLocation].userLocation.longitude);
+    QMSReverseGeoCodeSearchOption *reGeoSearchOption = [[QMSReverseGeoCodeSearchOption alloc] init];
+    [reGeoSearchOption setLocationWithCenterCoordinate:userLocation.coordinate];
+    [reGeoSearchOption setGet_poi:YES];
+    [self.mapSearcher searchWithReverseGeoCodeSearchOption:reGeoSearchOption];
+    
+}
+- (void)mapView:(QMapView *)mapView didFailToLocateUserWithError:(NSError *)error
+{
+    NSLog(@"定位失败");
+    UIAlertController * alertController = [UIAlertController alertControllerWithTitle:@"提示" message:@"对不起，定位失败" preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction * cancelAction = [UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleCancel handler:nil];
+    [alertController addAction:cancelAction];
+    
+    [self presentViewController:alertController animated:YES completion:nil];
+}
+
+#pragma mark - 腾讯反地理编码
+- (void)searchWithReverseGeoCodeSearchOption:(QMSReverseGeoCodeSearchOption *)reverseGeoCodeSearchOption didReceiveResult:(QMSReverseGeoCodeSearchResult *)reverseGeoCodeSearchResult
+{
+    self.reGeoResult = reverseGeoCodeSearchResult;
+    if (self.reGeoResult.address.length != 0) {
+        
+//        NSLog(@"******%@",self.reGeoResult.address);
+        [UserLocation shareUserLocation].city = self.reGeoResult.ad_info.city;
+        self.qMapView.showsUserLocation = NO;
+        [_loadingImageView removeFromSuperview];
+        self.navigationItem.titleView = _addressBT;
+        _addressLB.text = self.reGeoResult.address;
+        CGSize size = [self.addressLB.text sizeWithAttributes:[NSDictionary dictionaryWithObjectsAndKeys:[UIFont systemFontOfSize:17], NSFontAttributeName, nil]];
+        _addressLB.frame = CGRectMake(0 , _addressLB.top, size.width, 30);
+        _addressBT.frame = CGRectMake(self.view.width / 2 - size.width / 2, _addressBT.top,  size.width, _addressBT.height);
+        [self downloadData];
     }
-    if ([UserLocation shareUserLocation].streetName.length) {
-        [addressStr appendString:[UserLocation shareUserLocation].streetName];
-    }
-    if ([UserLocation shareUserLocation].streetNumber.length) {
-        [addressStr appendString:[UserLocation shareUserLocation].streetNumber];
-    }
-    self.addressLB.text = [addressStr copy];
-    CGSize size = [self.addressLB.text sizeWithAttributes:[NSDictionary dictionaryWithObjectsAndKeys:[UIFont systemFontOfSize:17], NSFontAttributeName, nil]];
-    _addressLB.frame = CGRectMake(_addressLB.left, _addressLB.top, size.width, 30);
-    _addressBT.frame = CGRectMake(_addressBT.left, _addressBT.top, _addressIM.width + _addressLB.width, _addressBT.height);
 }
 
 - (void)downloadData
 {
-    NSLog(@"2222");
+//    NSLog(@"2222");
     if ([UserLocation shareUserLocation].city != nil) {
-        [self downloadDataWithCommand:@6 page:_page count:DATA_COUNT type:0];
-//        [self.takeOutTabelView headerBeginRefreshing];
-        [self.timer invalidate];
+//        [self downloadDataWithCommand:@6 page:_page count:DATA_COUNT type:0];
+        [self.takeOutTabelView.header beginRefreshing];
+//        [self.timer invalidate];
     }
 }
 
@@ -287,115 +335,98 @@
 //    [self.takeOutTabelView headerEndRefreshing];
 }
 
-
+#pragma mark - 搜索
 - (void)searchTakeOut:(id)sender
 {
-    NSLog(@"搜索");
+//    NSLog(@"搜索");
     SearchViewController * searchVC = [[SearchViewController alloc] init];
     searchVC.hidesBottomBarWhenPushed = YES;
     [self.navigationController pushViewController:searchVC animated:YES];
 }
 
-- (void)startLocation:(UIButton *)button
-{
-    [_addressBT removeFromSuperview];
-    self.navigationItem.titleView = _loadingImageView;
-    [_locService stopUserLocationService];
-    NSLog(@"11");
-    [_locService startUserLocationService];
-//    [self.locationManager startUpdatingLocation];
-}
+#pragma mark - 外卖分类选择
 
 - (void)createTypeView
 {
-    UIButton * button = (UIButton *)[self.view viewWithTag:2000];
-    self.typeView = [[TypeView alloc] initWithFrame:CGRectMake(0, button.bottom, self.view.width, self.view.height - button.bottom)];
-    UITapGestureRecognizer * tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(hiddenTypeView)];
-    [_typeView addGestureRecognizer:tapGesture];
+
+        self.typeView = [[TypeView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, self.view.width / 2 + 10)];
     for (int i = 0; i < 8; i++) {
         UIButton * button = (UIButton *)[self.typeView viewWithTag:9000 + i];
         [button addTarget:self action:@selector(selectTakeOutType:) forControlEvents:UIControlEventTouchUpInside];
     }
-    _typeView.hidden = YES;
-    [self.view addSubview:_typeView];
+    self.takeOutTabelView.tableHeaderView  = _typeView;
 }
 
 
-- (void)changeTakeOutType:(UIButton *)button
-{
-//    NSLog(@"3333");
+//- (void)changeTakeOutType:(UIButton *)button
+//{
+////    NSLog(@"3333");
+////    button.selected = !button.selected;
+////    self.typeView.hidden = !button.selected;
+//    [self hiddenTypeView];
+//}
+
+//- (void)hiddenTypeView
+//{
+//    UIButton * button = (UIButton *)[self.view viewWithTag:2000];
 //    button.selected = !button.selected;
 //    self.typeView.hidden = !button.selected;
-    [self hiddenTypeView];
-}
-
-- (void)hiddenTypeView
-{
-    UIButton * button = (UIButton *)[self.view viewWithTag:2000];
-    button.selected = !button.selected;
-    self.typeView.hidden = !button.selected;
-}
+//}
 
 - (void)selectTakeOutType:(UIButton *)button
 {
+    TakeoutTypeController * takeoutTyprVC = [[TakeoutTypeController alloc]init];
     switch (button.tag) {
         case 9000:
         {
-            NSLog(@"零食");
-            [self downloadDataWithCommand:@6 page:_page count:DATA_COUNT type:1];
-            _type = 1;
+            takeoutTyprVC.takeoutType = @"美食";
+            takeoutTyprVC.type = 1;
         }
             break;
         case 9001:
         {
-            NSLog(@"快餐");
-            [self downloadDataWithCommand:@6 page:_page count:DATA_COUNT type:2];
-            _type = 2;
+            takeoutTyprVC.takeoutType = @"甜品饮食";
+            takeoutTyprVC.type = 2;
         }
             break;
         case 9002:
         {
-            NSLog(@"超市");
-            [self downloadDataWithCommand:@6 page:_page count:DATA_COUNT type:3];
-            _type = 3;
+            takeoutTyprVC.takeoutType = @"水果";
+            takeoutTyprVC.type = 3;
         }
             break;
         case 9003:
         {
-            NSLog(@"蛋糕");
-            [self downloadDataWithCommand:@6 page:_page count:DATA_COUNT type:4];
-            _type = 4;
+            takeoutTyprVC.takeoutType = @"超市";
+            takeoutTyprVC.type = 4;
         }
             break;
         case 9004:
         {
-            NSLog(@"奶茶");
-            [self downloadDataWithCommand:@6 page:_page count:DATA_COUNT type:5];
-            _type = 5;
+            takeoutTyprVC.takeoutType = @"零食小吃";
+            takeoutTyprVC.type = 5;
 
         }
             break;
         case 9005:
         {
-            NSLog(@"水果");
-            [self downloadDataWithCommand:@6 page:_page count:DATA_COUNT type:6];
-            _type = 6;
+            takeoutTyprVC.takeoutType = @"鲜花蛋糕";
+            takeoutTyprVC.type = 6;
 
         }
             break;
         case 9006:
         {
             NSLog(@"甜品");
-            [self downloadDataWithCommand:@6 page:_page count:DATA_COUNT type:7];
-            _type = 7;
+            takeoutTyprVC.takeoutType = @"送药上门";
+            takeoutTyprVC.type = 7;
 
         }
             break;
         case 9007:
         {
-            NSLog(@"面食");
-            [self downloadDataWithCommand:@6 page:_page count:DATA_COUNT type:8];
-            _type = 8;
+            takeoutTyprVC.takeoutType = @"蔬菜";
+            takeoutTyprVC.type = 8;
         }
             break;
             
@@ -403,9 +434,12 @@
             break;
     }
     _page = 1;
-    self.typeView.hidden = YES;
-    UIButton * typeBT = (UIButton *)[self.view viewWithTag:2000];
-    typeBT.selected = NO;
+    takeoutTyprVC.hidesBottomBarWhenPushed = YES;
+    [self.navigationController pushViewController:takeoutTyprVC animated:YES];
+    
+//    self.typeView.hidden = YES;
+//    UIButton * typeBT = (UIButton *)[self.view viewWithTag:2000];
+//    typeBT.selected = NO;
 //    [SVProgressHUD showWithStatus:@"正在加载..." maskType:SVProgressHUDMaskTypeClear];
 //    [self.takeOutTabelView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:YES];
 }
@@ -416,8 +450,8 @@
 - (void)headerRereshing
 {
     [self.takeOutTabelView.footer resetNoMoreData];
-    [self downloadDataWithCommand:@6 page:1 count:DATA_COUNT type:_type];
     _page = 1;
+    [self downloadDataWithCommand:@6 page:1 count:DATA_COUNT type:_type];
 }
 
 - (void)footerRereshing
@@ -445,7 +479,7 @@
 - (void)downloadDataWithCommand:(NSNumber *)command page:(int)page count:(int)count type:(int)type
 {
     if ([UserLocation shareUserLocation].city) {
-        _type = type;
+        _type = 0;
         NSDictionary * jsonDic = @{
                                    @"Command":command,
                                    @"CurPage":[NSNumber numberWithInt:page],
@@ -453,7 +487,9 @@
                                    @"Lat":[NSNumber numberWithDouble:[UserLocation shareUserLocation].userLocation.latitude],
                                    @"Lon":[NSNumber numberWithDouble:[UserLocation shareUserLocation].userLocation.longitude],
                                    @"City":[UserLocation shareUserLocation].city,
-                                   @"WakeoutType":[NSNumber numberWithInt:type]
+                                   @"WakeoutType":[NSNumber numberWithInt:0],
+                                   @"SortType":@0,
+                                   @"Favourableactivity":@0
                                    };
         [self playPostWithDictionary:jsonDic];
     }
@@ -489,38 +525,31 @@
 {
     [self.takeOutTabelView.header endRefreshing];
     [self.takeOutTabelView.footer endRefreshing];
-    NSLog(@"+++%@", data);
+//    NSLog(@"+++%@", data);
     if ([[data objectForKey:@"Result"] isEqualToNumber:@1]) {
         NSLog(@"%@", [data objectForKey:@"ErrorMsg"]);
         if ([[data objectForKey:@"Command"] isEqualToNumber:@10006]) {
             self.allCount = [data objectForKey:@"AllCount"];
+            
+            
             NSArray * array = [data objectForKey:@"StoreList"];
             if(_page == 1)
             {
-                _dataArray = nil;
+                if (self.dataArray.count != 0) {
+                    [self.dataArray removeAllObjects];
+                }
             }
-            NSMutableArray * sendArray = [NSMutableArray array];
-            NSMutableArray * noSendAry = [NSMutableArray array];
             NSInteger count = 0;
             for (NSDictionary * dic in array) {
                 TakeOutModel * takeOutMD = [[TakeOutModel alloc] initWithDictionary:dic];
                 if ([takeOutMD.peyType isEqualToNumber:@YES]) {
-                    [sendArray addObject:takeOutMD];
-                }else
-                {
-                    [noSendAry addObject:takeOutMD];
+                    [self.dataArray addObject:takeOutMD];
                 }
                 count++;
-//                [self.dataArray addObject:takeOutMD];
             }
-            if (sendArray.count > 0) {
-                [self.dataArray addObject:sendArray];
-            }
-            if (noSendAry.count > 0) {
-                [self.dataArray addObject:noSendAry];
-            }
+
             [self.takeOutTabelView reloadData];
-            if (count < self.dataArray.count) {
+            if (count > 0) {
                 [self.takeOutTabelView.footer resetNoMoreData];
             }else
             {
@@ -534,22 +563,28 @@
             collectMD.businessName = self.collectModel.storeName;
             collectMD.businessId = self.collectModel.storeId.intValue;
             collectMD.businessType = 2;
-            if ([self.collectDB insert:collectMD]) {
-                NSLog(@"写入数据成功");
-            }else
-            {
-                NSLog(@"写入数据失败");
-            }
-            
+//            if ([self.collectDB insert:collectMD]) {
+//                NSLog(@"写入数据成功");
+//            }else
+//            {
+//                NSLog(@"写入数据失败");
+//            }
+            [UserInfo shareUserInfo].collectCount = [NSNumber numberWithInt:([UserInfo shareUserInfo].collectCount.intValue + 1)];
             UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:@"收藏成功" delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
             [alert show];
             [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:1.5];
         }
     }else
     {
-        UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:[data objectForKey:@"ErrorMsg"] delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
-        [alert show];
-        [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:1.5];
+        if (((NSString *)[data objectForKey:@"ErrorMsg"]).length == 0) {
+            ;
+        }else
+        {
+            
+            UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:[data objectForKey:@"ErrorMsg"] delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
+            [alert show];
+            [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:1.5];
+        }
     }
 }
 
@@ -559,59 +594,6 @@
     [self.takeOutTabelView.footer endRefreshing];
 //    [SVProgressHUD dismiss];
     NSLog(@"%@", error);
-}
-
-
-
-#pragma mark - 定位
-
-- (void)didUpdateBMKUserLocation:(BMKUserLocation *)userLocation
-{
-    //    NSLog(@"title = %@, subtitle = %@", userLocation.title, userLocation.subtitle);
-    if (userLocation.location != nil) {
-        [UserLocation shareUserLocation].userLocation = userLocation.location.coordinate;
-        //发起反向地理编码检索
-        BMKReverseGeoCodeOption *reverseGeoCodeSearchOption = [[BMKReverseGeoCodeOption alloc] init];
-        reverseGeoCodeSearchOption.reverseGeoPoint = userLocation.location.coordinate;
-        BOOL flag = [_geoSearcher reverseGeoCode:reverseGeoCodeSearchOption];
-        if(flag)
-        {
-            NSLog(@"反geo检索发送成功");
-        }
-        else
-        {
-            NSLog(@"反geo检索发送失败");
-        }
-        [self.locService stopUserLocationService];
-    }
-    
-}
-
-- (void)didFailToLocateUserWithError:(NSError *)error
-{
-    NSLog(@"定位失败 error = %@", error);
-    [self.locService stopUserLocationService];
-    [self.locService startUserLocationService];
-}
-
-
-- (void)onGetReverseGeoCodeResult:(BMKGeoCodeSearch *)searcher result:(BMKReverseGeoCodeResult *)result errorCode:(BMKSearchErrorCode)error
-{
-    if (error == BMK_SEARCH_NO_ERROR) {
-        //在此处理正常结果
-        //        result.addressDetail.district
-        NSLog(@"处理结果2 %@, %@, %@ %@", result.address, result.addressDetail.streetName, result.addressDetail.streetNumber, result.addressDetail.district);
-        [UserLocation shareUserLocation].city = result.addressDetail.city;
-        [UserLocation shareUserLocation].streetName = result.addressDetail.streetName;
-        [UserLocation shareUserLocation].streetNumber = result.addressDetail.streetNumber;
-        [UserLocation shareUserLocation].district = result.addressDetail.district;
-        
-        [_loadingImageView removeFromSuperview];
-        self.navigationItem.titleView = _addressBT;
-        [self showLocationAddress];
-    }else {
-        NSLog(@"抱歉，未找到结果");
-    }
 }
 
 
@@ -627,25 +609,26 @@
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-    return self.dataArray.count;
+    return 1;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return [[_dataArray objectAtIndex:section] count];
+    return _dataArray.count;
 }
-
-
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     static NSString * cellIndetifiel = CELL_INDENTIFIER;
-    TakeOutModel * takeOutMD = [[self.dataArray objectAtIndex:indexPath.section] objectAtIndex:indexPath.row];
+    TakeOutModel * takeOutMD = [self.dataArray objectAtIndex:indexPath.row];
     TakeOutViewCell * cell = [tableView dequeueReusableCellWithIdentifier:cellIndetifiel];
     if (!cell) {
         cell = [[TakeOutViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIndetifiel];
     }
     [cell createSubview:tableView.bounds activityCount:(int)takeOutMD.activityArray.count];
+    cell.separatorInset = UIEdgeInsetsZero;
+    cell.preservesSuperviewLayoutMargins = NO;
+    cell.layoutMargins = UIEdgeInsetsZero;
     __weak TakeOutViewController * takeOutVC = self;
     cell.rightButtons = @[[MGSwipeButton buttonWithTitle:@"关注商店" backgroundColor:[UIColor redColor] callback:^BOOL(MGSwipeTableCell *sender) {
         if ([UserInfo shareUserInfo].userId) {
@@ -673,15 +656,44 @@
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    TakeOutModel * takoOutMD = [[self.dataArray objectAtIndex:indexPath.section] objectAtIndex:indexPath.row];
+    TakeOutModel * takoOutMD = [self.dataArray objectAtIndex:indexPath.row];
     return [TakeOutViewCell cellHeightWithTakeOutModel:takoOutMD];
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
 {
-    return 0.1;
+    if (section == 0) {
+        return 40;
+    }else
+    {
+        return 0;
+    }
 }
-
+- (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
+{
+    UIView * headView =[[UIView alloc]initWithFrame:CGRectMake(0, 0, tableView.width, 40)];
+    headView.backgroundColor = [UIColor whiteColor];
+    
+    UIView * lineView = [[UIView alloc]initWithFrame:CGRectMake(10, 12, 1, 15)];
+    lineView.backgroundColor = BACKGROUNDCOLOR;
+    [headView addSubview:lineView];
+    
+    UILabel * label = [[UILabel alloc] initWithFrame:CGRectMake(lineView.right, 12, tableView.width - 20 - 1, 15)];
+    label.textColor = TEXT_COLOR;
+    label.font = [UIFont systemFontOfSize:15];
+    label.text = @" 附近的美食";
+    label.backgroundColor = [UIColor whiteColor];
+    [headView addSubview:label];
+    
+    UIView * bottomView = [[UIView alloc]initWithFrame:CGRectMake(0, headView.bottom - 0.3, headView.width, .3)];
+    bottomView.backgroundColor = [UIColor colorWithWhite:.8 alpha:1];
+    [headView addSubview:bottomView];
+    
+        return headView;
+   
+    
+    
+}
 //- (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
 //{
 //    NSMutableArray * array = [self.dataArray objectAtIndex:section];
@@ -703,13 +715,14 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
-    TakeOutModel * takeOutMD = [[self.dataArray objectAtIndex:indexPath.section] objectAtIndex:indexPath.row];
+    TakeOutModel * takeOutMD = [self.dataArray objectAtIndex:indexPath.row];
     DetailTakeOutViewController * detailTakeOutVC = [[DetailTakeOutViewController alloc] init];
     detailTakeOutVC.takeOutID = takeOutMD.storeId;
     detailTakeOutVC.sendPrice = takeOutMD.sendPrice;
     detailTakeOutVC.outSentMoney = takeOutMD.outSentMoney;
     detailTakeOutVC.storeState = takeOutMD.storeState;
     detailTakeOutVC.storeName = takeOutMD.storeName;
+    detailTakeOutVC.iConimageURL = takeOutMD.icon;
     detailTakeOutVC.navigationItem.title = takeOutMD.storeName;
     detailTakeOutVC.hidesBottomBarWhenPushed = YES;
     [self.navigationController pushViewController:detailTakeOutVC animated:YES];
@@ -719,6 +732,7 @@
 {
     return 0.1;
 }
+
 
 #pragma mark - 点击图片放大
 
@@ -730,7 +744,7 @@
     CGPoint point = self.takeOutTabelView.contentOffset;
     CGRect cellRect = [self.takeOutTabelView rectForRowAtIndexPath:[NSIndexPath indexPathForRow:row inSection:section]];
     CGRect btFrame = button.frame;
-    btFrame.origin.y = cellRect.origin.y - point.y + button.frame.origin.y + self.takeOutTabelView.top;
+    btFrame.origin.y = cellRect.origin.y - point.y + button.frame.origin.y ;
     UITapGestureRecognizer * tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(removeBigImage)];
     
     UIView * view = [[UIView alloc] initWithFrame:[UIScreen mainScreen].bounds];
@@ -741,17 +755,19 @@
     imageView.center = view.center;
     imageView.layer.cornerRadius = 30;
     imageView.layer.masksToBounds = YES;
-    CGRect imageFrame = imageView.frame;
-    imageView.frame = btFrame;
+    
     imageView.image = [UIImage imageNamed:@"superMarket.png"];
-    [view addSubview:imageView];
-    [self.view.window addSubview:view];
     __weak UIImageView * imageV = imageView;
     [imageView setImageWithURL:[NSURL URLWithString:takeOutMd.icon] placeholderImage:[UIImage imageNamed:@"placeholderIM.png"] completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType) {
         if (error) {
             imageV.image = [UIImage imageNamed:@"load_fail.png"];
         }
     }];
+    CGRect imageFrame = imageView.frame;
+    imageView.frame = btFrame;
+    
+    [view addSubview:imageView];
+    [self.view.window addSubview:view];
     [UIView animateWithDuration:1 animations:^{
         imageView.frame = imageFrame;
     }];

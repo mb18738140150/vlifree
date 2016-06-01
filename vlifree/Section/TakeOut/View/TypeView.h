@@ -21,6 +21,6 @@
 @property (nonatomic, strong)UIButton * pastaBT;//面食
 
 
-
+//- (void)createSubviewWithtypeArray:(NSArray *)typearray;
 
 @end
