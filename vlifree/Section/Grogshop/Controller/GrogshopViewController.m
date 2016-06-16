@@ -156,12 +156,12 @@
     if ([CLLocationManager locationServicesEnabled] && [CLLocationManager authorizationStatus] != kCLAuthorizationStatusDenied) {
 
     }
+//    [self.groshopTabelView.header beginRefreshing];
 }
 
 - (void)viewWillDisappear:(BOOL)animated
 {
     [super viewWillDisappear:animated];
-    [self.groshopTabelView.header beginRefreshing];
 }
 /**
  *  检测是否已经定位成功了

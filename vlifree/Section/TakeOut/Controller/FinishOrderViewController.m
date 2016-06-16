@@ -1003,14 +1003,12 @@
     return @"";
 }
 
-
 -(NSString*)utf8toGbk:(NSString*)str
 {
     NSStringEncoding enc = CFStringConvertEncodingToNSStringEncoding(kCFStringEncodingGB_18030_2000);
     NSString* str1 = [str stringByReplacingPercentEscapesUsingEncoding:enc];
     return str1;
 }
-
 
 -(void)BDWalletPayResultWithCode:(int)statusCode payDesc:(NSString*)payDesc;
 {
@@ -1022,8 +1020,6 @@
 
 - (void)logEventId:(NSString*)eventId eventDesc:(NSString*)eventDesc;
 {}
-
-
 
 #pragma mark - 微信支付
 
@@ -1086,7 +1082,6 @@
     }
     
 }
-
 
 - (void)sendPay_demo
 {
@@ -1178,7 +1173,6 @@
     return md5Sign;
 }
 
-
 //客户端提示信息
 - (void)alert:(NSString *)title msg:(NSString *)msg
 {
@@ -1220,9 +1214,6 @@
     freeifaddrs(interfaces);
     return address;
 }
-
-
-
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.

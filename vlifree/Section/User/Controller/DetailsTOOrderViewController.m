@@ -919,9 +919,7 @@
                            };
     [self playPostWithDictionary:dic];
 //    [SVProgressHUD showWithStatus:@"取消请求中..." maskType:SVProgressHUDMaskTypeClear];
-   
 }
-
 
 - (void)confirmOrder:(UIButton *)button
 {

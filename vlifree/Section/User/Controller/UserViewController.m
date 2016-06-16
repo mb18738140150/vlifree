@@ -439,6 +439,9 @@
                                                                     };
     self.navigationController.navigationBar.barTintColor = [UIColor whiteColor];
     
+    [self.navigationController.navigationBar setBackgroundImage:nil forBarMetrics:UIBarMetricsDefault];
+    [self.navigationController.navigationBar setShadowImage:nil];
+    
 //    [[NSUserDefaults standardUserDefaults] objectForKey:@"haveLogIn"];
 //    if ([[[NSUserDefaults standardUserDefaults] objectForKey:@"haveLogIn"] intValue] == 1) {
 //        NSLog(@"已经登录了");
@@ -496,6 +499,7 @@
 }
 - (void)viewDidAppear:(BOOL)animated
 {
+    
     if ([UserInfo shareUserInfo].userId) {
         if (self.myScrollView.top != 64) {
             self.navigationController.navigationBar.alpha = 0;
@@ -511,6 +515,8 @@
             [self.colloctTableView.header beginRefreshing];
         }
     }
+    
+    NSLog(@"******%f", self.myScrollView.top);
     
 ////    if (self.mSegmentControl.selectIndex == 0) {
 ////        _takeoutPage = 1;

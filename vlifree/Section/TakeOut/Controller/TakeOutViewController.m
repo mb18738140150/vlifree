@@ -118,11 +118,14 @@
     [super viewWillAppear:animated];
     self.navigationController.navigationBar.tintColor = [UIColor blackColor];
     self.navigationController.navigationBar.barTintColor = [UIColor whiteColor];
-    [self downloadData];
+//    [self downloadData];
 //    [self.takeOutTabelView headerEndRefreshing];
 }
-
-
+- (void)viewWillDisappear:(BOOL)animated
+{
+    [super viewWillDisappear:animated];
+    //    [self.takeOutTabelView headerEndRefreshing];
+}
 - (void)viewDidLoad {
     [super viewDidLoad];
     
@@ -329,11 +332,7 @@
 }
 
 
-- (void)viewWillDisappear:(BOOL)animated
-{
-    [super viewWillDisappear:animated];
-//    [self.takeOutTabelView headerEndRefreshing];
-}
+
 
 #pragma mark - 搜索
 - (void)searchTakeOut:(id)sender

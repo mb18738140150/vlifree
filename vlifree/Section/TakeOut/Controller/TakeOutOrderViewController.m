@@ -726,7 +726,7 @@
 
 - (void)refresh:(id)data
 {
-    NSLog(@"+++%@", data);
+    NSLog(@"+++%@", [data description]);
     [self.hud dismiss];
     self.hud = nil;
     if ([[data objectForKey:@"Result"] isEqualToNumber:@1])
@@ -767,9 +767,10 @@
         }
     }else
     {
-        UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:[data objectForKey:@"ErrorMsg"] delegate:nil cancelButtonTitle:nil otherButtonTitles:nil, nil];
+        UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:[data objectForKey:@"ErrorMsg"] delegate:nil cancelButtonTitle:nil otherButtonTitles:@"yes", nil];
         [alert show];
-        [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:1.5];
+//        [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:1.5];
+        NSLog(@"%@",[data objectForKey:@"ErrorMsg"] );
     }
     //    [SVProgressHUD dismiss];
 }

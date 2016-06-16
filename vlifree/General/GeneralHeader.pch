@@ -90,7 +90,8 @@
  */
 #define WINDOW_WIDHT [UIScreen mainScreen].bounds.size.width
 
-
+// 高德 appkey
+#define gaodeAppKey @"a9ad6d209e94accc5ddebad1ed6477e5"
 
 #pragma mark -- 系统和设备区分
 #define ios7 ([[UIDevice currentDevice].systemVersion doubleValue] >= 7.0)
