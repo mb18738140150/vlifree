@@ -12,6 +12,6 @@
 
 
 - (void)showUserInfoViewWithCode:(NSString *)code;
-
+- (void)loginAgainAction;
 
 @end

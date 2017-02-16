@@ -40,7 +40,7 @@
 #define SHOPPINGCARVIEW_HEIGHT 55
 
 
-@interface DetailTakeOutViewController ()<UITableViewDataSource, UITableViewDelegate, HTTPPostDelegate, HYSegmentedControlDelegate, UIScrollViewDelegate>
+@interface DetailTakeOutViewController ()<UITableViewDataSource, UITableViewDelegate, HTTPPostDelegate, HYSegmentedControlDelegate, UIScrollViewDelegate, CAAnimationDelegate>
 
 {
     /**

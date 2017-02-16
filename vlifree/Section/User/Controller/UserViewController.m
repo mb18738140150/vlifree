@@ -497,6 +497,27 @@
         _logInView.weixinButton.hidden = YES;
     }
 }
+
+- (void)loginAgainAction
+{
+    _logInView.hidden = NO;
+    if (![WXApi isWXAppInstalled]) {
+        _logInView.weixinButton.hidden = YES;
+    }
+    _logInView.passwordTF.text = @"";
+    _myScrollView.hidden = YES;
+    //        [UIView beginAnimations:nil context:nil];
+    //        [UIView setAnimationDuration:1];
+    //        [UIView setAnimationTransition:UIViewAnimationTransitionCurlUp forView:_myScrollView cache:YES];
+    //        [UIView commitAnimations];
+    self.navigationItem.title = @"登录";
+    [self.navigationItem.rightBarButtonItem setImage:nil];
+    self.navigationItem.rightBarButtonItem.enabled = NO;
+    if (![WXApi isWXAppInstalled]) {
+        _logInView.weixinButton.hidden = YES;
+    }
+}
+
 - (void)viewDidAppear:(BOOL)animated
 {
     

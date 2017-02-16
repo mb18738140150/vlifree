@@ -767,7 +767,7 @@
         }
     }else
     {
-        UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:[data objectForKey:@"ErrorMsg"] delegate:nil cancelButtonTitle:nil otherButtonTitles:@"yes", nil];
+        UIAlertView * alert = [[UIAlertView alloc] initWithTitle:nil message:[data objectForKey:@"ErrorMsg"] delegate:nil cancelButtonTitle:nil otherButtonTitles:@"确认", nil];
         [alert show];
 //        [alert performSelector:@selector(dismissAnimated:) withObject:nil afterDelay:1.5];
         NSLog(@"%@",[data objectForKey:@"ErrorMsg"] );

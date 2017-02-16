@@ -731,7 +731,7 @@
 
 - (void)refresh:(id)data
 {
-    NSLog(@"+++%@", [data description]);
+    NSLog(@"PayReq = +++ = %@", [data description]);
     [self.hud dismiss];
     self.hud = nil;
     if ([[data objectForKey:@"Result"] isEqualToNumber:@1])
@@ -761,6 +761,10 @@
                 req.timeStamp           = stamp.intValue;
                 req.package             = [NSString stringWithFormat:@"%@", [data objectForKey:@"Package"]];
                 req.sign                = [NSString stringWithFormat:@"%@", [data objectForKey:@"Sign"]];
+                
+                NSLog(@"stamp = %@", stamp);
+                
+                
                 //            req.sign = sign;
                 BOOL a = [WXApi sendReq:req];
                 NSLog(@"%d", a);

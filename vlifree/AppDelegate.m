@@ -25,11 +25,18 @@
 #import <AVFoundation/AVFoundation.h>
 #import <AudioToolbox/AudioToolbox.h>
 
+#ifdef NSFoundationVersionNumber_iOS_9_x_Max
+#import <UserNotifications/UserNotifications.h>
+#endif
+// 如果需要使用idfa功能所需要引入的头文件（可选）
+#import <AdSupport/AdSupport.h>
+
+
 #import "Reachability.h"
 //#import "AFAppDotNetAPIClient.h"
 
 
-@interface AppDelegate ()<WXApiDelegate, HTTPPostDelegate, BMKGeneralDelegate>
+@interface AppDelegate ()<WXApiDelegate, HTTPPostDelegate, BMKGeneralDelegate, JPUSHRegisterDelegate>
 
 @property (nonatomic, strong)NSTimer * noticeTimer;
 @property (nonatomic, strong)MyTabBarController * myTabBarVC;
@@ -92,23 +99,23 @@
     [[QMSSearchServices sharedServices] setApiKey:@"FK4BZ-FIY35-SCVIC-QLRZK-ZYH23-PAFOX"];
     
     
+    JPUSHRegisterEntity * entity = [[JPUSHRegisterEntity alloc] init];
+    entity.types = JPAuthorizationOptionAlert|JPAuthorizationOptionBadge|JPAuthorizationOptionSound;
     if ([[UIDevice currentDevice].systemVersion floatValue] >= 8.0) {
-        [JPUSHService registerForRemoteNotificationTypes:(UIUserNotificationTypeBadge | UIUserNotificationTypeSound | UIUserNotificationTypeAlert) categories:nil];
-    }else
-    {
-        [JPUSHService registerForRemoteNotificationTypes:(UIRemoteNotificationTypeBadge |
-                                                          UIRemoteNotificationTypeSound |
-                                                          UIRemoteNotificationTypeAlert)
-                                              categories:nil];
+        //可以添加自定义categories
+        //    if ([[UIDevice currentDevice].systemVersion floatValue] >= 10.0) {
+        //      NSSet<UNNotificationCategory *> *categories;
+        //      entity.categories = categories;
+        //    }
+        //    else {
+        //      NSSet<UIUserNotificationCategory *> *categories;
+        //      entity.categories = categories;
+        //    }
     }
+    [JPUSHService registerForRemoteNotificationConfig:entity delegate:self];
     
     [JPUSHService setupWithOption:launchOptions appKey:JPappKey channel:JPchannel apsForProduction:isProductionJP advertisingIdentifier:nil];
 
-//    [APService registerForRemoteNotificationTypes:(UIUserNotificationTypeAlert |
-//                                                   UIUserNotificationTypeBadge |
-//                                                   UIUserNotificationTypeSound)
-//                                       categories:nil];
-//    [APService setupWithOption:launchOptions];
     
     
     if ([[[NSUserDefaults standardUserDefaults] objectForKey:@"haveLogIn"] isEqualToNumber:@YES]) {
@@ -316,7 +323,6 @@
 //        NSString * 
         
         
-        
         [[AlipaySDK defaultService] processOrderWithPaymentResult:url standbyCallback:^(NSDictionary *resultDic) {
             NSLog(@"****短**** result = %@",resultDic);
             
@@ -350,12 +356,9 @@
     }else
     {
         return [WXApi handleOpenURL:url delegate:self];
-        
     }
     
 }
-
-
 
 - (void)applicationWillResignActive:(UIApplication *)application {
     [BMKMapView willBackGround];
@@ -386,24 +389,24 @@
 //    NSLog(@"%@", [NSString stringWithFormat:@"Device Token: %@", deviceToken]);
     [JPUSHService registerDeviceToken:deviceToken];
     NSString * registrationID = [JPUSHService registrationID];
-    NSLog(@"registrID = %@", registrationID);
+    NSLog(@"*********registrID = %@", registrationID);
     
     if (registrationID.length == 0) {
         self.noticeTimer = [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(scrollNotice) userInfo:nil repeats:YES];
     }else
     {
         [[NSUserDefaults standardUserDefaults] setObject:registrationID forKey:@"registrationID"];
+        if ([UserInfo shareUserInfo].userId) {
+            NSDictionary * dic = @{
+                                   @"Command":@36,
+                                   @"UserId":[UserInfo shareUserInfo].userId,
+                                   @"Device":@1,
+                                   @"CID":registrationID
+                                   };
+            [self playPostWithDictionary:dic];
+        }
     }
     
-    if ([UserInfo shareUserInfo].userId) {
-        NSDictionary * dic = @{
-                               @"Command":@36,
-                               @"UserId":[UserInfo shareUserInfo].userId,
-                               @"Device":@1,
-                               @"CID":registrationID
-                               };
-        [self playPostWithDictionary:dic];
-    }
 }
 - (void)scrollNotice
 {
@@ -431,66 +434,6 @@
 
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
 {
-    
-//    [self playSound];
-    
-    if ([[[userInfo objectForKey:@"aps"] objectForKey:@"alert"] isEqualToString:@"微生活提醒你，你的帐号在别的设备登录，您已被退出"]) {
-        UIAlertController * alertcontroller = [UIAlertController alertControllerWithTitle:@"提示" message:@"您的账号已在另一台设备登录" preferredStyle:UIAlertControllerStyleAlert];
-        
-        UINavigationController * nav = (UINavigationController *)self.window.rootViewController;
-        
-        UIAlertAction * cameraAction = [UIAlertAction actionWithTitle:@"退出登录" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            NSLog(@"你点击了退出登录");
-            [[NSUserDefaults standardUserDefaults] setValue:@NO forKey:@"haveLogin"];
-            [[NSUserDefaults standardUserDefaults] setValue:@"" forKey:@"Pwd"];
-            [(UINavigationController *)self.window.rootViewController popToRootViewControllerAnimated:YES];
-            
-        }];
-        
-        UIAlertAction * libraryAction = [UIAlertAction actionWithTitle:@"重新登录" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            
-            NSString * passWord = [[NSUserDefaults standardUserDefaults] objectForKey:@"Pwd"];
-            NSString * name = [[NSUserDefaults standardUserDefaults] objectForKey:@"UserName"];
-            NSLog(@"你点击了重新登录");
-            
-            NSDictionary * jsonDic = nil;
-            if ([[NSUserDefaults standardUserDefaults] objectForKey:@"RegistrationID"]) {
-                jsonDic = @{
-                            @"Pwd":passWord,
-                            @"UserName":name,
-                            @"Command":@5,
-                            @"RegistrationID":[[NSUserDefaults standardUserDefaults] objectForKey:@"RegistrationID"],
-                            @"DeviceType":@1
-                            };
-            }else
-            {
-                jsonDic = @{
-                            @"Pwd":passWord,
-                            @"UserName":name,
-                            @"Command":@5,
-                            @"RegistrationID":[NSNull null],
-                            @"DeviceType":@1
-                            };
-            }
-            NSString * jsonStr = [jsonDic JSONString];
-            NSString * str = [NSString stringWithFormat:@"%@231618", jsonStr];
-            NSLog(@"jsonStr = %@", str);
-            NSString * md5Str = [str md5];
-            NSString * urlString = [NSString stringWithFormat:@"%@%@", POST_URL, md5Str];
-            HTTPPost * httpPost = [HTTPPost shareHTTPPost];
-            [httpPost post:urlString HTTPBody:[jsonStr dataUsingEncoding:NSUTF8StringEncoding]];
-            httpPost.delegate = self;
-            
-        }];
-        
-        [alertcontroller addAction:cameraAction];
-        [alertcontroller addAction:libraryAction];
-        [nav presentViewController:alertcontroller animated:YES completion:nil];
-        
-        
-    }
-    
-     NSLog(@"11%@, %@", userInfo, [[userInfo objectForKey:@"aps"] objectForKey:@"alert"]);
     
     [JPUSHService handleRemoteNotification:userInfo];
     completionHandler(UIBackgroundFetchResultNewData);
@@ -552,6 +495,150 @@ static SystemSoundID shake_sound_male_id = 0;
             [[NSNotificationCenter defaultCenter] postNotificationName:@"login" object:nil];
         }
     }
+}
+
+#ifdef NSFoundationVersionNumber_iOS_9_x_Max
+#pragma mark- JPUSHRegisterDelegate
+- (void)jpushNotificationCenter:(UNUserNotificationCenter *)center willPresentNotification:(UNNotification *)notification withCompletionHandler:(void (^)(NSInteger))completionHandler {
+    NSDictionary * userInfo = notification.request.content.userInfo;
+    
+    UNNotificationRequest *request = notification.request; // 收到推送的请求
+    UNNotificationContent *content = request.content; // 收到推送的消息内容
+    
+    NSNumber *badge = content.badge;  // 推送消息的角标
+    NSString *body = content.body;    // 推送消息体
+    UNNotificationSound *sound = content.sound;  // 推送消息的声音
+    NSString *subtitle = content.subtitle;  // 推送消息的副标题
+    NSString *title = content.title;  // 推送消息的标题
+    
+    if([notification.request.trigger isKindOfClass:[UNPushNotificationTrigger class]]) {
+        [JPUSHService handleRemoteNotification:userInfo];
+        NSLog(@"iOS10 前台收到远程通知:%@", [self logDic:userInfo]);
+        
+        [self operationNotification:userInfo];
+        
+    }
+    else {
+        // 判断为本地通知
+        NSLog(@"iOS10 前台收到本地通知:{\nbody:%@，\ntitle:%@,\nsubtitle:%@,\nbadge：%@，\nsound：%@，\nuserInfo：%@\n}",body,title,subtitle,badge,sound,userInfo);
+    }
+    completionHandler(UNNotificationPresentationOptionBadge|UNNotificationPresentationOptionSound); // 需要执行这个方法，选择是否提醒用户，有Badge、Sound、Alert三种类型可以设置
+}
+
+- (void)jpushNotificationCenter:(UNUserNotificationCenter *)center didReceiveNotificationResponse:(UNNotificationResponse *)response withCompletionHandler:(void (^)())completionHandler {
+    
+    NSDictionary * userInfo = response.notification.request.content.userInfo;
+    UNNotificationRequest *request = response.notification.request; // 收到推送的请求
+    UNNotificationContent *content = request.content; // 收到推送的消息内容
+    
+    NSNumber *badge = content.badge;  // 推送消息的角标
+    NSString *body = content.body;    // 推送消息体
+    UNNotificationSound *sound = content.sound;  // 推送消息的声音
+    NSString *subtitle = content.subtitle;  // 推送消息的副标题
+    NSString *title = content.title;  // 推送消息的标题
+    
+    if([response.notification.request.trigger isKindOfClass:[UNPushNotificationTrigger class]]) {
+        [JPUSHService handleRemoteNotification:userInfo];
+        NSLog(@"iOS10 收到远程通知:%@", [self logDic:userInfo]);
+        [self operationNotification:userInfo];
+        
+    }
+    else {
+        // 判断为本地通知
+        NSLog(@"iOS10 收到本地通知:{\nbody:%@，\ntitle:%@,\nsubtitle:%@,\nbadge：%@，\nsound：%@，\nuserInfo：%@\n}",body,title,subtitle,badge,sound,userInfo);
+    }
+    
+    completionHandler();  // 系统要求执行这个方法
+}
+#endif
+
+- (void)operationNotification:(NSDictionary *)userInfo
+{
+    if ([[[userInfo objectForKey:@"aps"] objectForKey:@"alert"] isEqualToString:@"微生活提醒你，你的帐号在别的设备登录，您已被退出"]) {
+        UIAlertController * alertcontroller = [UIAlertController alertControllerWithTitle:@"提示" message:@"您的账号已在另一台设备登录" preferredStyle:UIAlertControllerStyleAlert];
+        
+        UINavigationController * nav = (UINavigationController *)self.window.rootViewController;
+        
+        UIAlertAction * cameraAction = [UIAlertAction actionWithTitle:@"退出登录" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            NSLog(@"你点击了退出登录");
+            [UserInfo shareUserInfo].userId = nil;
+            [[NSUserDefaults standardUserDefaults] setValue:@NO forKey:@"haveLogin"];
+            [[NSUserDefaults standardUserDefaults] setValue:@"" forKey:@"password"];
+            if (self.myTabBarVC.selectedIndex == 3) {
+                UINavigationController * nav = self.myTabBarVC.selectedViewController;
+                [nav popToViewController:[nav.viewControllers objectAtIndex:0] animated:YES];
+                [[nav.viewControllers objectAtIndex:0] loginAgainAction];
+            }else
+            {
+                self.myTabBarVC.selectedIndex = 3;
+            }
+            
+        }];
+        
+        UIAlertAction * libraryAction = [UIAlertAction actionWithTitle:@"重新登录" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            
+            NSString * passWord = [[NSUserDefaults standardUserDefaults] objectForKey:@"password"];
+            NSString * name = [[NSUserDefaults standardUserDefaults] objectForKey:@"account"];
+            NSLog(@"你点击了重新登录");
+            
+            NSDictionary * jsonDic = nil;
+            if ([[NSUserDefaults standardUserDefaults] objectForKey:@"RegistrationID"]) {
+                jsonDic = @{
+                            @"Pwd":passWord,
+                            @"UserName":name,
+                            @"Command":@5,
+                            @"RegistrationID":[[NSUserDefaults standardUserDefaults] objectForKey:@"RegistrationID"],
+                            @"DeviceType":@1
+                            };
+            }else
+            {
+                jsonDic = @{
+                            @"Pwd":passWord,
+                            @"UserName":name,
+                            @"Command":@5,
+                            @"RegistrationID":[NSNull null],
+                            @"DeviceType":@1
+                            };
+            }
+            NSString * jsonStr = [jsonDic JSONString];
+            NSString * str = [NSString stringWithFormat:@"%@231618", jsonStr];
+            NSLog(@"jsonStr = %@", str);
+            NSString * md5Str = [str md5];
+            NSString * urlString = [NSString stringWithFormat:@"%@%@", POST_URL, md5Str];
+            HTTPPost * httpPost = [HTTPPost shareHTTPPost];
+            [httpPost post:urlString HTTPBody:[jsonStr dataUsingEncoding:NSUTF8StringEncoding]];
+            httpPost.delegate = self;
+            
+        }];
+        
+        [alertcontroller addAction:cameraAction];
+        [alertcontroller addAction:libraryAction];
+        [nav presentViewController:alertcontroller animated:YES completion:nil];
+        
+        
+    }
+}
+
+// log NSSet with UTF8
+// if not ,log will be \Uxxx
+- (NSString *)logDic:(NSDictionary *)dic {
+    if (![dic count]) {
+        return nil;
+    }
+    NSString *tempStr1 =
+    [[dic description] stringByReplacingOccurrencesOfString:@"\\u"
+                                                 withString:@"\\U"];
+    NSString *tempStr2 =
+    [tempStr1 stringByReplacingOccurrencesOfString:@"\"" withString:@"\\\""];
+    NSString *tempStr3 =
+    [[@"\"" stringByAppendingString:tempStr2] stringByAppendingString:@"\""];
+    NSData *tempData = [tempStr3 dataUsingEncoding:NSUTF8StringEncoding];
+    NSString *str =
+    [NSPropertyListSerialization propertyListFromData:tempData
+                                     mutabilityOption:NSPropertyListImmutable
+                                               format:NULL
+                                     errorDescription:NULL];
+    return str;
 }
 
 

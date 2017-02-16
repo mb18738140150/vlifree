@@ -31,7 +31,6 @@
 		7329E3901B1C059F0058137E /* GSOrderPayViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7329E38F1B1C059F0058137E /* GSOrderPayViewController.m */; };
 		7329E3931B1C373A0058137E /* CustomSearchBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 7329E3921B1C373A0058137E /* CustomSearchBar.m */; };
 		7329E3961B1C5B2C0058137E /* tel_order_detail_icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 7329E3951B1C5B2C0058137E /* tel_order_detail_icon.png */; };
-		732CFEF31CFC1F79000B19DD /* jpush-ios-2.1.7.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 732CFEF01CFC1F79000B19DD /* jpush-ios-2.1.7.a */; };
 		733163F51CC7147F0049A353 /* MBProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = 733163F31CC7147F0049A353 /* MBProgressHUD.m */; };
 		733819301B0ACB1E00E9F8AD /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 7338192F1B0ACB1E00E9F8AD /* main.m */; };
 		733819331B0ACB1E00E9F8AD /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 733819321B0ACB1E00E9F8AD /* AppDelegate.m */; };
@@ -438,6 +437,9 @@
 		73B1D71B1CB74C1D004D1FAA /* back_r_top.png in Resources */ = {isa = PBXBuildFile; fileRef = 73B1D71A1CB74C1D004D1FAA /* back_r_top.png */; };
 		73C95BD81C86DA3800A62823 /* check_list.png in Resources */ = {isa = PBXBuildFile; fileRef = 73C95BD61C86DA3800A62823 /* check_list.png */; };
 		73C95BD91C86DA3800A62823 /* hong_bao_bg.png in Resources */ = {isa = PBXBuildFile; fileRef = 73C95BD71C86DA3800A62823 /* hong_bao_bg.png */; };
+		73D4F0951E558AD5003DF81E /* jcore-ios-1.1.1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 73D4F0921E558AD5003DF81E /* jcore-ios-1.1.1.a */; };
+		73D4F0961E558AD5003DF81E /* jpush-ios-3.0.2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 73D4F0931E558AD5003DF81E /* jpush-ios-3.0.2.a */; };
+		73D4F0981E558AF9003DF81E /* libresolv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 73D4F0971E558AF9003DF81E /* libresolv.tbd */; };
 		73D65AB11B12F99A002A22FE /* ClassesViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 73D65AB01B12F99A002A22FE /* ClassesViewCell.m */; };
 		73D65AB41B13084E002A22FE /* MenusViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 73D65AB31B13084E002A22FE /* MenusViewCell.m */; };
 		73D65AB71B1315D0002A22FE /* add.png in Resources */ = {isa = PBXBuildFile; fileRef = 73D65AB51B1315D0002A22FE /* add.png */; };
@@ -504,8 +506,6 @@
 		7329E3921B1C373A0058137E /* CustomSearchBar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CustomSearchBar.m; sourceTree = "<group>"; };
 		7329E3941B1C48690058137E /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/LaunchScreen.strings"; sourceTree = "<group>"; };
 		7329E3951B1C5B2C0058137E /* tel_order_detail_icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tel_order_detail_icon.png; sourceTree = "<group>"; };
-		732CFEF01CFC1F79000B19DD /* jpush-ios-2.1.7.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "jpush-ios-2.1.7.a"; sourceTree = "<group>"; };
-		732CFEF11CFC1F79000B19DD /* JPUSHService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JPUSHService.h; sourceTree = "<group>"; };
 		733163F21CC7147F0049A353 /* MBProgressHUD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MBProgressHUD.h; sourceTree = "<group>"; };
 		733163F31CC7147F0049A353 /* MBProgressHUD.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBProgressHUD.m; sourceTree = "<group>"; };
 		733163F91CC718FF0049A353 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
@@ -1192,6 +1192,11 @@
 		73B1D71A1CB74C1D004D1FAA /* back_r_top.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = back_r_top.png; sourceTree = "<group>"; };
 		73C95BD61C86DA3800A62823 /* check_list.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = check_list.png; sourceTree = "<group>"; };
 		73C95BD71C86DA3800A62823 /* hong_bao_bg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = hong_bao_bg.png; sourceTree = "<group>"; };
+		73D4F0921E558AD5003DF81E /* jcore-ios-1.1.1.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "jcore-ios-1.1.1.a"; sourceTree = "<group>"; };
+		73D4F0931E558AD5003DF81E /* jpush-ios-3.0.2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "jpush-ios-3.0.2.a"; sourceTree = "<group>"; };
+		73D4F0941E558AD5003DF81E /* JPUSHService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JPUSHService.h; sourceTree = "<group>"; };
+		73D4F0971E558AF9003DF81E /* libresolv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libresolv.tbd; path = usr/lib/libresolv.tbd; sourceTree = SDKROOT; };
+		73D4F0991E558B13003DF81E /* vlifree.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = vlifree.entitlements; sourceTree = "<group>"; };
 		73D65AAF1B12F99A002A22FE /* ClassesViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ClassesViewCell.h; sourceTree = "<group>"; };
 		73D65AB01B12F99A002A22FE /* ClassesViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ClassesViewCell.m; sourceTree = "<group>"; };
 		73D65AB21B13084E002A22FE /* MenusViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MenusViewCell.h; sourceTree = "<group>"; };
@@ -1215,6 +1220,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				73D4F0981E558AF9003DF81E /* libresolv.tbd in Frameworks */,
 				73A29B2B1CA0EA88005BA705 /* libsqlite3.0.tbd in Frameworks */,
 				736E947C1C2E23E3006176AE /* CoreMotion.framework in Frameworks */,
 				736E947A1C2E239B006176AE /* CoreText.framework in Frameworks */,
@@ -1222,8 +1228,8 @@
 				736E94781C2E2233006176AE /* libc++.tbd in Frameworks */,
 				736D98B41B6CD265007CBB79 /* libstdc++.6.dylib in Frameworks */,
 				7314D1E91CFE6DF100FE4578 /* libWeChatSDK.a in Frameworks */,
+				73D4F0951E558AD5003DF81E /* jcore-ios-1.1.1.a in Frameworks */,
 				736D98B21B6CD246007CBB79 /* CoreMedia.framework in Frameworks */,
-				732CFEF31CFC1F79000B19DD /* jpush-ios-2.1.7.a in Frameworks */,
 				736D98B01B6CD229007CBB79 /* MediaPlayer.framework in Frameworks */,
 				736D98AE1B6CD211007CBB79 /* AVFoundation.framework in Frameworks */,
 				736D98AC1B6CD1F7007CBB79 /* StoreKit.framework in Frameworks */,
@@ -1245,6 +1251,7 @@
 				73464FBD1B1D3DAB000C3E9D /* Foundation.framework in Frameworks */,
 				736E94801C2E2D27006176AE /* libcrypto.a in Frameworks */,
 				73464FBB1B1D3D99000C3E9D /* QuartzCore.framework in Frameworks */,
+				73D4F0961E558AD5003DF81E /* jpush-ios-3.0.2.a in Frameworks */,
 				73464FB91B1D3D8D000C3E9D /* MapKit.framework in Frameworks */,
 				736E94741C2E2140006176AE /* AlipaySDK.framework in Frameworks */,
 				73464FB71B1D3D77000C3E9D /* ImageIO.framework in Frameworks */,
@@ -1286,21 +1293,12 @@
 		2477CB33367636F8CB61DC97 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				73D4F0971E558AF9003DF81E /* libresolv.tbd */,
 				733163F91CC718FF0049A353 /* libz.tbd */,
 				73A29B2A1CA0EA88005BA705 /* libsqlite3.0.tbd */,
 				8A85160B12179A9CC646DF19 /* libPods.a */,
 			);
 			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		732CFEF21CFC1F79000B19DD /* lib */ = {
-			isa = PBXGroup;
-			children = (
-				732CFEF01CFC1F79000B19DD /* jpush-ios-2.1.7.a */,
-				732CFEF11CFC1F79000B19DD /* JPUSHService.h */,
-			);
-			name = lib;
-			path = ../lib;
 			sourceTree = "<group>";
 		};
 		733819211B0ACB1E00E9F8AD = {
@@ -1327,6 +1325,7 @@
 		7338192C1B0ACB1E00E9F8AD /* vlifree */ = {
 			isa = PBXGroup;
 			children = (
+				73D4F0991E558B13003DF81E /* vlifree.entitlements */,
 				733819311B0ACB1E00E9F8AD /* AppDelegate.h */,
 				733819321B0ACB1E00E9F8AD /* AppDelegate.m */,
 				733819651B0ACE4100E9F8AD /* MyTabBarController.h */,
@@ -1822,7 +1821,7 @@
 		73464F731B1D3B3E000C3E9D /* Framework */ = {
 			isa = PBXGroup;
 			children = (
-				732CFEF21CFC1F79000B19DD /* lib */,
+				73D4F0911E558AD5003DF81E /* Lib */,
 				73A950221C9BA87200CC4E4A /* 腾讯地图 */,
 				736E947B1C2E23E3006176AE /* CoreMotion.framework */,
 				736E94791C2E239B006176AE /* CoreText.framework */,
@@ -2463,6 +2462,16 @@
 			name = "外卖筛选排序";
 			sourceTree = "<group>";
 		};
+		73D4F0911E558AD5003DF81E /* Lib */ = {
+			isa = PBXGroup;
+			children = (
+				73D4F0921E558AD5003DF81E /* jcore-ios-1.1.1.a */,
+				73D4F0931E558AD5003DF81E /* jpush-ios-3.0.2.a */,
+				73D4F0941E558AD5003DF81E /* JPUSHService.h */,
+			);
+			path = Lib;
+			sourceTree = "<group>";
+		};
 		73DEE76C1CA5359600A1C10E /* 外卖分类 */ = {
 			isa = PBXGroup;
 			children = (
@@ -2640,8 +2649,12 @@
 					733819291B0ACB1E00E9F8AD = {
 						CreatedOnToolsVersion = 6.3;
 						DevelopmentTeam = 26NQNZ7FXL;
+						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.BackgroundModes = {
+								enabled = 1;
+							};
+							com.apple.Push = {
 								enabled = 1;
 							};
 						};
@@ -3258,7 +3271,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_CXX_LIBRARY = "libstdc++";
+				CODE_SIGN_ENTITLEMENTS = vlifree/vlifree.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer: fuqian yu (X7Q7RAWEB7)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = NO;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -3294,13 +3310,15 @@
 					"$(PROJECT_DIR)/vlifree/Vendors",
 					"$(PROJECT_DIR)/lib",
 					"$(SRCROOT)/lib",
+					"$(PROJECT_DIR)/Framework/Lib",
 				);
 				OTHER_LDFLAGS = (
 					"-all_load",
 					"-ObjC",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "968defd6-d0c0-4e17-b994-7d70b8e10f96";
+				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				VALID_ARCHS = "armv7 armv7s arm64";
 			};
 			name = Debug;
@@ -3312,7 +3330,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_CXX_LIBRARY = "libstdc++";
+				CODE_SIGN_ENTITLEMENTS = vlifree/vlifree.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution: fuqian yu (26NQNZ7FXL)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = NO;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -3348,13 +3369,15 @@
 					"$(PROJECT_DIR)/vlifree/Vendors",
 					"$(PROJECT_DIR)/lib",
 					"$(SRCROOT)/lib",
+					"$(PROJECT_DIR)/Framework/Lib",
 				);
 				OTHER_LDFLAGS = (
 					"-all_load",
 					"-ObjC",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "968defd6-d0c0-4e17-b994-7d70b8e10f96";
+				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				VALID_ARCHS = "armv7 armv7s arm64";
 			};
 			name = Release;

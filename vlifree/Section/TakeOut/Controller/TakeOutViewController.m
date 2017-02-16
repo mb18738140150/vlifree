@@ -555,7 +555,6 @@
                 [self.takeOutTabelView.footer noticeNoMoreData];
             }
             
-            
         }else if([[data objectForKey:@"Command"] isEqualToNumber:@10028])
         {
             CollectStoreModel * collectMD = [[CollectStoreModel alloc]init];
